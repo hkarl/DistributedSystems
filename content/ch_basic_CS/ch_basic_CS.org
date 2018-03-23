@@ -1,103 +1,287 @@
 
+* Background: System model 
 
-
-* Section B.1.1
-
-
-** Some subsection 
-*** Slide a
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-
-*** Slide b
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-*** Slide c
-
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-*** Slide d
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-
-* Section B.1.2
-
-*** Slide a
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-
-*** Slide b
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-*** Slide c
+*** System models and system aspects
+ Generic modeling issues 
+ - Data exchange paradigm?
+ - Time behavior?
+ - Fault assumptions?
+ - Security?
+ - 
+ - 
+ - 
+ - Main system aspects for distributed systems
+ - Hardware: Capabilities and restrictions 
+ - Software: Services made available by software on top of hardware to abstract away details – “operating system” 
+ - Interaction models: How to organize the interaction of autonomous entities?
+*** Data exchange based on messages
+ Data exchange based on messages
+ Nodes communicating by messages
+ - Nodes = computer, process, processor, …?
+ - Message = reliable? in-order? correct?
+ - 
 
 
 
- - Lorem 
- - ipsum 
- - dolorosa 
+*** Data exchange: Sending and receiving
 
-*** Slide d
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-
-* Section B.1.3
-
-*** Slide a
-
- - Lorem 
- - ipsum 
- - dolorosa 
+ - Message: a well-delimited amount of data 
+ - Originating from (usually a single) sender 
+ - Destined to (usually a single) receiver 
+ - A packet 
+ - 
+ - Alternative notion: A stream of data
+ - Continuous flow of data, no natural boundaries 
+ - From sender to receiver 
+ - 
+ - Communication (either packet or stream) can be unidirectional or bidirectional 
+*** Data exchange: Synchronicity 
 
 
-*** Slide b
+ Send
+ - SIGNAL
+ - WAIT
 
 
- - Lorem 
- - ipsum 
- - dolorosa 
-
-*** Slide c
-
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-*** Slide d
+ Source
+ Synchronous Send
+ Receive
+ - SIGNAL
+ - WAIT
 
 
- - Lorem 
- - ipsum 
- - dolorosa 
+ Destination
+ Synchronous Receive
+ S:S
 
 
+
+
+
+
+*** Data exchange: Communication participants
+ Combinations of sender and receiver
+ - Unicast: 1 sender, 1 receiver
+ - Broadcast: 1 sender, all known destinations are receivers
+ - Multicast: 1 sender, selected group of receivers
+ - Convergecast: multiple senders, data is somehow combined to arrive only at a single receiver
+ - 
+
+
+
+
+* Background: Some messaging APIs
+
+*** API for communication: Sockets 
+ Suitable for both messages and streams 
+ - Can express all synchronicity combinations
+ - Based on analogy: Communication with a remote partner is akin to reading from/writing to a file 
+ - 
+ - For details see 
+ - VL KMS, VL Rechnernetze 
+ - Many online resources on the topic, e.g. http://jan.newmarch.name/distjava/socket/lecture.html 
+ - Books like Stevens, Unix Network Programming 
+ - 
+*** Nicer API: 0mq (http://zeromq.org)  
+ 8
+
+
+*** Issue: Language/system independence 
+
+- Supporting heterogeneity 
+- Example: Protobuf https://github.com/google/protobuf
+
+* Client/server, basic structure 
+
+*** From sockets to structured distributed programs
+ With sockets (or similar APIs), arbitrary data exchange relationships between different parts of a distributed system can be formulated 
+ -  ! “Spaghetti passing” akin to goto-induced Spaghetti code
+ - 
+ - Put some structure even in distributed applications
+ - 
+ - First idea: asymmetric roles between 
+ - A requester of some sort of processing/data
+ - A provider of this processing/data
+ - 
+ -  ! Client/server paradigm 
+*** Client/Server Paradigm
+ Basic assumption: Some computers are more equal than others!
+ - Some computers are connected to a printer, some not
+ - Some computers have little disk capacity, some a lot 
+ - Goal: share the resources of such special computers
+ - Second goal: make them available to “anybody”
+ - Access to these resources can be regarded as a service
+ - Print a file on my printer, store some files on your big hard disk
+ - Computers providing such services are called “servers”
+ - Machines accessing these services are “clients”
+*** Client/server interact via request/reply messages
+
+
+
+
+ Request
+ Server
+ Client
+
+ doOperation
+ (wait)
+ (continuation)
+ Reply
+ message
+
+ getRequest
+ execute
+ method
+
+
+
+
+ message
+ select object
+ sendReply
+*** Client/Server – Abstract 
+ Abstract representation as processes on different computers
+ Word 
+ - Processor
+ Service program 
+ - handling requests
+ Program 
+ - accepting
+ - print requests
+ Device
+ - driver
+*** Client/Server Paradigm
+ Roles are not fixed!
+ - A “print server” can be a client to a “file server” itself
+ - Depends on the task that is to be performed
+ - 
+ “Please store my file ‘ABC’ ”
+ “Please print
+ - file ‘ABC’ ”
+ “Please give me file ‘ABC’ “
+*** Behavior in time: Synchronous request
+ A client asks a server to perform some processing 
+ - Server is synchronous: Cannot proceed until request has arrived
+ - Client is synchronous: After sending the request, it blocks until the result arrives 
+ Client
+ Server
+ Channel
+
+
+ receive
+
+
+
+
+ Request
+
+
+
+ Result
+
+
+ reply
+ Process 
+ - request
+*** Behavior in time: Asynchronous request
+ A client asks a receiver to perform some processing 
+ - Server is synchronous: Cannot proceed until request has arrived
+ - Client is asynchronous: after posting the request, does not immediately wait for answer but first performs some other activities 
+ Client
+ Server
+ Channel
+
+
+ receive
+
+
+
+
+ Request
+
+
+
+ Result
+
+
+ reply
+ Process 
+ - request
+ receiveResult
+ Other 
+ - activities 
+ - take place
+*** Execution structures of servers
+ Servers can execute repeated requests (from same or different clients)
+ - One after the other ! potentially sub-optimal performance
+ - Concurrently, by dynamically creating a server thread/process for each incoming request
+ - Concurrently, by assigning incoming requests to one out of a pool of threads/processes
+ - Server activation – When is server process/thread started?
+ - Once, at system startup, remains active (“persistent server”)
+ - Once, at first invocation of requested service, remains active  
+ - Both: dedicated for a given service type or can serve different service types 
+ - Per request – started at request arrival, terminates afterwards 
+ - 
+*** Series of requests: Stateful/stateless servers
+ A series of requests might be related to each other
+ - Server might know of this connection and store relevant state to relate successive requests to each other: stateful server
+ - Server might not care, treat each request as if it were an isolated one: stateless server
+ - Requests must carry all necessary information all the time 
+ - Example: cookies 
+ - 
+ - Example: Server provides access to a file
+ - Stateful server: Stores the position in the file where last read attempt took place, continues to read from this position at the following request
+ - Stateless server: Each request must specify the position onwards from which to read 
+
+*** Summary: A simple two-tier model 
+
+*** Client/Server Evaluation
+  Advantages
+  - Simple architecture, clear assignment of responsibilities
+  - Simple programming paradigm: accessing a service is well known from sequential programming – call a function!
+  - Relatively simple to control: one machine provides a given service
+  - 
+  - Disadvantages
+  - Server can become performance bottleneck
+  - Server can be far away, long latency for services
+  - A service fails if the single server fails – “single point of failure” 
+  - How to find a server for a given service in the first place?
+  - Resources of non-servers might be wasted (e.g., disk space)
+  - 
+
+- server: performance, flexibility, how to run programs, fault tolerance 
+- client: flexibility, programability, executing code in browser (latency!) 
+
+
+*** Request/reply protocol in more detail
+ Request/reply is seemingly trivial
+ - But what about failures?
+ - Of communication (lost messages)? Client or server crash?
+ - Possible problems and remedies
+ - Observation 1: doOperation does not receive reply
+ - Detected by: Timeout in doOperation
+ - Possible causes: request or reply lost, server has crashed
+ - Action: Resend the request message, count number of attempts and abort if server crash is suspected 
+*** Request/reply protocol in more detail
+ Observation 2: same request arrives multiple times
+ - Detected by: Server repeatedly receives the same message identifier from the same client 
+ - Prerequisite: Message IDs in request message, server stores message identifiers
+ - Possible cause: Timeouts in client (owing to lost reply message or slow server), request message duplicated in the network
+ - Actions: 
+ - Discard the additional request (do not execute more than once)
+ - Reply (to original request) not yet sent: no further action necessary
+ - Reply (to original request) already sent: Resend the reply to this request 
+ - If server can reexecute the operation to obtain the same result again (including all sideeffects! – idempotent operations): 
+ - Do so, send reply again 
+ - If not: Server needs a history of message identifiers and replies 
+ - (History can be cleared by interpreting a client’s request n+1 as acknowledgement for the request n – but timeout still necessary)
+
+
+
+* Example code 
+
+*** ZeroMQ: Client/Server in C 
+ Distributed Systems, Ch. 2:  Basic Interaction Patterns
+*** ZeroMQ: Client/Server in Python 
 
 
