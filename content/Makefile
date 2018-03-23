@@ -46,7 +46,7 @@ slides: $(slidesPdf)
 %-slides.pdf: %-slides.tex
 	pdflatex $< 
 	pdflatex $< 
-	cp $@ ../output 
+	cp $@ ../../output 
 
 ##########################
 
