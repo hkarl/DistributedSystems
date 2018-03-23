@@ -26,6 +26,6 @@
 
 ** Basic client/server systems 
 
-#+include: "../ch_basic_CS/ch_basic_CS.org"
+#+include: "../ch_01_basic_CS/ch_basic_CS.org"
 
 
