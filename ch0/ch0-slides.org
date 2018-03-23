@@ -1,0 +1,10 @@
+#+TITLE: Orgnizational matter 
+#+include: "../slidehead.org"
+ 
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+
+#+include: "./ch0.org" 

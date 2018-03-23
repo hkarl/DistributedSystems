@@ -1,0 +1,10 @@
+#+TITLE: First real chapter 
+#+include: "../slidehead.org"
+ 
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+
+#+include: "./ch1.org" 

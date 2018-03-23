@@ -1,0 +1,13 @@
+#+LANGUAGE:  en
+#+LATEX_CLASS: beamer
+#+COLUMNS: %45ITEM %10BEAMER_env(Env) %10BEAMER_act(Act) %4BEAMER_col(Col) %8BEAMER_opt(Opt) 
+#+OPTIONS: toc:nil H:3
+#+BEAMER_FRAME_LEVEL: 3
+#+BEAMER_THEME: [hideothersubsections]Goettingen
+#+BEAMER_COLOR_THEME:sidebartab
+#+BEAMER_FONT_THEME:
+#+BEAMER_INNER_THEME:
+#+BEAMER_OUTER_THEME:
+#+LaTeX_CLASS_OPTIONS: [ignorenonframetext,presentation,nooutline]
+#+BEAMER_HEADER:
+#+latex_header: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Topic}\tableofcontents[currentsection]\end{frame}}

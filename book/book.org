@@ -1,0 +1,15 @@
+#+startup: beamer
+#+LaTeX_CLASS: book
+#+LaTeX_CLASS_OPTIONS: [a4paper,twoside,11pt]
+#+LATEX_HEADER: \usepackage{beamerarticle}
+#+OPTIONS: toc:nil
+
+#+TITLE: A Distributed Systems lecture 
+
+\tableofcontents 
+
+
+\part{Initial part}
+\chapter{Ch0 chapter header}
+#+include: "../ch0/ch0.org"
+
