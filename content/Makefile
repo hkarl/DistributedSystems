@@ -27,10 +27,10 @@ book.tex: book.org
 
 
 book.pdf: book.tex
-	pdflatex book
+	pdflatex -shell-escape book
 	# -bibtex book
-	# pdflatex book
-	# pdflatex book
+	# pdflatex -shell-escape  book
+	# pdflatex  -shell-escape book
 	cp $@ ../../output 
 
 #########################
@@ -44,8 +44,8 @@ slides: $(slidesPdf)
 
 
 %-slides.pdf: %-slides.tex
-	pdflatex $< 
-	pdflatex $< 
+	pdflatex  -shell-escape $< 
+	pdflatex  -shell-escape $< 
 	cp $@ ../../output 
 
 ##########################
