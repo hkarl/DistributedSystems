@@ -1,7 +1,7 @@
 #+startup: beamer
 #+LaTeX_CLASS: book
 #+LaTeX_CLASS_OPTIONS: [a4paper,twoside,11pt]
-#+LATEX_HEADER: \usepackage{beamerarticle}
+#+LATEX_HEADER: \usepackage[noxcolor]{beamerarticle}
 #+OPTIONS: toc:nil
 #+OPTIONS: toc:nil H:5
 #+BEAMER_FRAME_LEVEL: 5
