@@ -31,7 +31,7 @@ book.pdf: book.tex
 	# -bibtex book
 	# pdflatex book
 	# pdflatex book
-	cp $@ ../output 
+	cp $@ ../../output 
 
 #########################
 
