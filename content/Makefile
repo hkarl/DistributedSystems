@@ -51,10 +51,10 @@ slides: $(slidesPdf)
 ##########################
 
 clean:
-	-rm *.tex *.tex~ tmp.org *.pdf *.bbl
+	-rm *.tex *.tex~ tmp.org *.pdf *.bbl *.vrb
 	-rm -rf _minted*
 	-rm *.aux *.log *.nav *.out *.snm *.toc 
 
 cleanall:
-	-cd book ; rm *.pdf *.aux *.log *.bbl *.tex *.tex~ *.toc *.aux *.bbl *.log *.blg *.out
+	-cd book ; rm *.pdf *.aux *.log *.bbl *.tex *.tex~ *.toc *.aux *.bbl *.log *.blg *.out *.vrb
 	for d in ch*; do make -C $$d clean  ; done
