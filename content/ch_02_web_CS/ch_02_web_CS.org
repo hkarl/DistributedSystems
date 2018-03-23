@@ -1,0 +1,260 @@
+ 
+
+* Basic structure 
+    
+*** Case study: World Wide Web – Basic architecture
+ Basic architectures very simple
+ - Web servers provide “web pages”
+ - Identified by a “Uniform Resource Locator” (URL)
+ - Pages formatted in Hypertext Markup Language (HTML)
+ - Web browsers request pages from servers
+ - Server and browser communicate using Hypertext Transfer Protocol (HTTP)
+ - 
+*** The request/reply protocol: HTTP
+ HTTP essentially a simple protocol
+ - Requests
+ - GET: Obtain content of URL of interest
+ - 
+ - 
+ - 
+ - HEAD: Similar to GET, but only provide meta data, not actual content 
+ - POST: Provide URL corresponding to a program that can accept the data provided in the POST message 
+ - PUT: Provide URL where the data provided in the PUT message should be stored 
+ - … plus various others (DELTE, OPTIONS, TRACE)
+ - 
+ - Reply: Return page, plus error code, status, … 
+ - REDIRECT: Important example, error code telling the browser to use the returned URL instead 
+*** Requests: Static and dynamic content, state 
+ GET requests can refer to a static web page (simply delivered by the server) or to execution of a program 
+ - Server might make simple modifications to a page during delivery, triggered e.g. by “server side include” instructions
+ - Server might also compute the request page on the fly, depending on parameters in the request 
+ - Typical: “?” to signal that, key=value pairs separated by “&”
+ - GET http://somewhere.bla.net/some/path/somewhere?key=skjdfhskjdhf&param1=sdjhfgdsf&param2=sdhhjsd 
+ - Convention: GET does not alter state 
+ - 
+ - POST requests refer to a program execution 
+ - POST provides parameters to the program
+ - Parameters usually depend on user input 
+ - Typically, POST will alter state 
+ - Output of the program is delivered back to the client and rendered as the page
+
+
+
+* Server-side programmability  
+
+*** From static pages to dynamic content 
+
+- Splitting up the web server into actual server, web framework 
+- Example: simple nginx/django setup 
+
+
+*** Web frameworks 
+ 48
+*** Web frameworks – Example: Django (python) 
+ 49
+*** Running Web applications in Web servers
+ 50
+*** Running Web applications in Web servers
+ 51
+*** Example setup: django, nginx, uwsgi  
+
+
+
+
+
+
+*** Alternative examples
+
+- Tomcat, Ruby on Rails, ... 
+
+* Client-side programmability 
+
+*** Issue: latency for complex interactions 
+
+*** Applications in the WWW – State & cookies 
+ By design, HTTP is stateless, so are Web servers
+ - How to build applications in such an environment? 
+ - 
+ - How to still provide some statefulness in WWW context? 
+ - How to eat your cake and have it? Cookies! 
+ - 
+ - Cookie: Text string, sent by server to client, stored by browser 
+ - Main standards: RFC 2109, RFC 2965 
+ - Returned by browser to server with any request to a server matching the domain stated in the cookie (and where the path matches as well)
+ - Useful to identify users, store application state AT CLIENT, … 
+ - Can encode many different types of information 
+ - Alternatives to store state: complex URLs, dynamically updated and returned 
+ - 
+ - Simple, sometimes useful, yet problematic 
+ - Malicious cookie theft, inconsistencies between server/browser, … 
+*** Applications in the WWW – AJAX 
+ Interactive web applications easy in principle
+ - Changes result in POST messages, new Web page is returned
+ - Problem: Latency, bandwidth to transmit entire new page (after each user interaction!) limits “interactive feel” 
+ - Approach: Asynchronous JavaScript and XML – AJAX 
+ By DanielSHaischt, via Wikimedia Commons - https://commons.wikimedia.org/wiki/File%3AAjax-vergleich.svg, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=29724785
+*** AJAX: Basic ideas 
+ 41
+*** AJAX example
+ 42
+*** AJAX: XMLHttpRequest 
+ 43
+*** AJAX: Relevant libraries 
+ 44
+*** DOM manipulation 
+
+*** General idea: Event-based programming 
+
+- Asynchronous requests! 
+- Event loops, call backs 
+- Promises, futures, ? 
+
+
+
+*** Example Anuglar.JS 
+*** Model/view controller abstraction 
+*** Other example:  WebSocket 
+  45
+
+
+- not sure this is so important ? 
+
+
+
+*** TODO Suitable server: Torndao 
+- http://www.tornadoweb.org/en/stable/ 
+- Or introduce in the server section? 
+
+
+* Interfacing clients and servers: REST  
+
+*** A variation on the web services theme: REST
+ Web services can use complex interfaces 
+ - Specified with SOAP, WSDL
+ - Allow complex interaction relationships between users and providers of such services
+ - 
+ - Beauty in simplicity?
+ - Use a very restricted interface set: create, read, update, delete (CRUD)
+ - Sounds like GET, PUT, DELETE, POST ? 
+ - Concentrate on the manipulation of data through such a simple interface
+ - When accessing a data resource, the entire resource is provided (i.e., web page is downloaded) and can then be locally manipulated instead of complex interface operations 
+ - 
+ -  ! Realized in Representational state transfer (REST)
+ - Fielding, Architectural Styles and the Design of Network-based Software Architectures, 2000
+*** REST architecture: Constraints 
+ 114
+*** REST: Uniform interface 
+ 115
+*** Representations contain information to discover resources??
+ 116
+*** REST as specialisation of WebServices 
+ 117
+*** RESTful: Collections vs. HTTP methods 
+ https://en.wikipedia.org/wiki/Representational_state_transfer, retrieved 2016-11-14
+ nullipotent
+ idem-
+ - potent
+ idem-
+ - potent
+ server 
+ - chooses URI
+ client
+ - chooses URI
+*** RESTful: URL patterns 
+ 119
+*** RESTful: URL patterns practically 
+ 120
+
+#+BEGIN_SRC  html
+ <html>
+<body>
+  <form action="form_handler.php" method=”POST">
+    User Name: <input name="user" type="text" />
+   <input type="submit"value="Submit" />
+  </form>
+ </body>
+ </html>
+#+END_SRC
+
+ No DELETE, PUT, 
+ - ... supported!
+*** RESTful: Interface descriptions? 
+ 121
+*** Swagger examples 
+
+*** Swagger examples 
+
+*** Examples
+ Several popular sites provide Web services 
+ - Yahoo, google, ebay, Amazon, … 
+ - Example: Access to Google’s Map api 
+ - You’ll need: 
+ - a programming language that can curl a URL 
+ - Interpret the resulting JSON
+ - 
+ import requests
+ - import json
+ - 
+ - r = requests.get(“https://maps.googleapis.com/maps/api/
+ - geocode/json?address=Warbugrstr. 100, Paderborn")
+ - 
+ - print json.dumps(r.json(), indent=4)
+
+
+* Current development: HTTP2, SPDY 
+
+*** Perceived HTTP 1.1 shortcomings 
+ 60
+*** Current developments: HTTP 2.0 / SPDY © Google
+ 61
+*** SPDY design ideas
+ 62
+ http://www.chromium.org/spdy/spdy-whitepaper
+*** HTTP 2.0 (https://datatracker.ietf.org/doc/draft-ietf-httpbis-http2/) 
+ 63
+*** HTTP 2.0 
+ 64
+*** SPDY / HTTP 2.0 availability 
+ http://caniuse.com/spdy
+*** SPDY / HTTP 2.0 availability 
+ http://caniuse.com/#feat=http2
+
+
+*** Example: REST, Angular, Django 
+
+
+
+* An architecture style: microservices 
+
+*** Microservices: Architecture pattern 
+ 126
+*** Microservices: Architecture pattern – So? 
+ 127
+
+
+*** TODO Case study: Reactive Systems  
+
+- Check, does this really belong here? 
+
+*** Reactive Systems – “Manifesto”
+ 129
+*** Typesafe reactive platform 
+ 130
+ Programs, in Java or Scala, 
+ - running on JVM 
+ Data engine 
+ Message-driven 
+ - middleware, based on actors
+ Web framework 
+*** Typesafe: Actors programming model 
+ 131
+*** Typesafe: ConductR – Cluster runtime 
+ 132
+
+
+*** Example: Snort as microservice or NFV 
+
+- Not sure there is time for that? 
+
+
+
