@@ -3,7 +3,7 @@
 # on Holger's Mac: 
 EMACS="/Applications/Aquamacs 2.app/Contents/MacOS/Aquamacs"
 
-
+EMACSEXPORTPROG="(progn (add-to-list 'load-path (expand-file-name \"~/.emacs.d/org-mode/lisp\")) (require 'org)  (setq org-latex-listings 'minted) (setq org-latex-minted-options '((\"frame\" \"lines\") (\"linenos=true\") (\"mathescape\" \"true\"))) (org-beamer-export-to-latex))"
 
 SOURCE := $(wildcard *-slides.org)
 slidesTex := $(patsubst %.org,%.tex,$(SOURCE))
@@ -23,7 +23,7 @@ book:
 book.tex: book.org  
 	echo "making book.tex"
 	echo "building beamer tex file", $<, $@
-	${EMACS} -Q --batch $<  -eval "(progn (add-to-list 'load-path (expand-file-name \"~/.emacs.d/org-mode/lisp\")) (require 'org) (org-beamer-export-to-latex))"
+	${EMACS} -Q --batch $<  -eval ${EMACSEXPORTPROG}
 
 
 book.pdf: book.tex
@@ -40,7 +40,7 @@ slides: $(slidesPdf)
 
 %-slides.tex: %-slides.org %.org ../slidehead.org 
 	echo "building beamer tex file", $<, $@
-	${EMACS} -Q --batch $<  -eval "(progn (add-to-list 'load-path (expand-file-name \"~/.emacs.d/org-mode/lisp\")) (require 'org) (org-beamer-export-to-latex))"
+	${EMACS} -Q --batch $<  -eval ${EMACSEXPORTPROG}
 
 
 %-slides.pdf: %-slides.tex
