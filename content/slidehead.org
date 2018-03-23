@@ -11,3 +11,4 @@
 #+LaTeX_CLASS_OPTIONS: [ignorenonframetext,presentation,nooutline]
 #+BEAMER_HEADER:
 #+latex_header: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Topic}\tableofcontents[currentsection]\end{frame}}
+#+LATEX_HEADER: \usepackage{minted}

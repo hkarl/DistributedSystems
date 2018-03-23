@@ -6,6 +6,7 @@
 #+OPTIONS: toc:nil H:5
 #+BEAMER_FRAME_LEVEL: 5
 #+COLUMNS: %45ITEM %10BEAMER_env(Env) %10BEAMER_act(Act) %4BEAMER_col(Col) %8BEAMER_opt(Opt) 
+#+LATEX_HEADER: \usepackage{minted}
 
 
 
@@ -27,5 +28,9 @@
 ** Basic client/server systems 
 
 #+include: "../ch_01_basic_CS/ch_basic_CS.org"
+
+** The World-Wide Web as a client/server example 
+
+#+include: "../ch_02_web_CS/ch_02_web_CS.org" 
 
 
