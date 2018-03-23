@@ -1,121 +1,151 @@
+* Introduction 
+
+*** Overview
+ Who are we?
+ - Research and teaching at „Fachgebiet Rechnernetze“
+ - The topic of „Distributed Systems“
+ - Formalities
+ - Resources
+ - Exams
+ - 
+*** Who are we
+ Fachgebiet „Rechnernetze“ 
+ - Prof. Dr. Holger Karl 
+ - hkarl@ieee.org oder holger.karl@upb.de 
+ - O3.162  
+ - Sprechstunde siehe Webseite 
+ - 
+ - Mitarbeiter: Sevil Mehraghdam, Manuel Peuster
+ - 
+ - Web page: http://wwwcs.uni-paderborn.de/cs/cn/
+ - 
+ - 
+*** Main research topics
+ Main research topics
+ In general: architectures and protocols of communication systems
+ - Structure, design, performance evaluation, implementation, …
+ - For all types of communication: computer networks, voice communication, data & multimedia content
+ More specifically
+ - Future mobile and wireless communication
+ - What comes after GSM, UMTS, WLAN?
+ - Future Internet
+ - Data centre networks 
+ - Clouds meet operator networks 
+ - Buzzwords: Software-Defined Networking; 
+ - Network Function Virtualization 
+*** Teaching FG Rechnernetze (Karl)
+ Mobil-
+ - kommunikation
+ Empiric 
+ - Performance
+ - Evaluation
+ Seminar
+ VII
+ Seminar
+ VIII
+ Future
+ - Internet
+ Advanced
+ - Wireless (?)
+ Festnetz
+ Drahtlos/mobil
+ Methodik
+ Legende: 
+ Verteilte Systeme
+ Analytic
+ - Performance
+ - Evaluation (?)
+ Projektgruppe
+
+
+* What this class is all about 
+
+*** Distributed system (DS)?
+
+ - A distributed system is a collection of independent computers that appears to its users as a single coherent system.
+ - 							-- A. S. Tannenbaum
+ - 
+ - A distributed computing system consists of multiple autonomous processors that do not share primary memory but cooperate by sending messages over a communication network.
+ - 						-- Henri Bal
+ - 
+ - A distributed system is one in which the failure of a computer which you didn‘t even know existed can render your own computer unusable.
+ - 						-- Leslie Lamport
+*** Crucial aspects of a distributed system
+
+ - Autonomy
+ - A distributed system consists of autonomous, independent entities (but usually cooperative ones, not antagonistic ones)
+ - Each individual entity is – typically – a full-fledged, operational system of its own 
+ - 
+ - Transparency 
+ - The fact that the distributed system is indeed a conglomerate of different (simpler) systems is of no interest and should be of no concern to the user 
+ - 
+ - How to achieve this? 
+*** Topics of “Distributed Systems”
+ Even assuming many devices can communicate, this is not enough to turn them into a system
+ - This class is not about communication as such, 
+ - but about how communicating devices can be turned into a useful system
+ - It combines 
+ - Theoretical/fundamental aspects
+ - Practical issues, real-world systems, programming 
+ - And tries to explain how and why theoretical aspects are necessary to build systems  
+ - Considered examples (some of…) 
+ - Platforms/middleware: .NET & Web services, Java-based
+ - Systems/case studies: WWW, file systems, Mail, VoIP/SIP, CDN
+*** Non-Topics of “Distributed Systems”
+ This class is not about 
+ - Communication protocols – it helps to know the material of the lecture “Rechnernetze” (Computer networks) 
+ - Distributed algorithms – treated where necessary, but not in focus
+ - Parallel computing (hardware or software) – treated occasionally in passing
+ - Programming 
+*** Overview
+ Introduction 
+ - Basic Interaction Patterns
+ - Advanced Interaction Patterns
+ - 
+ - Time in distributed systems – Logical and real
+ - Various distributed algorithms
+ - Replication and consistency
+ - 
+ - Some case studies 
+
+
+
+* Organization, exam, material
+
+*** Homework assignments
+ Exercises as “traditional” assignments 
+ - This lecture will also include some practical exercises 
+ - Programming
+ - (We used to do VMWare-based actual installations, but nobody was interested ) 
+ - 
+ - Assignments will be discussed in “Tafelübung”; they will not be graded or used for bonus points, … 
+*** Project!
+*** Exam
+
+ - Written exam
+ - 
+ - Date and time: 
+ - First instance: ??? (time and location: unknown) 
+ - Second instance: ?? 
+ - 
+ - Material of both lecture and exercises is relevant for the exam
+*** Material
+
+ - There will be no script 
+ - 
+ - Slides will be available on the class web page prior to lecture 
+ - 
+ - You should have a look at at least one of the recommended textbooks 
+*** Textbooks
+
+- no ideal textbook exsits 
+- Good, but old fashioned: Tanenbaum, colouris
+- Lot's of material online 
+- See also Mendeley group 
+
+* TODO An example for this class 
+
+- Slides from FAD, ATOS scenario 
+
+
  
-
-
-
-
-* Section A.1
-
-Here is additional text 
-
-
-** Subsection A.1.1 
-
-
-Here is even more text 
-
-
-*** Slide a
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-
-*** Slide b
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-*** Slide c
-
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-** Subsection A.1.2
-*** Slide d
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-
-* Section A.2
-
-** Subsection A.2.1 
-
-*** Slide a
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-
-** Subsection A.2.2 
-*** Slide b
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-*** Slide c
-
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-*** Slide d
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-
-* Section A.3
-
-*** Slide a
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-
-*** Slide b
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-*** Slide c
-
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-*** Slide d
-
-
- - Lorem 
- - ipsum 
- - dolorosa 
-
-
-
-
-
-* Section A.4 
-* Section A.5 
-* Section A.6 
-* Section A.7 
