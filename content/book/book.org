@@ -15,16 +15,17 @@
 \tableofcontents 
 
 
-** Organization of this class 
+
+** Organization and content  of this class 
 
 #+include: "../ch0/ch0.org"
 
 
-* Initial part 
+* Web and Client/Server Systems 
 
 
-** Introduction 
+** Basic client/server systems 
 
-#+include: "../ch1/ch1.org"
+#+include: "../ch_basic_CS/ch_basic_CS.org"
 
 

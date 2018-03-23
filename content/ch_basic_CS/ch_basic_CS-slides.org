@@ -1,4 +1,4 @@
-#+TITLE: First real chapter 
+#+TITLE: Basic client/server systems
 #+include: "../slidehead.org"
  
 
@@ -7,4 +7,4 @@
 \end{frame}
 
 
-#+include: "./ch1.org" 
+#+include: "./ch_basic_CS.org" 
