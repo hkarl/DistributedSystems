@@ -1,0 +1,341 @@
+
+* Overall requirements 
+*** Issues and requirements 
+ - High performance 
+ - Fault tolerance (nothing bad happens when something goes wrong) 
+ - Availability (good things still happen when something goes wrong) 
+
+
+
+
+*** Issues and requirements 
+ - High performance 
+ - Fault tolerance (nothing bad happens when something goes wrong) 
+ - Availability (good things still happen when something goes wrong) 
+
+* Dependability 
+
+*** Laprie 
+*** Fault Model – Fault assumptions 
+ Everything is completely reliable 
+ - (not realistic)
+ - Processes can fail
+ - With or without warning
+ - Permanent or transient failure
+ - Give wrong results
+ - Malicious Byzantine failure
+ - Data can be
+ - Lost
+ - Falsified
+ - Reordered
+ - Delayed
+ - Whether this is failure or not depends on communication model
+
+*** What can go wrong? Taxonomy 
+ 17
+*** Fault model – System metrics, dependability  
+ Dependability (Zuverlässigkeit)
+ - Umbrella term, used to talk about a wide range of metrics and properties in an informal fashion
+ - Definitions by Laprie, Avizienis, et al. 
+ - Maintainability: ability to undergo modifications and repairs
+ - Performability: ability of a system to perform according to specifications even in the presence of failures 
+ - Safety: absence of catastrophic consequences for users/environment
+ - Distinction: system is “fail safe” or not (train, aircraft) 
+ - Typical aspects: reliability, availability 
+ - 
+*** Fault model – System metrics, dependability  
+ Reliability (Verlässlichkeit)
+ - Assuming a system is operational at time 0
+ - Reliability at time t is the probability that the system has been continuously operational in time [0,t] 
+ - Often expressed in vaguer forms: Mean time to failure (MTTF)
+ - 
+ - Availability (Verfügbarkeit)
+ - Assuming a system can be repaired, alters between operational and failed modes 
+ - Readiness for correct service 
+ - Steady-state availability is the probability of the system being operational at an arbitrarily chosen point in time
+ - Repairable system: Mean time to repair (MTTR), mean time between failures (MTBF)
+ - 
+ - 
+*** Computing reliability 
+ 20
+*** Availability requirements
+ Example: AT&T ESS 4 telephone switch
+ - Switch for about 700,000 calls per hour, introduced 1976
+ - 72,000 trunks
+ - Requirements
+ - Automatic initializations		< 0.5 / month
+ - Manual initializations		< 1 / 50 months
+ - Mean time to restore system 	32 seconds
+ - Cut-off-calls			< 5 / million
+ - Denied calls			< 4 / million
+ - Trunk out of service		9 minutes / trunk and year
+ - System downtime		< 1.7 hours / 40 years
+ - Maintenance performed in operational system
+
+
+
+
+*** Standby categories 
+
+- Cold, warm, hot standby 
+
+
+* Security 
+
+*** See separate class 
+
+Details in Jager's class. Here just some teasers. 
+
+*** Oauth – from the commercial 
+ 135
+*** Oauth – Situation 
+ 136
+
+ AppA.A.net
+ - (“client”)
+ AppB.B.com
+ - (“provider”)
+ usernameA
+ - passwordA
+ usernameB
+ - passwordB
+ User
+
+ DeveloperA
+ - “consumer”
+
+ DeveloperB
+ - “service
+ - provider”
+*** Problems of a password-based solution
+ 137
+*** Oauth structure 
+ 138
+*** Oauth – main protocol flow 
+ May be the same server or different. Interaction not specified here.
+*** Obtaining access token: Example Authorization Code
+ Distributed Systems, Ch. 2:  Basic Interaction Patterns
+ 140
+
+
+
+
+* Three-tier vs. four-tier  architectures 
+
+Here just opverview, details in next part 
+
+
+*** Client/Server – Latencies & proxy server
+ Problem: latency between client and server is high ® long response times
+ - Possible solution: bring the server nearer to the client! 
+ - Or at least a decent proxy 
+ - New problem: 
+ - How to find a proxy? 
+ - How to keep proxy up-to-date? 
+*** Client/Server – Several servers
+ Replication of a server can solve some problems
+ - Single point of failure, bottleneck
+ - 
+ - New problems 
+ - Selection of a particular server of a group 
+ - Consistency between servers
+ - Group communication!
+ - Example: replicated web server for big suppliers; Network Information System
+ Server group
+ - 
+
+ Client2
+
+
+* Improving throughput  
+
+*** The server side
+ Problem: Performance
+ - Mainly: Latency of disk access
+ - Solution 1: Multithreaded server application
+ - 
+ Server actions
+ - Wait for TCP connection
+ - Parse and execute HTTP command 
+ - E.g., get file from disk
+ - Send result to client over TCP connection
+ - Release connection
+*** Server farms
+ To improve performance, use multiple servers (server farm)
+ - Front end: accept request, hand off to separate processing node for actual execution
+ - 
+ - 
+ - 
+ - 
+ - 
+ - 
+*** TODO Server farms and hand-off, load balancing 
+ Problem: Serving request via different processing node will have the client receive the answer from a different node than the request was sent to
+ Solution 1: Send the answer back via the front-end
+ - (Solution 2: TCP handoff)
+ - Solution 3: Redirects of URLs – frontend tells client to fetch the page from another server (HTTP response status 3xx)
+ - Solution 4: Rewrite URLs in replies, e.g., to access a local mirror of a URL (this is usually not done for server performance but to lower latencies)
+ - Solution 5: Put entries for the servers into DNS, tell DNS that they are all an alias of the intended www server, tell DNS to do  round-robin among these aliases 
+ www0 	IN A 1.2.3.1 
+ - www1 	IN A 1.2.3.2 
+ - www2 	IN A 1.2.3.3 
+ - www3 	IN A 1.2.3.4 
+ - www4 	IN A 1.2.3.5 
+ - www5 	IN A 1.2.3.6 
+ - www 	IN CNAME www0.foo.com. 
+ - 	IN CNAME www1.foo.com. 
+ - 	IN CNAME www2.foo.com. 
+ - 	IN CNAME www3.foo.com. 
+ - 	IN CNAME www4.foo.com. 
+ - 	IN CNAME www5.foo.com. 
+ - 	IN CNAME www6.foo.com. 
+
+
+*** Multiple web servers, data bases
+ Usually, Web servers not simply serve web pages but also access/depend on/manipulate data bases
+ - Stocks, inventory, order information, … 
+ - How to keep database consistent with server farms?
+ - Usual solution: separate actual web serving and data base into a three-tier architecture
+ Server farm
+
+ Client n
+
+
+
+ Backend
+ - Database
+ Web 
+ - browser
+ Business
+ - logic
+ Often: separated again into “presentation tier” and “logic tier” (web server, application server like J2EE, database server)
+
+
+*** Spearate out consistency aspects into database layer - four-tier architecture 
+*** Four-tier architectures
+ Replication of a server can lead to consistency problems 
+ - Example: Web server of a department store that receives orders 
+ - Observation: „reading“ access significantly more frequent than modifying access
+ - Idea: separate consistency-sensitive parts 
+ - Separation of data management from actual logic of application (ordering procedure, business logic)
+ - Representation of contents delegated to Web browser anyway 
+ - Three tiers: data management, business logic, presentation
+*** Four-tier architectures
+ Server group
+ - 
+ - 
+ - 
+ - 
+ - 
+ - 
+ - 
+ - 
+ - 
+
+ Client n
+
+
+
+
+
+ Backend
+ - Database
+ Web 
+ - browser
+ Web server & 
+ - Business logic
+
+
+*** Practical: django, nginx, postgresql 
+
+
+
+*** Issue: object/relational mapping 
+
+- ORM models 
+- Django as example 
+
+
+* Improving  latency 
+
+Note: client-side programmability already big step towards it. 
+
+
+*** Web caches
+ Despite server farms, latency of web access remains a problem
+ -  ! Use caches (proxies)
+ - Overcomes problems of 
+ - Server connected via slow/congested lines (in “flash crowd” situations)
+ - Overcrowded peering points between backbone providers 
+ - 
+ - Location
+ - At client side, in end system
+ - At local network (e.g., UPB)
+ - In the Internet service provider
+ - 
+ - Obvious issue: Placement, size, freshness of cache
+ - Invalidation, timeout of cache entries, … 
+
+*** Issues in caching 
+
+- Read write ratios 
+
+*** An aside: Content distribution networks (CDN)
+ CDN: Originally, a set of coordinated caches (in a sense) 
+ - Remove load from large websites (e.g., news) or hide websites (governments) 
+ - Examples: Akamai, Digital Island 
+ - Caches are complemented by redirectors, selecting most appropriate cache server for a given request
+ - Today: Evolved into application-delivery networks 
+ - From static web content to HD streaming, applications, Java J2EE edge computing 
+ - One simple technique: Redirection
+ - Based on combining DNS redirection and URL rewriting 
+ - In a sense: redirectors should perform an application-level routing decision 
+ -  ! Overlay networks 
+*** HTTP proxy 
+
+- forward vs. reverse proxy 
+
+-  For the curious: 
+  - Compare against layer 5 proxies like SOCKS
+
+*** Server-side caching (reverse proxy) 
+
+*** Memcached as example of shared-nothing distributed cache 
+
+   - How to deal with that in webserver section already? Probbably better
+     here? Or because so simple, in webserver? Or under P2P??
+     - It actually makes a nice transition from c/s to P2P -- client
+       needs to know all servers vs. does not need to know... 
+   - Discuss integration with e.g. django
+   - 
+      https://www.nginx.com/blog/maximizing-python-performance-with-nginx-parti-web-serving-and-caching/
+   - https://www.digitalocean.com/community/tutorials/how-to-scale-django-beyond-the-basics
+   - https://docs.djangoproject.com/en/2.0/topics/cache/#the-per-site-cache
+   - http://www.re-cycledair.com/using-the-django-per-site-cache-with-the-nginx-http-memcached-module
+   - https://linuxtechme.wordpress.com/2012/03/29/470/
+   - http://engineering.khanacademy.org/posts/memcached-fms.htm
+
+
+*** Technique: Consistent hashing  
+
+   - Consistent hashing in Memcache
+     - http://www.mikeperham.com/2009/01/14/consistent-hashing-in-memcache-client/
+     - Library for continuous hashing: https://github.com/RJ/ketama
+     - Nice property: thundering herd problem; bring new servers on
+       gently
+     - Other example for consistent hashing: Dynamo http://s3.amazonaws.com/AllThingsDistributed/sosp/amazon-dynamo-sosp2007.pdf
+       - Delegate this to the distributed data storage ? 
+ - MemcacheDB? 
+
+
+*** foreshadowing: Consistency 
+
+- What happens if the caches coordinated? 
+- See Redis, see consistency chapter later on 
+
+
+*** Other examples for proxies 
+
+- Example: Squid http://www.squid-cache.org
+- Example: Apache Traffic SErver http://trafficserver.apache.org
+
