@@ -1,0 +1,346 @@
+
+* RPC 
+*** Remote Procedure Call/Remote Method Invocation
+ Take the client/server principles and provide a tighter integration with the used programming language
+ - Instead of sending a request/receive a reply: Call a function
+ - Instead of receiving a request/sending a reply: Execute a function, possibly with parameters, and return function results 
+ -  ! Function call may be executed at a remote server
+ - 
+ - Formalized as 
+ - Remote Procedure Call (RPC) in “traditional” languages
+ - Remote Method Invocation (RMI) in object-oriented languages
+ - Main difference to RPC: the “invoked object” has to be specified somehow – akin to “this” pointer in C++ local method invocation
+ - Core idea introduced in 1984, Birrell & Nelson
+*** (KMS) Erinnerung: Lokaler Prozeduraufruf
+ Aufrufender und aufgerufener Programmcode sind Teil des gleichen Prozesses
+ - Aufruf erfolgt durch Sprung an eine andere Stelle des Programmcodes
+ - Parameterübergabe im Speicher 
+ - Parameter an wohlbekannte Speicherstelle ablegen
+ - Ergebnisse von wohlbekannter Speicherstelle abholen
+
+
+
+
+
+
+
+
+
+ Caller
+ Callee (procedure)
+ Call
+ - procedure
+ Jump
+ Return
+ Retrieve 
+ - results,
+ - resume
+ - execution
+ Put 
+ - results
+ - in 
+ - memory
+*** (KMS) Grundlagen von RPC
+ RPC-Systeme unterstützen den Prozeduraufruf über Adressraumgrenzen hinweg
+ - Ein im Adressraum A ablaufendes Programm kann Unterprogramme in anderen Adressräumen aufrufen
+ - Vorteil: Kein Umdenken bei der Organisation der Interaktion zwischen Prozessen in disjunkten Adressräumen erforderlich
+ - Problem: Dynamische Bindung der auszuführenden Prozedur P an den aufrufenden Prozess zur Laufzeit
+ - Grundlegendes Prinzip des RPC
+
+
+ Adressraum A
+ Adressraum B
+
+
+
+
+
+ Eingabeparameter
+ Resultate
+ Auszuführende Prozedur P
+
+*** (KMS) Entfernter Prozeduraufruf – Wunschvorstellung 
+ Tatsache, das Prozedur auf anderem Rechner ausgeführt wird, für Aufrufer und Aufgerufenen nicht sichtbar
+ - Aufrufer schreibt Parameter an bekannte Speicherstelle, springt zu einer anderen Stelle im Programmcode, und erwartet nach Rückkehr Ergebnisse an bekannter Speicherstelle
+ - Aufgerufener erwartet Parameter an bekannter Stelle, schreibt Ergebnisse an bekannte Stelle, und sprint zurück
+ - Wie kann dies die gleiche Semantik erzielen?
+ -  ! Zusätzliche Funktionen erforderlich
+
+
+
+
+
+
+
+
+ Caller
+ Callee
+ Call
+ - procedure
+ Start
+ - execution
+ Request
+ Reply
+ Receive 
+ - results,
+ - resume
+ - execution
+ Send
+ - results
+*** (KMS) RPC Prozeduraufruf – Ablauf 
+ Client: Lokale Prozedur p() wird durch einen lokalen Stellvertreter (Client-Stub) ersetzt
+ - Client-Stub verpackt die Nachricht und sendet diese dem Server
+ Im Server nimmt ein Stellvertreter (Server-Stub) die Nachricht an und veranlasst die weiteren Schritte
+ - Entpacken der Nachricht
+ - Aufruf der lokalen Prozedur p() und Übergabe der Parameter
+ - Die Ergebnisse von p() werden vom Server-Stub angenommen, verpackt, an Client-Stub übermittelt
+ - Client-Stub liefert die Ergebnisse an das aufrufende Programm
+ ! Client glaubt, die lokale Prozedur p() aufgerufen zu haben 
+ - – in Wirklichkeit entfernt ausgeführt
+*** (KMS) Ablauf RPC 
+
+
+
+
+
+
+
+
+
+ Caller
+ Callee
+ Call
+ - procedure
+ Start
+ - execution
+ Request
+ Reply
+ Send
+ - results
+ Client stub
+ - p(a) {/*Client stub */
+ - Nachrichtenpuffer m;
+ - m=Einpacken(a);
+ - send(Server,m); 	/*Auftrag */
+ - receive(m);	    /*Ergebnis */
+ - r=Auspacken(m);
+ - return r; }
+ LOOP{ {/*Server stub */
+ - receive(m); /*Auftrag */
+ - a=Auspacken(m);
+ - r=rp(a); /* Lokaler Sprung */
+ - 
+ - 
+ - m=Einpacken(r);
+ - Send(client,m);}
+*** Marshalling 
+ Marshalling: taking parameters/results of a procedure call and prepare them for transmission over a network
+ - To ensure, e.g., transparency between different hardware, operating systems, programming languages
+ - Handled by client stub & server stub/skeleton 
+*** RPC as middleware 
+ RPCs present a more abstract view of a distributed system than a request/reply protocol directly realized with sockets 
+ - New programming model! 
+ - Collection of software realizing such a new programming model is a middleware 
+ - Can achieve, e.g., transparency towards location, communication protocols, hardware, operating system, different programming languages, … 
+*** Copy/restore semantics 
+
+- ... and its common pitfalls 
+
+
+
+
+
+* From RPC to RMI 
+*** Remote Method Invocation & Distributed objects
+ Goal: provide a distributed version of the object model made available by object-oriented programming languages
+ - 
+ - Ingredients of a “normal” object model (think: Java, C++, …)
+ - Program: Collection of objects, each with data & methods, 
+ - interacting with each other by means of method invocations 
+ - Object references: Necessary to access (identify) any object 
+ - Interfaces: Defines signature of a set of methods, possibly implemented by a call 
+ - Action: Invoke a method; effects: state change, new instance created, further method invocations 
+ - Exceptions
+ - Garbage collection
+*** Distributed objects 
+ In OO: state of a process is collection of the state of its objects 
+ - State is separated anyway
+ - Separating this state further onto different processes (and possibly machines) is the natural extension leading to distributed objects 
+ - Entails some limitations, e.g., no direct data access into objects, only methods 
+ - Provides new possibilities, e.g., replicating an object to several machines 
+*** Distributed object model
+ Interacting objects are no longer in a single process, but distributed onto several processes 
+ - Requires appropriate notions of 
+ - Remote object reference: Unique identifier of an instance in the entire distributed system, not only within a single process 
+ - Might contain: IP address, process ID, object ID within this process 
+ - Remote interface: Contains methods that are remotely invocable 
+ - Object might have an additional local interface 
+ - Typically specified in a programming-language-neutral form to allow invocations from other programming languages – an 
+ - interface definition language (IDL)
+*** Distributed object model
+ Requires appropriate notions of
+ - Actions in a distributed object system
+ - Method invocations might cross several process boundaries 
+ - Where/in which process is a new object instantiated? 
+ - E.g., in the process from which instantiation was requested? 
+ - At a remote process (via a “proxy instantiator”?)
+ - 
+ - 
+ - 
+ - 
+ - Exceptions transported from one process to another
+ - Distribution itself will cause new forms of exception, e.g., timeouts – make them visible to programmer or not?
+ - Distributed garbage collection 
+*** RMI design issues: Invocation semantics 
+ Local method invocations: Executed exactly once
+ - Remote method invocations: Not so easy
+ - Compare discussion on details of request/reply protocol
+ - Issues: retry request message, duplication filtering, reexecute/history for retransmitting reply messages
+ - Possible resulting semantics: maybe, at-least-once, at-most-once (exactly-once not possible in distributed systems!) 
+*** RMI implementation 
+ In principle: Very similar to RPC implementation 
+ - In detail: Middleware needs to provide some extra functionality to deal with remote object references, details of object lifetime, etc. 
+ - E.g., how to obtain a remote object reference in the first place? A binder service can provide such bootstrapping (e.g., RMIregistry) 
+
+
+* Examples: Java RMI, zerorpc 
+*** Overview
+ Basics: Data exchange, sockets 
+ - Client/server
+ - Mechanisms 
+ - Remote procedure call
+ - Remote method invocation & distributed objects
+ - Case study: Java RMI 
+ - Case study: ZeroRPC
+ - Case studies
+*** Case study: Java RMI 
+ Goal: Extend Java’s object model to a distributed one 
+ - Some design decisions
+ - Limited transparency 
+ - Caller and callee know about their remote relationship: Caller must handle RemoteExceptions, callee must implement the Remote interface
+ - Parameter-passing semantics differs between local and remote invocations 
+ - Single-language design 
+ - No interoperability with other languages 
+ - No separate interface definition language necessary 
+ - Classes not locally available can be loaded via the network 
+ - Dedicated service to lookup remote object references – rmiregistry 
+*** Java RMI – remote interfaces and parameters  
+ Remote interfaces in RMI 
+ - Defined by extending the Remote interface (from java.rmi package)
+ - Methods in interface must (at least) throw RemoteException
+ - Remote interfaces can have remote objects as parameters
+ - Parameter and result passing
+ - Marshalling happens via serialization ! any input parameter or result must implement the Serializable interface 
+ - Missing classes are downloaded 
+ - Remote references can be passed between remote interfaces ! method invocations on these references will result in remote method invocations; reference is passed by-value 
+ - Non-remote objects are serialized, copied, and passed by-value 
+ - 
+*** Java RMI – RMIregistry 
+ RMIregistry provides remote references to remote objects 
+ - An instance must run on any computer hosting remote objects 
+ - Essentially a table, mapping textual object names to real remote references 
+ - Accessed via the Naming class 
+ - Core methods
+ - bind/rebind: put an entry into the table, making the invoker’s local object remotely accessible 
+ - lookup: provides a remote object reference, matching a given textual description to the invoking client 
+ - Location of the server computer/rmiregistry must be known to the client program! 
+ - I.e., IP address & port number (usually default 1099 is used)
+*** Java RMI – Overview 
+
+
+ Lookup()
+
+ Clientrechner
+ Clientprogramm
+ Call remote method
+
+ - Stub
+
+ Registry
+ Serverrechner
+ 1099
+ ObjImpl_Stub.class
+ ObjImpl_skel.class
+ ObjImpl.class
+ - rebind(Obj)
+
+ 2. Wo ist das entfernte Objekt?
+ 3. Entferntes Objekt gefunden
+
+ 4. Anforderung Stub
+
+ 5. Lieferung Stub
+
+
+ 6. Rufe entfernte Methode auf
+
+
+ 7. Gebe das Ergebnis zurück
+ 1. Registrierung
+*** Overview
+ Basics: Data exchange, sockets 
+ - Client/server
+ - Mechanisms 
+ - Remote procedure call
+ - Remote method invocation & distributed objects
+ - Case study: Java RMI 
+ - Case study: ZeroRPC
+ - Case studies
+*** zerorpc 
+ 89
+*** zerorpc: HelloWorld 
+ Distributed Systems, Ch. 2:  Basic Interaction Patterns
+ 90
+ Port number identifies object 
+*** zerorpc: Streaming Reponses 
+ Distributed Systems, Ch. 2:  Basic Interaction Patterns
+ 91
+*** zerorpc: Basic structure 
+ 92
+
+
+*** Case study: Apache Thrift 
+
+- Java :-( ); 
+- https://thrift.apache.org
+
+
+
+*** Python Tornado 
+
+
+
+
+* WebServices: A tale from the past 
+
+*** One upon a time: Web services 
+
+*** Web services to the rescue… 
+ Remedy: Web services
+ - Provide a standard way of interacting between clients and servers that can be easily integrated into arbitrary programs
+ - Use standard Web-based infrastructure to do so
+ - Instead of RPC-like mechanisms 
+ - 
+ - 
+ - 
+*** Web Service: Definition (ca. 2004)  
+ 96
+*** Infrastructure and components for Web services 
+ Required
+ - A transport protocol between client and server
+ - Often: HTTP (over TCP over IP) – but alternatives exist 
+ - A representation syntax how to format service invocations and answers 
+ - Often: SOAP, written out in XML 
+ - A means to describe & find web services – WSDL & UDDI, covered later
+
+
+*** Comparison: Web services and distributed object model
+ At first glance: Very similar – Web service is but an interface to a remote object
+ - 
+ - But some subtle differences exist
+ - Web services are essentially a single remote object – they cannot be instantiated to form “new services”, no remote object references, no garbage collection, … 
+ - Transport protocols and syntax can be vastly different 
+ - Distributed object systems usually use proprietary protocols for interaction between objects, not HTTP/XML/SOAP 
+ - 
+ - 
+

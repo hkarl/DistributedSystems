@@ -33,4 +33,7 @@
 
 #+include: "../ch_02_web_CS/ch_02_web_CS.org" 
 
+** Remote Procedure Call: An alternative look at Client/Server" 
+
+#+include: "../ch_03_RPC_CS/ch_03_RPC_CS.org" 
 

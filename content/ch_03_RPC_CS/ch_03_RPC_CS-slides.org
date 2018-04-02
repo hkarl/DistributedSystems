@@ -1,0 +1,9 @@
+#+TITLE: Remote Procedure Call
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_03_RPC_CS.org"
