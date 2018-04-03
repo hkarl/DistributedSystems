@@ -1,0 +1,9 @@
+#+TITLE: Distributed storage and consistency
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_10_distStorage.org"

@@ -1,0 +1,319 @@
+
+
+Issue: Leader election under Dealing with failues? Maybe move up to a
+better place? 
+
+** Leader election 
+
+
+*** Goal of leader election
+
+ - Suppose a distributed system consists of a collection of homogeneous participants
+ - How to pick one out of this group?
+ - Purpose: this one might take over certain duties, additional tasks, coordinate other system participants, … 
+ - “Break symmetry” 
+ - 
+ - Crucial requirement: This choice is unambiguously known to all group members! 
+ - Leader election problem 
+*** Leader election algorithms – assumptions 
+ Basic assumptions
+ - Each participant has a unique identifier
+ - Goal is to choose that member with the largest identifier as leader
+ - Set of all identifiers unknown to all participants 
+ - 
+ - Fault assumptions
+ - Processes may or may not fail, may behave in a hostile fashion 
+ - Messages may or may not be lost, corrupted, … 
+ - Different algorithms can handle different fault assumptions 
+ - 
+ - Time assumptions
+ - Synchronous time model – all processes operate in lock-step, bounded message transit time? 
+ - Asynchronous model – no such bounds available? 
+*** Leader Election in a Synchronous Ring
+ Assumptions
+ - G is a ring consisting of n nodes
+ - Nodes are numbered 1 to n
+ - Nodes do not know their indices, nor those of their neighbors
+ - Node can distinguish its clockwise neighbor from its counterclockwise neighbor 
+*** Leader Election in a Synchronous Ring
+ Task
+ - Find an algorithm so that at the end of each execution exactly one node declares itself the leader
+ - Possible variations 
+ - All other nodes additionally declare themselves the non-leader
+ - G is unidirectional or bidirectional
+ - n is known or not 
+ - Processes can be identical or different (by UID)
+ - Possible with identical processes?
+*** LCR Leader-Election-Algorithmus
+ Simple algorithm by Le Lann, Chang, and Roberts (LCR)
+ - Assumptions: G unidirectional, n unknown, only leader performs output, nodes know their uniform identifier (UID)
+ - 
+ - Algorithm (informal)
+ - Each node sends its UID to its neighbor. A received UID is compared to a node’s own UID. 
+ - If new UID < own UID: ignore new UID, send largest UID so far 
+ - If new UID > largest so far occurred UID: pass this UID on
+ - If new UID = own UID: claim leadership
+ - 
+ - Invariant: Each node sends in every round the largest so far occurred UID to its neighbor
+ - 
+*** LCR Leader Election
+ Proof of correctness: induction over number of rounds
+ - Time complexity: O(n)
+ - Message complexity: O(n2) 
+ - 
+ - Time complexity is acceptable, but many messages 
+ - Algorithm with substantially fewer messages possible? 
+ - 
+ - 
+*** Leader Election in Arbitrary Graphs
+ FloodMax algorithm
+ - Assumption: diameter d of the graph is known
+ - Every process sends in every round the so far largest UID to its neighbors
+ - After d rounds the process is leader that has not seen a greater UID than its own 
+ - Improvement
+ - Process sends only messages to its neighbors if it received a value larger than its own
+ - After d rounds the winner is again determined
+ - Synchronization!
+*** Leader Election in Arbitrary Graphs
+ Leader Election possible even if neither the number of nodes nor the diameter of the graph are known? 
+ - 
+ - Yes! 
+ - One possibility: search the whole graph
+ - How? Tip: breadth-first search
+ - Or by intermediate steps – first determine the diameter
+ - How? Tip: breadth-first search
+ - See exercise sheet
+ - 
+ - 
+ - 
+*** Leader Election in Asynchronous Networks
+ Adaptation of optimized FloodMax
+ - In the beginning each process sends its UID to every neighbor 
+ - When a process sees a UID that is greater than the so far greatest, it sends it to its neighbors 
+ - Properties
+ - Eventually, all processes will receive the largest UID
+ - But when to terminate???
+ - In the synchronous model it was simple by counting the rounds, but here unclear! 
+ - Would knowledge about the graph’s diameter help?
+ - Different solutions possible (spanning tree and the like), but more expensive than in the synchronous model
+ - 
+*** Spanning Tree 
+ Spanning tree for the execution of broadcasts
+ - Spanning tree: partial graph that contains all nodes but only edges to create a tree
+ - Size or diameter of the graph are unknown
+ - Algorithm
+ - The root node sends a search message to each neighbor 
+ - Processes that receive a search message
+ - Mark themselves as part of the tree
+ - Set the sending node as father node in the tree
+ - Send a search message to each neighbor (except for father)
+ - Already marked nodes ignore search messages
+*** Spanning tree state machine 
+ 14
+ Variables: parent, nNACK, nDONE, 
+ - Given: nNeighbours   
+ - DONE messages can carry payload, e.g., largest ID seen so far 
+*** Spanning Tree – Properties 
+ Algorithm terminates when no search messages are on the way (how can this be detected?)
+ - Algorithm creates spanning tree
+ - In a synchronous network this algorithm even creates a breadth-first spanning tree! 
+ - Send message with search messages for broadcast
+ - Child pointer ascertainable by “reflected” search messages 
+ - Convergecast: leaves send information along the tree to the root
+ - Useful for distributed termination, e.g. with a leader election: each node starts a Broadcast/Convergecast
+*** Bully algorithm
+ Assumption 
+ - All nodes know already the unique IDs of all other nodes
+ - So leader choice is trivial, but …
+ - … nodes, including coordinators, may fail 
+ - Algorithm
+ - Once a node suspects the coordinator of having failed, it sends an ELECTION message to all nodes with a larger ID 
+ - If initiator does get no answer at all, it becomes the new coordinator 
+ - If this initiator gets an answer from one of these nodes, that node will take over coordinator role
+ - How to handle multiple answering nodes? 
+ - Recursive process of becoming initiators again, until one node does not get any answers any more 
+*** Example: Bully-Algorithm
+
+ 4
+
+ 6
+
+ 1
+
+
+ 2
+
+ 5
+
+ 0
+
+ 3
+ Coordinator
+
+
+ Election
+ Election
+ Election
+ OK
+ OK
+ 7
+ Election
+ Election
+ Election
+ OK
+
+ Coordinator
+
+** Distributed mutual exclusion 
+
+*** Mutual exclusion in distributed systems
+ Problem of mutual exclusion: when processes execute concurrently, there may be crucial portions of code which may only be executed by at most one process at any one time 
+ - This/these piece(s) of code form a so-called critical region
+ - In non-distributed systems: semaphores to protect such critical regions 
+ - But this does not directly carry over to distributed systems! 
+ - 
+ - Options
+ - Centralized algorithm
+ - Distributed algorithm 
+ - Token-Ring-based algorithm 
+*** A centralized algorithm for mutual exclusion 
+ Run a leader election algorithm, determine a coordinator for a critical region 
+ - Known to everybody
+ - Coordinator holds a token for the critical region 
+ - Node who wants to enter into the region sends message to coordinator
+ - If coordinator owns token, send it
+ - Else, put request into a queue 
+ - After leaving the critical region, send back token to coordinator 
+ - 
+*** Example: Mutual-Exclusion-Server
+
+ p1
+ p2
+ p3
+ p4
+ Server
+
+ Request 
+ -           token
+
+ 2. Grant 
+ -   token
+
+ 3. Request 
+ -           token
+ 4
+ Queue of
+ - requests
+
+
+ 4. Request 
+ -     token
+ 2
+
+ 5. Release  token
+
+ 6. Grant  token
+
+ Token
+
+*** Properties
+ Mutual exclusion is achieved
+ - Fair – requests are served in order 
+ - Easy to implement
+ - Per access to critical region, only three messages are required  
+ Coordinator is single point of failure
+ - When a requester is blocked, impossible to distinguish between a failed coordinator and a long queue
+ - Coordinator becomes a performance bottleneck in large systems 
+ - In particular when serving more than one critical region 
+*** Distributed mutual exclusion
+ How to achieve mutual exclusion without a coordinator? 
+ - 
+ - All processes use multicast 
+ - All processes have a logical clock 
+ - When trying to enter into the critical region
+ - Send a request to all other nodes
+ - All other nodes have to agree to such a request before a node may enter critical region 
+*** Example distributed mutual exclusion (1)
+ p1
+ p2
+ p3
+
+
+
+ Timestamp = 8
+ 8
+ 8
+ Timestamp = 12
+ 12
+ 12
+ Prozesses p1 and p3 want to enter critical region
+ Prozess p1 has smallest timestamp and wins
+*** Example distributed mutual exclusion(2)
+ p1
+ p2
+ p3
+ OK
+ OK
+ OK
+ Prozess p1 has smallest timestamp and wins
+ p1 enters critical region
+*** Example distributed mutual exclusion (3)
+ p1
+ p2
+ p3
+ OK
+ Once prozess p1 is done, it leaves critical region and sends OK to p3.
+ p1 leaves critical region
+   p3 enters critical region
+ Any problems if these messages are not delivered in atomic order???
+*** Algorithm (Ricart and Agrawala, 1981)
+ On initialization
+ - 	state := RELEASED; 
+ - To enter the section
+ - 	state := WANTED;
+ - 	Multicast request to all processes;		
+ - 	T := request’s timestamp;
+ - 	Wait until (number of replies received = (N – 1));
+ - 	state := HELD;
+ - 
+ - On receipt of a request <Ti , pi> at pj (i ≠ j)
+ - 	if  (state = HELD or (state = WANTED and (T, pj) < (Ti, pi)))
+ - 	then 
+ - 		queue request from pi without replying; 
+ - 	else 
+ - 		reply immediately to pi;
+ - 	end if
+ - To exit the critical section
+ - 	state := RELEASED;
+ - 	reply to all queued requests;
+*** Properties of distributed mutual exclusion 
+ In simple form, each node turns into a single point of failure 
+ - N of them, instead of just one
+ - Can be overcome by using additional protocol mechanisms
+ - E.g., a more powerful group communication protocol! With terminating reliable multicast 
+ - Each process is involved in decision about access to critical region, even if not interested 
+ - Possible improvement: simple majority suffices 
+ - In total: slower, more complicated, more expensive, less robust
+ - 
+ - 
+ - “Finally, like eating spinach and learning Latin in high school, some things are said to be good for you in some abstract way.” (Tanenbaum) 
+ - 
+*** Comparison mutual exclusion
+
+
+** Chubby  lock service 
+
+*** Auxiliary service: Chubby lock service  
+ 25
+ M. Burrows, The Chubby lock service for loosely-coupled distributed systems, proc. of OSDI 2006
+*** Chubby design rationale 
+ 26
+*** Chubby system structure 
+ 27
+
+
+** Alternative: Zookeeper as support system 
+
+-
+  https://www.igvita.com/2010/04/30/distributed-coordination-with-zookeeper/ 
+

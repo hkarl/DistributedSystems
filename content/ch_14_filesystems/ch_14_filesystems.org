@@ -1,0 +1,385 @@
+   
+** Overview, Conventional file systems 
+
+- NFS, AFS, ... 
+
+
+*** Distributed File System
+ Basic functions of a file
+ - Permanent storage
+ - Sharing of information
+ - Distributed file systems add salient features
+ - Transparent remote access
+ - Structural: hide number and location of multiple file servers
+ - Access: Local and remote files are equal
+ - Naming: Name gives no hint to location
+ - Replication
+ User mobility
+ - Availability and reliability
+ - Always accessible, never lost
+ - Performance
+ - Never feel the need to explicitly control placement of files
+ - Scalable
+ - Data integrity
+ - Concurrent modifications of a single file
+ - Simple
+ - Diskless workstations
+*** Distributed File Systems
+ Some design assumptions/principles/guidelines
+ - Clients have cycles to burn (compared to servers)
+ - Cache whenever possible
+ - Exploit usage properties
+ - Minimize system-wide knowledge
+ - Trust the fewest possible entities
+ - Batch if possible
+ - 
+*** Put into perspective: Storage systems
+ Sharing
+ Persis-
+ tence
+ Distributed
+ cache/replicas
+ Consistency
+ maintenance
+ Example
+ Main memory
+ RAM
+ File system
+ UNIX file system
+ Distributed file system
+ Sun NFS
+ Web
+ Web server
+ Distributed shared memory
+ Ivy (DSM, Ch. 18)
+ Remote objects (RMI/ORB)
+ CORBA
+ Persistent object store
+ 1
+ CORBA Persistent
+ Object Service
+ Peer-to-peer storage system
+ OceanStore (Ch. 10)
+ 1
+ 1
+ 1
+
+
+
+ 2
+ Types of consistency:
+ -  1: strict one-copy. 3:  slightly weaker guarantees. 2: considerably weaker guarantees.
+ References to Coulouris et al., Distributed Systems
+*** Basic File Model
+ Structure
+ - Unstructured: File is a sequence of data (bytes)
+ - Structured: Indexed, B-Tree, etc.
+ - Modifiability 
+ - Mutable or immutable files
+*** File Access Models
+ Remote service model
+ - Server executes file access requests
+ - Performance problems (network, server)
+ - Prime example: NFS (but adds caching)
+ Data-caching model
+ - Copy data from server to client, exploit locality
+ - Cache consistency problem
+ - Additional problem: Unit of Data Transfer
+ - File, block, byte level
+ - Record level (for structured files)
+*** File Sharing Semantics
+ When are modifications made by a user to a shared file visible to other users of this file?
+ - UNIX semantics
+ - Imposes absolute time ordering on all operations made on a file
+ - Every read operation sees effects of all previous write operations
+ - Particularly, writes to an open file are visible to all users
+ - Difficult to implement in a distributed context 
+ - No caching
+ - No global time base for both reads and writes from different systems, varying latencies
+ - Distributed file systems normally only implement relaxed versions of UNIX file system semantics
+ - Applications should use locks if necessary
+*** File Sharing Semantics
+ Session semantics
+ - Assumption: client performs “open – [read|write]* — close” operations; this is called a session
+ - All changes made during a session are visible only to that particular client, but not to any other client
+ - Changes are publicly visible instantaneously once close occurs — but not in other, already opened instances of the same file: they use a stale copy 
+ - What is the final version if multiple changes have been made?
+ - Problem: Merging of mutually inconsistent differences, whoever closes last takes precedence
+*** File Sharing Semantics
+ Immutable shared-files semantics
+ - File cannot be modified once it is declared sharable
+ - Transaction-like semantics
+ - Treat file access like a transaction
+ - Final file is equivalent to some sequence of accesses
+ - Partial modifications are not visible
+ - What about rollbacks?
+*** File-Caching Schemes
+ Cache location
+ - Assumption: original file on server disk
+ - Options: Server memory, client disk, client memory
+ - Memory cache emphasizes reduced access times, disk cache emphasizes reliability/autonomy
+ - 
+ - Modification propagation (client to server)
+ - Write through: immediately propagate all modifications
+ - Delayed-write
+ - Write on eject from cache, periodic write, write on close
+ - Handling client crashes becomes really nasty… 
+*** File-Caching Schemes
+ Cache validation (server to other clients)
+ - Think: when to reload a WWW page (not a DFS, but basically quite similar)
+ - Client-initiated
+ - Check before every access (defeats the purpose)
+ - Periodic checking
+ - Check on file open
+ - Server-initiated
+ - Server keeps information which file is opened by which client
+ - Client must indicate read or write access when opening files – exclusive write model
+ - Effective model, but has disadvantages
+ - Violates basic client/server model
+ - File servers become stateful
+ - 
+*** Additional Issues in DFS
+ File replication schemes
+ - Transparency
+ - Multicopy update problem
+ - Fault tolerance
+ - Atomic transactions
+*** Overview
+ Name services 
+ - eMail 
+ - Distributed file systems
+ - Basics
+ - Network File System NFS
+ - Andrew File System AFS
+ - Ceph / Ceph File System
+ - Google File System GFS
+ - Web search & Map/Reduce – Google, Hadoop
+ - Voice over IP / Internet Telephony 
+ - Messaging & presence – XMPP 
+ - Cloud computing
+ - Some odds and ends 
+
+
+** NFS, old and new  
+
+*** Case Study: SUN Network File System
+
+
+ Case Study: SUN Network File System
+ Introduced in 1985, first DFS as commercial product
+ - Key interfaces are in public domain since 1989
+ - (Typically) Symmetric client/server relationship
+ - Transparent access to remote files
+ Client
+ /
+ …
+ home
+ students
+ staff 
+ Server 1
+ /
+ export
+ people
+ bob
+ alice
+ …
+
+ - remote
+ - mount
+
+ - remote
+ - mount
+*** NFS Design Goals
+ Emulate UNIX file system interface
+ - Problematic: caching is essential for performance, but conflicts with UNIX one-copy update semantics (updates made to a file behave as if there were only a single copy of a file)
+ - Caching/replication must be completely transparent
+ - Access transparency: both local and remote files are accessed with the same system calls
+ - Location transparency: mapping of remote files to local file name space can hide actual location
+ - Failure transparency: NFS is stateless, most operations are idempotent. UNIX operations must be translated into (different) NFS operations by client modules
+*** NFS Design Goals
+ Performance transparency
+ - Migration transparency
+ - „mount“ allows to integrate different exported file systems at the same point in a local file system
+ - Subtrees can be moved between servers, but (re-) mounting must occur (semi-)manually
+ - Not addressed/achieved:
+ - Replication transparency: some support for replication of administrative data (passwords etc.) via NIS (network information system) in a master/slave concept
+ - Concurrency transparency: UNIX semantics has only rudimentary locking support, not improved by NFS
+ - Scalability: no replication -> server becomes a bottleneck
+*** NFS Implementation
+ Software architecture
+
+
+ Virtual file system
+ UNIX
+ - file
+ - system
+ NFS
+ - server
+ UNIX kernel
+
+
+
+
+ Network
+ Client
+ Server
+*** NFS Implementation (v3) 
+ NFS client and server communicate via RPC 
+ - Sun’s RPC was developed for NFS
+ - Any client can send requests to any server
+ - Will be serviced if authentication is sufficient
+ - Basic NFS operations
+ - lookup : associate a name with a file handle
+ - create, remove, read, write, getattr, setattr : act upon a file handle
+ - Virtual File System introduced to uniformly represent local and remote file systems
+*** NFS Implementation (v3)
+ Access control
+ - NFS server is stateless -> each request must contain access permission information, checked anew for each request
+ - Security problem: arbitrary processes can act as clients and impersonate users – solved by DES encryption of requests
+ - File names are resolved at the client (mount points might be crossed)
+*** NFS Implementation (v3)
+ Caching
+ - At server side: normal UNIX operation of cache, except that cache is operated as write-through cache 
+ - Client side: read and write operations are cached
+ - Introduces potential consistency problems
+ - Timestamps are associated with cached blocks, must be revalidated occasionally
+ - After a validation, caches are assumed to be consistent for some time (typically 3 seconds for files)
+ - Modified pages are flushed asynchronously
+ - Two additional sources of inconsistencies (compared to standard UNIX file system)
+ - Delay after write
+ - 3-second window for cache validation
+ - 
+*** NFS Problems (v3)
+ Performance problems
+ - Frequent use of getattr to fetch timestamps from servers for cache validation
+ - Relatively poor write performance because of write-through caches at the server
+ - Semantics
+ - UNIX file semantics is not perfectly mirrored
+ - Locking not really doable in stateless servers (separate lock server introduced) 
+*** NFS v4 
+ 33
+*** NFS v4 file locking 
+ 34
+*** NFS v4 file locking – share reservation  
+ The result of an open operation with share reservations in NFS.
+ - When the client requests shared access given the current denial state.
+ - When the client requests a denial state given the current file access state.
+ Request
+ - access
+ Current
+ - access
+ - state
+*** NFS summary – transparency aspects 
+ Access: yes – identical interface for clients
+ - Location: no network-wide unique name space (local mount point decision, but possible to configure such that location transp. results)
+ - Migration: not really – moving trees between servers requires reconfiguring clients
+ - Scalability: up to the point where single files become performance bottlenecks 
+ - Replication: only for read-only files
+ - Heterogeneity: yes
+ - Fault tolerance: similar failure modes to local access due to stateless server implementation, idempotent protocol design
+ - Consistency: only (close) approximation of one-copy semantics; ok for most practical applications  
+ - Security: need additional mechanisms (Kerberos, secure RPC)
+ - 
+*** Short Case Study: HA-NFS
+ Goal: highly available network file system
+ - Primary-backup approach
+ - Primary and secondary file server
+ - Connected by dual-ported disk (mirrored) and communication links (replicated)
+ - Normal operation
+ - Only primary accesses disk and handles requests
+ - Secondary sends “Are you alive?” messages to primary
+ - Failover
+ - Primary does not send heartbeat messages
+ - Secondary attempts communication via disk
+ - If still no answer, secondary takes over
+*** Overview
+ Name services 
+ - eMail 
+ - Distributed file systems
+ - Basics
+ - Network File System NFS
+ - Andrew File System AFS
+ - Ceph / Ceph File System
+ - Google File System GFS
+ - Web search & Map/Reduce – Google, Hadoop
+ - Voice over IP / Internet Telephony 
+ - Messaging & presence – XMPP 
+ - Cloud computing
+ - Some odds and ends 
+
+** AFS 
+
+*** Case study: Andrew File System (AFS)
+ Major difference to NFS: Scalability perceived as major goal 
+ - Strategy: Cache entire files locally at clients
+ - Results in whole-file serving and whole-file caching
+ - Opening a file causes transfer of the entire file to the client; changes are sent back to server upon closing the file 
+ - Cache is permanent, even over client reboots 
+ - Consequences
+ - Fits well with files updated by single user, rarely updated files 
+ - Needs substantial local cache to work well (working set) 
+ - Does not fit well with databases – design not optimized for such a use case 
+*** AFS implementation structure 
+ Vice and venus: core AFS processes 
+*** AFS name space 
+
+*** AFS cache consistency
+ Crucial mechanism for cache consistency: Callback promise 
+ - When server supplies copy to client, it guarantees to notify client when any other client modifies the file 
+ - Callback only declares local copies as invalid, does not transfer file (cache invalidation protocol)
+ - Once client opens file, it may need to reload if a callback has turned the local copy invalid 
+ - In case client had to reboot, locally cached files are checked against server before first use 
+ - Update semantics
+ - Tries to approximate one-copy semantics 
+ - Distributing all writes immediately “considered” impractical 
+ - Cache consistency only considered at open/close operations
+ - Note relationship to release consistency, but no locking implied! 
+ - Simultaneous updates are silently lost (not even error message); concurrency control must be implemented by clients if they need it  
+*** AFS system calls operation – Overview 
+
+*** Overview
+ Name services 
+ - eMail 
+ - Distributed file systems
+ - Basics
+ - Network File System NFS
+ - Andrew File System AFS
+ - Ceph / Ceph File System
+ - Google File System GFS
+ - Web search & Map/Reduce – Google, Hadoop
+ - Voice over IP / Internet Telephony 
+ - Messaging & presence – XMPP 
+ - Cloud computing
+ - Some odds and ends 
+
+** Ceph  
+
+*** Ceph: Marketing
+ 45
+ http://ceph.com/docs/master/architecture/
+*** Ceph Architecture 
+
+*** RADOS: Object storage 
+ http://ceph.com/papers/weil-rados-pdsw07.pdf
+*** Ceph Overview
+ …
+ LIBRADOS
+ CEPHFS
+ RBD
+ RADOSGW
+ HOST/VM
+ APP
+ …
+ APP
+ …
+ WS 14/15, v 1.3.3
+ Distributed Systems, Ch 7: Some case studies
+ 48
+
+
+
+
+** CaseStudy: Apache BookKeeper 
+
+https://bookkeeper.apache.org
+

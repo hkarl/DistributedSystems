@@ -71,3 +71,27 @@
 
 
 
+* Distributed data storage and transactions 
+
+** Distributed storage and consistency
+
+#+include: "ch_10_distStorage/ch_10_distStorage.org"
+
+** Distributed transactions
+
+#+include: "ch_11_distTransactions/ch_11_distTransactions.org"
+
+** Limits of distributed data bases: NoSQL
+
+#+include: "ch_12_nosql/ch_12_nosql.org"
+
+** Dealing with failures
+
+#+include: "ch_13_failures/ch_13_failures.org"
+
+** Distributed file systems
+
+#+include: "ch_14_filesystems/ch_14_filesystems.org"
+
+* Towards scale: Examples of large systems 
+

@@ -1,0 +1,103 @@
+
+** CAP and friends 
+
+*** CAP theorem 
+ - https://people.eecs.berkeley.edu/~brewer/cs262b-2004/PODC-keynote.pdf
+ - http://blog.nahurst.com/visual-guide-to-nosql-systems (find better
+   source for picture) 
+
+****  Sharding
+
+ - https://bravenewgeek.com/tag/vector-clocks/
+ - Shapiro,
+ Consistency without concurrency control in large, dynamic systems  https://dl.acm.org/citation.cfm?id=1773921 
+
+
+ - http://www.julianbrowne.com/article/brewers-cap-theorem 
+
+*** What can we hope for? CAP theorem 
+ 7
+ http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6133253
+*** BASE: Give up CAP 
+
+*** Structured approach: STate-machine replication 
+
+ - https://en.wikipedia.org/wiki/State_machine_replication
+
+
+  
+** Case study: Key-value stores 
+
+***  Case study: Key-Value stores, distributed  
+ - Key-Value-Stores, take up Memcache discussion from client/server
+   chapter 
+   - REdis
+     - REdis vs. Memcached
+       - persistent by default
+       - cluster support: https://redis.io/topics/cluster-tutorial
+       - high availability tools: https://redis.io/topics/sentinel
+     - REDIS vs. CAP: CP?
+       - Compare: https://aphyr.com/posts/283-jepsen-redis
+       - http://blog.nahurst.com/visual-guide-to-nosql-systems
+
+
+ - Issue: logical time, happened before, vector clocks, ... here? or in
+   distributed event log? (almost the same thing, in any case...)  
+
+ - Some other examples:
+
+   - RiakKV http://basho.com/products/riak-kv/ 
+
+     - http://basho.com/posts/technical/vector-clocks-revisited/
+
+*** Case study: Distributed event log 
+
+ - Kafka
+   - https://kafka-python.readthedocs.io/en/latest/
+ - Sources:
+   - 
+      http://krasserm.github.io/2015/01/13/event-sourcing-at-global-scale/
+
+*** Other No-Sql data bases 
+ - Long list of possible examples 
+   - Column-style databases
+   - Apache couchDB
+ - E.g., Cassandra
+   - what are 3 fundamental diffs between Cassandra and Riak?
+
+*** Case study: Spanner 
+
+ - Google scalable, multi-version, globally-distributed, and synchronously-replicated database
+ - https://research.google.com/archive/spanner.html 
+
+
+** Case study: Distributed message log (kfaka) 
+
+
+
+*** Case study: Apache Kafka 
+ 61
+ http://kafka.apache.org/documentation.html#introduction
+*** Kafka: Topics 
+ 62
+*** Kafka: Partitions 
+ 63
+*** Kafka: Consumer groups 
+ 64
+*** Kafka: Guarantees 
+ 65
+*** Kafka: Design 
+ 66
+*** Message queuing: Conclusion 
+ 67
+
+
+** Case study: DNS 
+
+*** Another case study: DNS 
+
+ - DNS conceived as a distributed database, custom-designed for certain patterns 
+
+
+
+

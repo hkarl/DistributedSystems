@@ -1,0 +1,404 @@
+
+
+** Reminder: Transactions and ACID 
+
+** Transactions in distributed storage 
+
+*** Transactions in distributed data bases 
+
+ - Two-phase commit 
+   - Examples: MySQL, Postgres, MariaDB
+ - What happens when we distribute storage, how to deal with commits
+   then?
+   - ACID: http://www.bailis.org/blog/when-is-acid-acid-rarely/ 
+ - Exampels:
+   - https://docs.oracle.com/cd/B19306_01/server.102/b14231/ds_txns.htm
+   - https://www.cs.rutgers.edu/~pxk/417/notes/content/transactions.html
+
+ - Three-phase commit 
+
+*** Two-phase commit 
+ The finite state machine for the coordinator in 2PC.
+ - The finite state machine for a participant.
+*** 2PC with faults 
+ 68
+*** From 2PC to 3PC 
+ Distributed Systems, Ch 5: Various distributed algorithms
+ 69
+ Finite state machine for the coordinator in 3PC
+ - Finite state machine for a participant
+
+*** TODO NEEDS MORE MATERIAL 
+
+** Consensus and PAXOS 
+*** The need for consensus: 
+ - Impossibility results 
+ - Paxos commit? here? 
+  
+
+*** Consensus 
+ Problem statement
+ - Each process starts the algorithm with an initial value
+ - Outputs of all processes are required to be the same
+ - All processes must decide for some output value
+ - Often: a particular value is seen as preferable
+ - Different criteria of validity of a solution
+ - Areas of application
+ - Status of a transaction, equivalence of sensor data, failure detection, ...
+ - Consensus is simple to solve in the absence of failures
+ - With failures?
+ - Communication/link failures?
+ - Process failures? 
+ - Time model here: Synchronous model!
+*** Consensus with Link Failures – Model 
+ Coordinated attack
+ - Two armies form up for an attack against each other 
+ - One army is split into two parts that have to attack together – alone they will lose 
+ - Commanders of the parts communicate via messengers who can be captured 
+ - Which rules shall the commanders use to agree on an attack date? 
+ - Developed: modeling of data base problems
+*** Consensus with Link Failures
+ Consensus is impossible to solve in these conditions!
+ - Look at graph G with two nodes and bidirectional edge, each node can decide for 0 or 1 (e.g., abort or commit)
+ - Requirements for the solution algorithm
+ - Agreement: Both processes decide on the same values.
+ - Validity: 
+ - If both processes start with 0, then 0 is the only possible decision value. 
+ - If both processes start with 1 and all messages are delivered, then 1 is the only possible decision value. 
+ - Termination: Both processes eventually decide. 
+ - Very weak requirements – only to exclude trivial solutions
+ - Just always outputting 0 is not valid solution algorithm 
+ - But: not even solvable under such relaxed requirements! 
+ - 
+ - 
+ Proof by contradiction: Assume algorithm exists, 
+ - construct sequence of errors such that algorithm 
+ - has to violate agreement or validity
+*** Consensus with Link Failure – a Way Out? 
+ Consensus with link failures is – even with weak assumptions – not solvable by deterministic algorithms 
+ - 
+ - Possible way out: randomized algorithms 
+ - Algorithm gives a correct result with “high probability”
+ - Idea: an opponent (may destroy messages) tries to mislead the algorithm into a false decision
+ - Modified agreement condition: for each opponent 				P (some nodes decide 0, others 1) < e
+ - e can depend, e.g., on the number of rounds
+*** Overview 
+ Leader election 
+ - Mutual exclusion
+ - Global snapshot
+ - Distributed consensus
+ - Consensus with link failures
+ - Consensus with node failures 
+ - Example algorithm: Basic Paxos 
+ - 2PC and 3PC
+ - Byzantine agreement 
+ - 
+ - 
+*** Consensus with Process Failures
+ Assumptions
+ - Communication is error-free
+ - Processes stop or
+ - Processes show Byzantine (arbitrary) behavior
+ - Many other assumptions are possible
+ - 
+ - In particular: processes can fail if they have sent only a part of a message
+ - Example: Process B sends a broadcast to processes A and C, but fails after the message has been sent to A but not to C
+ - 
+ - 
+ - 
+*** Consensus with Process Failures
+ Correctness conditions
+ - Agreement: No two processes decide on different values.
+ - Validity: If all processes start with the same value, then this value is the only valid one
+ - Sometimes also: The initial value of each process is a valid final value
+ - Termination: All nonfaulty processes eventually decide
+ - Why is it necessary to restrict here to “nonfaulty” processes? 
+ - 
+ - Fault model
+ - At most f processes will fail
+*** Consensus with Failing Processes
+ FloodSet algorithm
+ - Each process stores a subset W out of the valid values V 
+ - Initially: W is the value that the respective process proposes 
+ - After every round each process broadcasts W to all participants 
+ - All received elements are added to W
+ - After f +1 rounds each process decides
+ - Has W only one element, this is the result
+ - Otherwise a default value is chosen (e.g. the smallest possible value v0) – validity makes no requirements for the case when there is more than a single initial value!
+*** Consensus with Failing Processes
+ Why f +1 rounds? 
+ - At most f nodes may fail 
+ - With f +1 rounds, there is at least one round in which no node fails ® in this round consensus is established
+ -  f +1 rounds, O((f +1)n2) messages
+ - Optimizations possible (exponential information gathering algorithms which function also for other failure models)
+ - 
+ - Why not decide after two rounds? 
+ - See exercise sheet
+ - Hint: partly sending before failure
+ - 
+*** Overview 
+ Leader election 
+ - Mutual exclusion
+ - Global snapshot
+ - Distributed consensus
+ - Consensus with link failures
+ - Consensus with node failures 
+ - Example algorithm: Basic Paxos 
+ - 2PC and 3PC
+ - Byzantine agreement 
+ - 
+ - 
+*** Example consensus protocol: Paxos 
+ 55
+ L. Lamport, Paxos made simple, 2001. 
+ - http://research.microsoft.com/en-us/um/people/lamport/pubs/paxos-simple.pdf
+*** Paxos: Roles 
+ 56
+ One request can lead 
+ - to several proposals 
+ - with different values!
+*** Paxos: Quorums 
+ 57
+*** Paxos: Some intuition 
+ 58
+*** Paxos: Normal operation 
+ 59
+*** Paxos Phase 1: Prepare & Promise 
+ 60
+*** Paxos Phase 2: Accepting 
+ 61
+*** Paxos: Normal execution MSC 
+
+*** Paxos: Proposer  fails MSC 
+
+*** Paxos: Battling  Proposers 
+ 64
+
+
+*** Consensus with Byzantine Processes
+ Correctness conditions
+ - Agreement: No two nonfaulty processes decide on different values
+ - Validity: If all nonfaulty processes start with the same value, then this value is the only valid one
+ - Termination: All nonfaulty processes eventually decide
+ - Remark: 
+ - Restriction of the validity conditions to only nonfaulty processes because conditions for the behavior of Byzantine processes make no sense 
+ - n > 3f required (triple modular redundancy not sufficient!)
+ - For failing processes such a limit does not exist!
+ - An algorithm for Byzantine processes does in general not solve the consensus problem for failing processes 
+ - Reason: In version for failing processes all processes that decide have to agree – even processes that fail after they have decided! 	
+ - 
+*** n=3, f=1 does not Solve Byzantine Agreement
+ Example algorithm (no failure)
+ - Round 1: Everybody sends its own value to its neighbor
+ - 
+ - 
+ Round 2: Everybody sends value of each neighbor to the other neighbor
+
+
+
+
+ 1
+ 1
+ 0
+
+
+
+
+
+ 1
+ 0
+ 1
+ 0
+ 1
+ A
+ B
+ C
+
+
+
+
+ 1
+ 1
+ 0
+
+
+
+
+
+ B said 0
+ B said 0
+ A said 1
+ A said 1
+ C said 1
+ C said 1
+ A
+ B
+ C
+*** n=3, f=1 does not Solve Byzantine Agreement
+ Execution a1: C is faulty
+ - Round 1:  
+ Round 2: 
+
+
+
+
+
+
+
+
+
+ B said 1
+ B said 0
+ A said 1
+ A said 1
+ C said 0
+ C said 0
+ A
+ B
+ C
+
+
+
+
+
+ 1
+ 0
+ 1
+
+
+
+
+
+ 1
+ 0
+ 1
+ 0
+ 1
+ 1
+ A
+ B
+ C
+ A and B decide 1 because of validity
+*** n=3, f=1 does not Solve Byzantine Agreement
+ Execution a2: A is faulty 
+ - Round 1:  
+ Round 2: 
+
+
+
+
+ 1
+ 0
+ 0
+
+
+
+
+
+ 1
+ 0
+ 0
+ 0
+ 0
+ 1
+ A
+ B
+ C
+
+
+
+
+
+
+
+
+
+ B said 1
+ B said 0
+ A said 1
+ A said 1
+ C said 0
+ C said 0
+ A
+ B
+ C
+
+ B and C decide 0 because of validity
+*** n=3, f=1 does not Solve Byzantine Agreement
+ Execution 3: B is faulty
+ - Round 1: 
+ Round 2: 
+
+
+
+
+ 1
+ 0
+
+
+
+
+
+ 1
+ 0
+ 0
+ 0
+ 1
+ 1
+ A
+ B
+ C
+
+
+
+
+
+
+
+
+
+
+
+ B said 1
+ B said 0
+ A said 1
+ A said 1
+ C said 0
+ C said 0
+ A
+ B
+ C
+ A and C would have to decide for the same value because of agreement
+*** n=3, f=1 does not Solve Byzantine Agreement
+ Thus: 
+ - a1 ~1 a3
+ - Process A decides 1 in a1 (because of validity condition) and therefore also in a3
+ - a2 ~3 a3
+ - Process C decides 0 in a2 and therefore also in a3 
+ - Processes A and C violate the agreement condition in a3 
+ - 
+ - This algorithm cannot solve Byzantine agreement for n = 3f
+ - Because no statement was made about the type of decision making this holds for all algorithms with this communication structure 
+ - 
+ - Argument can be extended to a proof for arbitrary algorithms with n = 3f (with arbitrary messages, rounds) 
+ - 
+*** Byzantine agreement for n > 4f with 2(f+1) rounds 
+
+*** Example: n=5, f=1, 2(1+1) rounds, 2nd proc is traitor
+
+*** Powerful algorithms for Byzantine Agreement: EIG 
+
+ - To achieve bound n > 3f for Byzantine Agreement, better algorithms needed (which exist)
+ - 
+ - Popular: Exponential Information Gathering 
+ - Each node builds a tree of all the information all other nodes have achieved in all previous rounds 
+ - Complex information exchange among nodes 
+ - Relatively complex decisions rules
+
+
+
+*** Odds and ends 
+
+ - Life Beyond Distributed Transactions: https://queue.acm.org/detail.cfm?id=3025012 
+
+
