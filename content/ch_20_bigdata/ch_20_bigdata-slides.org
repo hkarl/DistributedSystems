@@ -1,0 +1,9 @@
+#+TITLE: Big data and the Map/Reduce programming model
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_20_bigdata.org"

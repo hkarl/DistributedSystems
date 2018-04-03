@@ -1,0 +1,20 @@
+** Virtualization 
+
+- Virtualbox 
+- VMWare ESX?
+- Containers, Docker
+- Briefly! 
+- Example: Vagrant
+
+** Server Configuration / IaC 
+
+- Infrastructure as code
+  - Context: DevOps 
+- Briefly! Just to compensate for Software Engineering Shortcomings 
+  - Chef, Puppet, Ansible, Salt?
+- Discuss delta to container approach; why are these competing approaches 
+
+** Service configuration 
+
+- Example: Canonical Juju 
+

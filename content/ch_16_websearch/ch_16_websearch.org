@@ -1,0 +1,82 @@
+
+
+*** Web search – Google as case study 
+ Overall setup: Several clusters worldwide, each self-sufficient
+ - Serving a google query 
+ - Via DNS-based load balancing, find IP address of a suitable cluster
+ - Query arrives at cluster, via hardware load balancing assigned to a Google Web Server (GWS) in charge of a query
+ - GWS handles HTML processing, coordinates search 
+ - GWS triggers index servers, which use an inverted index, mapping each query word to a list of documents (hit list)
+ - Inverted index: Several terabytes 
+ - Individual hit lists are intersected and scored, determining ranked list of relevant documents, identified by docids
+ - GWS takes docids list, uses document servers to extract, for each element in docids list, title, keyword in context, … from document
+ - Raw documents: > Tens of terabytes 
+ - GWS produces final HTML result page, returns to client 
+ - 
+ L.Barroso, J. Dean, and U. Hoelzle, Web Search for a Planet: The Google Cluster Architecture, IEEE Micro, 2003. 
+*** Google search overview 
+
+*** How to handle load in index/document servers?
+ Work can be easily parallelized
+ - 
+ - For index servers
+ - Divide entire index into pieces – index shards 
+ - Each shard: randomly chosen subset of documents from full index
+ - Each shard served by a pool of machines; one pool per shard
+ - Each request mapped to one specific machine per shard pool
+ - Via intermediate load balancer 
+ - 
+ - For document servers: similar
+*** Some design principles
+ Handle failures in software, not hardware
+ - With an MTBF of 1000 days and 10.000 servers, expected number of failures per day is 10 servers
+ - Use replication for better request throughput and availability
+ - Price/performance beats peak performance
+ - Use commodity PC with best price/performance ratio 
+ - Take into account depreciation cost (e.g., expected useful life is max. 3 years) 
+ - Think about power!
+ - Power supply density limited in data centers
+ - Cooling is a problem 
+*** Google BigTable
+ How to provide a convenient API to store data for search engines? On top of the GFS? 
+ - Answer: BigTable 
+ - Data model: sparse, distributed, persistent, multi-dimensional sorted map 
+ - Index by row key, column key, timestamp
+ - Entry can be any array of bytes
+ - (row: string, column: string, time: int64) ! string 
+ - Via timestamp, multiple versions of entry easily distinguishable 
+ - Columns are grouped into column families 
+ - “anchor:…” 
+ F. Chang, J. Dean, S. Ghemawat, W. C. Hsieh, D. A. Wallach, M. Burrows, T. Chandra, A. Fikes, R. E. Gruber, Bigtable: A Distributed Storage System for Structured Data, Proc. OSDI 2006
+*** BigTable example: WebTable 
+
+*** Handling BigTables
+ Rows are dynamically partitioned into tablets 
+ - Based on lexicographic order 
+ - E.g.: if row keys are inverted URLs (de.uni-paderborn.www), then sorting and partitioning keeps related URLs together 
+ - Tablets are unit of distribution and load balancing; tablet stored on one machine (or replicated) 
+ - Building blocks
+ - Log and data files stored in GFS
+ - SSTable file format 
+ - Chubby: highly available, persistent, distributed lock service 
+ - Used by BigTable to elect master, to discover clients of a master, to allow clients to find their master, as root of its data structure to store small amount of metadata 
+*** Some implementation aspects
+ One master server, many tablet servers
+ - Master assigns tablets to tablet servers, balances load, splits tablets as they grow, collects garbage, … 
+ - Actual data does not move via the master, but directly between tablet servers and clients
+ - Most clients never communicate with master at all 
+ - Tablet location: three-level hierarchy
+ - First level: find ROOT tablet
+ - Root tablet stores all 
+ - METADATA tablet locations
+ - METADATA tablet stores
+ - location of actual tablet, 
+ - using data about tablet as 
+ - row key 
+ - Clients can traverse hierarchy 
+ - bottom-up; initialized via Master
+ - 
+*** Some BigTables 
+
+
+

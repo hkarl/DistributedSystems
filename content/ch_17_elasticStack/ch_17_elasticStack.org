@@ -1,0 +1,10 @@
+
+
+- Was: ELK stack (ElasticSearch, logstash, kibana) 
+- https://www.elastic.co/elk-stack
+- Here, or in big data section? 
+
+
+
+
+

@@ -95,3 +95,49 @@
 
 * Towards scale: Examples of large systems 
 
+** Big file systems: GFS and HDFS
+
+#+include: "ch_15_gfs/ch_15_gfs.org"
+
+** Web search engines
+
+#+include: "ch_16_websearch/ch_16_websearch.org"
+
+** Elastic Stack
+
+#+include: "ch_17_elasticStack/ch_17_elasticStack.org"
+
+* Towards scale: Virtualization 
+
+** Virtualization as a base technology
+
+#+include: "ch_18_virtualization/ch_18_virtualization.org"
+
+** Clouds
+
+#+include: "ch_19_clouds/ch_19_clouds.org"
+
+
+* Big data & machine learning in distributed setups 
+
+** Big data and the Map/Reduce programming model
+
+#+include: "ch_20_bigdata/ch_20_bigdata.org"
+
+** Big data in memory: Spark
+
+#+include: "ch_21_spark/ch_21_spark.org"
+
+** Streaming big data: Storm
+
+#+include: "ch_22_streaming/ch_22_streaming.org"
+
+
+** Machine learning on big data
+
+#+include: "ch_23_ml/ch_23_ml.org"
+
+** Comparisons between different systems
+
+#+include: "ch_24_comparisons/ch_24_comparisons.org"
+

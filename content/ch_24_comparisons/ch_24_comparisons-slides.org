@@ -1,0 +1,9 @@
+#+TITLE: Comparisons between different systems
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_24_comparisons.org"

@@ -1,0 +1,116 @@
+** Clouds 
+
+*** Basic models 
+
+- I/P/SaaS
+- Function as a service or Framework as a Service
+  - Example: AWS Lambda ; https://webtask.io; https://www.iron.io
+- Serverless architectures
+  - https://stackify.com/function-as-a-service-serverless-architecture/
+  - https://martinfowler.com/articles/serverless.html
+  - https://medium.com/@MarutiTech/what-is-serverless-architecture-what-are-its-criticisms-and-drawbacks-928659f9899a 
+- Business models 
+
+**** Cloud computing 
+  74
+**** Cloud computing – “is a service” 
+  75
+**** Taxonomy of cloud computing 
+  76
+  Rimal, Choi, Lumb, A Taxonomy and Survey of Cloud Computing Systems, 2009
+  Licencing model 
+  - Payment systems 
+  - Standardization, in particular to protect against vendor lock-in 
+  - Formal service level agreements (SLA)? 
+  Hoefer, Karagiannis, Taxonomy of cloud computing, 2012 
+**** IaaS
+
+**** PaaS, SaaS 
+
+**** Open Source Examples 
+  Important missing example: OpenStack
+**** A taxonomy tree (Example: Google Apps)  
+  Hoefer, Karagiannis, Taxonomy of cloud computing, 2012 
+
+
+*** Private clouds: OpenStack 
+
+  - OpenStack, the whole family
+    - Neutron
+    - Heat
+    - ... ?
+
+      
+**** OpenStack: THE cloud stack, currently 
+  81
+  https://www.openstack.org/
+**** OpenStack: core and optional projects 
+  82
+**** OpenStack: Conceptual architecture (late 2015 release)
+  http://docs.openstack.org/liberty/install-guide-obs/common/get_started_conceptual_architecture.html
+  Non-trivial system to set up!
+**** Using OpenStack 
+  84
+
+
+
+
+*** Containter-based approach: Kubernetes 
+
+- Basics 
+- Autoscaling (and service discovery) 
+
+*** Main examples for public clouds , APIs 
+
+- AWS, block storage, etc.  
+- Google Cloud
+- Rackspace 
+- ??? 
+
+*** Dealing with heterogeneity 
+
+- Terraform 
+- Libcloud https://libcloud.apache.org 
+
+*** Cluster Management 
+
+- Apache Mesos 
+- Cluster Apache Helix https://helix.apache.org
+  - https://stackoverflow.com/questions/42154354/when-to-use-apache-helix-and-when-to-use-apache-mesos
+  - https://engineering.linkedin.com/blog/2017/02/building-venice-with-apache-helix
+    - Replciated state management, data partition. Fault tolerance. Probably does not fit in this category??? 
+
+
+
+**** Mesos: Cluster resource management 
+
+**** Mesos architecture overview 
+
+**** More examples 
+  87
+  Warning: marketing hype ahead!
+
+
+
+** Examples 
+
+
+*** Example: Amazon EC2
+
+**** Amazon Elastic Compute Cloud (EC2) 
+  88
+**** Other Amazon services 
+  89
+**** Other Amazon services 
+  90
+
+
+
+*** Conclusions 
+
+**** Cloud standardization 
+  91
+**** Cloud challenges 
+  92
+  Zhang, Chen, Boutaba, Cloud computing: state-of-the-art and research challenges, 2010
+

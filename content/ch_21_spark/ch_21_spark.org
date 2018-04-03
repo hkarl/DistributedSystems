@@ -1,0 +1,17 @@
+ - Apache Spark (Crunch as well?)
+
+
+
+*** Post-Map/Reduce: Apache Spark 
+ 65
+ https://databricks.com/blog/2014/10/10/spark-petabyte-sort.html
+*** Apache Spark Logistic regression (similar to k-means)
+ 66
+ http://spark.apache.org/examples.html
+*** Apache Spark/Mlib: kmeans 
+
+
+
+
+Issue: More slides needed here! 
+

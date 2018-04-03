@@ -1,0 +1,6 @@
+** Questions: 
+
+- compare and contrast Kafka, Storm, and Spark 
+
+
+

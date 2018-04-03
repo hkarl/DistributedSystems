@@ -1,0 +1,345 @@
+
+** Big Data 
+
+*** BigData – From scarcity to deluge?  
+ Distributed Systems, Ch 7: Some case studies
+ 29
+*** The Three (or Five?) Vs
+ 30
+
+
+** Basic programming mode: MR
+   
+- BigData / MapReduce
+- Hadoop, Yarn
+
+
+
+*** Programming model: MapReduce
+ Based on GFS and BigTable, programming actual applications remains difficult 
+ - Need to parallelize, consistency, … 
+ - Provide a simple programming model, applicable to wide range of applications
+ - Take a set of input key/value pairs <k1, v1>
+ - Example: List of <URL, PageContent> for all stored Webpages
+ - For each such pair, produce an intermediate set of key/value pairs <k2, v2> - the map operation 
+ - Example: For each URL, produce <word, “1”> for each word appearing in the web page
+ - Map: <k1,v1> ! list( <k2,v2> )
+ - Take these many lists, sort them according to produced key (sort/shuffle) 
+ - List (list (<k2, v2>)) ! list (<k2, list <v2>)
+ - Reduce operation: turn these lists of v2s into individual elements
+ - Done separately for each <k2, list <v2> >
+ - Example: Sum up the word counts for each word appearing in any webpage 
+ - Application programmer has to write map and reduce functions; rest is done by the MapReduce library
+ - Distribution of list to many worker machines, … 
+ J. Dean, S. Ghemawat, MapReduce: Simplified Data Processing on Large Clusters, Proc. OSDI 2004 & 
+ - ComMag article 2008 
+*** MapReduce application code
+ 41
+*** MapReduce big picture 
+ 42
+ Raw data as list of 
+ - (key, value) pairs:
+ - 
+ - [(k1, v1), 
+ -  (k2, v2), 
+ -  (k1, v3), 
+ -  (k1, v4), 
+ -  (k3, v1),
+ -  …. 
+ - ]
+ Map function
+ Shuffle and group
+ List of (key, list of value) pairs:
+ - [(k1, [v1, v3, v4]),
+ -  (k2, [v2]),
+ -  (k3, [v1]),
+ - ...]
+
+ Reduce function
+ List of (key, value) pairs: 
+ - [ (k1, u1)
+ -   (k2, u2),
+ -   (k3, u3), , …]
+ Input reader
+
+
+
+ Raw data 
+*** CountWords – Python example 
+ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. …
+ ['lorem',
+ -  'ipsum',
+ -  'dolor',
+ -  'sit',
+ -  'amet',
+ -  'consetetur',
+ -  'sadipscing',
+ -  'elitr',
+ -  'sed',
+ -  'diam',
+ -  'nonumy',
+ -  'eirmod',
+ -  'tempor',
+ -  'invidunt',
+ -  'ut', …
+ -  
+ mappedWords = [(w, 1) for w in words]
+ [('lorem', 1),
+ -  ('ipsum', 1),
+ -  ('dolor', 1),
+ -  ('sit', 1),
+ -  ('amet', 1),
+ -  ('consetetur', 1),
+ -  ('sadipscing', 1),
+ -  ('elitr', 1),
+ -  ('sed', 1),
+ -  ('diam', 1),
+ -  ('nonumy', 1),
+ -  ('eirmod', 1),
+ -  ('tempor', 1),
+ -  ('invidunt', 1), ... 
+ shuffleDir = defaultdict(list)
+ - for (w,s) in mappedWords: 
+ -     shuffleDir[w].append(s)
+ - shuffle = shuffleDir.items()
+ [('laoreet', [1, 1, 1, 1]),
+ -  ('blandit', [1, 1, 1, 1]),
+ -  ('possim', [1, 1]),
+ -  ('elit', [1, 1, 1, 1]), ...
+
+ reduced = sorted(
+ - 	[ (r, sum(v)) 
+ - 	   for (r,v) in shuffle])
+ [('accumsan', 4),
+ -  ('accusam', 12),
+ -  ('ad', 4),
+ -  ('adipiscing', 4),
+ -  ('aliquam', 4),
+ -  ('aliquip', 4), …
+ f = open ("rawtext", "r")
+ - lines = f.readlines()
+ - f.close() 
+ - words = list (chain.from_iterable([l.split() for l in lines]))
+ - words = [re.sub(r"\.|,", "", w.lower()) for w in words if w]
+
+
+
+*** Preparing Map/Reduce for distributed execution 
+ 44
+*** Example: distributed word count, Map/Reduce style
+ Worker Map #1
+
+ Lorem ipsum dolor 
+ Duis dolor vel 
+ Mapper
+ Mapper
+ [(lorem, 1),
+ -  (ipsum, 1),
+ -  (dolor, 1), …]
+ [(duis, 1),
+ -  (dolor, 1),
+ -  (vel, 1), …]
+ Worker Map #2
+
+ Duis autem vel eum iriure dolor in
+ Mapper
+ [(duis, 1), (autem, 1), (vel, 1),
+ -  (eum,1), (iriue,1),  (dolor, 1), 
+ -  (in,1),  …]
+
+
+
+ Worker Map #3
+
+ Duis ipsum dolor vel eum autem
+ Mapper
+ [(duis, 1), (ipsum, 1), (dolor, 1),
+ -  (vel,1), (eum,1),  (autem, 1),   …]
+
+
+ Shuffle (via network)
+ Worker Reduce #1
+ (lorem, [1])
+ (duis, [1,1,1])
+ (autem, [1,1])
+ Worker Reduce #1
+ (dolor, [1,1,1,1])
+ (ipsum, [1,1])
+ (eum, [1,1])
+ (vel, [1,1,1])
+ (iriue, [1])
+ (in, [1])
+ Reducer
+ Red.
+ Reducer
+ Red.
+ Red.
+ Red.
+ Red.
+ Reducer
+ Reducer
+
+
+
+
+
+
+
+
+
+ (vel, 3)
+ (lorem, 1)
+ (duis, 3)
+ (autem, 2)
+ (iriue, 1)
+ (in, 1)
+
+
+
+
+
+
+ (dolor, 4)
+ (ipsum, 2)
+ (eum, 2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** MapReduce: Distributed Execution 
+ Distributed shuffle/sort
+ - takes place 
+ - automatically!
+*** MapReduce execution overview 
+
+*** Questions to solve 
+ 48
+*** MapReduce example – WordCount with google functions
+ map (String key, String value):
+ - // key: document name
+ - // value: document contents
+ - for each word w in value:
+ - 	EmitIntermediate(w, "1");
+ - 
+ - reduce (String key, Iterator values):
+ - // key: a word
+ - // values: a list of counts
+ - int result = 0;
+ - for each v in values:
+ - 	result += ParseInt(v);
+ - 	Emit(AsString(result));
+
+
+*** MapReduce code example: Count word frequencies 
+
+*** Example: k-means clustering 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ x1
+ x2
+ WS 16/17, v 1.4
+ Distributed Systems, Ch 7: Some case studies
+ 51
+*** k-means as map/reduce 
+ 52
+*** 
+ Mapper
+
+ Mapper
+
+
+
+
+
+ [(c(1), v1),…
+ -     (c(m), vm)]
+ [(c(m+1), vm+1),…
+ -        (c(2m), v2m)]
+
+ Shuffle
+ [(c1, [v(1,1), v(1,2), … ]),
+ -   …
+ -   (c1, [v(1,1), v(1,2), … ]) ]
+
+
+
+ Reduce
+ Reduce
+
+
+ c1’
+ ck’
+ WS 16/17, v 1.4
+ Distributed Systems, Ch 7: Some case studies
+ 53
+*** Python k-means map/reduce  (NOT distributed!)  
+ Distributed Systems, Ch 7: Some case studies
+ 54
+*** MapReduce: Some old performance figures (2004)
+ Setup: cluster with about 1800 machines
+ - Dual 2GHz Xeon, 4 GB memory, two 160 GB IDE disks
+ - Gigabit Ethernet, ¼ 100-200 Gbps aggregate bandwidth 
+ - Application: Sort 
+ -  Sort 1010 100 byte long records, ¼ 1 TB data
+ - Write sorted output to 2-way replicated GFS file (2 TB output) 
+*** MapReduce: Some more performance figures 
+ 56
+*** Sorting: CloudSort benchmark
+ 57
+ http://sortbenchmark.org
+*** MapReduce statistics @ Google  
+
+*** Hadoop 
+ 59
+*** Hadoop 
+ Shafer, Rixner, Cox, The Hadoop Distributed Filesystem: Balancing Portability and Performance
+*** Hadoop Yarn – Map/Reduce task scheduler 
+ Distributed Systems, Ch 7: Some case studies
+ 61
+ from: http://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/YARN.html
+*** Outlook: SQL-like interaction with a BD infrastructure (*) 
+ 62
+*** Word Count using Pig
+ Distributed Systems, Ch 7: Some case studies
+ 63
+*** Kmeans Using Pig
+ 64
+
+*** PigLatin – advantages over, e.g., Python, SQL?
+ 68
+
