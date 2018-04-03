@@ -92,12 +92,162 @@
  67
 
 
-** Case study: DNS 
+** Directory services: LDAP 
 
-*** Another case study: DNS 
+*** Directory services 
+ Name services 
+ - DNS
+ - X.500, LDAP
+ - eMail 
+ - Distributed file systems
+ - Web search & Map/Reduce – Google, Hadoop
+ - Voice over IP / Internet Telephony 
+ - Messaging & presence – XMPP 
+ - Cloud computing
+ - Some odds and ends 
+*** More general: directory service
+ DNS can only store relative simple mappings <name,attribute> 
+ - Name: fully qualified domain name; attribute: IP address
+ - Lookup: provide name, get attribute
+ - Generalize to directory service
+ - Store collections of arbitrary names and attributes and their bindings
+ - Provide flexible ways of lookup – in particular, lookup via attributes, not only names! 
+ - “Where can I print?”, “Who has phone number 1234567?”
+ - Analogy: 
+ - Directory service = “yellow pages”
+ - Standard services like DNS = “white pages” 
+ - Sometimes, both functionalities present in one service 
+*** Example directory service: X.500 
+ Data stored in a tree structure – Directory Information Tree 
+ - Each node in tree can store wide range of attributes 
+ - Tree + data in nodes: Directory Information Base (DIB)
+ - Conceptually: one single DIB worldwide, stored distributedly at many X.500 servers 
+ - Servers: Directory 
+ - Service Agents (DSA)
+ - Clients: Directory 
+ - User Agents (DUA) 
+ - 
+*** X.500 Directory Information Tree 
 
- - DNS conceived as a distributed database, custom-designed for certain patterns 
+*** X.500 Directory Information Base entries 
+
+*** DIB access & updating
+ Access to DIB
+ - Read: provide absolute or relative path name in tree, returns attributes
+ - Search: Provide filter expression and base node; return all node names for nodes below base node where filter is true 
+ - Updating DIB: Add, delete, modify
+ - Replication and caching of data between multiple servers necessary
+ - But: no details specified in standard how consistency is to be maintained (if at all)
+ - E.g., disseminate updates based on time triggers
+ - Results in only eventually consistent database
+ - Often regarded as acceptable 
+ - 
+*** LDAP
+ Accessing to X.500 needs an API and a protocol
+ - One possible (and common) option: 
+ - Lightweight directory access protocol (LDAP)
+ - RFC 2251
+ - TCP/IP-based interaction with X.500 servers
+ - But can also access other servers which understand the protocol and are not X.500 servers themselves – e.g., Microsoft Active Directory 
+ - Provides secure access, authentication 
+ - 
+ - In practice: Have a look at ldapsearch and related tools 
+ - Try (access to IRB LDAP server): 
+ - ldapsearch -LLL -h irb-ldap2 -b dc=cs,dc=upb,dc=de -x sn=karl
+ - To run your own server: look at www.openldap.org 
+*** LDAP replication
+ LDAP can support replication of database 
+ - 
+ - One example implementation (based on openldap.org): slapd as LDAP server, slurpd as replication daemon 
+ - slapd as server can run as master or slave 
+ - Master server writes replication log file
+ - slurpd periodically checks whether replication log file has changed
+ - If so: lock log file, make private copy, spawn child process for each slave server to update, child process sends private copy to its slave 
+ - 
 
 
 
+
+
+** Directory services: DNS 
+
+
+*** Domain Name System (DNS) – Motivation 
+ Addressing in the Internet uses 4 bytes (IPv4), commonly represented in dotted decimal notation
+ - Nice for machines, impractical for human beings
+ - Do you recognize (or could remember) 131.234.25.30 ? 
+ - 
+ - More convenient: Mnemonic names for communication peers
+ - E.g., www.uni-paderborn.de 
+ - 
+ - Domain Name System (DNS) solves this need
+*** DNS – Architecture 
+ DNS maps names to names (common: IP “addresses”) 
+ - Actually: maps to resource records
+ - Names are structured hierarchically into a name space
+ - Max. 63 characters per component, max. 255 characters total
+ - Domains partition name space, can have subdomains 
+ - 
+ - 
+ - 
+ - 
+ - 
+ - 
+ - 
+ - Mapping done by name servers (well known, hierarchical) 
+*** DNS resource records	 
+ Resource records: Information about domains, single hosts, … 
+ - Structure: 5-tuple
+ - Domain_name: Domain which is described by record (can have multiple) 
+ - Time_to_live: Validity, in seconds
+ - Class: For Internet, always “IN” (anything else rarely seen)
+ - Type: See next page 
+ - Value: Actual value 
+ Check: http://www.dnsstuff.com/
+*** DNS types of resource records 
+
+*** DNS name servers
+ Name space divided into zones, bounded by delegation 
+ - Each zone has a primary name server with authoritative information
+ - Also secondary name server for dependability
+ - Secondaries periodically check whether their copies are up-to-date
+ - Each name server knows about
+ - Its own zone (among others, all the domains not in a children zone) 
+ - Name servers of all its children zones
+ - Its siblings or about some server that knows about the siblings
+ - Practically: Have a look at dig 
+ - 
+*** DNS query resolution
+ Queries by an end system are sent to their pre-configured name server (obtained from configuration, DHCP,…) 
+ - If possible, that name server answers query
+ - If not, it will forward query to the “most suitable” name server in the zone hierarchy it is aware of
+ - Continues recursively
+ - Answer sent back through intermediate servers
+ - Servers may cache replies (with limited time to live)
+ - Practically: Have a look at nslookup
+*** Iterative vs. recursive name resolution 
+ Iterative resolution
+ Recursive resolution
+*** DNS as a distributed system – Some issues 
+ DNS can be regarded as a distributed data store with local replicas (caches) 
+ - Has to serve vast number of lookups; distribution essential for performance and fault tolerance 
+ - Updates 
+ - Originally, assumed to be quite rare 
+ - Essentially: Enter new data into configuration file of authoritative primary name server 
+ - Consistency? 
+ - Inconsistency accepted; stale copies on the order of days ok – eventual consistency, depending on time-to-live value of cache entry  
+ - Cached data is flagged as non-authoritative when replying to client 
+ - No detection scheme for stale data! 
+ - Usually complemented by local naming-like services 
+ - E.g., to store user passwords (NIS, yellow pages, …) – see later 
+*** Dynamic DNS
+ Problem: More hosts than IP addresses; only temporarily assigned IP addresses 
+ - How to find such hosts in DNS? Not possible to put a permanent entry into DNS since IP address might change
+ - Solution: Dynamic DNS
+ - Idea: Once a node, which has a given name reserved, is assigned an IP address, it registers this address with the DNS server in charge of the reserved name
+ - Relatively low time-to-live entries, since values change
+ - 
+ - Practically: Most “home office” switches support registration of devices at one/several dynamic DNS providers
+ - E.g., www.dyndns.com 
+*** Example DNS database (zone: cs.vu.nl) 
 
