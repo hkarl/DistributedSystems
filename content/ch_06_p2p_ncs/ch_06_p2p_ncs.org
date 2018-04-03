@@ -1,0 +1,150 @@
+
+** Distributed hashing tables as lookup table 
+
+*** Distribute a consistent hash table? 
+*** Peer-to-peer systems
+ Client/server issues
+ - Dedicated role of servers breaks symmetry
+ - Servers can become bottlenecks, despite all previous tricks 
+ - In particular: network bandwidth of server farms, cost issue
+ - Idea: Use symmetric responsibilities between all participating nodes 
+ - Turn clients vs. servers into peers 
+ - Hoped-for benefit: Can remove/alleviate bottlenecks by spreading load around 
+ -  → Peer-to-peer systems 
+ - Architectural justification: Resources at the “edge of the network” became much cheaper/plentiful (storage, cycles, bandwidth) 
+ - 
+*** Typical characteristics and key issues
+ Characteristics
+ - Each user contributes resources to the system (storage, cycles, bandwidth)
+ - All participating nodes have equal functional capabilities & responsibilities 
+ - Often: some degree of anonymity of users
+ - Issues
+ - Algorithms for placement and retrieval of information in a P2P system (almost trivial in a client/server system)
+ - Fully decentralized & self-organizing design; no central administration assumed 
+ - Dynamically balance load between resources (storage, processing) 
+ - Handle unpredictable changes in the network and user population 
+*** Early examples & generations  
+ Key peer-to-peer ideas and techniques already present in 
+ - Domain Name System 
+ - Netnews/Usenet (1986)
+ - Xerox Grapevine name/mail delivery service (1982)
+ - Algorithms for distributed consensus (Lamport, 1989)
+ - Classless inter-domain IP routing
+ - “Generations” afterwards
+ - First: Napster (around 1998) – partly centralized 
+ - Second: Freenet, Gnutella, Kazaa, BitTorrent, … (2000-2004)
+ - Improved scalability, anonymity, fault tolerance, … 
+ - Third: P2P middleware, e.g., Pastry, Tapestry, CAN, Chord, Kadmelia, …  (2001-…) 
+ - Application-independent management of distributed resources 
+ - Main difference to 2G: bounded number of hops to target 
+*** Core idea: Resources, GUIDs
+ P2P systems work on resources, sending abstract requests to these resources
+ - E.g., resource = file, request = download 
+ - Resources are identified by a globally unique identifier  (GUID)
+ - Typically derived as a hash value on the state of the resource
+ - GUIDs contain no information about location of a resource 
+ - Changing resource states are difficult to handle
+ - GUID are the same for replicas of a given resource! 
+*** Core idea: Overlay routing 
+ Routing of requests to resources happens on a flat GUID space, decoupled from the underlying network topology
+ - Routing decisions are taken by members of the P2P system, not by the underlying routers
+ - Introduces second level of routing 
+ - → application-level routing overlay 
+ - 
+ - Main tasks
+ - Route request to a given GUID
+ - More precisely: to the nearest copy of a resource with a given GUID
+ - Compute GUID for a new resource, announce it to overlay routing 
+ - Remove resources upon request 
+ - Assign some responsibilities to joining nodes; compensate for leaving nodes 
+*** Comparison: IP routing, P2P overlay routing 
+
+
+** Case study: Pastry 
+
+*** Case study: Pastry
+ Goal: Develop a P2P system supporting this API
+ - Objects are stored on nodes 
+ - put (GUID, data): The data is stored in replicas at all nodes responsible for the object identified by GUID
+ - remove(GUID): Deletes all references to GUID and the associated data
+ - value = get (GUID): The data associated with GUID is retrieved from one of the nodes responsible for it
+ - 
+ - Main problem: More than one node can be responsible for a given GUID (needed for robustness) 
+ - → How to determine these nodes?
+ - Akin to looking up GUID in a hash table → distributed hash table 
+*** Pastry entities
+ Nodes store objects/resources
+ - Have a 128-bit secure GUID, computed as a hash value on the node’s public key 
+ - 
+ - Objects (resources, “things to be stored”)
+ - Have a 128-bit secure GUID, computed as a hash value on the object’s name or same part of the object’s content 
+ - Assign object GUIDs to that node with the smallest distance 
+ - 
+ - Goal: find any object in O(log N) steps, where N=|nodes|
+ - 
+ - (Remark: secure hash value 
+ - Uniformly randomly distributed in entire space
+ - Clashes are extremely unlikely (ignored here)
+ - Provide no clue as to value from which they were computed)
+*** Pastry routing – simplified version 
+ GUID space is assumed to carry a metric, closed to a ring
+ - I.e., distance (2n -1,  0) = 1 
+ - Each node maintains a leaf set of size 2l 
+ - Specifies the l closest neighbors above and below each given node 
+ - 
+ - Trivial routing: Route a request to that neighbor in the leaf set that has the smallest distance to the object GUID
+ - Will eventually deliver the message, but is inefficient 
+*** Pastry routing – simplified version
+ The dots depict live nodes. The space is considered as circular: node 0 is adjacent to node (2128-1). The diagram illustrates the routing of a message from node 65A1FC to D46A1C using leaf set information alone, assuming leaf sets of size 8 (l = 4). This is a degenerate type of routing that would scale very poorly; it is not used in practice. 
+*** Pastry routing – sophisticated version 
+ To reduce number of steps, additional knowledge about nodes far away in GUID space is required
+ - To quickly get the request into the right vicinity 
+ - Stored in a routing table
+ - Organized based on hexadecimal representation of node and object GUIDs
+ - For a GUID space of n bits, p=n/4 hexadecimal digits required to represent GUIDs 
+ - Routing table on a node A has p rows 
+ - Compare two GUIDs and count (from left) number of hexadecimal digits in which they concur 
+ - Example: GUIDA = 6D3FA, GUIDB = 6D4BA concur in first two digits
+ - Look in the corresponding row
+ - Each row has 16 columns; look in column corresponding to target GUID’s digit
+ - This table entry has GUID and IP address of next hop node 
+*** First four rows of a Pastry routing table 
+
+ D
+*** Pastry routing example 
+
+*** Pastry routing algorithm 
+
+*** Host integration
+ For a joining node: how to get leaf set, routing table? 
+ - Joining protocol
+ - Compute GUID for this new node, say, GUID=X 
+ - Contact some Pastry node with GUID, say, A  (X knows A’s IP!)
+ - Preferably, network-wise nearby node 
+ - X sends join message to A 
+ - A sends this join to GUID X via Pastry in normal way, finding node Z which has GUID closest to X among already existing nodes 
+ - X and Z will become neighbors
+ - A, Z, and all nodes in between update X with their routing tables 
+ - 
+ - Additional mechanisms for host failure, fault tolerance, dependability, locality, topological embedding, etc. exist – see literature 
+ - 
+*** Things to note about Pastry (and similar systems)
+ “Closeness” between nodes only refers to the distance defined on the GUID space 
+ - A highly abstract notion
+ - Going from two neighbors in GUID can involve many hops in the underlying IP network 
+ - 
+ - Neighborhood/distance definition in the overlay routing structure is a crucial difference between P2P systems
+ - Pastry: Consider underlying topology by choosing closest node as a neighbor when alternatives are known 
+ - 
+ - Pastry requires an underlying transport protocol 
+ - Typically, UDP 
+ - Optimality of such transport protocols for P2P is an open issue
+
+** Other examples  
+
+
+*** Alternative DHT structure: Kademlia 
+ 20
+*** Some examples 
+ 21
+
