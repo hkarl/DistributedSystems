@@ -40,3 +40,8 @@
 ** Improving Client/Server systems 
 
 #+include: "ch_04_improving_CS/ch_04_improving_CS.org"
+
+** Some practical tools 
+
+#+include: "ch_05_practical/ch_05_practical.org" 
+

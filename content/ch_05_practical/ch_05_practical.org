@@ -1,0 +1,30 @@
+
+* Deployment tools: Why and what for? 
+
+*** Categories 
+
+SErver, system, ... 
+
+
+
+*** Detour: Deplyoment tools 
+ 53
+
+* Examples for deployment tools 
+
+
+*** Deployment tool example: Ansible 
+ 54
+*** Deployment tool example: Ansible Playbook with one play 
+ 55
+
+
+* Continuous integration tools 
+*** Continuous integration 
+ 56
+*** Continuous integration example: Jenkins 
+ 57
+*** CI example: Travis 
+*** Web development/deployment: Resources to look at
+ 58
+
