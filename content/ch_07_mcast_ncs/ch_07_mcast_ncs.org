@@ -1,0 +1,378 @@
+
+New approach: Immediately talk about implementation approaches. Use
+that to introduce vector clocks during the causal bcast! 
+
+Make clear: Here, nothing goes wrong at first. 
+
+
+** Ordering semantics 
+
+*** Group Communication
+ Abstraction: process group
+ - A logical destination for a multicast message whose membership can be kept transparent to the sender
+ - Group communication = sending of messages to all members of a group
+ - Group operations
+ - Create/join a group
+ - Leave a group
+ - Get information on group members (a “view”)
+ - View: Sequence of group members, local property of each member
+ - Send multicast message to all members
+ - Suspect a failed process
+ - Leads to a new view
+ create
+ B joins
+ C joins
+ New view
+*** Request Ordering
+ Reliable Multicast
+ - All group members get a multicast message or no member 
+ - Both possible if sender fails
+ - Simplest requirement possible
+ - Terminating reliable multicast
+ - Always deliver a message, even if sender has crashed
+ - 
+ FIFO multicast
+ - Between any pair of sender & receiver, the messages are ordered FIFO
+ - Per-originator perspective
+ - No statements about message ordering regarding more than two nodes!
+ - 
+*** Request Ordering
+ Atomic order
+ - If r1 and r2 are requests, then either 
+ - r1 is processed before r2 at all shared destinations 
+ - or vice versa
+ - Example: Deposit to a replicated bank account from one site, add interest from another site
+ - Quite expensive in larger systems
+ - Not necessarily FIFO
+ - 
+ - Total order = Atomic + FIFO
+ - Typically, atomic is combined with FIFO, resulting in total order 
+ - 
+*** Request Ordering
+ Causal Order
+ - (Message deliveries are guaranteed to conform to the happened-before ordering (see later))
+ - If r1 and r2 are messages, sending of r1 happened-before sending of r2, 
+ - then r1 is guaranteed to be processed before r2  (at all shared destinations)
+ - Much cheaper than total order
+ - Example: News system – ordering of questions and replies
+ - Does this lead to uniform numbers?
+ - Potential problems: two copies of account balance, overlapping deposit and interest messages (which needs total order)
+*** Hierarchy of Request Orderings
+ Reliable
+ - Multicast
+ Atomic
+ - Multicast
+ FIFO
+ - Multicast
+ Total
+ - Multicast
+ Causal 
+ - Multicast
+ Atomic order
+ Atomic order
+ FIFO
+ FIFO
+ Causal
+*** Request Ordering
+ Sync order
+ - Suppose the desired order guarantee can be expressed per request
+ - If m1 is sync-ordered and m2 is sent with any ordering request, then either
+ - m1 is processed at all nodes before m2
+ - m1 is processed at all nodes after m2
+ - m1 acts as a synchronization point
+ - 
+ - Sync-ordered request flushes outstanding but unprocessed requests from anywhere
+ - Dividing line between past and future
+*** View-synchronous group communication
+ Sync order important for handling crashes 
+ - View messages should allow local decisions about the state of other group members
+ - View messages must be delivered in the same order on all processes
+ - How do views and normal messages relate to each other?
+ - View-synchronous communication requires some additional guarantees
+ - Agreement: if process p delivers message m in view v and then delivers v’, then all processes that are both in v and v’ deliver m in v 
+ - Integrity: No message is delivered twice 
+ - Validity: if a message m cannot be delivered to a process q, the correct processes deliver a new view immediately after the delivery of m and this new view does not contain q 
+ - In such a system, simple programming is possible based on the information contained in the view messages
+*** View-synchronous group communication
+ Possible sequences
+*** View-synchronous group communication
+ Disallowed sequences in view-synchronous comm.:
+ No „messages 
+ - from the dead“!
+
+** Implementation options 
+
+*** Implementing Request Ordering
+ Implementing Request Ordering
+ Application
+ Multicast 
+ - protocol
+ Lower layer communication
+ Originate
+ Transmit
+ Deliver
+ Receive
+ Hold-back
+ - queues
+*** Implementing Request Ordering – Context 
+ 33
+*** Example: Reliable order using deliver/transmit 
+ 34
+ Compare, e.g.:  X. Défago, A. Schiper, and P. Urbán, “Total order broadcast and multicast algorithms,” ACM Comput. Surv., vol. 36, no. 4, pp. 372–421, 2004.
+*** Example: Total order using deliver/transmit 
+ 35
+*** Implementing Request Ordering: Total order 
+ Simple mechanism: a central sequencer
+ - Relatively easy to implement for all ordering semantics 
+ - Often bad idea, thwarts many of the main purposes of replication
+ - Distributed algorithms 
+ - Many algorithms, typically Token passing
+ - Store retransmission requests and information which messages have been received by which nodes in a rotating token
+ - All nodes can compute delivery order from the token
+ Défago et al.
+ Who decides order? 
+*** Total order with central sequencer 
+ Distributed Systems, Ch. 3: Advanced Interaction Patterns
+ 37
+*** Total order with token passing 
+ 38
+
+** Implementation for causal bcast: Logical time 
+
+*** Logical and real time
+ Crucial problem: There is no uniform notion of time in a distributed system
+ - Only local clocks available – but they drift 
+ - 
+ - Two main approaches conceivable
+ - Try to do without information about the real, actual time – order of events is often sufficient ⇒ Logical time
+ - Try to compensate for drift of real clocks ⇒ Clock synchronization 
+ - 
+*** Logical Time in Asynchronous Networks
+ Logical time as substitute?
+ - Idea: maybe absolute order in physical time is not necessary, only causality relationships between events need to be preserved 
+ - ⇒ assign logical times to express this relationship
+ - Local events are ordered unambiguously in time for each process
+ - The logical times of all events have to respect all dependencies between events
+ - Enabling assumption: the order of events in different regions of the network is irrelevant! 
+ - 
+ - Assumptions: Distributed systems based on message exchange 
+*** Partial Order of events
+ Let a be an execution, p a process, m a message
+ - Execution: Sequence of events on all processes resulting from running a distributed program 
+ - Partial order of events
+ - Let ®1 be a partial order on the set of events
+ - ®1 expresses direct dependency
+ - For each event x, y at the same process it holds: 
+ - 		x ®1 y iff x happened before y 
+ - For each m: send(m) ®1 receive (m)
+ - No other event pairs are in ®1
+ - Happened-before 
+ - Let ® be the transitive closure of ®1
+ - ® is called happened-before relation 
+ - (other names: causal ordering, potential causal ordering)
+*** Happened-before relationship, concurrent events
+ It holds:
+ - a ® f (via b, c, d)
+ - But: a and e are not ordered by ®; a and e are concurrent
+ - Two events e1 and e2 are concurrent iff neither e1 → e2 nor e2 → e1 
+ - The happened-before relation represents only potential causality
+ - All messages that possibly had influence on a given event contribute to this partial order
+*** Partial order and logical time
+ A logical time L is an assignment of every event in a to a totally ordered set T 
+ - T represents points in time such that
+ - No two events are assigned the same logical time
+ - The events of a process p have increasing times in their order of occurrence in p
+ - L(send(m)) < L(receive(m)) for all messages m
+ - For any value t Î T there are only finitely many events that get assigned a previous time (progress condition) 
+ - Such an L is called compatible with ® 
+ - Formally: " x,y Î α: x ® y implies L(x) < L(y)
+ - 
+ - Does the contraposition hold? Is L uniquely determined 
+ - by → ?
+ - 
+*** Partial Order for Logical Time
+ L has freedoms compared to ®
+ - Events in different processes can be assigned different times 
+ - if they are concurrent to each other 
+ - Real time does not have this freedom, but this is the key property to algorithmically compute L
+ - 
+ - Crucial property: for a single process alone, a logical time is indistinguishable from a real time
+ - Formal: for every execution a with logical time L there is another execution a’ so that
+ - Events occur (in real time) in the order of logical time L 
+ - For every process: a’ is indistinguishable from a
+ - So-called „rubberband transformation“ 
+*** Assignment of Logical Time – Example  
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+*** Assignment of Logical Time – Rubberband 
+ 11
+
+
+
+
+ P1
+ P2
+ P3
+
+
+
+
+
+
+
+
+
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+*** Logical Time for Asynchronous Algorithms
+ How to algorithmically compute an assignment of a logical time to every event in a distributed system?
+ - LamportTime transformation of a given algorithm A to L(A)
+ - To each process in A a variable “clock” is added, initially 0
+ - Clock is increased at every event (in particular, send or receive)
+ - Logical time of an event:  
+ - 	(clock value immediately after the event, process index)
+ - Send:
+ - Clock is incremented
+ - Clock value is attached to the message (as timestamp)
+ - Receive:
+ - clock = MAX(clock, timestamp of the message) + 1
+ - 
+ - Result: Generated series of times is indeed a logical time and compatible with happened-before on given events 
+*** Lamport Algorithm – Totally ordered clocks 
+
+
+
+
+
+ P1
+ P2
+ P3
+
+
+
+
+
+
+
+
+
+
+
+ (0,1)
+
+ (0,2)
+ (0,3)
+ (1,1)
+ (6,1)
+ (7,1)
+ (2,2)
+ (3,2)
+ (4,2)
+ (5,2)
+ (1,3)
+ (4,3)
+ (5,3)
+*** Overview
+ Logical time 
+ - Happened-before relationship, Lamport Time
+ - Vector clocks & causal multicast 
+ - Real-time clock synchronization 
+ - 
+*** Causal Precedence
+ More general question: construction of the whole causal precedence relation?
+ - For example: decide whether two events are concurrent (causally independent) or not?
+ - Is LamportTime sufficient?
+ - Recall: e → e’ implies L(e) < L(e’)
+ - But: 	 L(e) < L(e’) does not imply e → e’ 
+ - 
+ - Extension to LamportTime necessary!
+*** Vector Clocks
+ For n processes, every process i contains a vector VC with n entries, initially all 0
+ - To every event e a vector time VC(e) is attached 
+ - Idea: each element VC(e)[ j ] represents the number of events that preceded e on processor j
+ - Rules for change of VC on processor i:
+ - If e is an internal or send event it applies 
+ - 		VC[i ] := VC[i ] +1, all other entries remain equal
+ - If e is a receive event it applies
+ - 			VC := max{VC, send vector time of the message}
+ - 			VC[i] := VC[i]+1
+ - Claim: Vector clocks allow to reconstruct the entire causal structure of an execution (e.g. concurrency of events)
+ - Formally: VC(e) < VC (e‘) if and only if e → e‘ !
+*** Comparing Vector Clocks
+ Two vector clocks are equal if they are identical in all components:
+ - 
+ - 
+ - 
+ - One vector clock is smaller than or equal to another if all components are smaller or equal:
+ - 
+ - 
+ - 
+ - Vector clocks are smaller if they are (smaller or equal) and unequal:
+*** Graphical Interpretation of Vector Clocks
+ Vector clocks represent the entire cone of previous events
+ - Comparing vector clocks of two events allows to decide whether one event is causally related to another or independent
+ - Two events are independent (or concurrent) if neither 
+ - e → e’ nor e’ → e
+ - This is equivalent to neither VC(e) < VC(e’) nor VC(e’) < VC(e)
+
+
+*** Realizing Causal Ordering: CBCAST protocol
+ Open question from chapter 3: 
+ - How is causally ordered group communication implemented?
+ - 
+ - CBCAST protocol
+ - Based on vector timestamps
+ - UDP/IP-based, IP multicast used if possible
+ - 
+ - CBCAST algorithm
+ - Let p1, p2, …, pn be group members
+ - Let VTj  be a vector timestamp
+ - VTj [i] represents the count of  multicast messages sent by pi that causally lead up to the latest message delivered to pj
+*** Causal Ordering in ISIS: CBCAST 
+ Update VT 
+ - Initially all VTi  are the zero vector
+ - When pi multicasts a message, increment VTi [i] by one, add resulting VTi to message as vector timestamp vt
+ - Upon message reception at pj, merge local timestamp of pj with timestamp received in the message
+ - Merging timestamps: Maximum per element
+ - Message is delivered at pj if (let vt be the message’s timestamp)
+ - Message must be next in sequence expected from pi:
+ - vt[i] = VTj[i]+1
+ - All causally prior messages that have been delivered at pi  must have been delivered at pj : 
+ - VTj [k] >= vt[k] (for k<>i)
+ - 
+*** CBCAST Example
+
+*** An architectural aside 
+ 22
+
+
+** Case study: VSync 
+
+*** Case study: Vsync  
+ 40
+ http://vsync.codeplex.com/
+*** Overview
+ Peer-to-peer networking 
+ - Group communication
+ - Distributed event systems & publish/subscribe 
+ - Message queuing 
+ - Odds & ends
+ - 
+

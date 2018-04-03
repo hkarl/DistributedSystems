@@ -1,0 +1,47 @@
+
+*** Overview
+ Peer-to-peer networking 
+ - Group communication
+ - Distributed event systems & publish/subscribe 
+ - Message queuing 
+ - Odds & ends
+ - 
+*** Tuple spaces 
+ Idea: use an associative memory of “tuples” 
+ - Access possible via atomic operations: Put & Get
+ - Sometimes: read, notify  
+ - Possibly with wildcards for partial matches
+ - Get REMOVES tuple from the tuple space, new ones have to be reinserted again 
+ - Tuples are not bound in any fashion to a process (no sender or destination, like in a message queue)
+ - Tuples have no notion of a “location” where they are stored → (logically) shared memory 
+ - Closely related to the Linda programming language
+ - See http://cocasoft.cs.tamu.edu/~lidu/courses/mccp02s/papers/GenerativeCommLinda-gelernter85toplas.pdf 
+ - Currently popular examples: JavaSpaces, SlackSpaces, blitz project 
+*** Content-centric networking 
+ 70
+ V. Jacobson, D.K. Smetters, J.D. Thornton, M.F. Plass, N.H. Briggs, 
+ - and R.L. Braynard, "Networking named content," in Proc. 5th intl. 
+ - conf. Emerging networking experiments and technologies – 
+ - CoNEXT, 2009, p. 1.
+*** Mobile code 
+ Client/server: data transmitted to where the code is
+ - Alternative: move code to where the data is → Mobile code
+ - Big security problems obvious
+ - Popular examples: Postscript, Javascript, Java applets 
+ - 
+ - More sophisticated: Mobile agents 
+ - Pieces of code & data that can “travel” from one computer to another, performing some sort of operation 
+ - Example: A search agent, traveling from one traveling agency computer to another, trying to find a good offer
+ - Agents can spawn offspring, merge with other agents, … 
+*** Conclusion
+
+ - Besides client/server systems, there are many alternative possibilities how interaction patterns could look like
+ - 
+ - Wide range of topics and emphasis
+ - Search of objects – P2P 
+ - Delivery semantics – group communication 
+ - Decoupling – publish/subscribe systems 
+ - 
+ - Open: a range of basic algorithmic questions, necessary to realize such systems 
+ - E.g., efficient implementations for group communication? 
+

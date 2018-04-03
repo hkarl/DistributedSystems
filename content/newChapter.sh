@@ -8,3 +8,10 @@ echo -e "#+include: \"../slidehead.org\"\n\n\\\\begin{frame}\n\\\\titlepage\n\\e
 echo "#+include: \"./$1.org\"" >> $1/$1-slides.org
 
 ln -s ../Makefile $1/Makefile 
+
+echo "** $2"
+echo " "
+echo "#+include: \"$1/$1.org\"" 
+
+aquamacs $1/$1.org
+

@@ -1,0 +1,47 @@
+
+** Idea 
+
+*** Events and publish/subscribe systems (blackboards) 
+ Other application scenario: Objects can undergo changes (“events”), other objects want to be notified about such changes
+ - Example: Object = stock price of IBM, can go up or down	
+ - Distributed event-based systems
+ - Objects can subscribe to event notifications of other objects 
+ - They “register interest” in the event 
+ - Objects can publish such notifications; subscribers are notified 
+ - Events may be typed, scoped, have attributes, provide wildcards, … 
+ - Notifications can have various delivery semantics (reliable, …)
+ - Key characteristics 
+ - Heterogeneous 
+ - Decoupling in time (asynchronous): subscription, publication, notification can happen at different points in time 
+ - Decoupling in identity: Neither publisher nor subscribers need to (or should) know their identities
+ - Decoupling in space: Where the matching of subscriptions and publications takes place is irrelevant 
+*** Classification of pub/sub systems 
+ 43
+*** Example: Dealing room system 
+
+
+
+** Case study: Pub/sub with 0mq 
+
+*** Case study: Pub/sub with 0mq  
+ 45
+ http://learning-0mq-with-pyzmq.readthedocs.org/en/latest/pyzmq/patterns/pubsub.html
+*** 0mq – Publisher 
+ http://zguide.zeromq.org/py:wuserver
+*** 0mq – Subscriber 
+ http://zguide.zeromq.org/
+ - py:wuclient
+*** Case study: Jini distributed event specification 
+ Subscribers can subscribe to event notification from objects across Java virtual machines, across computers 
+ - 
+ - Jini implementation 
+ - Event generators implement interface EventGenerator with 
+ - method register
+ - Subscribe to event generator by providing an object implementing the RemoteEventListener interface as target for notifications 
+ - Event generators call notify with an object of class RemoteEvent, delivered via JavaRMI 
+ - 
+ - See (Jini = Apache River): 
+ - https://river.apache.org/
+ - http://www.jini.org/wiki/Jini_Distributed_Events_Specification
+
+

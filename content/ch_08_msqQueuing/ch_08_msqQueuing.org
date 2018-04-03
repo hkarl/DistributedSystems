@@ -1,0 +1,51 @@
+
+** Message queuing semantics 
+
+*** (Distributed) Message queuing 
+ Interaction paradigm: asynchronous sending of messages between a sender and a receiver
+ - Messages stored internally in queue 
+ - Decoupling in time! 
+ - Specifying which message to receive based on ideas from pub/sub systems 
+ - E.g., filter on content, not just on sender 
+ - Messages typically go to exactly one receiver (out of those subscribing to topic)!
+ - Load balancing across receiver  
+ - Unlike: to all subscribers, as in Pub/sub systems 
+ - Atomicity/resilience guarantee: Exactly one receiver picks up a given message, messages are not lost 
+ - Key difference to simple HTTP/REST protocols! 
+ - Cum grano salis…. 
+ - 
+ - Detailed semantics often differ between different MQ realizations 
+ - 
+*** Message queuing: Challenges 
+ 51
+*** Message queuing: Areas, examples
+ 52
+*** Standardization: API vs. protocol 
+ 53
+
+
+** Case study: ActiveMQ 
+
+
+*** Example: Advanced Message Queuing Protocol 
+ Distributed Systems, Ch. 3: Advanced Interaction Patterns
+ 54
+ http://www.amqp.org/
+*** AMQP: Topologies 
+ 55
+*** AMQP – Type system 
+ 56
+ http://www.amqp.org/sites/amqp.org/files/amqp.pdf
+*** AMQP – Other functions 
+ 57
+ http://www.imatix.com/articles:whats-wrong-with-amqp/ 
+*** Case study: ActiveMQ 
+ 58
+ http://activemq.apache.org/
+*** Example aspect: Broker fault tolerance 
+ 59
+*** ActiveMQ: Practical aspects 
+ 60
+ http://activemq.apache.org/
+ - getting-started.html
+

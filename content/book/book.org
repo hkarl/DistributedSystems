@@ -49,3 +49,25 @@
 
 ** Peer-to-Peer systems 
 
+#+include: "ch_06_p2p_ncs/ch_06_p2p_ncs.org" 
+
+** Group communication and multicast semantics 
+
+#+include: "ch_07_mcast_ncs/ch_07_mcast_ncs.org"
+
+
+** Distributed event systems and publish/subscribe
+
+#+include: "ch_08_des_pubsub/ch_08_des_pubsub.org"
+
+** Message queueing
+
+#+include: "ch_08_msqQueuing/ch_08_msqQueuing.org"
+
+** Odds and ends in non-client/server systems
+
+#+include: "ch_09_oddsEnds_ncs/ch_09_oddsEnds_ncs.org"
+
+
+
+

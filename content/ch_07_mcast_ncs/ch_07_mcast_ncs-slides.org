@@ -1,0 +1,9 @@
+#+TITLE: Group communication
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_07_mcast_ncs.org"

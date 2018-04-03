@@ -1,0 +1,9 @@
+#+TITLE: Distributed event systems and publish/subscribe
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_08_des_pubsub.org"

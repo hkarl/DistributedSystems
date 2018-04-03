@@ -1,0 +1,9 @@
+#+TITLE: Message queueing
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_08_msqQueuing.org"
