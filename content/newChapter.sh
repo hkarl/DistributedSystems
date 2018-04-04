@@ -11,7 +11,7 @@ ln -s ../Makefile $1/Makefile
 
 echo "** $2"
 echo " "
-echo "#+include: \"$1/$1.org\"" 
+echo "#+include: \"../$1/$1.org\"" 
 
 aquamacs $1/$1.org
 
