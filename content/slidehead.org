@@ -10,7 +10,7 @@
 #+BEAMER_OUTER_THEME:
 #+LaTeX_CLASS_OPTIONS: [ignorenonframetext,presentation,nooutline]
 #+BEAMER_HEADER:
-#+latex_header: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Table of contents}\tableofcontents[currentsection]\end{frame}}
+#+latex_header: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Table of contents}\tableofcontents[currentsection,hideothersubsections]\end{frame}}
 #+LATEX_HEADER: \usepackage{tikz}
 #+LATEX_HEADER: \usepackage{minted}
 #+LATEX_HEADER: \usepackage{adjustbox}
