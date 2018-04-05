@@ -125,10 +125,74 @@ block/.style = {rectangle, draw=black, thick, align=center}]
 #+NAME: fig:structure_class 
 [[./figures/structure.pdf]]
 
-* TODO An example for this class 
+* An example for this class: FND  
 
-- Slides from FAD, ATOS scenario 
- 
+*** Fake News Detector 
+
+
+
+- Fake News, online rumours: Danger to society
+
+- German government issues call for tender: Build an Internet-scale
+  *Fake News Detector* (FND)
+
+  - Based on recent breakthroughs in artificial intelligence, machine
+    learning, ... 
+
+- Real-time surveillance of all social media sites 
+
+- Goal: Identify and prosecute publishers of fake news 
+
+*** Requirements 
+
+
+**** Requirements                                                     :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.6
+     :END:
+
+- Posts in all social media platforms needs to be checked 
+
+- Super-smart artificial intelligence algorithms will analyze,
+  cross-correlate postings
+
+- New algorithms should be deployable quickly by Federal agents
+
+- Analysis results need to be made available to Federal agents via
+  arbitrary devices (e.g., WebBrowsers or scripts for further
+  analysis) 
+
+
+**** Figure                                                           :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.4
+     :END:
+
+
+#+CAPTION: FAD stakeholders
+#+ATTR_LaTeX: :width 0.9\linewidth
+#+NAME: fig:FAD
+[[./figures/FAD.pdf]]
+
+*** Quantitative Requirements 
+
+Some numbers 
+
+- 0.5 billion user accounts to be analyzed 
+
+- One user produces 320 bytes every 10 minutes, on average
+
+- Output rate can surge dramatically during events of public interest
+
+- Each post has to be tagged as fake/not fake, within maximum 5
+  seconds 
+
+- Upon detection of a fake news item, workload is expected to increase
+  dramatically 
+
+- Maximum acceptable outage time: 1 minute
+
+- Minimum steady-state availability: 99.9 % 
 
 
 * Organization, exam, material
@@ -160,12 +224,13 @@ Consider whether we do a project
  - You should have a look at at least one of the recommended textbooks 
 
 *** Textbooks
-
+  
 - No ideal textbook exists
 - Good, but old fashioned:
   - Steen & Tanenbaum, Distributed systems
     \cite{Steen:DistributedSystems:2017}
-  - Coulouris, 
+  - Coulouris, Distributed Systems
+    \cite{Coulouris:DistributedSystems:2011}  
 - Lot's of material online 
 - See also Mendeley group: \url{https://www.mendeley.com/community/lecture-distributedsystems-upb} 
 
