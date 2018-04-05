@@ -40,3 +40,7 @@ emacs executable in Makefile.
 ### Produced files 
 
 Produced PDFs end up in subdirectory output 
+
+### Convenient latexmk replacement 
+
+fswatch -o *.org figures/*.tex  | xargs  -n1 make slides
