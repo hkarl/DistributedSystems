@@ -7,3 +7,9 @@
 
 
 #+include: "./ch_21_spark.org"
+* References 
+
+
+*** References 
+
+\bibliography{../bib}

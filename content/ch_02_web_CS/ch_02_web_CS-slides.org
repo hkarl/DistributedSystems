@@ -7,3 +7,9 @@
 
 
 #+include: "./ch_02_web_CS.org"
+* References 
+
+
+*** References 
+
+\bibliography{../bib}

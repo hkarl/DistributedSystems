@@ -7,3 +7,9 @@
 
 
 #+include: "./ch_11_distTransactions.org"
+* References 
+
+
+*** References 
+
+\bibliography{../bib}

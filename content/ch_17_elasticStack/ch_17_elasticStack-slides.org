@@ -7,3 +7,9 @@
 
 
 #+include: "./ch_17_elasticStack.org"
+* References 
+
+
+*** References 
+
+\bibliography{../bib}

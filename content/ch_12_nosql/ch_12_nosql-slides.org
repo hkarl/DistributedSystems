@@ -7,3 +7,9 @@
 
 
 #+include: "./ch_12_nosql.org"
+* References 
+
+
+*** References 
+
+\bibliography{../bib}

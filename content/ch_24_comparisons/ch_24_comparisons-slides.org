@@ -7,3 +7,9 @@
 
 
 #+include: "./ch_24_comparisons.org"
+* References 
+
+
+*** References 
+
+\bibliography{../bib}

@@ -7,3 +7,9 @@
 
 
 #+include: "./ch_14_filesystems.org"
+* References 
+
+
+*** References 
+
+\bibliography{../bib}

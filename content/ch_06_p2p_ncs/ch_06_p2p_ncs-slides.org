@@ -7,3 +7,9 @@
 
 
 #+include: "./ch_06_p2p_ncs.org"
+* References 
+
+
+*** References 
+
+\bibliography{../bib}

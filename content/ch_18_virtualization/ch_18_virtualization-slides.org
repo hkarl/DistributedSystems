@@ -7,3 +7,9 @@
 
 
 #+include: "./ch_18_virtualization.org"
+* References 
+
+
+*** References 
+
+\bibliography{../bib}

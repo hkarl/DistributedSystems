@@ -7,3 +7,9 @@
 
 
 #+include: "./ch_05_practical.org"
+* References 
+
+
+*** References 
+
+\bibliography{../bib}

@@ -7,3 +7,9 @@
 
 
 #+include: "./ch_04_improving_CS.org"
+* References 
+
+
+*** References 
+
+\bibliography{../bib}

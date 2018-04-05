@@ -8,3 +8,9 @@
 
 
 #+include: "./ch_basic_CS.org" 
+* References 
+
+
+*** References 
+
+\bibliography{../bib}

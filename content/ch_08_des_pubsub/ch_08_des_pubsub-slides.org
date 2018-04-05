@@ -7,3 +7,9 @@
 
 
 #+include: "./ch_08_des_pubsub.org"
+* References 
+
+
+*** References 
+
+\bibliography{../bib}
