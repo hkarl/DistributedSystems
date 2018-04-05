@@ -1,4 +1,4 @@
-#+TITLE: Orgnizational matter 
+#+TITLE: Distributed Systems -- Organizational matter 
 #+include: "../slidehead.org"
  
 
@@ -8,3 +8,10 @@
 
 
 #+include: "./ch0.org" 
+
+** References 
+
+
+*** References 
+
+\bibliography{../bib}

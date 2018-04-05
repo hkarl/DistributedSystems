@@ -1,30 +1,25 @@
+
+#+BIBLIOGRAPHY: ../bib plain
+
 * Introduction 
 
-*** Overview
- Who are we?
- - Research and teaching at „Fachgebiet Rechnernetze“
- - The topic of „Distributed Systems“
- - Formalities
- - Resources
- - Exams
- - 
 *** Who are we
+
  Fachgebiet „Rechnernetze“ 
  - Prof. Dr. Holger Karl 
  - hkarl@ieee.org oder holger.karl@upb.de 
  - O3.162  
- - Sprechstunde siehe Webseite 
- - 
- - Mitarbeiter: Sevil Mehraghdam, Manuel Peuster
- - 
+ - Office hours: see web page 
  - Web page: http://wwwcs.uni-paderborn.de/cs/cn/
- - 
- - 
+
+
 *** Main research topics
- Main research topics
- In general: architectures and protocols of communication systems
+
+In general: architectures and protocols of communication systems
  - Structure, design, performance evaluation, implementation, …
  - For all types of communication: computer networks, voice communication, data & multimedia content
+
+*** Main research topics 
  More specifically
  - Future mobile and wireless communication
  - What comes after GSM, UMTS, WLAN?
@@ -33,81 +28,107 @@
  - Clouds meet operator networks 
  - Buzzwords: Software-Defined Networking; 
  - Network Function Virtualization 
+
 *** Teaching FG Rechnernetze (Karl)
- Mobil-
- - kommunikation
- Empiric 
- - Performance
- - Evaluation
- Seminar
- VII
- Seminar
- VIII
- Future
- - Internet
- Advanced
- - Wireless (?)
- Festnetz
- Drahtlos/mobil
- Methodik
- Legende: 
- Verteilte Systeme
- Analytic
- - Performance
- - Evaluation (?)
- Projektgruppe
+
+
+
+#+BEGIN_EXPORT latex
+\begin{figure}
+\adjustbox{width=0.9\textwidth}{
+\begin{tikzpicture}[auto, node distance=5cm, xscale=2.5,yscale=1.25,
+block/.style = {rectangle, draw=black, thick, align=center}]
+\node at (0,0) (s4)  {IV}; 
+\node at (0,1) (s5) {V}; 
+\node at (0,2)  (s6) {VI}; 
+\node at (0,3) (s7) {VII}; 
+\node at (0,4) (s8) {VIII}; 
+% 
+\node [block] at (3, 0) (kms) {KMS};
+\node [block,fill=blue!20] at (3,1)  (rnvs){Rechnernetze/\\Verteilte Systeme}; 
+\node [block,fill=green!20] at (1,3)  (mc) {Mobile\\communication}; 
+\node [block,fill=red!20] at (2,4) (fi) {Future\\Internet}; 
+\node [block,fill=yellow!20] at (3,4)  (epe) {Empiric\\Performance\\Evaluation}; 
+\node [block] at (4,4)  (seminar8) {Seminar}; 
+\node [block] at (4,3) (seminar7) {Seminar}; 
+\node [block] at (4,2)  (ps) {Proseminar}; 
+\node [block] at (5,3)  (pg1) {Project\\group}; 
+\node [block] at (5,4)  (pg1) {Project\\group}; 
+%
+\draw [->] (kms) -- (rnvs); 
+\draw [->] (rnvs) -- (mc); 
+\draw [->] (rnvs) -- (fi); 
+\draw [->] (rnvs) -- (ps); 
+\end{tikzpicture}
+}
+\caption{Classes offered by Computer Networks group}
+\label{fig:classes}
+\end{figure}
+#+END_EXPORT 
+
+
 
 
 * What this class is all about 
 
 *** Distributed system (DS)?
 
- - A distributed system is a collection of independent computers that appears to its users as a single coherent system.
- - 							-- A. S. Tannenbaum
- - 
- - A distributed computing system consists of multiple autonomous processors that do not share primary memory but cooperate by sending messages over a communication network.
- - 						-- Henri Bal
- - 
- - A distributed system is one in which the failure of a computer which you didn‘t even know existed can render your own computer unusable.
- - 						-- Leslie Lamport
+#+BEGIN_QUOTE
+ A distributed system is a collection of independent computers that appears to its users as a single coherent system. 			-- A. S. Tannenbaum
+#+END_QUOTE
+
+
+#+BEGIN_QUOTE
+ A distributed computing system consists of multiple autonomous processors that do not share primary memory but cooperate by sending messages over a communication network.
+				-- Henri Bal
+#+END_QUOTE
+ 
+#+BEGIN_QUOTE
+ A distributed system is one in which the failure of a computer which
+ you didn‘t even know existed can render your own computer
+ unusable. -- Leslie Lamport
+#+END_QUOTE
+
 *** Crucial aspects of a distributed system
 
- - Autonomy
- - A distributed system consists of autonomous, independent entities (but usually cooperative ones, not antagonistic ones)
- - Each individual entity is – typically – a full-fledged, operational system of its own 
- - 
- - Transparency 
- - The fact that the distributed system is indeed a conglomerate of different (simpler) systems is of no interest and should be of no concern to the user 
- - 
- - How to achieve this? 
+- Autonomy
+  - A distributed system consists of autonomous, independent entities (but usually cooperative ones, not antagonistic ones)
+  - Each individual entity is – typically – a full-fledged, operational system of its own 
+
+- Transparency 
+  - The fact that the distributed system is indeed a conglomerate of different (simpler) systems is of no interest and should be of no concern to the user 
+
+- How to achieve this? 
+
 *** Topics of “Distributed Systems”
  Even assuming many devices can communicate, this is not enough to turn them into a system
+
  - This class is not about communication as such, 
  - but about how communicating devices can be turned into a useful system
  - It combines 
- - Theoretical/fundamental aspects
- - Practical issues, real-world systems, programming 
- - And tries to explain how and why theoretical aspects are necessary to build systems  
- - Considered examples (some of…) 
- - Platforms/middleware: .NET & Web services, Java-based
- - Systems/case studies: WWW, file systems, Mail, VoIP/SIP, CDN
+   - Theoretical/fundamental aspects
+   - Practical issues, real-world systems, programming 
+   - And tries to explain how and why theoretical aspects are necessary to build systems  
+
 *** Non-Topics of “Distributed Systems”
  This class is not about 
  - Communication protocols – it helps to know the material of the lecture “Rechnernetze” (Computer networks) 
  - Distributed algorithms – treated where necessary, but not in focus
  - Parallel computing (hardware or software) – treated occasionally in passing
  - Programming 
-*** Overview
- Introduction 
- - Basic Interaction Patterns
- - Advanced Interaction Patterns
- - 
- - Time in distributed systems – Logical and real
- - Various distributed algorithms
- - Replication and consistency
- - 
- - Some case studies 
 
+
+*** Structure  of this class 
+
+
+#+CAPTION: Structure of this class
+#+NAME: fig:structure_class 
+[[./figures/structure.pdf]]
+
+* TODO An example for this class 
+
+- Slides from FAD, ATOS scenario 
+ 
 
 
 * Organization, exam, material
@@ -117,35 +138,36 @@
  - This lecture will also include some practical exercises 
  - Programming
  - (We used to do VMWare-based actual installations, but nobody was interested ) 
- - 
  - Assignments will be discussed in “Tafelübung”; they will not be graded or used for bonus points, … 
-*** Project!
+
+*** TODO Project!
+
+Consider whether we do a project 
+
+
 *** Exam
 
  - Written exam
- - 
  - Date and time: 
- - First instance: ??? (time and location: unknown) 
- - Second instance: ?? 
- - 
+   - First instance: ??? (time and location: unknown) 
+   - Second instance: ?? 
  - Material of both lecture and exercises is relevant for the exam
+
 *** Material
 
  - There will be no script 
- - 
  - Slides will be available on the class web page prior to lecture 
- - 
  - You should have a look at at least one of the recommended textbooks 
+
 *** Textbooks
 
-- no ideal textbook exsits 
-- Good, but old fashioned: Tanenbaum, colouris
+- No ideal textbook exists
+- Good, but old fashioned:
+  - Steen & Tanenbaum, Distributed systems
+    \cite{Steen:DistributedSystems:2017}
+  - Coulouris, 
 - Lot's of material online 
-- See also Mendeley group 
-
-* TODO An example for this class 
-
-- Slides from FAD, ATOS scenario 
+- See also Mendeley group: \url{https://www.mendeley.com/community/lecture-distributedsystems-upb} 
 
 
  
