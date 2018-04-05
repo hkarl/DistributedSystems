@@ -27,6 +27,11 @@ output/*.pdf
 content/book/book.tex
 content/book/book.pdf
 content/ch*/ch*-slides.pdf
+content/ch*/figures/*.pdf
+content/ch*/figures/*.png
+content/ch*/ch*.tex
+
+
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 *.bbl
