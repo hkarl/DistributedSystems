@@ -144,13 +144,13 @@ Make clear: Here, nothing goes wrong at first.
  - Only local clocks available – but they drift 
  - 
  - Two main approaches conceivable
- - Try to do without information about the real, actual time – order of events is often sufficient ⇒ Logical time
- - Try to compensate for drift of real clocks ⇒ Clock synchronization 
+ - Try to do without information about the real, actual time – order of events is often sufficient $\rightarrow$ Logical time
+ - Try to compensate for drift of real clocks $\rightarrow$ Clock synchronization 
  - 
 *** Logical Time in Asynchronous Networks
  Logical time as substitute?
  - Idea: maybe absolute order in physical time is not necessary, only causality relationships between events need to be preserved 
- - ⇒ assign logical times to express this relationship
+ - $\rightarrow$ assign logical times to express this relationship
  - Local events are ordered unambiguously in time for each process
  - The logical times of all events have to respect all dependencies between events
  - Enabling assumption: the order of events in different regions of the network is irrelevant! 
@@ -160,21 +160,21 @@ Make clear: Here, nothing goes wrong at first.
  Let a be an execution, p a process, m a message
  - Execution: Sequence of events on all processes resulting from running a distributed program 
  - Partial order of events
- - Let ®1 be a partial order on the set of events
- - ®1 expresses direct dependency
+ - Let $\rightarrow_1$ be a partial order on the set of events
+ - $\rightarrow_1$ expresses direct dependency
  - For each event x, y at the same process it holds: 
- - 		x ®1 y iff x happened before y 
- - For each m: send(m) ®1 receive (m)
- - No other event pairs are in ®1
+ - 		x $\rightarrow_1$ y iff x happened before y 
+ - For each m: send(m) $\rightarrow_1$ receive (m)
+ - No other event pairs are in $\rightarrow_1$
  - Happened-before 
- - Let ® be the transitive closure of ®1
- - ® is called happened-before relation 
+ - Let $\rightarrow$ be the transitive closure of $\rightarrow_1$
+ - $\rightarrow$ is called happened-before relation 
  - (other names: causal ordering, potential causal ordering)
 *** Happened-before relationship, concurrent events
  It holds:
- - a ® f (via b, c, d)
- - But: a and e are not ordered by ®; a and e are concurrent
- - Two events e1 and e2 are concurrent iff neither e1 → e2 nor e2 → e1 
+ - a $\rightarrow$ f (via b, c, d)
+ - But: a and e are not ordered by $\rightarrow$; a and e are concurrent
+ - Two events e1 and e2 are concurrent iff neither e1 $\rightarrow$ e2 nor e2 $\rightarrow$ e1 
  - The happened-before relation represents only potential causality
  - All messages that possibly had influence on a given event contribute to this partial order
 *** Partial order and logical time
@@ -182,16 +182,16 @@ Make clear: Here, nothing goes wrong at first.
  - T represents points in time such that
  - No two events are assigned the same logical time
  - The events of a process p have increasing times in their order of occurrence in p
- - L(send(m)) < L(receive(m)) for all messages m
+ - L(send(m)) $<$ L(receive(m)) for all messages m
  - For any value t Î T there are only finitely many events that get assigned a previous time (progress condition) 
- - Such an L is called compatible with ® 
- - Formally: " x,y Î α: x ® y implies L(x) < L(y)
+ - Such an L is called compatible with $\rightarrow$ 
+ - Formally: $\forall  x,y \in \alpha: x \rightarrow y \text{ implies } L(x) < L(y)$
  - 
  - Does the contraposition hold? Is L uniquely determined 
- - by → ?
+ - by $\rightarrow$ ?
  - 
 *** Partial Order for Logical Time
- L has freedoms compared to ®
+ L has freedoms compared to $\rightarrow$
  - Events in different processes can be assigned different times 
  - if they are concurrent to each other 
  - Real time does not have this freedom, but this is the key property to algorithmically compute L
@@ -299,8 +299,8 @@ Make clear: Here, nothing goes wrong at first.
  More general question: construction of the whole causal precedence relation?
  - For example: decide whether two events are concurrent (causally independent) or not?
  - Is LamportTime sufficient?
- - Recall: e → e’ implies L(e) < L(e’)
- - But: 	 L(e) < L(e’) does not imply e → e’ 
+ - Recall: e $\rightarrow$ e’ implies L(e) < L(e’)
+ - But: 	 L(e) < L(e’) does not imply e $\rightarrow$ e’ 
  - 
  - Extension to LamportTime necessary!
 *** Vector Clocks
@@ -314,7 +314,7 @@ Make clear: Here, nothing goes wrong at first.
  - 			VC := max{VC, send vector time of the message}
  - 			VC[i] := VC[i]+1
  - Claim: Vector clocks allow to reconstruct the entire causal structure of an execution (e.g. concurrency of events)
- - Formally: VC(e) < VC (e‘) if and only if e → e‘ !
+ - Formally: VC(e) < VC (e‘) if and only if e $\rightarrow$ e‘ !
 *** Comparing Vector Clocks
  Two vector clocks are equal if they are identical in all components:
  - 
@@ -329,8 +329,8 @@ Make clear: Here, nothing goes wrong at first.
  Vector clocks represent the entire cone of previous events
  - Comparing vector clocks of two events allows to decide whether one event is causally related to another or independent
  - Two events are independent (or concurrent) if neither 
- - e → e’ nor e’ → e
- - This is equivalent to neither VC(e) < VC(e’) nor VC(e’) < VC(e)
+ - e $\rightarrow$ e’ nor e’ $\rightarrow$ e
+ - This is equivalent to neither VC(e) $<$ VC(e’) nor VC(e’) $<$ VC(e)
 
 
 *** Realizing Causal Ordering: CBCAST protocol
@@ -355,7 +355,7 @@ Make clear: Here, nothing goes wrong at first.
  - Message must be next in sequence expected from pi:
  - vt[i] = VTj[i]+1
  - All causally prior messages that have been delivered at pi  must have been delivered at pj : 
- - VTj [k] >= vt[k] (for k<>i)
+ - VTj [k] $\geq$ vt[k] (for k $\neq$ i)
  - 
 *** CBCAST Example
 
