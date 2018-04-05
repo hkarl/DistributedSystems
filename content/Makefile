@@ -1,4 +1,4 @@
-.PHONY: chapters all slides clean book bookpdf cleanall
+.PHONY: chapters all slides clean book bookpdf cleanall figures
 
 # on Holger's Mac: 
 EMACS="/Applications/Aquamacs 2.app/Contents/MacOS/Aquamacs"
@@ -35,18 +35,22 @@ book.pdf: book.tex
 
 #########################
 
-slides: $(slidesPdf)
+slides: $(slidesPdf) 
+	make -C figures
 	make $<
+
 
 %-slides.tex: %-slides.org %.org ../slidehead.org 
 	echo "building beamer tex file", $<, $@
 	${EMACS} -Q --batch $<  -eval ${EMACSEXPORTPROG}
 
 
-%-slides.pdf: %-slides.tex
+%-slides.pdf: %-slides.tex $(wildcard figures/*.pdf)
 	pdflatex  -shell-escape $< 
-	pdflatex  -shell-escape $< 
-	cp $@ ../../output 
+	pdflatex  -shell-escape $<
+	bibtex $(basename $<)
+	pdflatex  -shell-escape $<
+	#	cp $@ ../../output 
 
 ##########################
 
