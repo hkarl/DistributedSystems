@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 
 
 Issue: Leader election under Dealing with failues? Maybe move up to a
@@ -316,4 +317,3 @@ better place?
 
 -
   https://www.igvita.com/2010/04/30/distributed-coordination-with-zookeeper/ 
-

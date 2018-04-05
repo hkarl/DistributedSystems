@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 
 
 ** Reminder: Transactions and ACID 
@@ -400,5 +401,3 @@
 *** Odds and ends 
 
  - Life Beyond Distributed Transactions: https://queue.acm.org/detail.cfm?id=3025012 
-
-

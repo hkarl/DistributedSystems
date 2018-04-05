@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 ** Model: distributed storage, distributed objects  
 
 *** Distributed storage models 
@@ -381,4 +382,3 @@ Consistency protocols necessary to ensure desired level of consistency between r
 - How are replicas handled?
 - How are updates distributed? 
 - Missing: cache-coherence protocols
-

@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
  
 
 * Basic structure 
@@ -255,6 +256,3 @@
 *** Example: Snort as microservice or NFV 
 
 - Not sure there is time for that? 
-
-
-

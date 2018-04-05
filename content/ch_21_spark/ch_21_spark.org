@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
  - Apache Spark (Crunch as well?)
 
 
@@ -14,4 +15,3 @@
 
 
 Issue: More slides needed here! 
-

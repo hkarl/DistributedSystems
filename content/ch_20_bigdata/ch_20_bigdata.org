@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 
 ** Big Data 
 
@@ -342,4 +343,3 @@
 
 *** PigLatin – advantages over, e.g., Python, SQL?
  68
-

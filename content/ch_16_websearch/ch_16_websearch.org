@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 
 
 *** Web search – Google as case study 
@@ -77,6 +78,3 @@
  - bottom-up; initialized via Master
  - 
 *** Some BigTables 
-
-
-

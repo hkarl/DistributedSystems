@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 
 ** CAP and friends 
 
@@ -250,4 +251,3 @@
  - Practically: Most “home office” switches support registration of devices at one/several dynamic DNS providers
  - E.g., www.dyndns.com 
 *** Example DNS database (zone: cs.vu.nl) 
-

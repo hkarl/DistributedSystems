@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
    
 ** Overview, Conventional file systems 
 
@@ -382,4 +383,3 @@
 ** CaseStudy: Apache BookKeeper 
 
 https://bookkeeper.apache.org
-

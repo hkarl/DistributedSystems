@@ -1,3 +1,5 @@
+#+BIBLIOGRAPHY: ../bib plain
+
 
 New approach: Immediately talk about implementation approaches. Use
 that to introduce vector clocks during the causal bcast! 

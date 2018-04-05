@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 
 ** Big file systems 
 
@@ -141,5 +142,3 @@
  - Replica management aware of racks 
  - Read and writes largely similar to GFS 
  - Useful: HDFS can be mounted like traditional FSs 
-
-

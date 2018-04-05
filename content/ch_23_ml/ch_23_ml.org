@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 ** Machine learning on big data as example? 
 
 - TensorFlow 

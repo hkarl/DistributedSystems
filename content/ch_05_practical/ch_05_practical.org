@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 
 * Deployment tools: Why and what for? 
 
@@ -27,4 +28,3 @@ SErver, system, ...
 *** CI example: Travis 
 *** Web development/deployment: Resources to look at
  58
-

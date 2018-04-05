@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 
 *** Overview
  Peer-to-peer networking 
@@ -44,4 +45,3 @@
  - 
  - Open: a range of basic algorithmic questions, necessary to realize such systems 
  - E.g., efficient implementations for group communication? 
-

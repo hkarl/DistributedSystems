@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 
 ** Message queuing semantics 
 
@@ -48,4 +49,3 @@
  60
  http://activemq.apache.org/
  - getting-started.html
-

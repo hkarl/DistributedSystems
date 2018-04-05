@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 
 ** Idea 
 
@@ -43,5 +44,3 @@
  - See (Jini = Apache River): 
  - https://river.apache.org/
  - http://www.jini.org/wiki/Jini_Distributed_Events_Specification
-
-

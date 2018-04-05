@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 
 * Overall requirements 
 *** Issues and requirements 
@@ -338,4 +339,3 @@ Note: client-side programmability already big step towards it.
 
 - Example: Squid http://www.squid-cache.org
 - Example: Apache Traffic SErver http://trafficserver.apache.org
-

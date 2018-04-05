@@ -1,3 +1,4 @@
+#+BIBLIOGRAPHY: ../bib plain
 
 * Background: System model 
 
@@ -283,5 +284,3 @@
 *** ZeroMQ: Client/Server in C 
  Distributed Systems, Ch. 2:  Basic Interaction Patterns
 *** ZeroMQ: Client/Server in Python 
-
-
