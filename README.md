@@ -46,3 +46,13 @@ https://www.dropbox.com/sh/ts47xz5vgiua4l6/AAC-8XZVs3xP0A5--sBslN9na?dl=0
 ### Convenient latexmk replacement 
 
 fswatch -o *.org figures/*.tex  | xargs  -n1 make slides
+
+
+## TODO 
+
+### Continuous intgration 
+
+If somebody feels like setting up a continous integration toolchain on
+TravisCI, I'd be oblighed. It would need a fairly new TexLive, emacs,
+orgmode9 current version, and dropbox uploader. See here for
+inspiration: https://github.com/harshjv/travis-ci-latex-pdf
