@@ -27,6 +27,7 @@ output/*.pdf
 content/book/book.tex
 content/book/book.pdf
 content/ch*/ch*-slides.pdf
+content/ch*/ch*-slides169.pdf
 content/ch*/figures/*.pdf
 content/ch*/figures/*.png
 content/ch*/ch*.tex

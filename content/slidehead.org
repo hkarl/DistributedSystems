@@ -8,7 +8,7 @@
 #+BEAMER_FONT_THEME:
 #+BEAMER_INNER_THEME:
 #+BEAMER_OUTER_THEME:
-#+LaTeX_CLASS_OPTIONS: [ignorenonframetext,presentation,nooutline]
+#+LaTeX_CLASS_OPTIONS: [ignorenonframetext,\\OutputStyle,nooutline]
 #+BEAMER_HEADER:
 #+latex_header: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Table of contents}\tableofcontents[currentsection,hideothersubsections]\end{frame}}
 #+LATEX_HEADER: \usepackage{tikz}
