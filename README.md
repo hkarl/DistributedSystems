@@ -39,7 +39,9 @@ emacs executable in Makefile.
 
 ### Produced files 
 
-Produced PDFs end up in subdirectory output 
+Produced PDFs end up in subdirectory output. One version of the PDFs
+is available in Dropbox:
+https://www.dropbox.com/sh/ts47xz5vgiua4l6/AAC-8XZVs3xP0A5--sBslN9na?dl=0 
 
 ### Convenient latexmk replacement 
 
