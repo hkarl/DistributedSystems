@@ -30,6 +30,7 @@ book.tex: book.org
 	echo "making book.tex"
 	echo "building beamer tex file", $<, $@
 	${EMACS} -Q --batch $<  -eval ${EMACSEXPORTPROG}
+	grep -v "begin{LaTeX}" $@ | grep -v "end{LaTeX}" | sponge $@
 
 
 book.pdf: book.tex
