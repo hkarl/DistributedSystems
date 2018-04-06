@@ -194,6 +194,30 @@ Some numbers
 - Minimum steady-state availability: 99.9 % 
 
 
+*** FAD Challenges 
+
+- HUGE scale
+  - No single system able to handle that
+- Many systems needed 
+- Results in
+  - Concurrent execution
+  - Failures
+  - No consistent notion of time  (no global clock) 
+
+
+*** Crucial aspects
+
+
+- *Autonomy*
+  - Entities in a distributed system are autonomous, independent
+    entities
+  - But cooperative, not antagonistic
+#+BEAMER: \pause
+- *Transparency* 
+  - Distributed as such not of interest to user
+  - Should be hidden from user: distribution is invisible,
+    *transparent* 
+
 * Organization, exam, material
 
 *** Homework assignments
