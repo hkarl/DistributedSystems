@@ -277,7 +277,7 @@ better place?
  - 	Wait until (number of replies received = (N – 1));
  - 	state := HELD;
  - 
- - On receipt of a request <Ti , pi> at pj (i ≠ j)
+ - On receipt of a request <Ti , pi> at pj (i $\not =$ j)
  - 	if  (state = HELD or (state = WANTED and (T, pj) < (Ti, pi)))
  - 	then 
  - 		queue request from pi without replying; 

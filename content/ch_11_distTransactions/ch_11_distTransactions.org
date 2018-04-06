@@ -326,7 +326,7 @@
 
  B and C decide 0 because of validity
 *** n=3, f=1 does not Solve Byzantine Agreement
- Execution 3: B is faulty
+ Execution  a3: B is faulty
  - Round 1: 
  Round 2: 
 
