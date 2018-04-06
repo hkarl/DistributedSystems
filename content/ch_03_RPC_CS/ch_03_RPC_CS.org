@@ -344,3 +344,11 @@
  - Distributed object systems usually use proprietary protocols for interaction between objects, not HTTP/XML/SOAP 
  - 
  - 
+
+
+* Notes 
+
+- https://capnproto.org/rpc.html
+
+- Come back to marshalling: Thrift 
+

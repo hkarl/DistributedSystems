@@ -1,96 +1,1035 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+* Overview 
+  
+*** Goals of this chapter 
+
+- Define some common ground on terminology, models
+  - System, data exchange
+- Some messaging APIs
+  - Sockets, more convenient ones 
+- Then: structure distributed systems as client/server systems 
+- Some simple example code 
+
+*** Intended outcome 
+
+You should be able to understand 
+- the rationale for a client/server structure 
+- name its pros and cons 
+- write simple example code 
+
+
 * Background: System model 
 
-*** System models and system aspects
- Generic modeling issues 
- - Data exchange paradigm?
- - Time behavior?
- - Fault assumptions?
- - Security?
- - 
- - 
- - 
- - Main system aspects for distributed systems
- - Hardware: Capabilities and restrictions 
- - Software: Services made available by software on top of hardware to abstract away details – “operating system” 
- - Interaction models: How to organize the interaction of autonomous entities?
+** Nodes and data exchange 
+
+*** System models and system aspects 
+
+Generic modeling issues
+ - Node model (hardware and software) 
+ - Data exchange paradigm
+ - Behaviour in time 
+ - Fault assumptions
+ - Security assumptions 
+
+
+*** Node model 
+
+- Each *node* in a distributed system acts on its own 
+  - Autonomy! 
+  - Nodes = computer, process, processor, \ldots 
+- Can imply
+  - Node is full-fledged system, with own operating system, etc.
+  - Part of a coordinated system (e.g., multiprocessor)
+    - Not focus here! 
+
+
+
 *** Data exchange based on messages
- Data exchange based on messages
- Nodes communicating by messages
- - Nodes = computer, process, processor, …?
- - Message = reliable? in-order? correct?
- - 
+
+- Data exchange based on messages
+  - Nodes communicating by messages
+- Message: a well-delimited amount of data 
+
+ 
+#+CAPTION: Message exchange pattern
+#+ATTR_LATEX: :width 0.9\linewidth
+#+NAME: fig:msg_exchange_pattern
+[[./figures/message_exchange_pattern.pdf]]
 
 
+** Message exchange  
 
-*** Data exchange: Sending and receiving
+*** Sending and receiving
 
- - Message: a well-delimited amount of data 
- - Originating from (usually a single) sender 
- - Destined to (usually a single) receiver 
- - A packet 
- - 
- - Alternative notion: A stream of data
- - Continuous flow of data, no natural boundaries 
- - From sender to receiver 
- - 
- - Communication (either packet or stream) can be unidirectional or bidirectional 
-*** Data exchange: Synchronicity 
+- Message: 
+  - Originating from (usually a single) sender 
+  - Destined to (usually a single) receiver 
+  - A *packet*
+- Alternative notion: A *stream of data*
+  - Continuous flow of data, no natural boundaries 
+  - From sender to receiver 
+- Communication (either packet or stream) can be *unidirectional* or *bidirectional*
+
+*** Properties 
+
+Properties of message delivery: 
+
+- Messages lost?
+- Modified in transit?
+- In-order?
+- Time-bounded?
+- Changes to originator? 
+
+*** Sending and receiving: Operations 
+
+We usually have some operations like: 
+
+- ~send~
+  - ~send(msg_buffer, destination)~
+- ~receive~
+  - ~receive(msg_buffer, meta_data)~
+  - ~meta_data~ might contain originator, length, \ldots
+    - Both input and output value! 
+- Both with relevant return values (error codes, etc.) 
+
+*** Synchronicity of operations 
+
+~send~, ~receive~ are OS operations, might block a running process 
+
+- ~send~ operation
+  - (Strictly) blocking, version 1: Wait until message has been *delivered*
+    - Unusual 
+  - Blocking, version 2: Wait until the message has been sent on its way
+    - At least: *copied* into an OS buffer
+    - After return, buffer can be reused
+    - Return does not state anything about delivery
+    - Only stalls process for longer time if OS is out of buffer space 
+  - (Strictly) non-blocking: Prepare OS for sending of message
+    - Buffer still occupied by message; cannot be reused immediately
+    - Needs separate information that buffer is cleared
+    - Unusual  
 
 
- Send
- - SIGNAL
- - WAIT
+*** Synchronicity of operations 
 
 
- Source
- Synchronous Send
- Receive
- - SIGNAL
- - WAIT
+- ~receive~ operation
+  - Blocking: Wait until a message has arrived (process blocked)
+    - Process resumes (sometime) after message arrives 
+    - Possibly, of specified properties: desired originator, maximum
+      length, \ldots
+    - Often, no guarantee on minimum length!
+  - Nonblocking: Check whether message is available
+    - Copy into process buffer if yes
+    - Corresponding return value if no
+    - Does never block process for longer time 
 
+*** Synchronicity of operations: combinations 
 
- Destination
- Synchronous Receive
- S:S
+- All combinations possible
+- Highly depends on operating system, API in use 
+- Common combination:
+  - Blocking (v2) ~send~, blocking ~receive~ 
 
+- Other combinations: Homework! 
 
-
-
-
-
-*** Data exchange: Communication participants
+*** Communication participants
  Combinations of sender and receiver
  - Unicast: 1 sender, 1 receiver
  - Broadcast: 1 sender, all known destinations are receivers
  - Multicast: 1 sender, selected group of receivers
  - Convergecast: multiple senders, data is somehow combined to arrive only at a single receiver
- - 
 
 
+** Shared memory 
+
+*** Data exchange based on shared memory 
+
+- Nodes do not communicate directly, but via a joint memory 
+- Behavior of the memory? 
+  - Central memory? Distributed memory?
+  - Semantics of the memory, e.g. at simultaneous accesses? 
+  - What does /simultaneous/ mean? 
+
+
+#+CAPTION: Shared memory structure
+#+ATTR_LATEX: :width 0.9\linewidth
+#+NAME: fig:shared_memory
+[[./figures/shared_memory.pdf]]
+
+
+*** Shared memory: PRAM model 
+
+Common model: *Parallel* Random Access Machine 
+
+- Generalizes ordinary Random Access Machine
+- Multiple processes issue ~LOAD~ and ~STORE~ operations
+  - Operands: Memory address, register 
+- In strict synchrony: *lock-step model*  
+- Compare: \url{http://pages.cs.wisc.edu/~tvrdik/2/html/Section2.html}
+  (and many other online resources) 
+
+*** PRAM: Multiple concurrent reads 
+
+Situation: Multiple processors want to *read* the same address at the 
+same time 
+
+
+#+BEAMER: \pause
+
+
+- Option 1: That's fine; allow to proceed; all get same value
+  - Allow *concurrent reads* (CR) 
+- Option 2: Forbid even that; terminate program with error
+  - Insist on *exclusive reads* (ER) 
+
+*** PRAM: Multiple concurrent writes 
+
+Situation: Multiple processors want to *write*  the same address at the 
+same time 
+
+
+#+BEAMER: \pause
+
+
+- Option 1: That's dangerous; terminate program with error
+  - Insist on *exclusive writes* (EW)
+- Option 2: That's ok if they all write the same value; otherwise,
+  error
+  - *COMMON concurrent write (CW)*
+- Option 3: That's ok as long as we have some priority among the
+  processors; highest priority wins
+  - *PRIORITY concurrent write*
+- Option 4: I don't care, just write any one of the intended values
+  - *ARBITRARY concurrent write* 
+
+
+*** PRAM: Combinations 
+
+- All combinations of ER/CR with EW/variants of CW are possible
+- /Weaker/ models like EREW closer to reality, but more difficult to
+  program
+- /Stronger/ models like CRCW: vice versa
+
+
+#+BEAMER: \pause
+
+- But: On $p$ processors, weakest model can simulate strongest model
+  with $O(\log p)$ slowdown and $p$ times memory 
+
+
+*** PRAM algorithm: Check if value is present in memory 
+
+- $p$ processors, $n$ memory cells, processor $P_0$ has value $x$
+- $P_0$ wants to know whether $x$ occurs in at least one of the $n$
+  cells 
+
+
+*** EREW-PRAM: Check if value is present in memory 
+
+- $P_0$ broadcasts $x$ to other processors: *binary broadcast*
+  - Cost: $O(\log p)$
+- All processors perform local search on $n/p$ items
+  - Cost: $n/p$
+- All processors perform *parallel reduction*
+  - Cost: $n/p$
+- Total cost: $O(\log p) + n/p$
+
+
+*** Other PRAMs: Check if value is present in memory 
+
+- What can be simplified on a CREW PRAM, a COMMON-CRCW PRAM? 
+
+#+BEAMER: \pause
+- CREW: No binary broadcast needed; $O(1)$
+- COMMON-CRCW: No parallel reduction needed as well: processors that
+  found $x$ just write ~True~ into $P_0$ 
+
+** Timing models 
+
+*** Time in distributed systems? 
+
+- PRAM model made a *strong* assumption: lock-step model for execution
+- This is ok for a theoretic model like PRAMs
+- It is not realizable in a real system
+
+#+BEAMER: \pause
+
+- What can we say about timing behaviour?
+- Formalized in *timing models* 
+
+*** Timing models 
+
+In general: assumptions about the set of points in time where events
+are allowed to occur
+
+**** Timing models for processing 
+
+- Are all nodes equally fast? Varying speed? 
+
+**** Timing models for communication 
+
+- Do all message exchanges take equally long?
+  - All packets same (maximum?) size?
+- When is it allowed to send data?
+
+
+*** Ends of a spectrum 
+
+
+**** Synchronous model 
+
+- Everything takes *exactly* one time unit: processing, communication
+- Everything happens *exactly* at the same time 
+- PRAM's lock-step model
+- Unrealistic  
+
+**** Asynchronous model 
+
+- Nothing is assumed: Everything can take arbitrarily long
+  - E.g., no upper bound on how long it takes a packet from A to B 
+
+*** In between? 
+
+- Options in between these extremes? 
+  - Restrict maximum speed difference
+  - Give access to approximately synchronized clock
+    - With some error compared to *real* time, but bounded
+  - Assume upper bounds on some actions, e.g., packet delivery
+    - If it did not arrive with $T$ time, consider it lost
+      $\rightarrow$ Timeout! 
+    
+  
+
+
+** Faults models 
+
+*** Fault models 
+
+- Things go wrong!
+  - Processors fail, messages are lost, \ldots
+  - By accident or maliciously 
+- Different techniques needed to handle different faults
+- Different metrics needed to describe 
+- We come back to that in Chapter 4 
 
 
 * Background: Some messaging APIs
+
+** Sockets 
 
 *** API for communication: Sockets 
  Suitable for both messages and streams 
  - Can express all synchronicity combinations
  - Based on analogy: Communication with a remote partner is akin to reading from/writing to a file 
- - 
  - For details see 
- - VL KMS, VL Rechnernetze 
- - Many online resources on the topic, e.g. http://jan.newmarch.name/distjava/socket/lecture.html 
- - Books like Stevens, Unix Network Programming 
- - 
+   - VL KMS, VL Rechnernetze 
+   - Many online resources on the topic,
+     e.g. http://jan.newmarch.name/distjava/socket/lecture.html ;
+     \url{https://www.tutorialspoint.com/unix_sockets/index.htm} 
+   - Stevens, Unix Network Programming
+     \cite{Stevens:UnixNetworkProgramming}, \cite{9780131411555} -- old but still useful
+
+** 0mq
+
 *** Nicer API: 0mq (http://zeromq.org)  
- 8
+
+**** Marketing                                                      :B_quote:
+     :PROPERTIES:
+     :BEAMER_env: quote
+     :END:
+ØMQ (also known as ZeroMQ, 0MQ, or zmq) looks like an embeddable networking library but acts like a concurrency framework. It gives you sockets that carry atomic messages across various transports like in-process, inter-process, TCP, and multicast. You can connect sockets N-to-N with patterns like fan-out, pub-sub, task distribution, and request-reply. It's fast enough to be the fabric for clustered products. Its asynchronous I/O model gives you scalable multicore applications, built as asynchronous message-processing tasks. It has a score of language APIs and runs on most operating systems. ØMQ is from iMatix and is LGPLv3 open source.
 
 
-*** Issue: Language/system independence 
 
-- Supporting heterogeneity 
-- Example: Protobuf https://github.com/google/protobuf
+*** Nicer API: 0mq (http://zeromq.org)  
+
+- Clean-up the socket interface 
+- Make both simple sockets and more abstract patterns (see below)
+  available in many languages
+- Simple usage 
+- Be *fast* and efficient 
+
+- (BTW: nanomsg http://nanomsg.org can be regarded successor to 0mq) 
+
+*** 0mq: Send and receive data, in C  
+
+**** Sender                                                   :B_block:BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.5
+     :BEAMER_env: block
+     :END:
+
+
+
+#+BEGIN_LaTeX
+\begin{adjustbox}{width=0.5\columnwidth}
+\begin{varwidth}{\columnwidth}
+#+END_LaTeX  
+
+#+BEGIN_SRC C
+#include <zmq.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+
+int main (void)
+{
+    void *context = zmq_ctx_new ();
+    void *sender = zmq_socket (context, ZMQ_REQ);
+    zmq_connect (sender, "tcp://localhost:5555");
+
+    zmq_send (sender, "Hello", 5, 0);
+
+    zmq_close (sender);
+    zmq_ctx_destroy (context);
+    return 0;
+}
+
+#+END_SRC
+
+#+BEGIN_LaTeX
+\end{varwidth}
+\end{adjustbox}
+#+END_LaTeX
+
+**** Receiver                                                 :B_block:BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.5
+     :BEAMER_env: block
+     :END:
+
+#+BEGIN_LaTeX
+\begin{adjustbox}{width=0.5\columnwidth}
+\begin{varwidth}{\columnwidth}
+#+END_LaTeX
+
+
+#+BEGIN_SRC C
+#include <zmq.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+
+int main (void)
+{
+    void *context = zmq_ctx_new ();
+    void *sender = zmq_socket (context, ZMQ_REQ);
+    zmq_connect (sender, "tcp://localhost:5555");
+
+    zmq_send (sender, "Hello", 5, 0);
+
+    zmq_close (sender);
+    zmq_ctx_destroy (context);
+    return 0;
+}
+#+END_SRC
+
+#+BEGIN_LaTeX
+\end{varwidth}
+\end{adjustbox}
+#+END_LaTeX
+
+
+*** Sockets in C -- good? 
+
+- Even with 0mq (or similar), sockets stay cumbersome 
+- Alternatives?
+  - Change programming language? Wrap sockets in an object-oriented
+    concept?
+  - Change paradigm? Raise abstraction level? 
+
+
+
+
+*** 0mq sockets in C++
+
+**** Sender                                                   :B_block:BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.5
+     :BEAMER_env: block
+     :END:
+
+#+BEGIN_LaTeX 
+\begin{adjustbox}{width=0.5\columnwidth}
+\begin{varwidth}{\columnwidth}
+#+END_LaTeX 
+
+#+BEGIN_SRC C++
+#include <zmq.hpp>
+#include <string>
+#include <iostream>
+
+int main ()
+{
+    zmq::context_t context (1);
+    zmq::socket_t socket (context, ZMQ_REQ);
+
+    socket.connect ("tcp://localhost:5555");
+
+    zmq::message_t request (5);
+    memcpy (request.data (), "Hello", 5);
+    socket.send (request);
+
+    return 0;
+}
+#+END_SRC
+
+#+BEGIN_LaTeX 
+\end{varwidth}
+\end{adjustbox}
+#+END_LaTeX 
+
+**** Receiver                                                 :B_block:BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.5
+     :BEAMER_env: block
+     :END:
+
+#+BEGIN_LaTeX 
+\begin{adjustbox}{width=0.5\columnwidth}
+\begin{varwidth}{\columnwidth}
+#+END_LaTeX 
+
+#+BEGIN_SRC C++
+#include <zmq.hpp>
+#include <string>
+#include <iostream>
+
+
+int main () {
+    zmq::context_t context (1);
+    zmq::socket_t socket (context, ZMQ_REP);
+    socket.bind ("tcp://*:5555");
+
+    zmq::message_t request;
+
+    socket.recv (&request);
+    std::cout << "Received Hello" << std::endl;
+
+    return 0;
+}
+#+END_SRC
+
+#+BEGIN_LaTeX 
+\end{varwidth}
+\end{adjustbox}
+#+END_LaTeX 
+
+
+
+
+
+*** 0mq sockets in Python 
+
+**** Sender                                                   :B_block:BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.5
+     :BEAMER_env: block
+     :END:
+
+#+BEGIN_LaTeX 
+\begin{adjustbox}{width=0.5\columnwidth}
+\begin{varwidth}{\columnwidth}
+#+END_LaTeX 
+
+#+BEGIN_SRC python 
+import zmq
+
+context = zmq.Context()
+
+socket = context.socket(zmq.REQ)
+socket.connect("tcp://localhost:5555")
+    
+socket.send(b"Hello")
+
+#+END_SRC
+
+#+BEGIN_LaTeX 
+\end{varwidth}
+\end{adjustbox}
+#+END_LaTeX 
+
+**** Receiver                                                 :B_block:BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.5
+     :BEAMER_env: block
+     :END:
+
+#+BEGIN_LaTeX 
+\begin{adjustbox}{width=0.5\columnwidth}
+\begin{varwidth}{\columnwidth}
+#+END_LaTeX 
+
+#+BEGIN_SRC python
+import zmq
+
+context = zmq.Context()
+socket = context.socket(zmq.REP)
+socket.bind("tcp://*:5555")
+
+message = socket.recv()
+print("Received request: %s" % message)
+#+END_SRC
+
+#+BEGIN_LaTeX 
+\end{varwidth}
+\end{adjustbox}
+#+END_LaTeX 
+
+
+*** Sockets in OO languages 
+
+- No substantial simplification over plain code 
+  - But modern languages do help 
+
+
+#+BEAMER: \pause
+
+- Issue: Does it depend on programming language?
+- Can programs in different languages talk to each other? 
+
+
+#+BEAMER: \pause
+- Expectation:
+  - Should be possible for simple data types (integers, strings,
+    \ldots)
+  - Objects of classes? Challenging! 
+
+
+** Heterogeneity 
+
+*** Language/architecture independence: Issue 
+
+- Different programming languages, different computer architectures
+  lay out data differently
+  - Byte order for integers
+  - Strings: Length byte, null-terminated, \ldots?
+  - Objects: large variety in memory layout, semantics 
+
+
+#+BEAMER: \pause
+
+- In general, we cannot assume but parts are written using the same
+  language!
+
+- We need to translate between different representations 
+
+*** Serialization 
+
+- We need to *serialize* programming-language/architecture internal
+  representation into a *neutral* representation 
+  - Translating back and forth between internal and neutral
+    representation 
+  - Only neutral representation is sent -- the so-called *wire format*
+
+
+#+BEAMER: \pause
+
+- Why an intermediate neutral representation?
+  - Alternative: $O(n^2)$ translations necessary 
+
+*** 0mq: Exchanging data across languages 
+
+- Uses a simple an very efficient wire format 
+- No explicit support for translation between complex language
+  artefacts
+  - Simple things like strings work 
+
+
+*** Wire transfer approaches 
+
+- Some candidates 
+  - Abstract Syntax Notation.1 -- ISO/OSI layer 6; self-descriptive
+  - XML 
+  - OMG CDR
+  - JSON
+- Issues
+  - Cumbersome, talkative, memory and CPU-intensive 
+
+*** Wire transfer approaches -- modern candidates 
+
+- Google protobuf -- https://github.com/google/protobuf
+
+- Apache Thrift -- http://thrift.apache.org 
+
+- Fast Buffers --
+  http://www.eprosima.com/index.php/products-all/eprosima-fast-buffers 
+
+- Message Pack -- https://msgpack.org
+
+  - Lot's of language bindings; used by redis, Pinterest, ... 
+
+- Cap'n Proto -- https://capnproto.org
+
+  - From one of the developers of Google Protobuf 
+
+- FlatBuffers -- https://google.github.io/flatbuffers/ 
+
+
+*** Core idea: Put type information into message 
+
+- When transferring an integer, explicitly say it is an integer!
+- For a string: say how long
+- For a map: where are keys and values
+
+- Next slides: Examples from msgbug
+  https://github.com/msgpack/msgpack/blob/master/spec.md 
+
+
+*** Example: msgbuf string  
+
+
+#+BEGIN_LaTeX 
+\begin{adjustbox}{width=0.75\textwidth}
+\begin{varwidth}{\textwidth}
+#+END_LaTeX 
+
+
+
+
+#+BEGIN_EXAMPLE
+fixstr stores a byte array whose length is upto 31 bytes:
++--------+========+
+|101XXXXX|  data  |
++--------+========+
+
+str 8 stores a byte array whose length is upto (2^8)-1 bytes:
++--------+--------+========+
+|  0xd9  |YYYYYYYY|  data  |
++--------+--------+========+
+
+str 16 stores a byte array whose length is upto (2^16)-1 bytes:
++--------+--------+--------+========+
+|  0xda  |ZZZZZZZZ|ZZZZZZZZ|  data  |
++--------+--------+--------+========+
+
+#+END_EXAMPLE
+
+#+BEGIN_LaTeX 
+\end{varwidth}
+\end{adjustbox}
+#+END_LaTeX 
+
+*** Example: msgbuf array
+
+
+
+#+BEGIN_LaTeX 
+\begin{adjustbox}{width=0.75\textwidth}
+\begin{varwidth}{\textwidth}
+#+END_LaTeX 
+
+#+BEGIN_EXAMPLE
+fixarray stores an array whose length is upto 15 elements:
++--------+~~~~~~~~~~~~~~~~~+
+|1001XXXX|    N objects    |
++--------+~~~~~~~~~~~~~~~~~+
+
+array 16 stores an array whose length is upto (2^16)-1 elements:
++--------+--------+--------+~~~~~~~~~~~~~~~~~+
+|  0xdc  |YYYYYYYY|YYYYYYYY|    N objects    |
++--------+--------+--------+~~~~~~~~~~~~~~~~~+
+
+array 32 stores an array whose length is upto (2^32)-1 elements:
++--------+--------+--------+--------+--------+~~~~~~~~~~~~~~~~~+
+|  0xdd  |ZZZZZZZZ|ZZZZZZZZ|ZZZZZZZZ|ZZZZZZZZ|    N objects    |
++--------+--------+--------+--------+--------+~~~~~~~~~~~~~~~~~+
+#+END_EXAMPLE
+
+
+#+BEGIN_LaTeX 
+\end{varwidth}
+\end{adjustbox}
+#+END_LaTeX 
+
+
+
+*** Example: msgbuf map 
+
+
+#+BEGIN_LaTeX 
+\begin{adjustbox}{width=0.75\textwidth}
+\begin{varwidth}{\textwidth}
+#+END_LaTeX 
+
+
+#+BEGIN_EXAMPLE
+fixmap stores a map whose length is upto 15 elements
++--------+~~~~~~~~~~~~~~~~~+
+|1000XXXX|   N*2 objects   |
++--------+~~~~~~~~~~~~~~~~~+
+
+map 16 stores a map whose length is upto (2^16)-1 elements
++--------+--------+--------+~~~~~~~~~~~~~~~~~+
+|  0xde  |YYYYYYYY|YYYYYYYY|   N*2 objects   |
++--------+--------+--------+~~~~~~~~~~~~~~~~~+
+
+map 32 stores a map whose length is upto (2^32)-1 elements
++--------+--------+--------+--------+--------+~~~~~~~~~~~~~~~~~+
+|  0xdf  |ZZZZZZZZ|ZZZZZZZZ|ZZZZZZZZ|ZZZZZZZZ|   N*2 objects   |
++--------+--------+--------+--------+--------+~~~~~~~~~~~~~~~~~+
+
+#+END_EXAMPLE
+
+
+
+#+BEGIN_LaTeX 
+\end{varwidth}
+\end{adjustbox}
+#+END_LaTeX 
+
+
+*** How to know what to translate into wire format? 
+
+- Option 1: Language has enough type information at run-time
+  - Use that! 
+- Option 2: It does not! :-(
+  - Need additional information about the structure of a piece of data
+    to be translated
+  - Option 2.1: Provide it explicitly in the code, by appropriate
+    function calls
+  - Option 2.2: Provide it separately, explicit annotation; separate
+    "mini-language"  
+    - Comes by different names: Schema Language, Interface Definition
+      Language, Thrift file, ...
+    - Generate code for target language from there 
+
+
+*** Option 1: Translate based on run-time type information 
+
+- Example: msgpack 
+
+**** Simple example                                                 :B_block:
+     :PROPERTIES:
+     :BEAMER_env: block
+     :END:
+
+#+BEGIN_SRC python
+>>> import umsgpack
+>>> umsgpack.packb({u"compact": True, u"schema": 0})
+b'\x82\xa7compact\xc3\xa6schema\x00'
+>>> umsgpack.unpackb(_)
+{u'compact': True, u'schema': 0}
+#+END_SRC
+
+
+*** Option 1: Translate based on run-time type information 
+
+
+**** More complex                                                   :B_block:
+     :PROPERTIES:
+     :BEAMER_env: block
+     :END:
+
+#+BEGIN_LaTeX 
+\begin{adjustbox}{width=0.75\textwidth}
+\begin{varwidth}{\textwidth}
+#+END_LaTeX 
+
+#+BEGIN_SRC python
+>>> umsgpack.packb(
+...     [1, True, False, 0xffffffff, {u"foo": b"\x80\x01\x02",
+...      u"bar": [1,2,3, {u"a": [1,2,3,{}]}]}, -1, 2.12345] )
+b'\x97\x01\xc3\xc2\xce\xff\xff\xff\xff\x82\xa3foo\xc4\x03\x80\x01\
+\x02\xa3bar\x94\x01\x02\x03\x81\xa1a\x94\x01\x02\x03\x80\xff\xcb\
+@\x00\xfc\xd3Z\x85\x87\x94'
+>>> umsgpack.unpackb(_)
+[1, True, False, 4294967295, {u'foo': b'\x80\x01\x02', \
+ u'bar': [1, 2, 3, {u'a': [1, 2, 3, {}]}]}, -1, 2.12345]
+>>> 
+#+END_SRC
+
+#+BEGIN_LaTeX 
+\end{varwidth}
+\end{adjustbox}
+#+END_LaTeX 
+
+
+*** Option 2.1: Explicit annotation in source code 
+
+- When creating a wire transfer representation, add data *and type* to
+  a buffer
+- Typically, using library functions
+- Put type information into 
+
+*** Option 2.1: Explicit annotation -- C-Example 
+#+BEGIN_LaTeX 
+\begin{adjustbox}{scale=0.5}
+\begin{varwidth}{\textwidth}
+#+END_LaTeX 
+
+#+BEGIN_SRC C
+#include <msgpack.h>
+#include <stdio.h>
+
+int main(void)
+{
+    /* msgpack::sbuffer is a simple buffer implementation. */
+    msgpack_sbuffer sbuf;
+    msgpack_sbuffer_init(&sbuf);
+
+    /* serialize values into the buffer using msgpack_sbuffer_write callback function. */
+    msgpack_packer pk;
+    msgpack_packer_init(&pk, &sbuf, msgpack_sbuffer_write);
+
+    msgpack_pack_array(&pk, 3);
+    msgpack_pack_int(&pk, 1);
+    msgpack_pack_true(&pk);
+    msgpack_pack_str(&pk, 7);
+    msgpack_pack_str_body(&pk, "example", 7);
+
+    /* deserialize the buffer into msgpack_object instance. */
+    /* deserialized object is valid during the msgpack_zone instance alive. */
+    msgpack_zone mempool;
+    msgpack_zone_init(&mempool, 2048);
+
+    msgpack_object deserialized;
+    msgpack_unpack(sbuf.data, sbuf.size, NULL, &mempool, &deserialized);
+
+    /* print the deserialized object. */
+    msgpack_object_print(stdout, deserialized);
+    puts("");
+
+    msgpack_zone_destroy(&mempool);
+    msgpack_sbuffer_destroy(&sbuf);
+
+    return 0;
+}
+#+END_SRC
+
+#+BEGIN_LaTeX 
+\end{varwidth}
+\end{adjustbox}
+#+END_LaTeX 
+
+
+*** Option 2.2: Separate specification of types 
+
+- Separate from the program code: describe data structure 
+- Translate that into code that packs, unpacks actual data at runtime 
+- For each data type that needs to be transmitted!
+
+
+#+CAPTION: Packing and unpacking data based on external data definition
+#+ATTR_LaTeX: :width 0.85\textwidth
+#+NAME: fig:packunpack
+[[./figures/idl.pdf]]
+
+
+*** Option 2.2: Example google Protocol Buffers 
+
+- Protocol Buffers provides
+
+  - Format to describe data structures in ~.proto~ files
+
+  - Generate sender and receiver code from that -- a *compiler* for
+    ~.proto~ files 
+
+  - For different target languages (Java, C++, Go, Python, C#) 
+
+  - Some runtime library support 
+
+*** Protocol Buffers: proto example 
+
+Examples follow https://developers.google.com/protocol-buffers/docs/pythontutorial
+
+#+BEGIN_SRC python 
+message Person {
+  required string name = 1;
+  required int32 id = 2;
+  optional string email = 3;
+}
+#+END_SRC
+
+
+*** Protocol Buffers: proto example (2) 
+
+
+**** addressbook.proto 
+
+#+BEGIN_LaTeX 
+\begin{adjustbox}{width=0.55\textwidth}
+\begin{varwidth}{\textwidth}
+#+END_LaTeX 
+
+#+BEGIN_SRC python 
+syntax = "proto2";
+
+package tutorial;
+
+message Person {
+  required string name = 1;
+  required int32 id = 2;
+  optional string email = 3;
+
+  enum PhoneType {
+    MOBILE = 0;
+    HOME = 1;
+    WORK = 2;
+  }
+
+  message PhoneNumber {
+    required string number = 1;
+    optional PhoneType type = 2 [default = HOME];
+  }
+
+  repeated PhoneNumber phones = 4;
+}
+
+message AddressBook {
+  repeated Person people = 1;
+}
+#+END_SRC
+
+#+BEGIN_LaTeX 
+\end{varwidth}
+\end{adjustbox}
+#+END_LaTeX 
+
+*** Protocol Buffers: Compile 
+
+#+BEGIN_SRC bash
+protoc addressbook.proto
+#+END_SRC
+
+
+Produces ~adressbook_pb2.py~ 
+
+*** Use generate class to old data 
+
+#+BEGIN_SRC python 
+import addressbook_pb2
+person = addressbook_pb2.Person()
+person.id = 1234
+person.name = "John Doe"
+person.email = "jdoe@example.com"
+phone = person.phones.add()
+phone.number = "555-4321"
+phone.type = addressbook_pb2.Person.HOME
+#+END_SRC
+
+**** With attribute checks 
+
+Cannot assign to undefined fields 
+
+*** Pack and unpack from ProtocolBuffer class
+
+**** Packing 
+
+#+BEGIN_SRC python 
+person.SerializeToString()
+#+END_SRC
+
+
+**** Unpacking 
+
+#+BEGIN_SRC python 
+# f a file descriptor or socket 
+person = addressbook_pb2.Person()
+person.ParseFromString(f.read())
+#+END_SRC
 
 * Client/server, basic structure 
 
