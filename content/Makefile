@@ -5,6 +5,10 @@ EMACS="/Applications/Aquamacs 2.app/Contents/MacOS/Aquamacs"
 
 EMACSEXPORTPROG="(progn (add-to-list 'load-path (expand-file-name \"~/.emacs.d/org-mode/lisp\")) (require 'org)  (setq org-latex-listings 'minted) (setq org-latex-minted-options '((\"frame\" \"lines\") (\"linenos=true\") (\"mathescape\" \"true\"))) (org-beamer-export-to-latex))"
 
+# pdflatex command
+PDFLATEX=pdflatex -shell-escape -interaction=nonstopmode
+
+
 SOURCE := $(wildcard *-slides.org)
 slidesTex := $(patsubst %.org,%.tex,$(SOURCE))
 slidesPdf := $(patsubst %.org,%.pdf,$(SOURCE))
@@ -29,10 +33,10 @@ book.tex: book.org
 
 
 book.pdf: book.tex
-	pdflatex -shell-escape book
-	# -bibtex book
-	# pdflatex -shell-escape  book
-	# pdflatex  -shell-escape book
+	${PDFLATEX} book
+	-bibtex book
+	${PDFLATEX} book
+	${PDFLATEX} book
 	cp $@ ../../output 
 
 #########################
@@ -54,28 +58,28 @@ slides169: $(slides169Pdf)
 %-slides.tex: %-slides.org %.org ../slidehead.org 
 	echo "building beamer tex file", $<, $@
 	${EMACS} -Q --batch $<  -eval ${EMACSEXPORTPROG}
+	grep -v "begin{LaTeX}" $@ | grep -v "end{LaTeX}" | sponge $@
 
 
 %-slides.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
-	pdflatex  -shell-escape "\\def\\OutputStyle{presentation}\\input{$<}"
-	pdflatex  -shell-escape "\\def\\OutputStyle{presentation}\\input{$<}"
+	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
+	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
 	bibtex $(basename $<)
-	pdflatex  -shell-escape "\\def\\OutputStyle{presentation}\\input{$<}"
+	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
 	cp $@ ../../output/slides/
 
-
 %-handout.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
-	pdflatex  -jobname $(patsubst %-slides.tex,%-handout,$<) -shell-escape "\\def\\OutputStyle{handout}\\input{$<}"
-	pdflatex  -jobname $(patsubst %-slides.tex,%-handout,$<) -shell-escape "\\def\\OutputStyle{handout}\\input{$<}"
+	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
+	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
 	bibtex $(basename $<)
-	pdflatex  -jobname $(patsubst %-slides.tex,%-handout,$<) -shell-escape "\\def\\OutputStyle{handout}\\input{$<}"
+	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
 	cp $@ ../../output/handout/
 
 %-slides169.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
-	pdflatex  -jobname $(patsubst %-slides.tex,%-slides169,$<) -shell-escape "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
-	pdflatex  -jobname $(patsubst %-slides.tex,%-slides169,$<) -shell-escape "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
+	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
+	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
 	bibtex $(basename $<)
-	pdflatex  -jobname $(patsubst %-slides.tex,%-slides169,$<) -shell-escape "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
+	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
 	cp $@ ../../output/slides169/
 
 
