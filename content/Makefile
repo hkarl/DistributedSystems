@@ -1,4 +1,7 @@
 .PHONY: chapters chapter all slides slides169 handout clean book bookpdf cleanall figures
+.SECONDARY: 
+
+
 
 # on Holger's Mac: 
 EMACS="/Applications/Aquamacs 2.app/Contents/MacOS/Aquamacs"
