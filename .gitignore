@@ -24,6 +24,7 @@
 
 ## Actually generated files:
 output/*.pdf
+output/*/*.pdf
 content/book/book.tex
 content/book/book.pdf
 content/ch*/ch*-slides.pdf
