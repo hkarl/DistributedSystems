@@ -11,7 +11,7 @@ EMACSEXPORTPROG="(progn (add-to-list 'load-path (expand-file-name \"~/.emacs.d/o
 # pdflatex command
 PDFLATEX=pdflatex -shell-escape -interaction=nonstopmode
 
-
+BookSources := $(shell find .. -name "ch*.org")
 SOURCE := $(wildcard *-slides.org)
 slidesTex := $(patsubst %.org,%.tex,$(SOURCE))
 slidesPdf := $(patsubst %.org,%.pdf,$(SOURCE))
@@ -27,10 +27,9 @@ chapters:
 #########################
 
 book:
-	make -C book clean
 	make -C book book.pdf 
 
-book.tex: book.org  
+book.tex: book.org  $(BookSources)
 	echo "making book.tex"
 	echo "building beamer tex file", $<, $@
 	${EMACS} -Q --batch $<  -eval ${EMACSEXPORTPROG}
