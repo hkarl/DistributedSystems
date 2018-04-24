@@ -3,7 +3,7 @@
 # on Holger's Mac: 
 EMACS="/Applications/Aquamacs 2.app/Contents/MacOS/Aquamacs"
 
-EMACSEXPORTPROG="(progn (add-to-list 'load-path (expand-file-name \"~/.emacs.d/org-mode/lisp\")) (require 'org)  (setq org-latex-listings 'minted) (setq org-latex-minted-options '((\"frame\" \"lines\") (\"linenos=true\") (\"mathescape\" \"true\"))) (org-beamer-export-to-latex))"
+EMACSEXPORTPROG="(progn (add-to-list 'load-path (expand-file-name \"~/.emacs.d/org-mode/lisp\")) (require 'org)  (setq org-latex-listings 'minted) (setq org-latex-minted-options '((\"frame\" \"lines\") (\"linenos=false\") (\"mathescape\" \"true\") (\"breaklines\") (\"autogobble\") (\"escapeinside\" \"??\") )) (org-beamer-export-to-latex))"
 
 # pdflatex command
 PDFLATEX=pdflatex -shell-escape -interaction=nonstopmode
@@ -19,11 +19,12 @@ bookTex := $(patsubst %.org,%-chapter.tex,$(wildcard *.org))
 all: chapters book
 
 chapters:
-	for d in ch*; do make -C $$d slides  ; done
+	for d in ch*; do make -C $$d chapter  ; done
 
 #########################
 
-book: 
+book:
+	make -C book clean
 	make -C book book.pdf 
 
 book.tex: book.org  
@@ -64,10 +65,10 @@ slides169: $(slides169Pdf)
 
 %-slides.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
-	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
-	bibtex $(basename $<)
-	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
-	cp $@ ../../output/slides/
+	# ${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
+	# bibtex $(basename $<)
+	# ${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
+	# cp $@ ../../output/slides/
 
 %-handout.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
