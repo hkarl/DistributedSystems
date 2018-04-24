@@ -46,16 +46,16 @@ book.pdf: book.tex
 chapter: slides slides169 handout 
 
 slides: $(slidesPdf) 
-	make -C figures
-	make $<
+	-make -C figures
+	-make $<
 
 handout: $(handoutPdf)
-	make -C figures
-	make $<
+	-make -C figures
+	-make $<
 
 slides169: $(slides169Pdf) 
-	make -C figures
-	make $<
+	-make -C figures
+	-make $<
 
 %-slides.tex: %-slides.org %.org ../slidehead.org 
 	echo "building beamer tex file", $<, $@
@@ -66,21 +66,21 @@ slides169: $(slides169Pdf)
 %-slides.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
-	bibtex $(basename $<)
+	-bibtex $(basename $<)
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
 	cp $@ ../../output/slides/
 
 %-handout.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
-	bibtex $(basename $<)
+	-bibtex $(basename $<)
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
 	cp $@ ../../output/handout/
 
 %-slides169.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
-	bibtex $(basename $<)
+	-bibtex $(basename $<)
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
 	cp $@ ../../output/slides169/
 
