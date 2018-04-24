@@ -1,0 +1,41 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+  \begin{msc}{Synchronous request}
+    \declinst{c}{}{Client} 
+    \declinst{cc}{}{Channel API}
+    \declinst{sc}{}{Channel API} 
+    \declinst{s}{}{Server} 
+    % 
+% \action[action height=1.5cm]{Blocks}{s}
+    \regionstart{suspension}{s}
+    \msccomment[side=right]{Block for request}{s}
+    \nextlevel
+    \mess{Pass request   to channel}{c}{cc}
+    \regionstart{suspension}{c}
+    \msccomment[side=left]{Block for reply}{c}
+    \nextlevel
+    \mess{Transport request}{cc}{sc}[1]
+    \nextlevel[1]
+    \regionend{s}
+    \mess{Receive request}{sc}{s}
+    \nextlevel 
+    \regionstart{activation}{s}
+    \msccomment[side=right]{Process  request}{s}
+    \nextlevel[4] 
+    \regionend{s}
+    \mess{Pass reply}{s}{sc}
+    \nextlevel
+    \mess{Transport reply}{sc}{cc}[1]
+    \nextlevel[2]
+    \regionend{c}
+    \msccomment[side=left]{Msg  unblocks}{c}
+    \mess{Receive reply}{cc}{c}
+\nextlevel
+  \end{msc}
+
+\end{document}

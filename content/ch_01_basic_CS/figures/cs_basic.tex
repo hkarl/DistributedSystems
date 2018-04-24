@@ -1,0 +1,35 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz,varwidth]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{minted}
+\usepackage{tikz}
+\usetikzlibrary{tikzmark}
+\author{Holger Karl}
+\date{\today}
+\title{}
+
+ 
+
+\begin{document}
+
+
+\begin{minted}[]{py}
+def f(x):
+    y = x + 2
+    return y
+\end{minted}
+
+% \begin{minted}[escapeinside=??]{py}
+% def f(x):
+%     y = x?\tikzmark{here}?2
+%     return y
+% \end{minted}
+
+
+% See this bit:
+% \begin{tikzpicture}[remember picture]
+% \draw[overlay, ->, line width=5pt, red] (0,0) -- (pic cs:here);
+% \end{tikzpicture}
+ 
+\end{document}

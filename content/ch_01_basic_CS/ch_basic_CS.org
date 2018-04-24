@@ -331,7 +331,84 @@ are allowed to occur
    - Stevens, Unix Network Programming
      \cite{Stevens:UnixNetworkProgramming}, \cite{9780131411555} -- old but still useful
 
-** 0mq
+
+*** Plain socket example in C 
+
+\tiny
+****  Sender                                                  :B_block:BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.5
+     :BEAMER_env: block
+     :BEAMER_opt: [t]
+     :END:
+
+
+
+#+BEGIN_SRC c
+int main(int argc, char **argv)
+{
+	int	sockfd;
+	struct sockaddr_un	cliaddr, servaddr;
+	char 	buffer[100];
+
+	sockfd = socket (AF_LOCAL, SOCK_DGRAM, 0);
+
+	bzero(&cliaddr, sizeof(cliaddr));	
+	cliaddr.sun_family = AF_LOCAL;
+	strcpy(cliaddr.sun_path, tmpnam(NULL));
+
+	bind(sockfd, (SA *) &cliaddr, sizeof(cliaddr));
+
+	bzero(&servaddr, sizeof(servaddr));	
+	servaddr.sun_family = AF_LOCAL;
+	strcpy(servaddr.sun_path, "kanalobjekt");
+
+	sendto (sockfd, "Hallo!", strlen("Hallo!"), 0, 
+		&servaddr, sizeof(servaddr);
+}
+#+END_SRC
+
+
+****  Receiver                                                :B_block:BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.5
+     :BEAMER_env: block
+     :BEAMER_opt: [t]
+     :END:
+
+
+#+BEGIN_SRC c
+int main(int argc, char **argv)
+{
+	int	sockfd;
+	struct sockaddr_un	servaddr, claddr;
+	char	buffer[127];
+
+	sockfd = socket (AF_LOCAL, SOCK_DGRAM, 0);
+
+	bzero (&servaddr, sizeof(servaddr));
+	servaddr.sun_family = AF_LOCAL;
+	strcpy (servaddr.sun_path, "kanal");
+
+	bind (sockfd, (SA *) &servaddr, sizeof(servaddr));
+
+	recvfrom (sockfd, buffer, 127, 0, &claddr, sizeof(claddr));
+	printf ("Auftrag: %s \n", buffer); 
+}
+
+#+END_SRC
+
+
+
+
+*** Plain sockets -- good? 
+
+- Complex API, owing to its age 
+- But full control over all details 
+- Option: retain the basic interaction structure, but wrap it in nicer
+  API  
+
+** Example: 0mq
 
 *** Nicer API: 0mq (http://zeromq.org)  
 
@@ -353,20 +430,17 @@ are allowed to occur
 
 - (BTW: nanomsg http://nanomsg.org can be regarded successor to 0mq) 
 
-*** 0mq: Send and receive data, in C  
+*** 0mq: Send and receive data, in C 
 
+\tiny
 **** Sender                                                   :B_block:BMCOL:
      :PROPERTIES:
      :BEAMER_col: 0.5
      :BEAMER_env: block
+     :BEAMER_opt: [t]
      :END:
 
 
-
-#+BEGIN_LaTeX
-\begin{adjustbox}{width=0.5\columnwidth}
-\begin{varwidth}{\columnwidth}
-#+END_LaTeX  
 
 #+BEGIN_SRC C
 #include <zmq.h>
@@ -389,21 +463,13 @@ int main (void)
 
 #+END_SRC
 
-#+BEGIN_LaTeX
-\end{varwidth}
-\end{adjustbox}
-#+END_LaTeX
 
 **** Receiver                                                 :B_block:BMCOL:
      :PROPERTIES:
      :BEAMER_col: 0.5
      :BEAMER_env: block
+     :BEAMER_opt: [t]
      :END:
-
-#+BEGIN_LaTeX
-\begin{adjustbox}{width=0.5\columnwidth}
-\begin{varwidth}{\columnwidth}
-#+END_LaTeX
 
 
 #+BEGIN_SRC C
@@ -426,15 +492,12 @@ int main (void)
 }
 #+END_SRC
 
-#+BEGIN_LaTeX
-\end{varwidth}
-\end{adjustbox}
-#+END_LaTeX
-
 
 *** Sockets in C -- good? 
 
 - Even with 0mq (or similar), sockets stay cumbersome 
+  - Advantage: Full, detailed control
+  - E.g., ~select()~ call -- see homework 
 - Alternatives?
   - Change programming language? Wrap sockets in an object-oriented
     concept?
@@ -443,20 +506,20 @@ int main (void)
 
 
 
+
 *** 0mq sockets in C++
 
+\tiny
 **** Sender                                                   :B_block:BMCOL:
      :PROPERTIES:
      :BEAMER_col: 0.5
      :BEAMER_env: block
+     :BEAMER_opt: [t]
      :END:
 
-#+BEGIN_LaTeX 
-\begin{adjustbox}{width=0.5\columnwidth}
-\begin{varwidth}{\columnwidth}
-#+END_LaTeX 
 
-#+BEGIN_SRC C++
+
+#+BEGIN_SRC c++
 #include <zmq.hpp>
 #include <string>
 #include <iostream>
@@ -474,25 +537,19 @@ int main ()
 
     return 0;
 }
+
 #+END_SRC
 
-#+BEGIN_LaTeX 
-\end{varwidth}
-\end{adjustbox}
-#+END_LaTeX 
 
 **** Receiver                                                 :B_block:BMCOL:
      :PROPERTIES:
      :BEAMER_col: 0.5
      :BEAMER_env: block
+     :BEAMER_opt: [t]
      :END:
 
-#+BEGIN_LaTeX 
-\begin{adjustbox}{width=0.5\columnwidth}
-\begin{varwidth}{\columnwidth}
-#+END_LaTeX 
 
-#+BEGIN_SRC C++
+#+BEGIN_SRC c++
 #include <zmq.hpp>
 #include <string>
 #include <iostream>
@@ -512,27 +569,17 @@ int main () {
 }
 #+END_SRC
 
-#+BEGIN_LaTeX 
-\end{varwidth}
-\end{adjustbox}
-#+END_LaTeX 
-
-
-
 
 
 *** 0mq sockets in Python 
-
+\tiny
 **** Sender                                                   :B_block:BMCOL:
      :PROPERTIES:
      :BEAMER_col: 0.5
      :BEAMER_env: block
+     :BEAMER_opt: [t]
      :END:
 
-#+BEGIN_LaTeX 
-\begin{adjustbox}{width=0.5\columnwidth}
-\begin{varwidth}{\columnwidth}
-#+END_LaTeX 
 
 #+BEGIN_SRC python 
 import zmq
@@ -540,27 +587,19 @@ import zmq
 context = zmq.Context()
 
 socket = context.socket(zmq.REQ)
-socket.connect("tcp://localhost:5555")
+socket.connect ("tcp://localhost:5555")
     
 socket.send(b"Hello")
 
 #+END_SRC
 
-#+BEGIN_LaTeX 
-\end{varwidth}
-\end{adjustbox}
-#+END_LaTeX 
 
 **** Receiver                                                 :B_block:BMCOL:
      :PROPERTIES:
      :BEAMER_col: 0.5
      :BEAMER_env: block
+     :BEAMER_opt: [t]
      :END:
-
-#+BEGIN_LaTeX 
-\begin{adjustbox}{width=0.5\columnwidth}
-\begin{varwidth}{\columnwidth}
-#+END_LaTeX 
 
 #+BEGIN_SRC python
 import zmq
@@ -573,11 +612,6 @@ message = socket.recv()
 print("Received request: %s" % message)
 #+END_SRC
 
-#+BEGIN_LaTeX 
-\end{varwidth}
-\end{adjustbox}
-#+END_LaTeX 
-
 
 *** Sockets in OO languages 
 
@@ -587,7 +621,7 @@ print("Received request: %s" % message)
 
 #+BEAMER: \pause
 
-- Issue: Does it depend on programming language?
+- Issue: Does communication depend on programming language?
 - Can programs in different languages talk to each other? 
 
 
@@ -630,9 +664,13 @@ print("Received request: %s" % message)
 - Why an intermediate neutral representation?
   - Alternative: $O(n^2)$ translations necessary 
 
+
+#+BEAMER: \pause
+- Different names: serialization, pack/unpack, marshalling 
+
 *** 0mq: Exchanging data across languages 
 
-- Uses a simple an very efficient wire format 
+- Uses a simple and very efficient wire format 
 - No explicit support for translation between complex language
   artefacts
   - Simple things like strings work 
@@ -1031,98 +1069,126 @@ person = addressbook_pb2.Person()
 person.ParseFromString(f.read())
 #+END_SRC
 
+
+
 * Client/server, basic structure 
 
+
+** Basics  of client/server 
 *** From sockets to structured distributed programs
- With sockets (or similar APIs), arbitrary data exchange relationships between different parts of a distributed system can be formulated 
- -  ! “Spaghetti passing” akin to goto-induced Spaghetti code
- - 
+
+With sockets (or similar APIs), arbitrary data exchange relationships between different parts of a distributed system can be formulated 
+ -  $\rightarrow$  ``Spaghetti passing'' akin to goto-induced Spaghetti code
  - Put some structure even in distributed applications
- - 
- - First idea: asymmetric roles between 
+ 
+
+First idea: asymmetric roles between 
  - A requester of some sort of processing/data
  - A provider of this processing/data
- - 
- -  ! Client/server paradigm 
+
+#+BEAMER: \pause
+
+$\rightarrow$ *Client/server paradigm*
+
+
 *** Client/Server Paradigm
- Basic assumption: Some computers are more equal than others!
- - Some computers are connected to a printer, some not
- - Some computers have little disk capacity, some a lot 
+
+ - Basic assumption: Some computers are more equal than others!
+   - Some computers are connected to a printer, some not
+   - Some computers have little disk capacity, some a lot 
  - Goal: share the resources of such special computers
  - Second goal: make them available to “anybody”
- - Access to these resources can be regarded as a service
- - Print a file on my printer, store some files on your big hard disk
- - Computers providing such services are called “servers”
- - Machines accessing these services are “clients”
+   - *Access* to these resources can be regarded as a *service*
+   - Print a file on my printer, store some files on your big hard
+     disk
+ - Terminology 
+   - Processes providing such services are called *servers*
+   - Processes accessing these services are *clients*
+
+
 *** Client/server interact via request/reply messages
 
+\tiny
+
+
+**** Client: Request                                          :B_block:BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.5
+     :BEAMER_env: block
+     :BEAMER_opt: [t]
+     :END:
+
+
+#+BEGIN_SRC python 
+doOperation ?\tikzmark{doOp}?
+...
+(wait)
+...
+receiveReply
+(continue) 
+#+END_SRC
 
 
 
- Request
- Server
- Client
-
- doOperation
- (wait)
- (continuation)
- Reply
- message
-
- getRequest
- execute
- method
+**** Server                                                   :B_block:BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.5
+     :BEAMER_env: block
+     :BEAMER_opt: [t]
+     :END:
 
 
 
+#+BEGIN_SRC python 
+?\tikzmark{receiveReq}?receiveRequest 
+identify operation (and data) 
+execute operation 
+return reply
+#+END_SRC
 
- message
- select object
- sendReply
-*** Client/Server – Abstract 
- Abstract representation as processes on different computers
- Word 
- - Processor
- Service program 
- - handling requests
- Program 
- - accepting
- - print requests
- Device
- - driver
+
+
 *** Client/Server Paradigm
  Roles are not fixed!
  - A “print server” can be a client to a “file server” itself
  - Depends on the task that is to be performed
- - 
- “Please store my file ‘ABC’ ”
- “Please print
- - file ‘ABC’ ”
- “Please give me file ‘ABC’ “
+
+
+#+CAPTION: Roles are not fixed: One process' server is another process' server
+#+NAME: rolesNotFixed
+[[./figures/rolesNotFixed.pdf]]
+
 *** Behavior in time: Synchronous request
- A client asks a server to perform some processing 
- - Server is synchronous: Cannot proceed until request has arrived
- - Client is synchronous: After sending the request, it blocks until the result arrives 
- Client
- Server
- Channel
+
+****                                                        :B_columns:BMCOL:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                        :B_column:BMCOL:
+      :PROPERTIES:
+      :BEAMER_env: column
+      :BEAMER_col: 0.5
+      :END:
+
+A client asks a server to perform some processing 
+- Server is synchronous: Cannot proceed until request has arrived
+- Client is synchronous: After sending the request, client  blocks until the result arrives 
+
+*****                                                        :B_column:BMCOL:
+      :PROPERTIES:
+      :BEAMER_env: column
+      :BEAMER_col: 0.5
+      :END:
 
 
- receive
+#+CAPTION: Synchronous request 
+#+ATTR_LATEX: :width 0.9\textwidth 
+#+NAME: synchrequest
+[[./figures/syncReq.pdf]]
 
 
 
-
- Request
-
-
-
- Result
-
-
- reply
- Process 
- - request
 *** Behavior in time: Asynchronous request
  A client asks a receiver to perform some processing 
  - Server is synchronous: Cannot proceed until request has arrived
@@ -1151,59 +1217,131 @@ person.ParseFromString(f.read())
  Other 
  - activities 
  - take place
+
+
+** Some structural aspects 
 *** Execution structures of servers
+
  Servers can execute repeated requests (from same or different clients)
- - One after the other ! potentially sub-optimal performance
+ - One after the other $\rightarrow$ potentially sub-optimal performance
  - Concurrently, by dynamically creating a server thread/process for each incoming request
  - Concurrently, by assigning incoming requests to one out of a pool of threads/processes
- - Server activation – When is server process/thread started?
- - Once, at system startup, remains active (“persistent server”)
+
+*** Execution structure: Server activation 
+
+When is server process/thread started?
+ - Once, at system startup, and remains active (*persistent server*)
  - Once, at first invocation of requested service, remains active  
  - Both: dedicated for a given service type or can serve different service types 
  - Per request – started at request arrival, terminates afterwards 
- - 
+
+
+*** Execution structure: Server activation, practically  
+
+- Persistent server
+  - In bootup process, e.g.: upstart, ~/etc/init.d/~, ... 
+- At first invocation
+  - ~inet.d~, ~xnet.d~, ...
+  - Tying request to service: Typically via port number 
+
+
 *** Series of requests: Stateful/stateless servers
  A series of requests might be related to each other
- - Server might know of this connection and store relevant state to relate successive requests to each other: stateful server
- - Server might not care, treat each request as if it were an isolated one: stateless server
- - Requests must carry all necessary information all the time 
- - Example: cookies 
- - 
- - Example: Server provides access to a file
- - Stateful server: Stores the position in the file where last read attempt took place, continues to read from this position at the following request
- - Stateless server: Each request must specify the position onwards from which to read 
+ - Server might know of this connection and store relevant state to relate successive requests to each other: *stateful server*
+   - Requests must identify request sequence they belong to 
+ - Server might not care, treat each request as if it were an isolated one: *stateless server*
+   - Requests must carry all necessary information all the time
+   - Can be substantially larger than just sequence identifier 
 
-*** Summary: A simple two-tier model 
+*** Stateful/stateless: Examples 
+
+ - Cookies
+   - Versatile, more in HTTP chapter 
+ - Server provides access to a file
+   - Stateful server: Stores the position in the file where last read attempt took place, continues to read from this position at the following request
+   - Stateless server: Each request must specify the position onwards from which to read 
+     - E.g., Network File System
+ - Remote editing (like Google docs or similar) 
+
+*** How to find server? 
+
+- Open issue: How does client know which server to talk to? 
+
+#+BEAMER: \pause
+
+- Options:
+  - Hard-coded IP/port 
+  - Hard-coded name + port 
+    - Needs *name resolution*, like DNS
+  - /Service name/ somehow specified
+    - Needs name resolution, provides IP *and* port
+    - What if we do not run on top of IP? 
+
+- More details later
+
+
+
+*** Name resolution       
+
+- Maps from one name space to another 
+- Typical operations
+  - Make an entry: *bind*, *register*, ...
+  - Look up and entry 
+- Many examples
+  - DNS, Peer-to-peer systems,
+
+#+BEAMER: \pause
+
+  - Broadcasting (like ARP), without explicit registration step 
 
 *** Client/Server Evaluation
   Advantages
   - Simple architecture, clear assignment of responsibilities
-  - Simple programming paradigm: accessing a service is well known from sequential programming – call a function!
-  - Relatively simple to control: one machine provides a given service
-  - 
-  - Disadvantages
+  - Simple programming paradigm: accessing a service is well known from sequential programming -– call a function!
+    - Syntactically, it does not look like it yet 
+  - Relatively simple to control: one process provides a given service
+
+  Disadvantages
   - Server can become performance bottleneck
   - Server can be far away, long latency for services
-  - A service fails if the single server fails – “single point of failure” 
+  - A service fails if the single server fails -– /single point of failure/
   - How to find a server for a given service in the first place?
   - Resources of non-servers might be wasted (e.g., disk space)
-  - 
 
-- server: performance, flexibility, how to run programs, fault tolerance 
-- client: flexibility, programability, executing code in browser (latency!) 
 
+
+** Example code 
+
+*** ZeroMQ: Client/Server in C 
+ Distributed Systems, Ch. 2:  Basic Interaction Patterns
+*** ZeroMQ: Client/Server in Python 
+
+
+
+** Request/reply  
 
 *** Request/reply protocol in more detail
  Request/reply is seemingly trivial
  - But what about failures?
  - Of communication (lost messages)? Client or server crash?
  - Possible problems and remedies
- - Observation 1: doOperation does not receive reply
+
+*** What if no reply received? 
+
+Issue 1: doOperation does not receive reply
  - Detected by: Timeout in doOperation
  - Possible causes: request or reply lost, server has crashed
- - Action: Resend the request message, count number of attempts and abort if server crash is suspected 
-*** Request/reply protocol in more detail
- Observation 2: same request arrives multiple times
+ - Action: Resend the request message, count number of attempts and abort if server crash is suspected
+
+
+#+BEAMER: \pause
+
+Easy!  But... 
+
+*** Multiple copies of a request 
+
+Issue 2: same request arrives multiple times
+ - Caused by retransmissions (needed to cure Issue 1) 
  - Detected by: Server repeatedly receives the same message identifier from the same client 
  - Prerequisite: Message IDs in request message, server stores message identifiers
  - Possible cause: Timeouts in client (owing to lost reply message or slow server), request message duplicated in the network
@@ -1216,10 +1354,10 @@ person.ParseFromString(f.read())
  - If not: Server needs a history of message identifiers and replies 
  - (History can be cleared by interpreting a client’s request n+1 as acknowledgement for the request n – but timeout still necessary)
 
+** Summary 
 
+*** Summary: A simple two-tier model 
 
-* Example code 
+- Client/server is a simple model to structure distributed applications
+- So far, just two *tiers* considered
 
-*** ZeroMQ: Client/Server in C 
- Distributed Systems, Ch. 2:  Basic Interaction Patterns
-*** ZeroMQ: Client/Server in Python 
