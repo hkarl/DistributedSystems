@@ -65,10 +65,10 @@ slides169: $(slides169Pdf)
 
 %-slides.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
-	# ${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
-	# bibtex $(basename $<)
-	# ${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
-	# cp $@ ../../output/slides/
+	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
+	bibtex $(basename $<)
+	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
+	cp $@ ../../output/slides/
 
 %-handout.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
@@ -91,7 +91,7 @@ slides169: $(slides169Pdf)
 clean:
 	-rm *.tex *.tex~ tmp.org *.pdf *.bbl *.vrb
 	-rm -rf _minted*
-	-rm *.aux *.log *.nav *.out *.snm *.toc 
+	-rm *.aux *.log *.nav *.out *.snm *.toc *.pyg
 
 cleanall:
 	-cd book ; rm *.pdf *.aux *.log *.bbl *.tex *.tex~ *.toc *.aux *.bbl *.log *.blg *.out *.vrb
