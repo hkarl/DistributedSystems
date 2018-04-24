@@ -1,0 +1,46 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{tikz}
+\author{Holger Karl}
+\date{\today}
+\title{}
+\begin{document}
+\begin{tikzpicture}[auto, xscale=3,
+block/.style = {rectangle, draw=black, thick, align=left}]
+\node[block] at (0,0) (c1) {Client 1};
+\node[block] at (0,2) (c2) {Client 2}; 
+\node[block] at (1,1) (pr) {Proxy}; 
+\node[block] at (3,1) (s1) {Server}; 
+\draw [->] (c1.east)  [bend right=45, line width=1.25] to (pr.south); 
+\draw [->] (c2) [bend left=45, line width=1.25] to (pr.north); 
+\draw [->] (pr)  [bend right=45, line width=1.25] to (c1); 
+\draw [->] (pr) [bend left=45, line width=1.25] to (c2); 
+\draw [->] (pr) [bend left=45, line width=2] to (s1); 
+\draw [->] (s1) [bend left=45, line width=2] to (pr); 
+  % \node [block]  at (0,1) (sender) {\textbf{Sender:} \\x = native data;\\px = pack(x);
+  %   \\send(px);};
+  % \node [block] at (2,3) (idl) {Data definition file};
+  % \node [block] at (2,2) (idlcomp) {IDL compiler};
+  % \node [block] at (1,1) (pack) {pack()}; 
+  % \node [block] at (3,1) (unpack) {unpack()}; 
+  % \node [block]  at (4,1) (receiver) {\textbf{Receiver:} \\px =  receive();\\x = unpack(px);
+  %   \\//use native data in x };
+  % %
+  % \draw [->] (idl) -- (idlcomp); 
+  % \draw [->] (idlcomp) -- (pack); 
+  % \draw [->] (idlcomp) -- (unpack); 
+  % \draw (-1,-1) -- (5,-1);
+  % \draw [->] (sender) -- (0, -1); 
+  % \draw [->] (4, -1) -- (receiver); 
+  % \draw  [->] (sender.east) to [bend left=80] (pack.west) ; 
+  % \draw  [->] (pack.west) to [bend left=45] (sender.east) ; 
+  % \draw  [->] (receiver.west) to [bend left=45] (unpack.east) ; 
+  % \draw  [->] (unpack.east) to [bend left=45] (receiver.west) ; 
+  % \path (sender) edge [bend north ] node [right] {} (pack);
+\end{tikzpicture}
+\end{document}

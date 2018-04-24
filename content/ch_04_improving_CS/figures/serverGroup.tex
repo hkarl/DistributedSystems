@@ -1,0 +1,26 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+\begin{tikzpicture}[auto, xscale=3,
+block/.style = {rectangle, draw=black, thick, align=left}]
+\node[block] at (1,0) (c1) {Client 1};
+\node[block] at (1,4) (c2) {Client 2}; 
+\node[block] at (2,1) (s1) {Server 1}; 
+\node[block] at (2,2) (s2) {Server 2}; 
+\node[block] at (2,3) (s3) {Server 3}; 
+% \draw ([xshift=-0.5mm,yshift=-1mm]s1.south west) rectangle ([xshift=+0.5mm,yshift=+1mm]s3.north
+% east);
+% \node at (2,3.5) {Server group};
+% \draw [->] (c1) -- ()
+% \draw  (2,3) node[minimum width=4cm, minimum
+% height=4cm,draw,label={Server group}] (sg) {};
+\draw  (s2) node[minimum width=2cm, minimum
+height=3cm,draw,label={Server group}] (sg) {};
+\draw [->] (c1) -- (sg); 
+\draw [->] (c2) -- (sg); 
+
+\end{tikzpicture}
+\end{document}
