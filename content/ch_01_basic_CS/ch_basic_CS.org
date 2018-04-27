@@ -25,7 +25,7 @@ You should be able to understand
 
 *** System models and system aspects 
 
-Generic modeling issues
+Generic modeling issues \cite[Ch.~2]{Coulouris:DistributedSystems:2011}
  - Node model (hardware and software) 
  - Data exchange paradigm
  - Behaviour in time 
@@ -95,7 +95,8 @@ We usually have some operations like:
 
 *** Synchronicity of operations 
 
-~send~, ~receive~ are OS operations, might block a running process 
+~send~, ~receive~ are OS operations, might block a running process
+(~man send~) 
 
 - ~send~ operation
   - (Strictly) blocking, version 1: Wait until message has been *delivered*
@@ -114,13 +115,13 @@ We usually have some operations like:
 *** Synchronicity of operations 
 
 
-- ~receive~ operation
+- ~receive~ operation (~man recvfrom~, ~man recvmsg~)
   - Blocking: Wait until a message has arrived (process blocked)
     - Process resumes (sometime) after message arrives 
     - Possibly, of specified properties: desired originator, maximum
       length, \ldots
     - Often, no guarantee on minimum length!
-  - Nonblocking: Check whether message is available
+  - Nonblocking (~man fcntl~, ~O_NONBLOCK~): Check whether message is available
     - Copy into process buffer if yes
     - Corresponding return value if no
     - Does never block process for longer time 
@@ -161,7 +162,7 @@ We usually have some operations like:
 
 *** Shared memory: PRAM model 
 
-Common model: *Parallel* Random Access Machine 
+Common model: *Parallel* Random Access Machine \cite{Karp:1988:SPA:894803}
 
 - Generalizes ordinary Random Access Machine
 - Multiple processes issue ~LOAD~ and ~STORE~ operations
@@ -679,8 +680,9 @@ print("Received request: %s" % message)
 *** Wire transfer approaches 
 
 - Some candidates 
-  - Abstract Syntax Notation.1 -- ISO/OSI layer 6; self-descriptive
-  - XML 
+  - Abstract Syntax Notation.1 (ASN.1 )-- ISO/OSI layer 6;
+    self-descriptive \cite{itut:applic_asn.1}
+  - XML \url{http://www.omg.org/cgi-bin/doc?formal/02-06-51}
   - OMG CDR
   - JSON
 - Issues
@@ -823,6 +825,9 @@ map 32 stores a map whose length is upto (2^32)-1 elements
 
 - Option 1: Language has enough type information at run-time
   - Use that! 
+
+#+BEAMER: \pause
+
 - Option 2: It does not! :-(
   - Need additional information about the structure of a piece of data
     to be translated
@@ -1106,47 +1111,64 @@ $\rightarrow$ *Client/server paradigm*
    - Processes accessing these services are *clients*
 
 
+
+
+
 *** Client/server interact via request/reply messages
 
-\tiny
 
 
-**** Client: Request                                          :B_block:BMCOL:
+****                                                        :B_columns:BMCOL:
      :PROPERTIES:
-     :BEAMER_col: 0.5
-     :BEAMER_env: block
+     :BEAMER_env: columns
      :BEAMER_opt: [t]
      :END:
 
-
-#+BEGIN_SRC python 
-doOperation ?\tikzmark{doOp}?
-...
-(wait)
-...
-receiveReply
-(continue) 
-#+END_SRC
+***** Client: Request                                         :B_block:BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :BEAMER_env: block
+      :BEAMER_opt: [t]
+      :END:
 
 
-
-**** Server                                                   :B_block:BMCOL:
-     :PROPERTIES:
-     :BEAMER_col: 0.5
-     :BEAMER_env: block
-     :BEAMER_opt: [t]
-     :END:
-
-
-
-#+BEGIN_SRC python 
-?\tikzmark{receiveReq}?receiveRequest 
-identify operation (and data) 
-execute operation 
-return reply
-#+END_SRC
+ #+BEGIN_SRC python 
+ doOperation ?\tikzmark{doOp}?
+ ...
+ (wait)
+ ... 
+ ... 
+ ... 
+ receiveReply ?\tikzmark{receiveReply}? 
+ (continue) 
+ #+END_SRC
 
 
+
+***** Server                                                  :B_block:BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :BEAMER_env: block
+      :BEAMER_opt: [t]
+      :END:
+
+
+
+ #+BEGIN_SRC python 
+ while True:
+     ?\tikzmark{receiveReq}?receiveRequest 
+     identify operation, data
+     execute operation 
+     ?\tikzmark{sendReply}?send reply
+ #+END_SRC
+
+
+ #+BEGIN_LaTeX
+ \begin{tikzpicture}[remember picture]
+   \draw[overlay, ->, line width=5pt, red] (pic cs:doOp) -- (pic cs:receiveReq);
+   \draw[overlay, ->, line width=5pt, red] (pic cs:sendReply) -- (pic cs:receiveReply);
+ \end{tikzpicture}
+ #+END_LaTeX
 
 *** Client/Server Paradigm
  Roles are not fixed!
@@ -1159,6 +1181,8 @@ return reply
 [[./figures/rolesNotFixed.pdf]]
 
 *** Behavior in time: Synchronous request
+
+\zrc
 
 ****                                                        :B_columns:BMCOL:
      :PROPERTIES:
@@ -1190,33 +1214,41 @@ A client asks a server to perform some processing
 
 
 *** Behavior in time: Asynchronous request
- A client asks a receiver to perform some processing 
+
+\zrc 
+
+****                                                        :B_columns:BMCOL:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                         :B_column:BMCOL:
+      :PROPERTIES:
+      :BEAMER_env: column
+      :BEAMER_col: 0.5
+      :END:
+
+
+A client asks a receiver to perform some processing 
  - Server is synchronous: Cannot proceed until request has arrived
- - Client is asynchronous: after posting the request, does not immediately wait for answer but first performs some other activities 
- Client
- Server
- Channel
+ - Client is asynchronous: after posting the request, does not
+   immediately wait for answer but first performs some other
+   activities
 
-
- receive
-
-
-
-
- Request
+*****                                                         :B_column:BMCOL:
+      :PROPERTIES:
+      :BEAMER_env: column
+      :BEAMER_col: 0.5
+      :END:
 
 
 
- Result
+#+CAPTION: Asynchronous request 
+#+ATTR_LATEX: :width 0.9\textwidth 
+#+NAME: synchrequest
+[[./figures/asyncReq.pdf]]
 
 
- reply
- Process 
- - request
- receiveResult
- Other 
- - activities 
- - take place
 
 
 ** Some structural aspects 
@@ -1224,8 +1256,10 @@ A client asks a server to perform some processing
 
  Servers can execute repeated requests (from same or different clients)
  - One after the other $\rightarrow$ potentially sub-optimal performance
- - Concurrently, by dynamically creating a server thread/process for each incoming request
- - Concurrently, by assigning incoming requests to one out of a pool of threads/processes
+ - Concurrently, by dynamically creating a server thread/process for
+   each incoming request 
+ - Concurrently, by assigning incoming requests to one out of a pool
+   of threads/processes 
 
 *** Execution structure: Server activation 
 
@@ -1240,16 +1274,32 @@ When is server process/thread started?
 
 - Persistent server
   - In bootup process, e.g.: upstart, ~/etc/init.d/~, ... 
-- At first invocation
-  - ~inet.d~, ~xnet.d~, ...
-  - Tying request to service: Typically via port number 
+- At first invocation, via a *super server daemon* 
+  - ~inet.d~ (deprecated), ~xinet.d~, ~launchd~, ...
+  - Tying request to service: Typically via port number; no actual
+    *service naming* scheme in Internet architecture as such 
+
+*** Execution structure: Server activation, example xinit.d 
+
+Some features: 
+
+- Allows access control
+- Time-based availability of servers
+- Maximum number of instances 
+- Accessible via UDP or TCP 
+
+- See ~man xinetd.conf~ 
+
 
 
 *** Series of requests: Stateful/stateless servers
- A series of requests might be related to each other
- - Server might know of this connection and store relevant state to relate successive requests to each other: *stateful server*
-   - Requests must identify request sequence they belong to 
- - Server might not care, treat each request as if it were an isolated one: *stateless server*
+
+A series of requests might be related to each other
+ - Server might know of this connection and store relevant state to
+   relate successive requests to each other: *stateful server*
+   - Requests must identify request sequence they belong to
+ - Server might not care, treat each request as if it were an isolated
+   one: *stateless server*
    - Requests must carry all necessary information all the time
    - Can be substantially larger than just sequence identifier 
 
@@ -1258,8 +1308,11 @@ When is server process/thread started?
  - Cookies
    - Versatile, more in HTTP chapter 
  - Server provides access to a file
-   - Stateful server: Stores the position in the file where last read attempt took place, continues to read from this position at the following request
-   - Stateless server: Each request must specify the position onwards from which to read 
+   - Stateful server: Stores the position in the file where last read
+     attempt took place, continues to read from this position at the
+     following request
+   - Stateless server: Each request must specify the position onwards
+     from which to read
      - E.g., Network File System
  - Remote editing (like Google docs or similar) 
 
@@ -1310,49 +1363,107 @@ When is server process/thread started?
 
 
 
-** Example code 
-
-*** ZeroMQ: Client/Server in C 
- Distributed Systems, Ch. 2:  Basic Interaction Patterns
-*** ZeroMQ: Client/Server in Python 
-
-
-
 ** Request/reply  
 
 *** Request/reply protocol in more detail
- Request/reply is seemingly trivial
+
+Request/reply is seemingly trivial
  - But what about failures?
  - Of communication (lost messages)? Client or server crash?
  - Possible problems and remedies
 
+*** Recall: Simple request/reply protocol 
+****                                                        :B_columns:BMCOL:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :BEAMER_opt: [t]
+     :END:
+
+***** Client                                         :B_block:BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :BEAMER_env: block
+      :BEAMER_opt: [t]
+      :END:
+
+
+ #+BEGIN_SRC python 
+ doOperation ?\tikzmark{doOp}?
+ ...
+ (wait)
+ ... 
+ ... 
+ ... 
+ receiveReply ?\tikzmark{receiveReply}? 
+ (continue) 
+ #+END_SRC
+
+
+
+***** Server                                                  :B_block:BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :BEAMER_env: block
+      :BEAMER_opt: [t]
+      :END:
+
+
+
+ #+BEGIN_SRC python 
+ while True:
+     ?\tikzmark{receiveReq}?receiveRequest 
+     identify operation, data
+     execute operation 
+     ?\tikzmark{sendReply}?send reply
+ #+END_SRC
+
+
+ #+BEGIN_LaTeX
+ \begin{tikzpicture}[remember picture]
+   \draw[overlay, ->, line width=5pt, red] (pic cs:doOp) -- (pic cs:receiveReq);
+   \draw[overlay, ->, line width=5pt, red] (pic cs:sendReply) -- (pic cs:receiveReply);
+ \end{tikzpicture}
+ #+END_LaTeX
+
 *** What if no reply received? 
 
 Issue 1: doOperation does not receive reply
- - Detected by: Timeout in doOperation
+ - Detected by: Timeout in client 
  - Possible causes: request or reply lost, server has crashed
- - Action: Resend the request message, count number of attempts and abort if server crash is suspected
+ - Action:
+   - Resend the request message
+   - Count number of attempts and abort if server crash is suspected
 
 
 #+BEAMER: \pause
 
-Easy!  But... 
+Easy!  But what if \ldots 
+
+
 
 *** Multiple copies of a request 
 
 Issue 2: same request arrives multiple times
  - Caused by retransmissions (needed to cure Issue 1) 
- - Detected by: Server repeatedly receives the same message identifier from the same client 
- - Prerequisite: Message IDs in request message, server stores message identifiers
- - Possible cause: Timeouts in client (owing to lost reply message or slow server), request message duplicated in the network
- - Actions: 
- - Discard the additional request (do not execute more than once)
- - Reply (to original request) not yet sent: no further action necessary
- - Reply (to original request) already sent: Resend the reply to this request 
- - If server can reexecute the operation to obtain the same result again (including all sideeffects! – idempotent operations): 
- - Do so, send reply again 
- - If not: Server needs a history of message identifiers and replies 
- - (History can be cleared by interpreting a client’s request n+1 as acknowledgement for the request n – but timeout still necessary)
+ - Detected by: Server repeatedly receives the same message identifier
+   from the same client
+   - Prerequisite: Message IDs in request message, server stores message identifiers
+   - Possible cause: Timeouts in client (owing to lost reply message
+     or slow server), request message duplicated in the network
+
+Challenge: Execute operation *exactly once* per request 
+
+*** Multiple copies of a request -- Actions: 
+
+Actions: 
+   - Discard the additional request (do not execute more than once)
+   - Reply (to original request) not yet sent: no further action necessary
+   - Reply (to original request) already sent: Resend the reply to this request 
+     - If server can reexecute the operation to obtain the same result
+       again (including all sideeffects! – idempotent operations):
+       - Do so, send reply again 
+     - If not: Server needs a history of message identifiers and replies 
+     - (History can be cleared by interpreting a client’s request n+1 as acknowledgement for the request n – but timeout still necessary)
 
 ** Summary 
 
