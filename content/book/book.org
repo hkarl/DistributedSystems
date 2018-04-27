@@ -13,6 +13,7 @@
 #+LATEX_HEADER: \setminted{breaklines,autogobble,escapeinside=??,frame=lines,linenos=false,mathescape=true}
 #+LATEX_HEADER: \usepackage{adjustbox}
 #+LATEX_HEADER: \usepackage{natbib}
+#+LATEX_HEADER: \usepackage{acronym}
 #+LATEX_HEADER: \bibliographystyle{plain}
 #+LATEX_HEADER: \usepackage{../templates/msc}
 #+LATEX_HEADER: \graphicspath{{../ch0/}{../ch_01_basic_CS/}{../ch_02_web_CS/}{../ch_03_RPC_CS/}{../ch_04_improving_CS/}{../ch_05_practical/}{../ch_06_p2p_ncs/}{../ch_07_mcast_ncs/}{../ch_08_des_pubsub/}{../ch_08_msqQueuing/}{../ch_09_oddsEnds_ncs/}{../ch_10_distStorage/}{../ch_11_distTransactions/}{../ch_12_nosql/}{../ch_13_failures/}{../ch_14_filesystems/}{../ch_15_gfs/}{../ch_16_websearch}{../ch/}{../ch_17_elasticStack/}{../ch_18_virtualization/}{../ch_19_clouds/}{../ch_20_bigdata/}{../ch_21_spark/}{../ch_22_streaming/}{../ch_23_ml/}{../ch_24_comparisons/}}

@@ -13,3 +13,9 @@
 *** References 
 
 \bibliography{../bib}
+
+
+
+*** Acronyms 
+
+\input{../acronyms}
