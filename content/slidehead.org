@@ -22,6 +22,7 @@
 #+LATEX_HEADER: \renewcommand\bibfont{\scriptsize}
 #+LATEX_HEADER: \graphicspath{{./figures/}}
 #+LATEX_HEADER: \addtobeamertemplate{navigation symbols}{}{ \hspace{1em}    \usebeamerfont{footline}  \insertframenumber / \inserttotalframenumber }
+#+LATEX_HEADER: \newcommand{\zrc}{\framezoom<1><2>(0.5\textwidth,0.01cm)(0.5\textwidth,0.01cm)}  % zoom right column }
 #+BIBLIOGRAPHY: bib plain
 
 
