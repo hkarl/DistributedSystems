@@ -13,6 +13,8 @@ EMACSEXPORTPROG="(progn (add-to-list 'load-path (expand-file-name \"~/.emacs.d/o
 
 # pdflatex command
 PDFLATEX=pdflatex -shell-escape -interaction=nonstopmode
+BIBCOMMAND=bibtex
+
 
 BookSources := $(shell find .. -name "ch*.org")
 SOURCE := $(wildcard *-slides.org)
@@ -41,7 +43,7 @@ book.tex: book.org  $(BookSources)
 
 book.pdf: book.tex
 	${PDFLATEX} book
-	-bibtex book
+	-${BIBCOMMAND} book
 	${PDFLATEX} book
 	${PDFLATEX} book
 	cp $@ ../../output 
@@ -70,21 +72,21 @@ slides169: $(slides169Pdf)
 
 %-slides.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
-	-bibtex $(basename $<)
+	-${BIBCOMMAND} $(basename $<)
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
 	cp $@ ../../output/slides/
 
 %-handout.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
-	-bibtex $(basename $<)
+	-${BIBCOMMAND} $(basename $<)
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
 	cp $@ ../../output/handout/
 
 %-slides169.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib 
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
-	-bibtex $(basename $<)
+	-${BIBCOMMAND} $(basename $<)
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
 	cp $@ ../../output/slides169/
