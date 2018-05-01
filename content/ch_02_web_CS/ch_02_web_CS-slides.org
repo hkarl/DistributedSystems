@@ -11,6 +11,9 @@
 
 
 *** References 
+    :PROPERTIES:
+    :BEAMER_OPT: allowframebreaks
+    :END:
 
 \printbibliography
 
