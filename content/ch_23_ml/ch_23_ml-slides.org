@@ -7,9 +7,4 @@
 
 
 #+include: "./ch_23_ml.org"
-* References 
-
-
-*** References 
-
-\bibliography{../bib}
+#+include: "../references.org"

@@ -7,9 +7,4 @@
 
 
 #+include: "./ch_20_bigdata.org"
-* References 
-
-
-*** References 
-
-\bibliography{../bib}
+#+include: "../references.org"

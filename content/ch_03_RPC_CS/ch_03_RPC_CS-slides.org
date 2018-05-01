@@ -7,9 +7,4 @@
 
 
 #+include: "./ch_03_RPC_CS.org"
-* References 
-
-
-*** References 
-
-\bibliography{../bib}
+#+include: "../references.org"

@@ -9,10 +9,4 @@
 
 #+include: "./ch0.org" 
 
-* References 
-
-
-*** References 
-
-\bibliography{../bib}
-
+#+include: "../references.org"

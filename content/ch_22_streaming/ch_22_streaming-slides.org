@@ -7,9 +7,4 @@
 
 
 #+include: "./ch_22_streaming.org"
-* References 
-
-
-*** References 
-
-\bibliography{../bib}
+#+include: "../references.org"

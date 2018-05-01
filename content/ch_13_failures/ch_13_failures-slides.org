@@ -7,9 +7,4 @@
 
 
 #+include: "./ch_13_failures.org"
-* References 
-
-
-*** References 
-
-\bibliography{../bib}
+#+include: "../references.org"

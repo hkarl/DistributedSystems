@@ -7,9 +7,4 @@
 
 
 #+include: "./ch_15_gfs.org"
-* References 
-
-
-*** References 
-
-\bibliography{../bib}
+#+include: "../references.org"

@@ -7,9 +7,4 @@
 
 
 #+include: "./ch_16_websearch.org"
-* References 
-
-
-*** References 
-
-\bibliography{../bib}
+#+include: "../references.org"

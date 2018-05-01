@@ -7,9 +7,4 @@
 
 
 #+include: "./ch_19_clouds.org"
-* References 
-
-
-*** References 
-
-\bibliography{../bib}
+#+include: "../references.org"

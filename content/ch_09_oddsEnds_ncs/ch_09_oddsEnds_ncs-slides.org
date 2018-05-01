@@ -7,9 +7,4 @@
 
 
 #+include: "./ch_09_oddsEnds_ncs.org"
-* References 
-
-
-*** References 
-
-\bibliography{../bib}
+#+include: "../references.org"
