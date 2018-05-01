@@ -7,17 +7,4 @@
 
 
 #+include: "./ch_02_web_CS.org"
-* References 
-
-
-*** References 
-    :PROPERTIES:
-    :BEAMER_OPT: allowframebreaks
-    :END:
-
-\printbibliography
-
-
-*** Acronyms 
-
-\input{../acronyms}
+#+include: "../references.org"

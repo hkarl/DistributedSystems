@@ -1,0 +1,17 @@
+* References 
+
+
+*** References 
+    :PROPERTIES:
+    :BEAMER_OPT: allowframebreaks
+    :END:
+
+\printbibliography
+
+
+*** Acronyms 
+    :PROPERTIES:
+    :BEAMER_OPT: allowframebreaks
+    :END:
+
+\input{../acronyms}
