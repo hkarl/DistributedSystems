@@ -13,7 +13,7 @@ EMACSEXPORTPROG="(progn (add-to-list 'load-path (expand-file-name \"~/.emacs.d/o
 
 # pdflatex command
 PDFLATEX=pdflatex -shell-escape -interaction=nonstopmode
-BIBCOMMAND=bibtex
+BIBCOMMAND=biblatex
 
 
 BookSources := $(shell find .. -name "ch*.org")

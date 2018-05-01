@@ -11,9 +11,11 @@
 
 
 *** References 
+    :PROPERTIES:
+    :BEAMER_OPT: allowframebreaks
+    :END:
 
-\bibliography{../bib}
-
+\printbibliography
 
 
 *** Acronyms 
