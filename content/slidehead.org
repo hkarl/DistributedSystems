@@ -18,6 +18,7 @@
 #+LATEX_HEADER: \usepackage{adjustbox}
 #+LATEX_HEADER: \usepackage{acronym}
 #+LATEX_HEADER: \usepackage[style=numeric,bibstyle=numeric,url=false,natbib=true]{biblatex}
+#+LATEX_HEADER: \setbeamertemplate{bibliography item}{\insertbiblabel}
 #+LATEX_HEADER: \usepackage{../templates/msc}
 #+LATEX_HEADER: \graphicspath{{./figures/}}
 #+LATEX_HEADER: \addtobeamertemplate{navigation symbols}{}{ \hspace{1em}    \usebeamerfont{footline}  \insertframenumber / \inserttotalframenumber }
