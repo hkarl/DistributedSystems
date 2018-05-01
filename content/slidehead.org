@@ -17,13 +17,13 @@
 #+LATEX_HEADER: \setminted{breaklines,autogobble,escapeinside=??,frame=lines,linenos=false,mathescape=true}
 #+LATEX_HEADER: \usepackage{adjustbox}
 #+LATEX_HEADER: \usepackage{acronym}
-#+LATEX_HEADER: \usepackage[style=numeric,natbib=true]{biblatex}
+#+LATEX_HEADER: \usepackage[style=numeric,bibstyle=numeric,url=false,natbib=true]{biblatex}
 #+LATEX_HEADER: \usepackage{../templates/msc}
 #+LATEX_HEADER: \graphicspath{{./figures/}}
 #+LATEX_HEADER: \addtobeamertemplate{navigation symbols}{}{ \hspace{1em}    \usebeamerfont{footline}  \insertframenumber / \inserttotalframenumber }
 #+LATEX_HEADER: \newcommand{\zrc}{\framezoom<1><2>(0.5\textwidth,0.01cm)(0.5\textwidth,0.01cm)}  % zoom right column }
 #+BIBLIOGRAPHY: bib plain
-#+LATEX_HEADER: \addbibresource{../bib}
+#+LATEX_HEADER: \addbibresource{../bib.bib}
 
 
 
