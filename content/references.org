@@ -1,4 +1,4 @@
-* References 
+* References
 
 
 *** References 
@@ -6,7 +6,7 @@
     :BEAMER_OPT: allowframebreaks
     :END:
 
-\printbibliography
+\printbibliography[heading=none]
 
 
 *** Acronyms 
