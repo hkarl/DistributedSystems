@@ -1,5 +1,8 @@
 
 * Material 
+
+** References 
+
 *** References 
     :PROPERTIES:
     :BEAMER_OPT: allowframebreaks
@@ -7,6 +10,7 @@
 
 \printbibliography[heading=none]
 
+** Acronyms 
 
 *** Acronyms 
     :PROPERTIES:
