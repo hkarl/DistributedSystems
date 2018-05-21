@@ -25,6 +25,8 @@
 #+LATEX_HEADER: \newcommand{\zrc}{\framezoom<1><2>(0.5\textwidth,0.01cm)(0.5\textwidth,0.01cm)}  % zoom right column }
 #+BIBLIOGRAPHY: bib plain
 #+LATEX_HEADER: \addbibresource{../bib.bib}
+#+LATEX_HEADER: \definecolor{links}{HTML}{2A1B81}
+#+LATEX_HEADER: \hypersetup{colorlinks,linkcolor=,urlcolor=links}
 
 
 
