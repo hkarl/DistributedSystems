@@ -1,7 +1,7 @@
 #+BIBLIOGRAPHY: ../bib plain
  
 
-* Basic structure 
+* Basic structure
     
 *** Case study: World Wide Web – Basic architecture
 
@@ -41,6 +41,8 @@ representation data
 
 
 
+** HTTP 
+
 *** The request/reply protocol: HTTP
 
  HTTP essentially a simple protocol
@@ -75,7 +77,127 @@ GET requests can refer to a static web page (simply delivered by the server) or 
    - Output of the program is delivered back to the client and rendered as the page
 
 
+** Web servers
+
+*** Servers 
+
+- Main job: Serve static files 
+- Do not write your own webserver 
+
+#+BEAMER: \pause
+
+- Example full-scale servers
+  - \href{https://httpd.apache.org}{Apache HTTPD}
+  - \href{https://www.nginx.com}{Nginx}
+  - \href{https://www.iis.net}{Internet Information Services}
+
+#+BEAMER: \pause
+- Example simple servers
+  - Python's \href {https://docs.python.org/3.5/library/http.server.html#module-http.server}{http.server}
+  - npm's \href{https://www.npmjs.com/package/http-server}{http-server}
+
+
+*** http.server Example 
+
+**** Basic                                                        :B_example:
+     :PROPERTIES:
+     :BEAMER_env: example
+     :END:
+\footnotesize
+#+BEGIN_SRC python 
+def run(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
+    server_address = ('', 8000)
+    httpd = server_class(server_address, handler_class)
+    httpd.serve_forever()
+#+END_SRC
+
+
+**** Serve files from directory                                   :B_example:
+     :PROPERTIES:
+     :BEAMER_env: example
+     :END:
+
+\footnotesize
+#+BEGIN_SRC python 
+import http.server
+import socketserver
+
+httpd = socketserver.TCPServer(("", 8000), http.server.SimpleHTTPRequestHandler)
+httpd.serve_forever()
+#+END_SRC     
+
+
+*** http.server from command line 
+
+Serve all that is in \ac{CWD}
+
+**** Defaults 
+
+#+BEGIN_SRC bash 
+$ python3 -m http.server
+#+END_SRC
+
+**** With parameters 
+#+BEGIN_SRC bash 
+$ python3 -m http.server 8888 
+#+END_SRC
+
+
+*** NPM http-server 
+
+#+BEGIN_SRC bash 
+$ npm install http-server -g
+$ http-server [path] [options]
+#+END_SRC
+
+Options: path, address, show directories, server gzips, proxy
+unresolvable request, ... 
+
+*** Nginx 
+
+- Actually, more than a simple web server for static files
+  - Application platform, load balancer, mircoservices, content
+    caching
+- With open-source and commercial versions 
+- Structure: One master, multiple worker processes
+  - Master: configure, control workers
+    - Configuration files as input 
+  - Workers: do actual work, requests distributed to workers
+
+*** Nginx as web server                                         :B_quotation:
+    :PROPERTIES:
+    :BEAMER_env: quotation
+    :CUSTOM_ID: nginx_config
+    :END:
+  
+- Idea: depending on URL, server files from directories or forward to
+  other "locations" 
+- Order in configuration file matters 
+
+**** Configuration                                                :B_example:
+     :PROPERTIES:
+     :BEAMER_env: example
+     :END:
+
+\footnotesize
+#+BEGIN_SRC bash
+http {
+    server {
+	listen 127.0.0.1:8080;
+	server_name example.org www.example.org;
+	location /images/ { root /data; }
+	location /wrong/url { return 404; }
+	location /permanently/moved/url {  return 301 http://www.example.com/moved/here;
+					}
+	location /users/ {  rewrite ^/users/(.*)$ /show?user=$1 break;}
+	location / { proxy_pass http://www.example.com;
+		   }
+    } }
+#+END_SRC
+
 * Server-side programmability  
+
+** Issue? 
 
 *** Jobs of a typical HTTP server 
 
@@ -109,41 +231,491 @@ Hence division of labor:
   - Highly optimized program for parsing request, static content
     delivery
     - A *web server* in the narrow sense of the word
-    - Examples: Apache HTTPD \url{https://httpd.apache.org}, Nginx
-      \url{https://www.nginx.com} 
   - A *web framework* to provide context for customized computation of
     dynamic responses (a *web application*) 
     - Examples: Django \url{https://www.djangoproject.com}, Tomcat \cite{ApacheTo2:online}, Ruby on Rails
       \url{http://rubyonrails.org}, Play \url{https://www.playframework.com}, ...
     - Lot's of fanboyism -- but some good comparisons
-      \href{https://en.wikipedia.org/wiki/Comparison_of_web_frameworks}{1},
-      \href{https://softwareengineering.stackexchange.com/questions/102090/why-isnt-java-used-for-modern-web-application-development}{2}
+      (\href{https://en.wikipedia.org/wiki/Comparison_of_web_frameworks}{Ref1},
+      \href{https://softwareengineering.stackexchange.com/questions/102090/why-isnt-java-used-for-modern-web-application-development}{Ref2})
+
 
 *** Web frameworks 
- 48
+
+Good frameworks support: 
+
+- Mapping URLs to pieces of code (*URL routing* or *dispatching*)
+  - To individual objects, URL parameters passed as parameters to
+    methods 
+- Templating for Web pages, form validation  
+- Security/authentication/authorization 
+- Database integration, caching
+  - Often: \ac{ORM}
+- AJAX support, Javascript integration 
+- Often: Model/view/controller abstractions 
+
+
+*** Side remark: Model/view/controller abstraction 
+
+
+
+
+****                                                           :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.5
+     :BEAMER_opt: [c]
+     :END:
+
+
+
+- Old concept how to structure graphical user interfaces (and similar)
+  \cite{Fowler:GUIArchi61:online}\cite{krasner1988description}\cite{950428}\cite{Gamma:DesignPatterns:1995:DPE:186897} 
+- Components:
+  - Model holds data, rules, logic
+  - Views convert model into user-useful representations 
+  - Controller accepts user input, sends commands to model (or
+    sometimes to views) 
+
+****                                                    :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.5
+     :BEAMER_opt: [c]
+     :END:
+
+
+
+#+CAPTION: Model/View/Controller concept
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:mvc:concept
+[[./figures/mvc.pdf]]
+
+
+
+
+
+
+** Simple examples 
+*** A short list  
+
+- Python world: 
+  - \href{http://werkzeug.pocoo.org}{Werkzeug}
+  - \href{http://flask.pocoo.org}{Flask}
+    - Based on werkzeug 
+  - \href{https://twistedmatrix.com/documents/17.5.0/core/howto/basics.html}{Twisted}
+  - \href{http://www.tornadoweb.org/en/stable/}{Tornado}
+- Javascript world (\href{see also}{https://nordicapis.com/13-node-js-frameworks-to-build-web-apis/}):
+  - \href{https://expressjs.com}{Express}
+  - \href{https://github.com/fastify/fastify}{Fastify}
+  - \href{https://www.meteor.com/developers}{Meteor}
+- Java (\href{https://zeroturnaround.com/webframeworksindex/}{see
+  also}, \href{https://www.dailyrazor.com/blog/best-java-web-frameworks/}{comparison}) 
+  - \href{https://spring.io}{Spring} 
+  - \href{https://www.playframework.com}{Play}
+
+*** Werkzeug 
+
+#+BEGIN_SRC python 
+from werkzeug.wrappers import Request, Response
+
+@Request.application
+def application(request):
+    return Response('Hello World!')
+
+if __name__ == '__main__':
+    from werkzeug.serving import run_simple
+    run_simple('localhost', 4000, application)
+#+END_SRC
+
+
+*** Flask 
+
+****                                                                :B_quote:
+     :PROPERTIES:
+     :BEAMER_env: quote
+     :END:
+
+Flask is a microframework for Python based on Werkzeug, Jinja 2 and good intentions. And before you ask: It's BSD licensed!
+
+
+**** Code 
+\footnotesize 
+#+BEGIN_SRC python 
+from flask import Flask
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    return "Hello World!"
+#+END_SRC
+
+**** Setup
+\footnotesize 
+
+#+BEGIN_SRC bash
+$ pip install Flask
+$ FLASK_APP=hello.py flask run
+ * Running on http://localhost:5000/
+#+END_SRC
+
+*** Tornado 
+
+- Special feature: Not based on WSGI (see below) 
+
+**** From web site marketing: 
+****                                         :B_quote:
+     :PROPERTIES:
+     :BEAMER_env: quote
+     :END:
+
+Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed. By using non-blocking network I/O, Tornado can scale to tens of thousands of open connections, making it ideal for long polling, WebSockets, and other applications that require a long-lived connection to each user.
+
+
+*** Tornado Hello world                                           :B_example:
+     :PROPERTIES:
+     :BEAMER_env: example
+     :END:
+
+\footnotesize 
+#+BEGIN_SRC python
+import tornado.ioloop
+import tornado.web
+
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.write("Hello, world")
+
+def make_app():
+    return tornado.web.Application([
+        (r"/", MainHandler),
+    ])
+
+if __name__ == "__main__":
+    app = make_app()
+    app.listen(8888)
+    tornado.ioloop.IOLoop.current().start()
+#+END_SRC
+
+
+
+
+*** Fastify 
+
+#+BEGIN_SRC javascript 
+// Require the framework and instantiate it
+const fastify = require('fastify')()
+
+// Declare a route
+fastify.get('/', function (request, reply) {
+  reply.send({ hello: 'world' })
+})
+
+// Run the server!
+fastify.listen(3000, '127.0.0.1', function (err) 
+{
+  if (err) throw err
+  console.log(`server listening on ${fastify.server.address().port}`)
+})
+#+END_SRC
+
+** Detailed  framework example: Django 
+
 *** Web frameworks – Example: Django (python) 
- 49
+
+
+Idea: Model/view/controller approach, tightly integrated with an SQL database 
+
+- Write model description (corresponds to SQL tables) as Python
+  classes
+- Write views to execute when user calls a URL 
+- Map URLs to views via small configuration files, 
+- Views are methods of Python objects with predefined signatures,
+  matching HTTP messages 
+- Templates render HTML as result
+  - With access to Python data structures
+
+*** Describing model/data base 
+
+
+
+
+- Model: SQL data base tables 
+- \ac{ORM} abstraction layer to hide SQL access behind Python classes
+  and objects
+- Examples follow
+  \href{https://docs.djangoproject.com/en/2.0/topics/db/models/}{Django
+  tutorial, v2}
+
+#+BEGIN_SRC python 
+from django.db import models
+
+class Person(models.Model):
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+#+END_SRC
+
+*** References between models 
+
+#+BEGIN_SRC python 
+from django.db import models
+
+class Musician(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    instrument = models.CharField(max_length=100)
+
+class Album(models.Model):
+    artist = models.ForeignKey(Musician, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    release_date = models.DateField()
+    num_stars = models.IntegerField()
+#+END_SRC
+
+*** Fields 
+
+- Plenty of field types, e.g., BigInteger, Boolean, Date, DateTime,
+  Duration, Email, file, Float, Image, Slug, Text, Time, URL, ... 
+- With plenty of options: null, blank, choices, primary_key, unique,
+  ... 
+- \href{https://docs.djangoproject.com/en/2.0/ref/models/fields/}{Django field types}
+
+*** SQL storage 
+
+- Tables are storage in selectable SQL engine
+- Transparent; details hidden by ORM
+- Direct access possible if necessary
+- Actual database
+  - Great for development: \href{https://www.sqlite.org/index.html}{sqlite3}
+  - For deployment: \href{https://www.mysql.com}{mysql}, \href{https://www.postgresql.org}{Postgresql} popular options
+  - Configured in settings file: type, IP, port, account, password 
+
+*** URL dispatching  
+
+- Developer specifies pairs of
+  - regular expression for URLs to be matched against
+  - *class* to be called as when URL is matched 
+
+*** Example URL dispatching  
+
+See \href{https://docs.djangoproject.com/en/2.0/topics/http/urls/}{URLconf.py}
+
+\footnotesize 
+#+BEGIN_SRC python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('articles/2003/', views.special_case_2003.as_view()),
+    path('articles/<int:year>/', views.year_archive.as_view()),
+    path('articles/<int:year>/<int:month>/', views.month_archive.as_view()),
+    path('articles/<int:year>/<int:month>/<slug:slug>/', views.article_detail.as_view()),
+]
+#+END_SRC
+
+*** Views 
+
+- Views are Python classes, with predefined methods
+  - in particular,  ~get()~ and ~post()~ invoked for corresponding
+    HTTP messages)
+- Subclassed from default classes with typical combinations of
+  functionality
+  - Render a template (~TemplateView~)
+  - Deal with an input form (~FormView~)
+  - ~ListView~, ~DetailView~, ... 
+  - Heavily relies on mixins to add functionality 
+- New view object instantiated per call
+  - Use class attributes!
+  - State in database, plus cookies, plus middleware 
+- Parameters in URL \ac{RE} mapped to method parameters 
+
+*** Views: Example
+     :PROPERTIES:
+     :BEAMER_env: example
+     :END:
+
+In ~views.py~: 
+
+#+BEGIN_SRC python 
+from django.http import HttpResponse
+from django.views import TemplateView
+
+class article_detail(TemplateView):
+    template_name = "article_detail.html"
+    def get(self, year, month, slug, request, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['year'] = 1984
+        return context        
+#+END_SRC
+
+*** Template engine 
+
+**** Problem 
+
+- Browser expects an HTML document as result of a request
+- Framework deals with data structure, Python objects
+- Generating HTML pages from data structures possible, but cumbersome 
+
+**** Solution: Engine 
+
+- Template engines turn data structures into HTML documents by filling
+  in templates 
+
+*** Example engine: Jinja2 
+
+- See \href{http://jinja.pocoo.org/docs/2.10/}{Jinja2 website}
+- Expands HTML template using data structures (here: Python) as input
+  to substitute patterns 
+- With loops, if, ... 
+- When invoked from a Django ~TemplateView~, has access to the view's
+  returned  context data 
+
+*** Jinja Template example
+
+- Context attributes accessible in evaluation context
+  - Use ~{{ ... }}~ for variable substition
+  - Use ~{% ... %}~ to call functions from template 
+
+#+BEGIN_SRC html
+<title>{% block title %}{% endblock %}</title>
+<ul>
+{% for user in users %}
+  <li><a href="{{ user.url }}">{{ user.username }}</a></li>
+{% endfor %}
+</ul>
+#+END_SRC
+
+** Running a Web framework 
+- Templates to render HTML as result, allowing access to Python data
+  structures 
+  - Can integrate various templating engines (in particular, Jinja2
+    \cite{Jinja2:online}) 
+
 *** Running Web applications in Web servers
- 50
-*** Running Web applications in Web servers
- 51
+- Remaining question: How to run Web application code (written against
+  a given framework) inside a Web server?  
+- Or: how to tell the Web server which code to invoke for a given HTTP
+  get, post, \ldots  request?  
+  - Note: Web frameworks often include ``toy'' web servers; good for
+    debugging, but not scalable, secure, performing enough \ldots for
+    production use
+- Easy part: have Web server deal with static material
+  - Put it in separate directory; configure Web server (cp. e.g. Slide [[#nginx_config]])
+  - Possibly generated by framework, possibly truly static (e.g., CSS
+    files) 
+- Necessary: interface between server and framework for dynamic
+  content 
+ 
+
+*** Running Web applications in Web servers: Interface 
+
+- Example: Web Server Gateway Interface (WSGI) for Python
+  \cite{eby10:_python_web_server_gatew_inter} 
+  - Actually: a calling convention between web servers and web
+    frameworks 
+  - Similar for other languages/frameworks, e.g., Servlet API for
+    Java  
+- Devil is in the details, though – lot’s of configuration ... 
+
+*** WSGI approach 
+
+- Upon request, server calls framework (at defined function) with
+    environment and callback  
+- Framework executes request, computes result (i.e., a HTML
+    document) and calls the server’s callback function  
+- Often realized by a middleware implementing both server and
+  framework side (which can enrich functionality of
+  this interface, e.g., by loadbalancing)
+- Multiple framework implementations exist
+  - Example \href{https://uwsgi-docs.readthedocs.io/en/latest/}{uWSGI}
+    - Generalizes to other languages as well
+    - Include management for many instances (so-called Emperor) 
+
 *** Example setup: django, nginx, uwsgi  
 
+Ingredients 
+
+- django as web framework 
+  - To run actual application code 
+  - To award meaning to nice-looking URLs
+- nginx as web server 
+  - To filter out URLs that need to be passed on to the web framework 
+  - To serve static content (not dynamically computed per request via
+    the web framework): fixed HTML, CSS, images, \ldots 
+- uwsgi to couple the web server to django 
+- postgresql as database 
+
+
+*** Example setup: django, nginx, uwsgi  
+
+#+CAPTION: Typical web application pipeline
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:uwsgipipeline
+[[./figures/uwsgi.pdf]]
+
+
+
+*** Example configurations 
+
+- Follows example \href{http://uwsgi-docs.readthedocs.io/en/latest/tutorials/Django_and_nginx.html}{here} 
+- Hint: use virtualenv for less heartache 
+
+
+**** django 
+
+- Not much to do, django typically creates a wsgi file ~mysite.wsgi~
+  which can be given to uWSGI 
+
+
+**** uWSGI 
+
+#+BEGIN_SRC bash
+$ uwsgi --socket 8001 --module mysite.wsgi --chmod-socket=664
+#+END_SRC
+
+Will run django framework as module 
+
+*** Example configurations 
+**** nginx 
+
+
+\footnotesize
+#+BEGIN_SRC bash 
+upstream django { server 127.0.0.1:8001; }
+
+server {
+    listen      8000;
+    server_name example.com; 
+    charset     utf-8;
+
+    location /media  {
+        alias /path/to/your/mysite/media;  
+    }
+    location /static {
+        alias /path/to/your/mysite/static; 
+    }
+    location / {
+        uwsgi_pass  django;
+        include     /path/to/your/mysite/uwsgi_params; 
+    }}
+#+END_SRC
+
+** Outlook 
+
+
+*** How to pick the right stack 
+
+- Plenty of options exist
+- But each project is different 
+- Do not
+  - Use competitor experience
+  - Use prior experience (only with grain of salt) 
+  - Beware of team/personnel/private preferences
+    - But factor in lead time if training required
+  - Obey checklists on the web, marketing hype 
 
 
 
 
-
-*** Alternative examples
-
-- Tomcat, Ruby on Rails, ... 
-
-
-
-*** From web server to application platform 
-
-
-* Client-side programmability 
+* Client-side programmability                                      :noexport:
 
 *** Issue: latency for complex interactions 
 
@@ -202,7 +774,7 @@ Hence division of labor:
 - Or introduce in the server section? 
 
 
-* Interfacing clients and servers: REST  
+* Interfacing clients and servers: REST                            :noexport:
 
 *** A variation on the web services theme: REST
  Web services can use complex interfaces 
@@ -277,7 +849,7 @@ Hence division of labor:
  - print json.dumps(r.json(), indent=4)
 
 
-* Current development: HTTP2, SPDY 
+* Current development: HTTP2, SPDY                                 :noexport:
 
 *** Perceived HTTP 1.1 shortcomings 
  60
@@ -300,7 +872,7 @@ Hence division of labor:
 
 
 
-* An architecture style: microservices 
+* An architecture style: microservices                             :noexport:
 
 *** Microservices: Architecture pattern 
  126
