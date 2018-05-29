@@ -64,7 +64,7 @@ slides169: $(slides169Pdf)
 	-make -C figures
 	-make $<
 
-%-slides.tex: %-slides.org %.org ../slidehead.org  ../references.org
+%-slides.tex: %-slides.org %.org ../slidehead.org  ../references.org ../acronyms.tex
 	echo "building beamer tex file", $<, $@
 	${EMACS} -Q --batch $<  -eval ${EMACSEXPORTPROG}
 	grep -v "begin{LaTeX}" $@ | grep -v "end{LaTeX}" | sponge $@
