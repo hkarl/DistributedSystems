@@ -1,6 +1,6 @@
 #+BIBLIOGRAPHY: ../bib plain
 
-** CAP and friends 
+* CAP and friends 
 
 *** CAP theorem 
  - https://people.eecs.berkeley.edu/~brewer/cs262b-2004/PODC-keynote.pdf
@@ -21,35 +21,40 @@
  http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6133253
 *** BASE: Give up CAP 
 
+bla 
+
 *** Structured approach: STate-machine replication 
 
  - https://en.wikipedia.org/wiki/State_machine_replication
 
 
   
-** Case study: Key-value stores 
+* Case study: Key-value stores 
 
 ***  Case study: Key-Value stores, distributed  
  - Key-Value-Stores, take up Memcache discussion from client/server
    chapter 
-   - REdis
-     - REdis vs. Memcached
-       - persistent by default
-       - cluster support: https://redis.io/topics/cluster-tutorial
-       - high availability tools: https://redis.io/topics/sentinel
-     - REDIS vs. CAP: CP?
-       - Compare: https://aphyr.com/posts/283-jepsen-redis
-       - http://blog.nahurst.com/visual-guide-to-nosql-systems
-
-
+ - REdis
+   - REdis vs. Memcached
+     - persistent by default
+     - cluster support: https://redis.io/topics/cluster-tutorial
+     - high availability tools: https://redis.io/topics/sentinel
+   - REDIS vs. CAP: CP?
+     - Compare: https://aphyr.com/posts/283-jepsen-redis
+     - http://blog.nahurst.com/visual-guide-to-nosql-systems
  - Issue: logical time, happened before, vector clocks, ... here? or in
    distributed event log? (almost the same thing, in any case...)  
-
  - Some other examples:
-
    - RiakKV http://basho.com/products/riak-kv/ 
-
      - http://basho.com/posts/technical/vector-clocks-revisited/
+
+*** Redis -- Some more details 
+    :PROPERTIES:
+    :CUSTOM_ID:       sec:redis
+    :END:
+
+bla bla 
+
 
 *** Case study: Distributed event log 
 
@@ -72,7 +77,7 @@
  - https://research.google.com/archive/spanner.html 
 
 
-** Case study: Distributed message log (kfaka) 
+* Case study: Distributed message log (kfaka) 
 
 
 
@@ -93,7 +98,7 @@
  67
 
 
-** Directory services: LDAP 
+* Directory services: LDAP 
 
 *** Directory services 
  Name services 
@@ -170,7 +175,7 @@
 
 
 
-** Directory services: DNS 
+* Directory services: DNS 
 
 
 *** Domain Name System (DNS) – Motivation 
