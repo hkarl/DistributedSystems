@@ -48,9 +48,9 @@ book.tex: book.org  $(BookSources)
 
 
 book.pdf: book.tex
-	${PDFLATEX} book
+	-${PDFLATEX} book
 	-${BIBCOMMAND} book
-	${PDFLATEX} book
+	-${PDFLATEX} book
 	${PDFLATEX} book
 	cp $@ ../../output 
 
@@ -104,7 +104,7 @@ slides169: $(slides169Pdf)
 clean:
 	-rm *.tex *.tex~ tmp.org *.pdf *.bbl *.vrb
 	-rm -rf _minted*
-	-rm *.aux *.log *.nav *.out *.snm *.toc *.pyg  *.bcf *.blg *.synctex.gz  *.fls *.fdb_latexmk 
+	-rm *.aux *.log *.nav *.out *.snm *.toc *.pyg  *.bcf *.blg *.synctex.gz  *.fls *.fdb_latexmk *.run.xml *.auxlock
 
 cleanall:
 	-cd book ; rm *.pdf *.aux *.log *.bbl *.tex *.tex~ *.toc *.aux *.bbl *.log *.blg *.out *.vrb
