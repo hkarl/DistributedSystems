@@ -9,7 +9,7 @@
 # on Holger's Mac: 
 EMACS="/Applications/Aquamacs 2.app/Contents/MacOS/Aquamacs"
 
-EMACSEXPORTPROG="(progn (add-to-list 'load-path (expand-file-name \"~/.emacs.d/org-mode/lisp\")) (require 'org)  (setq org-latex-listings 'minted) (setq org-latex-minted-options '((\"frame\" \"lines\") (\"linenos=false\") (\"mathescape\" \"true\") (\"breaklines\") (\"autogobble\") (\"escapeinside\" \"??\") )) (org-beamer-export-to-latex))"
+EMACSEXPORTPROG="(progn (add-to-list 'load-path (expand-file-name \"~/.emacs.d/org-mode/lisp\")) (require 'org)  (setq org-latex-listings 'minted) (setq org-latex-minted-options '((\"frame\" \"lines\") (\"linenos=false\") (\"mathescape\" \"true\") (\"breaklines\") (\"autogobble\") (\"escapeinside\" \"??\") )) (setq org-latex-prefer-user-labels t) (org-beamer-export-to-latex))"
 
 # pdflatex command
 PDFLATEX=pdflatex -shell-escape -interaction=nonstopmode
