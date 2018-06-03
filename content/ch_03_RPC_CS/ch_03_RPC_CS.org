@@ -346,6 +346,116 @@
  - 
 
 
+* Today's tale: REST                                               :noexport:
+
+*** A variation on the web services theme: REST
+ Web services can use complex interfaces 
+ - Specified with SOAP, WSDL
+ - Allow complex interaction relationships between users and providers of such services
+ - 
+ - Beauty in simplicity?
+ - Use a very restricted interface set: create, read, update, delete (CRUD)
+ - Sounds like GET, PUT, DELETE, POST ? 
+ - Concentrate on the manipulation of data through such a simple interface
+ - When accessing a data resource, the entire resource is provided (i.e., web page is downloaded) and can then be locally manipulated instead of complex interface operations 
+ - 
+ -  ! Realized in Representational state transfer (REST)
+ - Fielding, Architectural Styles and the Design of Network-based Software Architectures, 2000
+*** REST architecture: Constraints 
+ 114
+*** REST: Uniform interface 
+ 115
+*** Representations contain information to discover resources??
+ 116
+*** REST as specialisation of WebServices 
+ 117
+*** RESTful: Collections vs. HTTP methods 
+ https://en.wikipedia.org/wiki/Representational_state_transfer, retrieved 2016-11-14
+ nullipotent
+ idem-
+ - potent
+ idem-
+ - potent
+ server 
+ - chooses URI
+ client
+ - chooses URI
+*** RESTful: URL patterns 
+ 119
+*** RESTful: URL patterns practically 
+ 120
+
+#+BEGIN_SRC  html
+ <html>
+<body>
+  <form action="form_handler.php" method=”POST">
+    User Name: <input name="user" type="text" />
+   <input type="submit"value="Submit" />
+  </form>
+ </body>
+ </html>
+#+END_SRC
+
+ No DELETE, PUT, 
+ - ... supported!
+*** RESTful: Interface descriptions? 
+ 121
+*** Swagger examples 
+
+*** Swagger examples 
+
+*** Examples
+ Several popular sites provide Web services 
+ - Yahoo, google, ebay, Amazon, … 
+ - Example: Access to Google’s Map api 
+ - You’ll need: 
+ - a programming language that can curl a URL 
+ - Interpret the resulting JSON
+ - 
+ import requests
+ - import json
+ - 
+ - r = requests.get(“https://maps.googleapis.com/maps/api/
+ - geocode/json?address=Warbugrstr. 100, Paderborn")
+ - 
+ - print json.dumps(r.json(), indent=4)
+
+
+
+
+* An architecture style: microservices                             :noexport:
+
+*** Microservices: Architecture pattern 
+ 126
+*** Microservices: Architecture pattern – So? 
+ 127
+
+
+*** TODO Case study: Reactive Systems  
+
+- Check, does this really belong here? 
+
+*** Reactive Systems – “Manifesto”
+ 129
+*** Typesafe reactive platform 
+ 130
+ Programs, in Java or Scala, 
+ - running on JVM 
+ Data engine 
+ Message-driven 
+ - middleware, based on actors
+ Web framework 
+*** Typesafe: Actors programming model 
+ 131
+*** Typesafe: ConductR – Cluster runtime 
+ 132
+
+
+*** Example: Snort as microservice or NFV 
+
+- Not sure there is time for that? 
+
+
 * Notes 
 
 - https://capnproto.org/rpc.html
