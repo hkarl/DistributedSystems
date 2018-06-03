@@ -735,8 +735,418 @@ server {
 
 
 
-* Client-side programmability                                   :noexport:
 
+* Client-side programmability
+
+** Code in browser: AJAX  
+
+*** Latency for complex interactions 
+
+- With server-side programs, user actions in a browser result in 
+  requests
+  - Travels to server and back
+- Results in *latency* 
+- Options:
+  - Bring server closer to user (proxy, compare Chapter 4)
+  - Execute code at client
+    - In particular, for interactive applications 
+
+
+*** Applications in the WWW – AJAX 
+
+
+
+****                                                         :BMCOL:
+      :PROPERTIES:
+      :BEAMER_opt: [t]
+      :BEAMER_col: 0.5
+      :END:
+
+Interactive web applications easy in principle
+ - Changes result in POST messages, new Web page is returned
+ - Problem: Latency, bandwidth to transmit entire new page (after each user interaction!) limits “interactive feel” 
+ - Approach: \ac{AJAX}
+
+
+****                                                         :BMCOL:
+      :PROPERTIES:
+      :BEAMER_opt: [t]
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: AJAX comparison 
+#+NAME: fig:ajax_comparison
+[[./figures/ajax_vergleich_en.png]]
+
+ \tiny 
+ By DanielSHaischt, via Wikimedia Commons -
+ https://commons.wikimedia.org/wiki/File%3AAjax-vergleich.svg, CC
+ BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=29724785
+
+*** AJAX: Basic ideas 
+
+Core idea: *Asynchronously* load (parts of) a Web page, triggered by
+actions on the client side
+- Javascript downloaded with web page from server 
+- Javascript @ browers operates on the \ac{DOM} of the HTML /\ac{XML} code
+- Data is moved between browser and server in various ways
+  - E.g., as a \ac{JSON} object, \ac{YAML} ... -- does not really matter
+
+
+*** General idea: Event-based programming 
+
+- Issue: Asynchronous requests! Asynchronous answers! 
+- Suitable model: Event-based programming 
+  - An *event loop* wait for events
+  - For an event, a callback function (plus parameters) is specified
+    to be invoked when event happens
+- Concrete expression of this model depends on programming
+  language/environment
+  - We will look at Javascript below 
+
+
+*** Document Object Model \cite{W3CDocum23:online}
+
+Think of the HTML (or XML) document displayed by browser as a data
+structure 
+- With an API (language-independent)
+- Structure: a tree
+- Nodes in the tree represent structural entities of the web page
+  - E.g., a headline, a paragraph
+- Nodes can
+  - be given names for reference
+  - have attributes (e.g., color) 
+
+*** Operations on the DOM 
+
+- Data structure can be profoundly manipulated
+  - Add, change, remove nodes, their names or their attributes
+- Code can be triggered when an element in the DOM changes (callback
+  model for events) 
+- New events can be generated 
+
+
+*** AJAX Pros and Cons 
+- Advantage: Only script and data has to be loaded from server, translation to HTML done locally
+- Disadvantage:
+- Interaction with browser’s “Back” button/bookmarking often “surprising”  (improved by an explicit API in HTML5)
+- Interface design not trivial for good usability
+- Difficulties for search engines, deep link hard to do
+- \href{http://code.google.com/web/ajaxcrawling/}{Some approaches}
+  officially 
+  \href{https://webmasters.googleblog.com/2015/10/deprecating-our-ajax-crawling-scheme.html}{deprecated}
+- Google’s crawler does execute Javascript/CSS!
+
+
+*** AJAX example
+\footnotesize
+#+BEGIN_SRC html
+<html>
+  <head>
+  <script type="text/javascript">
+  function loadXMLDoc()
+  {
+     xmlhttp=new XMLHttpRequest();
+     xmlhttp.onreadystatechange=function()
+    {
+    if (xmlhttp.readyState==4 &&
+        xmlhttp.status==200)
+      {
+        document.getElementById("myDiv").innerHTML=
+         xmlhttp.responseText;
+      }
+    }
+    xmlhttp.open("GET","ajax_info.txt",true);
+    xmlhttp.send();
+  }
+  </script>
+  </head>
+
+  <body>
+
+  <div id="myDiv"><h2>Let AJAX change this text</h2></div>
+  <button type="button" onclick="loadXMLDoc()">Change Content</button>
+
+  </body>
+  </html>
+#+END_SRC
+
+*** AJAX: XMLHttpRequest 
+
+Core line of codes in previous example: Interact with the XMLHttpRequest API
+- A class, instantiated into an object
+- On that object, method calls are available to
+  - Transfer data between server and client (=Javascript program running in browser’s runtime environment)
+  - Register callback functions, to be invoked when data arrives from server
+  - Callbacks: Non-trivial programming model!
+  - Protocols: not only HTTP; data formats: not only XML
+- But it is still called XMLHttpRequest 
+- Callbacks: Typically, modify the page’s DOM
+
+*** AJAX: Relevant libraries 
+**** Pure Javascript libraries, to run in browsers
+- jQuery / jQueryUI: basic JS library for AJAX applications in browsers; some animation/user interfaces plugins
+- AngularJS: Framework to develop single-page Web-browser based applications; client-side model/view/controller approach
+  - MEAN stack: Mongo.db database; Express.js web application server;
+    Angular.js; Node.js as server-side runtime environment 
+- React.JS: geared towards user-interface aspects in Browser 
+
+*** AJAX: Relevant libraries 
+
+**** Server-side frameworks with associated browser libraries
+- Node.js: server-side runtime environment; key feature: non-blocking,
+  event-driven (concurrency without threads!). Ecosystem for packages
+  (npm) 
+- Compilers to produce Javascript
+
+
+
+
+**  JS, Angular 
+
+*** From high-level idea to concrete framework 
+
+- AJAX as an idea all nice and well
+- But highly complex programming task
+- Simplify by introducing frameworks
+- But first: event-based programming in Javascript 
+
+
+
+*** First: Callbacks 
+
+**** Event-based programming 
+- Arrange for an event to happen (later, at unknown time --
+  *asynchronously*)
+- Arrange for a particular function to process that event -- the
+  *callback*
+- Callback executed at unknown point in time, by event loop,  *not* in thread! 
+
+**** In Javascript 
+
+- Relatively easy, as functions are *first-class citizens* of JS
+
+
+*** Event loop 
+    
+Pseudocode: 
+
+#+BEGIN_SRC javascript
+while (True) {
+    // block for event
+    ev = wait_for_event();
+    // find callback associated with event ev
+    f = lookup_callback(ev);
+    // handle this event: call this callback; 
+    // normal, synchronous function call!
+    f();
+}
+#+END_SRC
+
+*** Simple callback example 
+
+Javascript examples mostly from \cite{Eloquent5:online}
+
+#+BEGIN_SRC javascript 
+function first(){
+  // Simulate a code delay
+  setTimeout( 
+  ?\tikzmark{callbackStart}?function(){
+    console.log(1);  }?\tikzmark{callbackEnd}?,
+    500 );
+}
+#+END_SRC
+
+ #+BEGIN_LaTeX
+ \begin{tikzpicture}[remember picture]
+   \draw[overlay, line width=1pt, red] ($(pic cs:callbackStart) + (-0.1, +0.4)$) rectangle ($ (pic cs:callbackEnd) + (0, -0.1)$);
+ \end{tikzpicture}
+ #+END_LaTeX
+
+
+*** Callback in jQuery 
+
+
+**** Just one callback 
+
+(\href{https://www.w3schools.com/Jquery/jquery_callback.asp}{Example})) 
+
+#+BEGIN_SRC javascript 
+$("button").click(function(){
+    $("p").hide(1000);
+    alert("The paragraph is now hidden");
+});
+#+END_SRC
+
+**** Nested callbacks 
+Associate the clicking of a button with a particular callback
+function, which in turn has a callback associated
+
+
+#+BEGIN_SRC javascript
+$("button").click(function(){
+    $("p").hide("slow", function(){
+        alert("The paragraph is now hidden");
+    });
+});
+#+END_SRC
+
+
+
+*** Callback hell 
+
+\href{http://callbackhell.com}{Nice?}
+
+\tiny
+#+BEGIN_SRC javascript
+fs.readdir(source, function (err, files) {
+  if (err) {
+    console.log('Error finding files: ' + err)
+  } else {
+    files.forEach(function (filename, fileIndex) {
+      console.log(filename)
+      gm(source + filename).size(function (err, values) {
+        if (err) {
+          console.log('Error identifying file size: ' + err)
+        } else {
+          console.log(filename + ' : ' + values)
+          aspect = (values.width / values.height)
+          widths.forEach(function (width, widthIndex) {
+            height = Math.round(width / aspect)
+            console.log('resizing ' + filename + 'to ' + height + 'x' + height)
+            this.resize(width, height).write(dest + 'w' + width + '_' + filename, function(err) {
+              if (err) console.log('Error writing file: ' + err)
+            })
+          }.bind(this))
+        }
+      })
+    })
+  }
+})
+#+END_SRC
+
+
+*** JS Syntactic help: Arrow functions 
+
+
+Define functions more compactly: use ~=>~ 
+- ~(List of parameters) => {body}~ 
+- Anonymous function, compare $\lambda$-expressions in other languages 
+
+**** Examples 
+
+#+BEGIN_SRC javascript 
+const squareA = (y) => { return y*y;}
+const squareB = y  => y*y;
+#+END_SRC
+
+
+*** Callbacks as arrow functions 
+
+**** Simple 
+
+#+BEGIN_SRC javascript
+setTimeout( () => console.log("Hi!"), 500);
+#+END_SRC
+
+
+**** Look up storage 
+
+\cite[p.\ 182]{Eloquent5:online}
+#+BEGIN_SRC javascript 
+bigOak.readStorage("food caches",
+		   caches => {
+		       let firstCache = caches[0];
+		       bigOak.readStorage(firstCache,
+					  info => {
+					      console.log(info);
+   });
+});
+#+END_SRC
+
+*** From callbacks to promises 
+
+- So far: setting up a callback, to be called at an unspecified later
+  time when event occurs 
+- How about: explicitly represent this *future* event, and the result
+  the handling of this event could lead to 
+- Supported by notion of a *promise* 
+  - Value might already be there, or only be there in the future
+  - Value is called a *future* value 
+
+
+*** JS Promise example 
+
+#+BEGIN_SRC javascript 
+let fifteen = Promise.resolve(15); 
+// register the actual callback 
+fifteen.then(value => console.log(`Got ${value}`)); 
+// → Got 15
+#+END_SRC
+
+*** JS Promise example 2 
+
+#+BEGIN_SRC javascript 
+function storage(nest, name) {
+   return new Promise(resolve => {
+     nest.readStorage(name, result => resolve(result));
+   });
+}
+storage(bigOak, "enemies")
+.then(value => console.log("Got", value));
+#+END_SRC
+
+
+*** Promises for the callback hell 
+
+\href{http://davidshariff.com/blog/futures-and-promises-in-javascript/}{Example}
+
+**** Hell 
+
+#+BEGIN_SRC javascript
+doA(function(aResult) {
+    // do some stuff inside b then fire callback
+    doB(aResult, function(bResult) {
+        // ok b is done, now do some stuff in c and fire callback
+        doC(bResult, function(cResult) {
+            // finished, do something here with the result from doC()
+        });
+    });
+});
+#+END_SRC
+
+**** with promises 
+
+#+BEGIN_SRC javascript
+doA()
+    .then(function() { return doB(); })
+    .then(function() { return doC(); })
+    .done(function() { /* do finished stuff here */ });
+#+END_SRC
+
+*** Example Angular
+
+- Intended for single-page applications 
+- Extends HTML with new attributes
+- Comprises best practices, conventions, tools, development
+  environment
+  - Environment tightly coupled to NPM
+  - Layout of files in directories prescribed 
+- Cross-platform
+- Actually, Typescript, non Javascript
+  - Gets translated 
+
+*** Angular components 
+
+- Component (as such)
+  - Classes (in an OO sense) 
+- CSS files for components 
+
+
+
+
+  
 * Current developments
 
 ** SPDY/HTTP2                                                      :noexport:
@@ -952,10 +1362,9 @@ socket.addEventListener('message', function (event) {
 - Example: WebSocket in django
   - \href{https://channels.readthedocs.io/en/latest/}{DjangoChannels}
   - Challenge: Django design  inherently synchronous
-  - Ties in with Redis -- see later in Chapter \ref{ch:nosql},
-    Section~\ref{sec:keyvalue_stores}, 
-    Slide \ref{sec:redis}
-  - See in Chapter \slideref{ch:nosql}[s:redis]
+  - Ties in with Redis (see later, \slideref{sec:keyvalue_stores}[s:redis])
+  - Good tutorial available \cite{GettingS25:online}
 
 
-Local reference \ref{sec:testlabel}
+
+
