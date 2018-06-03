@@ -27,7 +27,10 @@ bookTex := $(patsubst %.org,%-chapter.tex,$(wildcard *.org))
 
 # build order for all is important; have to make sure that
 # book.aux file exists for inter-chapter cross-references 
-all: chapterfigures book chapters
+all: 
+	-make chapterfigures
+	-make book
+	-make chapters
 
 chapters:
 	for d in ch*; do make -C $$d chapter  ; done
@@ -76,21 +79,21 @@ slides169: $(slides169Pdf)
 	grep -v "begin{LaTeX}" $@ | grep -v "end{LaTeX}" | sponge $@
 
 
-%-slides.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib ../book.aux 
+%-slides.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib ../book/book.aux 
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
 	-${BIBCOMMAND} $(basename $<)
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
 	cp $@ ../../output/slides/
 
-%-handout.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib ../book.aux  
+%-handout.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib ../book/book.aux  
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
 	-${BIBCOMMAND} $(basename $<)
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
 	cp $@ ../../output/handout/
 
-%-slides169.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib  ../book.aux 
+%-slides169.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib  ../book/book.aux 
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
 	-${BIBCOMMAND} $(basename $<)
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
