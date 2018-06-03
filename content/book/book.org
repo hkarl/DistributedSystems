@@ -1,4 +1,5 @@
 #+startup: beamer
+#+BIBLIOGRAPHY: bib plain
 #+LaTeX_CLASS: book
 #+LaTeX_CLASS_OPTIONS: [a4paper,twoside,11pt]
 #+LATEX_HEADER: \usepackage[noxcolor]{beamerarticle}
@@ -6,15 +7,17 @@
 #+OPTIONS: toc:nil H:5
 #+BEAMER_FRAME_LEVEL: 5
 #+COLUMNS: %45ITEM %10BEAMER_env(Env) %10BEAMER_act(Act) %4BEAMER_col(Col) %8BEAMER_opt(Opt) 
+
+#+LATEX_HEADER: \usepackage[style=numeric,bibstyle=numeric,url=false,natbib=true,backend=biber]{biblatex}
+#+LATEX_HEADER: \addbibresource{../bib.bib}
+
 #+LATEX_HEADER: \usepackage{minted}
 #+LATEX_HEADER: \usepackage{tikz}
 #+LATEX_HEADER: \usetikzlibrary{tikzmark}
 #+LATEX_HEADER: \usepackage{minted}
 #+LATEX_HEADER: \setminted{breaklines,autogobble,escapeinside=??,frame=lines,linenos=false,mathescape=true}
 #+LATEX_HEADER: \usepackage{adjustbox}
-#+LATEX_HEADER: \usepackage{natbib}
 #+LATEX_HEADER: \usepackage{acronym}
-#+LATEX_HEADER: \bibliographystyle{plain}
 #+LATEX_HEADER: \usepackage{../templates/msc}
 #+LATEX_HEADER: \graphicspath{{../ch_00/}{../ch_01_basic_CS/}{../ch_02_web_CS/}{../ch_03_RPC_CS/}{../ch_04_improving_CS/}{../ch_05_practical/}{../ch_06_p2p_ncs/}{../ch_07_mcast_ncs/}{../ch_08_des_pubsub/}{../ch_09_msqQueuing/}{../ch_10_oddsEnds_ncs/}{../ch_11_distStorage/}{../ch_12_distTransactions/}{../ch_13_nosql/}{../ch_14_failures/}{../ch_15_filesystems/}{../ch_16_gfs/}{../ch_17_websearch}{../ch/}{../ch_18_elasticStack/}{../ch_19_virtualization/}{../ch_20_clouds/}{../ch_21_bigdata/}{../ch_22_spark/}{../ch_23_streaming/}{../ch_24_ml/}{../ch_25_comparisons/}}
 #+BIBLIOGRAPHY: ../bib plain
@@ -159,4 +162,17 @@
 ** Comparisons between different systems
 
 #+include: "../ch_25_comparisons/ch_25_comparisons.org"
+
+
+\appendix
+* Appendix  
+
+** References 
+
+\printbibliography[heading=none]
+
+** Acronyms 
+
+\input{../acronyms}
+
 
