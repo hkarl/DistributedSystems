@@ -98,7 +98,7 @@ slides169: $(slides169Pdf)
 clean:
 	-rm *.tex *.tex~ tmp.org *.pdf *.bbl *.vrb
 	-rm -rf _minted*
-	-rm *.aux *.log *.nav *.out *.snm *.toc *.pyg
+	-rm *.aux *.log *.nav *.out *.snm *.toc *.pyg  *.bcf *.blg *.synctex.gz  *.fls *.fdb_latexmk 
 
 cleanall:
 	-cd book ; rm *.pdf *.aux *.log *.bbl *.tex *.tex~ *.toc *.aux *.bbl *.log *.blg *.out *.vrb
