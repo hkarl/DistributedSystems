@@ -35,6 +35,11 @@ content/ch*/figures/*.png
 content/ch*/ch*.tex
 
 
+# Intermediate files, perhaps useful later
+content/ch_01_basic_CS/code.org
+dir2forest.py
+
+
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 *.bbl
