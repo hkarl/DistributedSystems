@@ -30,6 +30,15 @@ bla
 
   
 * Case study: Key-value stores 
+  :PROPERTIES:
+  :CUSTOM_ID:       sec:keyvalue_stores
+  :END:
+
+** Bla 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:bla
+   :END:
+
 
 ***  Case study: Key-Value stores, distributed  
  - Key-Value-Stores, take up Memcache discussion from client/server
@@ -42,15 +51,15 @@ bla
    - REDIS vs. CAP: CP?
      - Compare: https://aphyr.com/posts/283-jepsen-redis
      - http://blog.nahurst.com/visual-guide-to-nosql-systems
- - Issue: logical time, happened before, vector clocks, ... here? or in
-   distributed event log? (almost the same thing, in any case...)  
+   - Issue: logical time, happened before, vector clocks, ... here? or in
+     distributed event log? (almost the same thing, in any case...)  
  - Some other examples:
    - RiakKV http://basho.com/products/riak-kv/ 
      - http://basho.com/posts/technical/vector-clocks-revisited/
 
 *** Redis -- Some more details 
     :PROPERTIES:
-    :CUSTOM_ID:       sec:redis
+    :CUSTOM_ID:       s:redis
     :END:
 
 bla bla 
@@ -77,7 +86,7 @@ bla bla
  - https://research.google.com/archive/spanner.html 
 
 
-* Case study: Distributed message log (kfaka) 
+* Case study: Distributed message log (kafka) 
 
 
 
