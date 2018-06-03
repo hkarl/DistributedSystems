@@ -1,0 +1,10 @@
+#+TITLE: Limits of distributed data bases: NoSQL
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_13_nosql.org"
+#+include: "../references.org"

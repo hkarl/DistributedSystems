@@ -1,0 +1,10 @@
+#+TITLE: Distributed transactions
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_12_distTransactions.org"
+#+include: "../references.org"

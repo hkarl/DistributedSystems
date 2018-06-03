@@ -31,7 +31,34 @@
 #+LATEX_HEADER: \definecolor{links}{HTML}{2A1B81}
 #+LATEX_HEADER: \hypersetup{colorlinks,linkcolor=,urlcolor=links}
 #+LATEX_HEADER: \externaldocument{../book/book}
-#+LATEX_HEADER: \externaldocument{../ch_12_nosql/ch_12_nosql-slides} 
+#+LATEX_HEADER: \externaldocument{../ch_00/ch_00-slides}
+#+LATEX_HEADER: \externaldocument{../ch_01_basic_CS/ch_01_basic_CS-slides}
+#+LATEX_HEADER: \externaldocument{../ch_02_web_CS/ch_02_web_CS-slides}
+#+LATEX_HEADER: \externaldocument{../ch_03_RPC_CS/ch_03_RPC_CS-slides}
+#+LATEX_HEADER: \externaldocument{../ch_04_improving_CS/ch_04_improving_CS-slides}
+#+LATEX_HEADER: \externaldocument{../ch_05_practical/ch_05_practical-slides}
+#+LATEX_HEADER: \externaldocument{../ch_06_p2p_ncs/ch_06_p2p_ncs-slides}
+#+LATEX_HEADER: \externaldocument{../ch_07_mcast_ncs/ch_07_mcast_ncs-slides}
+#+LATEX_HEADER: \externaldocument{../ch_08_des_pubsub/ch_08_des_pubsub-slides}
+#+LATEX_HEADER: \externaldocument{../ch_09_msqQueuing/ch_09_msqQueuing-slides}
+#+LATEX_HEADER: \externaldocument{../ch_10_oddsEnds_ncs/ch_10_oddsEnds_ncs-slides}
+#+LATEX_HEADER: \externaldocument{../ch_11_distStorage/ch_11_distStorage-slides}
+#+LATEX_HEADER: \externaldocument{../ch_12_distTransactions/ch_12_distTransactions-slides}
+#+LATEX_HEADER: \externaldocument{../ch_13_nosql/ch_13_nosql-slides}
+#+LATEX_HEADER: \externaldocument{../ch_14_failures/ch_14_failures-slides}
+#+LATEX_HEADER: \externaldocument{../ch_15_filesystems/ch_15_filesystems-slides}
+#+LATEX_HEADER: \externaldocument{../ch_16_gfs/ch_16_gfs-slides}
+#+LATEX_HEADER: \externaldocument{../ch_17_websearch/ch_17_websearch-slides}
+#+LATEX_HEADER: \externaldocument{../ch_18_elasticStack/ch_18_elasticStack-slides}
+#+LATEX_HEADER: \externaldocument{../ch_19_virtualization/ch_19_virtualization-slides}
+#+LATEX_HEADER: \externaldocument{../ch_20_clouds/ch_20_clouds-slides}
+#+LATEX_HEADER: \externaldocument{../ch_21_bigdata/ch_21_bigdata-slides}
+#+LATEX_HEADER: \externaldocument{../ch_22_spark/ch_22_spark-slides}
+#+LATEX_HEADER: \externaldocument{../ch_23_streaming/ch_23_streaming-slides}
+#+LATEX_HEADER: \externaldocument{../ch_24_ml/ch_24_ml-slides}
+#+LATEX_HEADER: \externaldocument{../ch_25_comparisons/ch_25_comparisons-slides}
 
 #+LATEX_HEADER: \usepackage{xparse}
 #+LATEX_HEADER: \DeclareDocumentCommand \slideref { m o } {\only<article>{\ref{#1}}\only<presentation>{\IfNoValueTF {#2} {\ref{#1}}{\ref{#1}, slide~\ref{#2}}}}
+
+

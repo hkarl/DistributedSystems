@@ -1,0 +1,10 @@
+#+TITLE: Big file systems: GFS and HDFS
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_16_gfs.org"
+#+include: "../references.org"

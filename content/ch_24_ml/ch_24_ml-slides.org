@@ -1,0 +1,10 @@
+#+TITLE: Machine learning on big data
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_24_ml.org"
+#+include: "../references.org"

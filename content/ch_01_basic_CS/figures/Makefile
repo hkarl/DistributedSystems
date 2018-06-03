@@ -1,1 +1,1 @@
-../../ch0/figures/Makefile
+../../ch_00/figures/Makefile

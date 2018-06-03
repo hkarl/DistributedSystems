@@ -1,0 +1,10 @@
+#+TITLE: Virtualization as a base technology
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_19_virtualization.org"
+#+include: "../references.org"

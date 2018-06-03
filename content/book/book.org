@@ -16,7 +16,7 @@
 #+LATEX_HEADER: \usepackage{acronym}
 #+LATEX_HEADER: \bibliographystyle{plain}
 #+LATEX_HEADER: \usepackage{../templates/msc}
-#+LATEX_HEADER: \graphicspath{{../ch0/}{../ch_01_basic_CS/}{../ch_02_web_CS/}{../ch_03_RPC_CS/}{../ch_04_improving_CS/}{../ch_05_practical/}{../ch_06_p2p_ncs/}{../ch_07_mcast_ncs/}{../ch_08_des_pubsub/}{../ch_08_msqQueuing/}{../ch_09_oddsEnds_ncs/}{../ch_10_distStorage/}{../ch_11_distTransactions/}{../ch_12_nosql/}{../ch_13_failures/}{../ch_14_filesystems/}{../ch_15_gfs/}{../ch_16_websearch}{../ch/}{../ch_17_elasticStack/}{../ch_18_virtualization/}{../ch_19_clouds/}{../ch_20_bigdata/}{../ch_21_spark/}{../ch_22_streaming/}{../ch_23_ml/}{../ch_24_comparisons/}}
+#+LATEX_HEADER: \graphicspath{{../ch_00/}{../ch_01_basic_CS/}{../ch_02_web_CS/}{../ch_03_RPC_CS/}{../ch_04_improving_CS/}{../ch_05_practical/}{../ch_06_p2p_ncs/}{../ch_07_mcast_ncs/}{../ch_08_des_pubsub/}{../ch_09_msqQueuing/}{../ch_10_oddsEnds_ncs/}{../ch_11_distStorage/}{../ch_12_distTransactions/}{../ch_13_nosql/}{../ch_14_failures/}{../ch_15_filesystems/}{../ch_16_gfs/}{../ch_17_websearch}{../ch/}{../ch_18_elasticStack/}{../ch_19_virtualization/}{../ch_20_clouds/}{../ch_21_bigdata/}{../ch_22_spark/}{../ch_23_streaming/}{../ch_24_ml/}{../ch_25_comparisons/}}
 #+BIBLIOGRAPHY: ../bib plain
 
 #+LATEX_HEADER: \usepackage{xparse}
@@ -33,7 +33,7 @@
 
 ** Organization and content  of this class 
 
-#+include: "../ch0/ch0.org"
+#+include: "../ch_00/ch_00.org"
 
 
 * Web and Client/Server Systems 
@@ -76,11 +76,11 @@
 
 ** Message queueing
 
-#+include: "../ch_08_msqQueuing/ch_08_msqQueuing.org"
+#+include: "../ch_09_msqQueuing/ch_09_msqQueuing.org"
 
 ** Odds and ends in non-client/server systems
 
-#+include: "../ch_09_oddsEnds_ncs/ch_09_oddsEnds_ncs.org"
+#+include: "../ch_10_oddsEnds_ncs/ch_10_oddsEnds_ncs.org"
 
 
 
@@ -89,11 +89,11 @@
 
 ** Distributed storage and consistency
 
-#+include: "../ch_10_distStorage/ch_10_distStorage.org"
+#+include: "../ch_11_distStorage/ch_11_distStorage.org"
 
 ** Distributed transactions
 
-#+include: "../ch_11_distTransactions/ch_11_distTransactions.org"
+#+include: "../ch_12_distTransactions/ch_12_distTransactions.org"
 
 ** Limits of distributed data bases: NoSQL
    :PROPERTIES:
@@ -101,61 +101,61 @@
    :END:
 
 
-#+include: "../ch_12_nosql/ch_12_nosql.org"
+#+include: "../ch_13_nosql/ch_13_nosql.org"
 
 ** Dealing with failures
 
-#+include: "../ch_13_failures/ch_13_failures.org"
+#+include: "../ch_14_failures/ch_14_failures.org"
 
 ** Distributed file systems
 
-#+include: "../ch_14_filesystems/ch_14_filesystems.org"
+#+include: "../ch_15_filesystems/ch_15_filesystems.org"
 
 * Towards scale: Examples of large systems 
 
 ** Big file systems: GFS and HDFS
 
-#+include: "../ch_15_gfs/ch_15_gfs.org"
+#+include: "../ch_16_gfs/ch_16_gfs.org"
 
 ** Web search engines
 
-#+include: "../ch_16_websearch/ch_16_websearch.org"
+#+include: "../ch_17_websearch/ch_17_websearch.org"
 
 ** Elastic Stack
 
-#+include: "../ch_17_elasticStack/ch_17_elasticStack.org"
+#+include: "../ch_18_elasticStack/ch_18_elasticStack.org"
 
 * Towards scale: Virtualization 
 
 ** Virtualization as a base technology
 
-#+include: "../ch_18_virtualization/ch_18_virtualization.org"
+#+include: "../ch_19_virtualization/ch_19_virtualization.org"
 
 ** Clouds
 
-#+include: "../ch_19_clouds/ch_19_clouds.org"
+#+include: "../ch_20_clouds/ch_20_clouds.org"
 
 
 * Big data & machine learning in distributed setups 
 
 ** Big data and the Map/Reduce programming model
 
-#+include: "../ch_20_bigdata/ch_20_bigdata.org"
+#+include: "../ch_21_bigdata/ch_21_bigdata.org"
 
 ** Big data in memory: Spark
 
-#+include: "../ch_21_spark/ch_21_spark.org"
+#+include: "../ch_22_spark/ch_22_spark.org"
 
 ** Streaming big data: Storm
 
-#+include: "../ch_22_streaming/ch_22_streaming.org"
+#+include: "../ch_23_streaming/ch_23_streaming.org"
 
 
 ** Machine learning on big data
 
-#+include: "../ch_23_ml/ch_23_ml.org"
+#+include: "../ch_24_ml/ch_24_ml.org"
 
 ** Comparisons between different systems
 
-#+include: "../ch_24_comparisons/ch_24_comparisons.org"
+#+include: "../ch_25_comparisons/ch_25_comparisons.org"
 

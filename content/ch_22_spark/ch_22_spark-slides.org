@@ -1,0 +1,10 @@
+#+TITLE: Big data in memory: Spark
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_22_spark.org"
+#+include: "../references.org"

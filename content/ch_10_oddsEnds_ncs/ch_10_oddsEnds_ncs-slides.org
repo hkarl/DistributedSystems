@@ -1,0 +1,10 @@
+#+TITLE: Odds and ends in non-client/server systems
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_10_oddsEnds_ncs.org"
+#+include: "../references.org"
