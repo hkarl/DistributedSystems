@@ -9,5 +9,5 @@
 \end{frame}
 
 
-#+include: "./ch_basic_CS.org" 
+#+include: "./ch_01_basic_CS.org" 
 #+include: "../references.org"
