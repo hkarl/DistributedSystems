@@ -1363,8 +1363,103 @@ socket.addEventListener('message', function (event) {
   - \href{https://channels.readthedocs.io/en/latest/}{DjangoChannels}
   - Challenge: Django design  inherently synchronous
   - Ties in with Redis (see later, \slideref{sec:keyvalue_stores}[s:redis])
-  - Good tutorial available \cite{GettingS25:online}
+  - Good tutorial available \cite{GettingS25:online} (used for
+    following examples) 
+
+*** WebSocket Server end: Django  (2) 
+
+Core aspects: Decorated message handlers in *consumers* 
+
+#+BEGIN_SRC python 
+@channel_session_user_from_http
+def ws_connect(message):
+    Group('users').add(message.reply_channel)
+    Group('users').send({
+        'text': json.dumps({
+            'username': message.user.username,
+            'is_logged_in': True
+        })
+    })
+#+END_SRC
+
+*** WebSocket Server end: Django  (3) 
+
+Core aspects: Route messages to handlers
+
+#+BEGIN_SRC python 
+from channels.routing import route
+from example.consumers import ws_connect, ws_disconnect
 
 
+channel_routing = [
+    route('websocket.connect', ws_connect),
+    route('websocket.disconnect', ws_disconnect),
+]
+#+END_SRC
+
+*** WebSocket Server end: Django  (4a) 
+
+Core aspect: Use received JSON in template 
+
+#+BEGIN_SRC html
+{% block content %}
+  <a href="{% url 'example:log_out' %}">Log out</a>
+  <br>
+  <ul>
+    {% for user in users %}
+      <li data-username="{{ user.username|escape }}">
+        {{ user.username|escape }}: {{ user.status|default:'Offline' }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock content %}
+#+END_SRC
+
+*** WebSocket Server end: Django  (4b) 
+
+Core aspect: Use received JSON in template 
+
+\footnotesize 
+#+BEGIN_SRC html
+{% block script %}
+  <script>
+    var socket = new WebSocket('ws://' + window.location.host + '/users/');
+
+    socket.onopen = function open() {
+      console.log('WebSockets connection created.');
+    };
+
+    socket.onmessage = function message(event) {
+      var data = JSON.parse(event.data);
+      var username = encodeURI(data['username']);
+      var user = $('li').filter(function () {
+        return $(this).data('username') == username;
+      });
+
+      if (data['is_logged_in']) {
+        user.html(username + ': Online');
+      }
+      else {
+        user.html(username + ': Offline');
+      }
+    };
+
+    if (socket.readyState == WebSocket.OPEN) {
+      socket.onopen();
+    }
+  </script>
+{% endblock script %}
+#+END_SRC
 
 
+* Conclusion 
+
+** Conclusion 
+
+- HTML and HTTP as such relatively simple request/reply protocols 
+- Imply stateless design, which complicates matters considerably
+- Both server- and client-side programming expertise is necessary for
+  full-fledged, modern applications (/full-stack developer/) 
+- With current developments, interactive Web applications not too
+  difficult
+  - Can generalize to non-Web browser setups 
