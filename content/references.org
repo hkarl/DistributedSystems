@@ -8,6 +8,7 @@
     :BEAMER_OPT: allowframebreaks
     :END:
 
+\footnotesize
 \printbibliography[heading=none]
 
 ** Acronyms 
@@ -17,4 +18,5 @@
     :BEAMER_OPT: allowframebreaks
     :END:
 
+\footnotesize
 \input{../acronyms}
