@@ -1,7 +1,7 @@
 #+BIBLIOGRAPHY: ../bib plain
 
 
-* Basic structure                                                  :noexport:
+* Basic structure
     
 *** Case study: World Wide Web – Basic architecture
 
@@ -195,7 +195,7 @@ http {
     } }
 #+END_SRC
 
-* Server-side programmability                                      :noexport:
+* Server-side programmability
 
 ** Issue? 
 
@@ -1051,7 +1051,7 @@ setTimeout( () => console.log("Hi!"), 500);
 #+END_SRC
 
 
-**** Look up storage 
+**** Look up storage                                               :noexport:
 
 \cite[p.\ 182]{Eloquent5:online}
 #+BEGIN_SRC javascript 
