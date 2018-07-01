@@ -1,4 +1,4 @@
-.PHONY: chapters chapter all slides slides169 handout clean book cleanall dirfigures 
+.PHONY: chapters chapter all slides slides169 handout clean book cleanall dirfigures quick
 
 # Use .SECONDARY with no argument is a little overkill, but using %.tex does not work
 # because we need to refer to .tex files in subdirectories. make does not allow %/%.tex. 
@@ -61,6 +61,9 @@ book.pdf: book.tex
 
 chapter: slides # slides169 handout 
 
+quick:
+	quick=True make slides
+
 slides: $(slidesPdf) 
 	-make -C figures
 	-make $<
@@ -81,10 +84,12 @@ slides169: $(slides169Pdf)
 
 %-slides.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib ../book/book.aux 
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
+ifndef quick	
 	-${BIBCOMMAND} $(basename $<)
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
 	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
 	cp $@ ../../output/slides/
+endif
 
 %-handout.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib ../book/book.aux  
 	${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
