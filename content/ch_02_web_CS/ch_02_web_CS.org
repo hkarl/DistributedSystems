@@ -19,7 +19,7 @@ Compare \cite[Sect.\ 2.4]{Coulouris:DistributedSystems:2011}
 
 *** Resources and representation 
 
-- Resource: could be anything; type not  
+- Resource: could be anything; type not fixed 
 - Representation \cite[Sec.\ 3]{RFC7231}:
 
 #+BEGIN_QUOTE
@@ -290,31 +290,7 @@ Good frameworks support:
 [[./figures/mvc.pdf]]
 
 
-
-
-
-*** Applications in the WWW – State
-
-By design, HTTP is stateless, so are Web servers
- - How to build applications in such an environment? 
- - How to still provide some statefulness in WWW context? 
- - How to eat your cake and have it? Cookies! 
-
-*** Applications in the WWW – Cookie 
-
- - Cookie: Text string, sent by server to client, stored by browser 
- - Main standards: RFC 2109, RFC 2965 
- - Returned by browser to server with any request to a server matching the domain stated in the cookie (and where the path matches as well)
- - Useful to identify users, store application state AT CLIENT, ... 
- - Can encode many different types of information 
- - Alternatives to store state: complex URLs, dynamically updated and returned 
- - 
- - Simple, sometimes useful, yet problematic 
- - Malicious cookie theft, inconsistencies between server/browser,
-   ... 
-
-
-** Simple examples 
+** Some Web framework examples
 *** A short list  
 
 - Python world: 
@@ -717,6 +693,43 @@ server {
         include     /path/to/your/mysite/uwsgi_params; 
     }}
 #+END_SRC
+
+
+
+** State 
+*** Applications in the WWW – State
+
+By design, HTTP is stateless
+ - How to build applications in such an environment? 
+
+**** Server-side state 
+
+- Easy to handle: data base, ...  
+- But: How to relate clients to server state?
+  - Implicitly via persistent connections? Unreliable! 
+
+
+#+BEAMER: \pause
+
+**** Client-side state 
+
+  - How to still provide some statefulness in WWW context? 
+  - How to eat your cake and have it? Cookies! 
+
+
+
+*** Applications in the WWW – Cookie 
+
+ - Cookie: Text string, sent by server to client, stored by browser 
+ - Main standards: RFC 2109, RFC 2965 
+ - Returned by browser to server with any request to a server matching the domain stated in the cookie (and where the path matches as well)
+ - Useful to identify users, store application state AT CLIENT, ... 
+ - Can encode many different types of information 
+ - Alternatives to store state: complex URLs, dynamically updated and returned 
+ - 
+ - Simple, sometimes useful, yet problematic 
+ - Malicious cookie theft, inconsistencies between server/browser,
+   ... 
 
 ** Outlook 
 
@@ -1136,8 +1149,19 @@ doA()
 - Cross-platform
 - Actually, Typescript, non Javascript
   - Gets translated 
+- Best thing: \href{https://angular.io/guide/quickstart}{look at tutorials} 
 
-*** Angular components 
+*** Angular components                                             :noexport:
+
+**** Definition 
+
+\href{https://angular.io/api/core/Component}{To quote:}
+
+#+BEGIN_QUOTE
+Decorator that marks a class as an Angular component and provides
+configuration metadata that determines how the component should be
+processed, instantiated, and used at runtime. 
+#+END_QUOTE
 
 - Component (as such)
   - Classes (in an OO sense) 
