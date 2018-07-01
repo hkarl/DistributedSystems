@@ -1,4 +1,4 @@
-.PHONY: chapters chapter all slides slides169 handout clean book cleanall 
+.PHONY: chapters chapter all slides slides169 handout clean book cleanall dirfigures 
 
 # Use .SECONDARY with no argument is a little overkill, but using %.tex does not work
 # because we need to refer to .tex files in subdirectories. make does not allow %/%.tex. 
@@ -112,3 +112,9 @@ clean:
 cleanall:
 	-cd book ; rm *.pdf *.aux *.log *.bbl *.tex *.tex~ *.toc *.aux *.bbl *.log *.blg *.out *.vrb
 	for d in ch*; do make -C $$d clean  ; done
+
+
+dirfigures:
+	mkdir figures
+	cd figures ; ln -s ../../ch_00/figures/Makefile
+
