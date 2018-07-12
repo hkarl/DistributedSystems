@@ -83,11 +83,11 @@ slides169: $(slides169Pdf)
 
 
 %-slides.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib ../book/book.aux 
-	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
-ifndef quick	
+	-${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
+ifndef quick
 	-${BIBCOMMAND} $(basename $<)
-	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
-	${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
+	-${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
+	-${PDFLATEX} "\\def\\OutputStyle{presentation}\\input{$<}"
 	cp $@ ../../output/slides/
 endif
 
