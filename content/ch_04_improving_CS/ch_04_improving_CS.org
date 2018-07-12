@@ -15,7 +15,11 @@
  - Availability (good things still happen when something goes wrong) 
 
 * Dependability 
+  :PROPERTIES:
+  :CUSTOM_ID: sec:dependability
+  :END:
 
+** Models 
 *** Laprie 
 *** Fault Model – Fault assumptions 
  Everything is completely reliable 
@@ -80,6 +84,19 @@
 
 - Cold, warm, hot standby 
 
+
+  
+** Example: RPC and faults 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:rpc_faults
+   :END:
+
+*** RPC execution protocols 
+    :PROPERTIES:
+    :CUSTOM_ID: s:rpc_protocols
+    :END:
+
+Lorem ipsum 
 
 * Security 
 
