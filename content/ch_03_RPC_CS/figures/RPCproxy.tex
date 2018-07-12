@@ -1,0 +1,58 @@
+
+\documentclass[tikz]{standalone}
+
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+  \begin{msc}{Remote procedure call}
+    \declinst{a}{}{Caller in  A}
+    \declinst{ap}{}{Callee proxy in A}
+    \declinst{bp}{}{Caller proxy in B}
+    \declinst{b}{}{Callee in B}
+    % \regionstart{suspension}{a}
+    \msccomment[side=left]{Put parameters, return address on stack}{a}
+    \nextlevel 
+    \mess{Jump}{a}{ap}
+    \nextlevel 
+    \msccomment[side=left]{Access parameters on stack}{ap}
+    \nextlevel 
+    % --
+    \msccomment[side=left]{Prepare parameters for transport}{ap}
+    \nextlevel[2] 
+    \mess{Transport parameters, procedure ID}{ap}{bp}
+    \nextlevel 
+    \msccomment[side=right]{Prepare parameters for use}{bp}
+    \nextlevel 
+    %---
+    \msccomment[side=right]{Put parameters, return address on stack}{bp}
+    \nextlevel[2] 
+    \mess{Jump}{bp}{b}
+    \nextlevel 
+    \msccomment[side=right]{Access parameters on stack}{b}
+    \nextlevel 
+    %--------
+    \msccomment[side=right]{Process}{b}
+    \nextlevel 
+    \msccomment[side=right]{Put result on stack }{b}
+    \nextlevel[2]  
+    \mess{Jump}{b}{bp}
+    \nextlevel 
+    \msccomment[side=right]{Retrieve result from  stack }{bp}
+    \nextlevel 
+    %----
+    \msccomment[side=right]{Prepare result for transport }{bp}
+    \nextlevel 
+    % 
+    \mess{Transport result}{bp}{ap}
+    \nextlevel 
+    \msccomment[side=left]{Retrieve result, prepare for use }{ap}
+    \nextlevel 
+    \msccomment[side=left]{Put result on stack }{ap}
+    \nextlevel[2]  
+    \mess{Jump}{ap}{a}
+    \nextlevel 
+    %---
+    \msccomment[side=left]{Retrieve result from stack }{a}
+  \end{msc}
+\end{document}

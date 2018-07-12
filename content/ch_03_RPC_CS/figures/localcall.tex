@@ -1,0 +1,39 @@
+
+\documentclass[tikz]{standalone}
+
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+  \begin{msc}{Local procedure call}
+  % example: +
+    % \declinst{c}{}{Client} 
+    % \declinst{cc}{}{Channel API}
+    % \declinst{sc}{}{Channel API} 
+    % \declinst{s}{}{Server} 
+    % % 
+    % \regionstart{suspension}{s}
+    % \nextlevel
+    % \mess{Pass request   to channel}{c}{cc}
+    % \regionstart{activation}{c}
+    % \msccomment[side=left]{Do something}{c}
+    % \nextlevel
+    % \msccomment[side=left]{Block for reply}{c}
+    \declinst{a}{}{Caller}
+    \declinst{b}{}{Callee}
+    % \regionstart{suspension}{a}
+    \msccomment[side=left]{Put parameters, return address on stack}{a}
+    \nextlevel 
+    \mess{Jump}{a}{b}
+    \nextlevel 
+    \msccomment[side=right]{Access parameters on stack}{b}
+    \nextlevel 
+    \msccomment[side=right]{Process}{b}
+    \nextlevel 
+    \msccomment[side=right]{Put result on stack }{b}
+    \nextlevel 
+    \mess{Jump}{b}{a}
+    \nextlevel 
+    \msccomment[side=left]{Retrieve result from  stack }{a}
+  \end{msc}
+\end{document}

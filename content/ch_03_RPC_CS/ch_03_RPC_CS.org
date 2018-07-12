@@ -1,151 +1,190 @@
 #+BIBLIOGRAPHY: ../bib plain
 
 * RPC 
+
+** RPC basics 
+*** How to bring order to chaos 
+
+- Direct communication can lead to unstructured distributed programs
+  ("spaghetti sockets") 
+
+- Instead: Take the client/server principles and provide a tighter
+  integration  with the used programming language  
+  - Instead of sending a request/receive a reply: Call a function
+  - Instead of receiving a request/sending a reply: Execute a function, possibly with parameters, and return function results 
+  -  Function call may be executed at a remote server
+
+
 *** Remote Procedure Call/Remote Method Invocation
- Take the client/server principles and provide a tighter integration with the used programming language
- - Instead of sending a request/receive a reply: Call a function
- - Instead of receiving a request/sending a reply: Execute a function, possibly with parameters, and return function results 
- -  ! Function call may be executed at a remote server
- - 
- - Formalized as 
- - Remote Procedure Call (RPC) in “traditional” languages
- - Remote Method Invocation (RMI) in object-oriented languages
- - Main difference to RPC: the “invoked object” has to be specified somehow – akin to “this” pointer in C++ local method invocation
+
+Idea formalized as 
+ - \ac{RPC} in procedural languages
+ - \ac{RMI} in object-oriented languages
+   - Main difference to RPC: the *invoked object* has to be specified
+     somehow
+   - akin to *this* pointer in C++, *self* in Python, ...  local
+     method invocation 
  - Core idea introduced in 1984, Birrell & Nelson
-*** (KMS) Erinnerung: Lokaler Prozeduraufruf
- Aufrufender und aufgerufener Programmcode sind Teil des gleichen Prozesses
- - Aufruf erfolgt durch Sprung an eine andere Stelle des Programmcodes
- - Parameterübergabe im Speicher 
- - Parameter an wohlbekannte Speicherstelle ablegen
- - Ergebnisse von wohlbekannter Speicherstelle abholen
+   \cite{Birrell:1984:IRP:2080.357392}
+
+*** Reminder: Local procedure call 
+
+Local: Caller and callee can access same address space (e.g., are part
+of the same process) 
+- Call works by jump to start of the procedure
+  - Parameters passed in memory, on stack, in both directions 
+  - Caller and callee can access that shared memory 
 
 
+#+CAPTION: Local procedure call (one address space)
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:localcall
+[[./figures/localcall.pdf]]
 
 
+*** Goal of RPC 
+
+Allow procedure calls across address spaces 
+- Process in address space 1 can call procedure P running in a process
+  with another address space 
+- Advantage: No need to reorganise interaction between disjunct
+  address spaces
+- Challenge: Binding procedure P at runtime to calling process
 
 
+#+CAPTION: Idea of remote procedure call
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:ideaRPC
+[[./figures/ideaRPC.pdf]]
 
 
+*** Practical requirement for RPC: Transparency 
 
- Caller
- Callee (procedure)
- Call
- - procedure
- Jump
- Return
- Retrieve 
- - results,
- - resume
- - execution
- Put 
- - results
- - in 
- - memory
-*** (KMS) Grundlagen von RPC
- RPC-Systeme unterstützen den Prozeduraufruf über Adressraumgrenzen hinweg
- - Ein im Adressraum A ablaufendes Programm kann Unterprogramme in anderen Adressräumen aufrufen
- - Vorteil: Kein Umdenken bei der Organisation der Interaktion zwischen Prozessen in disjunkten Adressräumen erforderlich
- - Problem: Dynamische Bindung der auszuführenden Prozedur P an den aufrufenden Prozess zur Laufzeit
- - Grundlegendes Prinzip des RPC
+- Ideally, neither caller nor callee can distinguish a local call from
+  a remote call
+  - I.e., caller behaves identically
+    - Writes parameters to stack, jumps, retrieves result from stack
+  - I.e., callee sees no difference
+    - Is invoked with parameters and return address on stack, puts
+      result back on stack 
+  - Neither should have to bother with *transport* part of RPC 
+- A *transparency* requirement 
+      
 
 
- Adressraum A
- Adressraum B
+*** Transparency by proxies       
+
+- To ensure transparency, *proxies* are introduced
+  - Shielding caller, callee from RPC details
+  - Can still be calling/called locally
+  - Pretend to be the missing piece 
+- Proxy on caller side: *stub*
+  - Pretends to be called function 
+- Proxy on callee side: *skeleton* 
+  - Pretends to be calling function
+  - Often, in infinite loop
+- Stub and skeleton together realize data transport 
+
+*** RPC by proxy 
 
 
+#+CAPTION: Remote procedure call enabled by proxies
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:rpc_proxy
+[[./figures/RPCproxy.pdf]]
 
 
-
- Eingabeparameter
- Resultate
- Auszuführende Prozedur P
-
-*** (KMS) Entfernter Prozeduraufruf – Wunschvorstellung 
- Tatsache, das Prozedur auf anderem Rechner ausgeführt wird, für Aufrufer und Aufgerufenen nicht sichtbar
- - Aufrufer schreibt Parameter an bekannte Speicherstelle, springt zu einer anderen Stelle im Programmcode, und erwartet nach Rückkehr Ergebnisse an bekannter Speicherstelle
- - Aufgerufener erwartet Parameter an bekannter Stelle, schreibt Ergebnisse an bekannte Stelle, und sprint zurück
- - Wie kann dies die gleiche Semantik erzielen?
- -  ! Zusätzliche Funktionen erforderlich
+** RPC challenges 
 
 
-
-
-
-
-
-
- Caller
- Callee
- Call
- - procedure
- Start
- - execution
- Request
- Reply
- Receive 
- - results,
- - resume
- - execution
- Send
- - results
-*** (KMS) RPC Prozeduraufruf – Ablauf 
- Client: Lokale Prozedur p() wird durch einen lokalen Stellvertreter (Client-Stub) ersetzt
- - Client-Stub verpackt die Nachricht und sendet diese dem Server
- Im Server nimmt ein Stellvertreter (Server-Stub) die Nachricht an und veranlasst die weiteren Schritte
- - Entpacken der Nachricht
- - Aufruf der lokalen Prozedur p() und Übergabe der Parameter
- - Die Ergebnisse von p() werden vom Server-Stub angenommen, verpackt, an Client-Stub übermittelt
- - Client-Stub liefert die Ergebnisse an das aufrufende Programm
- ! Client glaubt, die lokale Prozedur p() aufgerufen zu haben 
- - – in Wirklichkeit entfernt ausgeführt
-*** (KMS) Ablauf RPC 
-
-
-
-
-
-
-
-
-
- Caller
- Callee
- Call
- - procedure
- Start
- - execution
- Request
- Reply
- Send
- - results
- Client stub
- - p(a) {/*Client stub */
- - Nachrichtenpuffer m;
- - m=Einpacken(a);
- - send(Server,m); 	/*Auftrag */
- - receive(m);	    /*Ergebnis */
- - r=Auspacken(m);
- - return r; }
- LOOP{ {/*Server stub */
- - receive(m); /*Auftrag */
- - a=Auspacken(m);
- - r=rp(a); /* Lokaler Sprung */
- - 
- - 
- - m=Einpacken(r);
- - Send(client,m);}
 *** Marshalling 
  Marshalling: taking parameters/results of a procedure call and prepare them for transmission over a network
  - To ensure, e.g., transparency between different hardware, operating systems, programming languages
  - Handled by client stub & server stub/skeleton 
+
+
+*** Parameter passing  semantics 
+
+- Value parameters of function: Copy to callee
+  - Simple.
+- Reference parameters: Not possible, address space isolation 
+  - Copy to callee
+  - Callee might modify!
+  - Restore back to caller
+  - So-called *copy-and-restore* semantics 
+
+
+*** Parameter passing semantics: Challenges 
+
+- How to deal with size?
+- How to deal with pointer-based data structures?
+  - E.g., a binary tree is passed as a pointer (reference!) in many
+    languages
+  - E.g., copy and restore entire tree when only one field of root
+    node is interesting? 
+
+*** Copy and restore: Equivalent semantics? 
+
+Challenge:  Does *call by copy-and-restore* provide exact same
+semantics as *call by reference*? 
+
+
+#+BEAMER: \pause
+
+No! 
+
+#+BEGIN_SRC C
+int a=42; 
+void f(int *x, int *y) {
+  *x++; *y++; }
+
+f(&a, &a);
+#+END_SRC
+
+*** RPC Interface Definition Languages 
+
+- Need: describe interface of functions to be called more explicitly
+  - More precise calling semantics
+    - Distinguish between in, out, in-out parameters 
+  - Helps in heterogeneous contexts
+    - Multiple languages
+    - Multiple architectures (e.g., byte ordering!)
+  - Allows custom-tailored marshalling for certain data types 
+
+- External languages, or built into a programming language 
+
+
+
+*** RPC execution semantics 
+
+What if things go wrong? 
+
+- Local calls: executed *exactly once*
+  - More precisely: *fate sharing* between caller and callee
+- Remote calls:
+  - Maybe executed?
+  - At least once?
+  - At most once? 
+
+We will revisit in Section \slideref{sec:rpc_faults}[s:rpc_protocols] 
+
+
+*** RPC binding 
+
+How does RPC stub know where to find its skeleton? 
+- Statically configured IP? 
+- Static DNS name?
+
+We will revisit later 
+
 *** RPC as middleware 
  RPCs present a more abstract view of a distributed system than a request/reply protocol directly realized with sockets 
  - New programming model! 
  - Collection of software realizing such a new programming model is a middleware 
  - Can achieve, e.g., transparency towards location, communication protocols, hardware, operating system, different programming languages, … 
-*** Copy/restore semantics 
 
-- ... and its common pitfalls 
+
+
 
 
 
@@ -203,7 +242,7 @@
  - In detail: Middleware needs to provide some extra functionality to deal with remote object references, details of object lifetime, etc. 
  - E.g., how to obtain a remote object reference in the first place? A binder service can provide such bootstrapping (e.g., RMIregistry) 
 
-
+   
 * Examples: Java RMI, zerorpc 
 *** Overview
  Basics: Data exchange, sockets 
