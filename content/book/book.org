@@ -63,7 +63,8 @@
 
 #+include: "../ch_05_practical/ch_05_practical.org" 
 
-* Non-client/server systems 
+
+* Non-client/server systems					   :noexport:
 
 ** Peer-to-Peer systems 
 
@@ -89,7 +90,7 @@
 
 
 
-* Distributed data storage and transactions 
+* Distributed data storage and transactions
 
 ** Distributed storage and consistency
 
@@ -115,7 +116,8 @@
 
 #+include: "../ch_15_filesystems/ch_15_filesystems.org"
 
-* Towards scale: Examples of large systems 
+
+* Towards scale: Examples of large systems			   :noexport:
 
 ** Big file systems: GFS and HDFS
 
@@ -129,7 +131,8 @@
 
 #+include: "../ch_18_elasticStack/ch_18_elasticStack.org"
 
-* Towards scale: Virtualization 
+
+* Towards scale: Virtualization					   :noexport:
 
 ** Virtualization as a base technology
 
@@ -140,7 +143,7 @@
 #+include: "../ch_20_clouds/ch_20_clouds.org"
 
 
-* Big data & machine learning in distributed setups 
+* Big data & machine learning in distributed setups		   :noexport:
 
 ** Big data and the Map/Reduce programming model
 
@@ -165,6 +168,7 @@
 
 
 \appendix
+
 * Appendix  
 
 ** References 
