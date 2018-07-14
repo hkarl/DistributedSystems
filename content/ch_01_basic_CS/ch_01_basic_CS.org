@@ -1251,7 +1251,12 @@ A client asks a receiver to perform some processing
 
 
 
+
 ** Some structural aspects 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:server_structure
+   :END:
+   
 *** Execution structures of servers
 
  Servers can execute repeated requests (from same or different clients)
@@ -1262,6 +1267,9 @@ A client asks a receiver to perform some processing
    of threads/processes 
 
 *** Execution structure: Server activation 
+    :PROPERTIES:
+    :CUSTOM_ID: s:server_activation
+    :END:
 
 When is server process/thread started?
  - Once, at system startup, and remains active (*persistent server*)

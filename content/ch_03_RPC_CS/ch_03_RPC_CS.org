@@ -94,7 +94,7 @@ Allow procedure calls across address spaces
 [[./figures/RPCproxy.pdf]]
 
 
-** RPC challenges 
+** RPC parameter passing 
 
 
 *** Marshalling 
@@ -154,6 +154,18 @@ f(&a, &a);
 - External languages, or built into a programming language 
 
 
+*** Alternative parameter passing semantics 
+
+Alternative ideas exist 
+
+
+- Idea: long address formats
+#+BEAMER: \pause
+  - Address encodes machine, process ID, and address inside process
+  - Applicable to both RPC and RMI 
+
+
+** RPC execution  
 
 *** RPC execution semantics 
 
@@ -161,21 +173,191 @@ What if things go wrong?
 
 - Local calls: executed *exactly once*
   - More precisely: *fate sharing* between caller and callee
-- Remote calls:
+- Remote calls: Problem is failures 
   - Maybe executed?
   - At least once?
   - At most once? 
 
-We will revisit in Section \slideref{sec:rpc_faults}[s:rpc_protocols] 
+*** Source or failures
+
+- Request message is lost
+- Reply message is lost
+- Server/callee  crashes (but client survives)
+- Client/caller  crashes (but server survives) 
 
 
-*** RPC binding 
+*** RPC request/reply protocol 
+
+- Basic idea: Caller  re-issues request when no reply has been
+  received 
+- Details: *RPC request/reply protocol* 
+
+
+*** RPC request/reply: no errors
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+***** No errors                                                       :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+- Simplest case 
+- Set timeout when sending request to prepare for failures 
+
+*****                                                        :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+
+
+#+CAPTION: Simplest case: request/reply without errors
+#+ATTR_LaTeX: :width \linewidth :page 1
+#+NAME: fig:rpc_rrp_noerrors
+[[./figures/rpc_rrp.pdf]] 
+
+
+
+
+*** RPC request/reply: request lost
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+*****                                                        :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+- When no reply, resend request after timeout  
+
+*****                                                        :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+
+
+#+CAPTION: Request/reply, timeout on request  
+#+ATTR_LaTeX: :width \linewidth :options page=2
+#+NAME: fig:rpc_rrp_noerrors
+[[./figures/rpc_rrp.pdf]] 
+
+
+*** RPC request/reply: reply lost
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+*****                                                        :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+- Lost reply indistinguishable from lost request
+- Resending request
+- Simple case: just recompute result 
+- Need *idempotent* function!
+  - $\forall x: f(f(x)) = f(x)$
+
+*****                                                        :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+
+
+#+CAPTION: Request/reply with reply lost, recompute 
+#+ATTR_LaTeX: :width \linewidth :options page=3
+#+NAME: fig:rpc_rrp_noerrors
+[[./figures/rpc_rrp.pdf]] 
+
+
+*** RPC request/reply: reply lost
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+*****                                                        :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+- If recomputing infeasible, need to a *reply cache* for previous
+  answers
+- Need to be able to identify request and pertaining answer! 
+
+*****                                                        :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+#+CAPTION: Request/reply, reply cache 
+#+ATTR_LaTeX: :width \linewidth :options page=4
+#+NAME: fig:rpc_rrp_noerrors
+[[./figures/rpc_rrp.pdf]] 
+
+
+*** RPC request/reply: server crash 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+*****                                                        :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+- Crashing server needs to be restarted 
+  - Detection: Periodic heartbeating
+  - On same or different machine (beware networking!) 
+
+
+*****                                                        :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+#+CAPTION: Request/reply, server restart
+#+ATTR_LaTeX: :width \linewidth :options page=5
+#+NAME: fig:rpc_rrp_noerrors
+[[./figures/rpc_rrp.pdf]] 
+
+
+
+*** RPC request/reply: key ingredients 
+
+- *Timeout* and *sequence numbers* for requests and replies
+- Means to *recompute results* or *cache results*
+- *Reply cache*: When to remove entries?
+  - When will no resending of a request happen?
+    - After having seen a bigger sequence numbers
+    - Or after assumptions on timeout and network lifetime of packets 
+- Means to *restart a server*
+  - Typical: *heartbeating* 
+
+** RPC binding 
+
+*** TODO RPC binding 
 
 How does RPC stub know where to find its skeleton? 
-- Statically configured IP? 
-- Static DNS name?
+- Aspect 1: correct machine 
+  - Statically configured IP? 
+  - Static DNS name?
+- Aspect 2: correct process
+  - Compare server activation (Section
+    \slideref{sec:server_structure}[s:server_activation]) 
 
-We will revisit later 
+We will revisit *binding* and *service discovery* later 
+
+
 
 *** RPC as middleware 
  RPCs present a more abstract view of a distributed system than a request/reply protocol directly realized with sockets 
@@ -192,11 +374,10 @@ We will revisit later
 
 * From RPC to RMI 
 *** Remote Method Invocation & Distributed objects
- Goal: provide a distributed version of the object model made available by object-oriented programming languages
- - 
+Goal: provide a distributed version of the object model made available by object-oriented programming languages
  - Ingredients of a “normal” object model (think: Java, C++, …)
- - Program: Collection of objects, each with data & methods, 
- - interacting with each other by means of method invocations 
+ - Program: Collection of objects, each with data & methods,
+   interacting with each other by means of method invocations
  - Object references: Necessary to access (identify) any object 
  - Interfaces: Defines signature of a set of methods, possibly implemented by a call 
  - Action: Invoke a method; effects: state change, new instance created, further method invocations 
@@ -212,27 +393,27 @@ We will revisit later
  Interacting objects are no longer in a single process, but distributed onto several processes 
  - Requires appropriate notions of 
  - Remote object reference: Unique identifier of an instance in the entire distributed system, not only within a single process 
- - Might contain: IP address, process ID, object ID within this process 
+   - Might contain: IP address, process ID, object ID within this process
+   - Compare long address formats 
  - Remote interface: Contains methods that are remotely invocable 
- - Object might have an additional local interface 
- - Typically specified in a programming-language-neutral form to allow invocations from other programming languages – an 
- - interface definition language (IDL)
+   - Object might have an additional local interface 
+   - Typically specified in an IDL 
+
 *** Distributed object model
+
  Requires appropriate notions of
- - Actions in a distributed object system
- - Method invocations might cross several process boundaries 
- - Where/in which process is a new object instantiated? 
- - E.g., in the process from which instantiation was requested? 
- - At a remote process (via a “proxy instantiator”?)
- - 
- - 
- - 
- - 
- - Exceptions transported from one process to another
- - Distribution itself will cause new forms of exception, e.g., timeouts – make them visible to programmer or not?
- - Distributed garbage collection 
+ - *Actions* in a distributed object system
+ - *Method* invocations might cross several process boundaries 
+ - Where/in which process is a new object *instantiated*? 
+   - E.g., in the process from which instantiation was requested? 
+   - At a remote process (via a “proxy instantiator”?)
+ - *Exceptions* transported from one process to another
+   - Distribution itself will cause new forms of exception, e.g., timeouts – make them visible to programmer or not?
+ - Distributed *garbage collection*
+ 
 *** RMI design issues: Invocation semantics 
- Local method invocations: Executed exactly once
+
+Local method invocations: Executed exactly once
  - Remote method invocations: Not so easy
  - Compare discussion on details of request/reply protocol
  - Issues: retry request message, duplication filtering, reexecute/history for retransmitting reply messages
