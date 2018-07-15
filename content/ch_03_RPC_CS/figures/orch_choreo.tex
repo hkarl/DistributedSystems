@@ -1,0 +1,104 @@
+
+\documentclass[tikz]{standalone}
+
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+
+\newcommand{\centerbox}[4]{ % 
+% xstart, ystart, xwidth, text 
+\draw [thick, fill=gray!5] (#1+0.05, #2+0.05) rectangle  (#1+#3-0.05, #2+1-0.05); %
+\draw ( #1+#3/2, #2+0.5) node {#4};
+%
+  }
+
+\newcommand{\topbox}[4]{ % 
+% xstart, ystart, xwidth, text 
+\draw [thick, fill=gray!5] (#1+0.05, #2+0.05) rectangle  (#1+#3-0.05, #2+1-0.05); %
+\draw ( #1+#3/2, #2+0.5) node {#4};
+%
+  }
+
+
+% Orchestrator:
+\begin{tikzpicture}
+
+  \node [fill=gray!20] (m1) at (0,0) {MS 1}; 
+  \node [fill=gray!20] (m2) at (2,0) {MS 2}; 
+  \node [fill=gray!20] (m3) at (4,0) {MS 3}; 
+  \node [fill=gray!20] (orch) at (2,1) {Orchestrator};
+
+  \node [below left=0.25 of m1] (x) {}; 
+  \node (innode) at (-1, 1)  {}; 
+  \node (outnode) at (5, 1)  {}; 
+
+  \draw [->] (innode) -- (orch.west); 
+  \draw [->] (orch.east) -- (outnode); 
+  \draw [->] ([xshift=-10pt]orch.south) -- ([xshift=-10pt]m1.north); 
+  \draw [->] ([xshift=-5pt]m1.north) -- ([xshift=-5pt]orch.south); 
+  \draw [->] ([xshift=-2pt]orch.south) -- ([xshift=-2pt]m2.north); 
+  \draw [->] ([xshift=+2pt]m2.north) -- ([xshift=+2pt]orch.south); 
+  \draw [->] ([xshift=+5pt]orch.south) -- ([xshift=+5pt]m3.north); 
+  \draw [->] ([xshift=+10pt]m3.north) -- ([xshift=+10pt]orch.south); 
+
+  \draw (-0.75,-0.5)  rectangle (4.75,1.5);
+\end{tikzpicture}
+
+
+
+% Cheoregraphy:  
+\begin{tikzpicture}
+
+  \node [fill=gray!20] (m1) at (0,0) {MS 1}; 
+  \node [fill=gray!20] (m2) at (2,0) {MS 2}; 
+  \node [fill=gray!20] (m3) at (4,0) {MS 3}; 
+
+  \node [below left=0.25 of m1] (x) {}; 
+  \node [left=0.5 of m1] (innode) {}; 
+  \node [above right=0.25 of m3] (y) {}; 
+  \node [right=0.5 of m3] (outnode) {}; 
+
+  
+  \draw [->] (m1.east) -- (m2.west); 
+  \draw [->] (m2.east) -- (m3.west); 
+  \draw [->] (innode) -- (m1.west); 
+  \draw [->] (m3.east) -- (outnode); 
+
+  
+
+  \draw (x)  rectangle (y);
+\end{tikzpicture}
+
+% Cheoregraphy, multiple instnaces 
+\begin{tikzpicture}
+
+  \node [fill=gray!20] (m1) at (0,0) {MS 1}; 
+  \node [fill=gray!20] (m2a) at (2,0) {MS 2a}; 
+  \node [fill=gray!20] (m2b) at (2,-1) {MS 2b}; 
+  \node [fill=gray!20] (m2c) at (2,1) {MS 2c}; 
+  \node [fill=gray!20] (m3) at (4,0) {MS 3}; 
+
+  \node (x) at (-0.75, -1.5)  {}; 
+  \node [left=0.5 of m1] (innode) {}; 
+  \node (y) at (4.75, 1.5)  {}; 
+  \node [right=0.5 of m3] (outnode) {}; 
+
+  
+  \draw [->] (m1.east) -- (m2a.west); 
+  \draw [->] (m1.east) -- (m2b.west); 
+  \draw [->] (m1.east) -- (m2c.west); 
+  \draw [->] (m2a.east) -- (m3.west); 
+  \draw [->] (m2b.east) -- (m3.west); 
+  \draw [->] (m2c.east) -- (m3.west); 
+  \draw [->] (innode) -- (m1.west); 
+  \draw [->] (m3.east) -- (outnode); 
+
+  \fill [fill=red] (m1.east) circle [radius=0.15] {}; 
+  \fill [fill=red] (m3.west) circle [radius=0.15] {}; 
+
+  \draw (x)  rectangle (y);
+\end{tikzpicture}
+
+
+\end{document}

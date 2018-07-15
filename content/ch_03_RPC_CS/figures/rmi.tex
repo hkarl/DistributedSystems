@@ -1,0 +1,60 @@
+% RPC request/reply protocol
+
+
+\documentclass[tikz]{standalone}
+
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+
+  \begin{msc}{RPC -- no errors}
+    \declinst{a}{}{Caller}
+    \declinst{ap}{}{Stub}
+    \declinst{reg}{}{Registry}
+    \declinst{bp}{}{Skeleton}
+    \declinst{b}{}{Callee}
+
+    \inlinestart{register}{Register}{reg}{b}
+    \nextlevel[2] 
+    \mess{Register}{b}{reg}
+    \nextlevel 
+    \inlineend{register}
+    \nextlevel 
+
+    
+    \inlinestart{lookup}{Lookup}{a}{reg}
+    \nextlevel[2] 
+    \mess{Lookup remote reference}{a}{reg}
+    \nextlevel 
+    \mess{Reference}{reg}{a}
+    \nextlevel 
+    \inlineend{lookup}
+    \nextlevel 
+
+    \inlinestart{use}{Get stub}{a}{bp}
+    \nextlevel[2] 
+    \mess{Get stub}{a}{bp}
+    \nextlevel
+    \mess{Stub}{bp}{a}
+    \nextlevel
+    \inlineend{use}
+    \nextlevel 
+
+    
+    \mess{Call}{a}{ap}
+    \nextlevel 
+    \mess{Request}{ap}{bp}
+    \nextlevel 
+    \mess{Call}{bp}{b}
+    \nextlevel 
+    \mess{Result}{b}{bp}
+    \nextlevel 
+    \mess{Reply}{bp}{ap}
+    \nextlevel 
+    \mess{Result}{ap}{a}
+  \end{msc}
+
+
+
+\end{document}

@@ -1,5 +1,11 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+* Distributed event systems 
+  :PROPERTIES:
+  :CUSTOM_ID: sec:des
+  :END:
+
+
 ** Idea 
 
 *** Events and publish/subscribe systems (blackboards) 

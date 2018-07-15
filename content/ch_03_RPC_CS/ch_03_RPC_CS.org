@@ -1,6 +1,6 @@
 #+BIBLIOGRAPHY: ../bib plain
 
-* RPC 
+* RPC
 
 ** RPC basics 
 *** How to bring order to chaos 
@@ -165,9 +165,15 @@ Alternative ideas exist
   - Applicable to both RPC and RMI 
 
 
-** RPC execution  
+** RPC protocol  
+   :PROPERTIES:
+   :CUSTOM_ID: sec:rpp_protocol
+   :END:
 
 *** RPC execution semantics 
+    :PROPERTIES:
+    :CUSTOM_ID: s:rpc_execution
+    :END:
 
 What if things go wrong? 
 
@@ -244,7 +250,7 @@ What if things go wrong?
 
 #+CAPTION: Request/reply, timeout on request  
 #+ATTR_LaTeX: :width \linewidth :options page=2
-#+NAME: fig:rpc_rrp_noerrors
+#+NAME: fig:rpc_timeout_request
 [[./figures/rpc_rrp.pdf]] 
 
 
@@ -343,6 +349,7 @@ What if things go wrong?
 - Means to *restart a server*
   - Typical: *heartbeating* 
 
+
 ** RPC binding 
 
 *** TODO RPC binding 
@@ -372,7 +379,7 @@ We will revisit *binding* and *service discovery* later
 
 
 
-* From RPC to RMI 
+* From RPC to RMI
 *** Remote Method Invocation & Distributed objects
 Goal: provide a distributed version of the object model made available by object-oriented programming languages
  - Ingredients of a “normal” object model (think: Java, C++, …)
@@ -388,18 +395,20 @@ Goal: provide a distributed version of the object model made available by object
  - State is separated anyway
  - Separating this state further onto different processes (and possibly machines) is the natural extension leading to distributed objects 
  - Entails some limitations, e.g., no direct data access into objects, only methods 
- - Provides new possibilities, e.g., replicating an object to several machines 
+ - Provides new possibilities, e.g., replicating an object to several
+   machines 
+
 *** Distributed object model
  Interacting objects are no longer in a single process, but distributed onto several processes 
  - Requires appropriate notions of 
- - Remote object reference: Unique identifier of an instance in the entire distributed system, not only within a single process 
-   - Might contain: IP address, process ID, object ID within this process
-   - Compare long address formats 
- - Remote interface: Contains methods that are remotely invocable 
-   - Object might have an additional local interface 
-   - Typically specified in an IDL 
+   - *Remote object reference*: Unique identifier of an instance in the entire distributed system, not only within a single process 
+     - Might contain: IP address, process ID, object ID within this process
+     - Compare long address formats 
+   - *Remote interface*: Contains methods that are remotely invocable 
+     - Object might have an additional local interface 
+     - Typically specified in an IDL 
 
-*** Distributed object model
+*** Distributed object model (2) 
 
  Requires appropriate notions of
  - *Actions* in a distributed object system
@@ -413,27 +422,21 @@ Goal: provide a distributed version of the object model made available by object
  
 *** RMI design issues: Invocation semantics 
 
-Local method invocations: Executed exactly once
- - Remote method invocations: Not so easy
- - Compare discussion on details of request/reply protocol
+ - Local method invocations: Executed exactly once
+ - Remote method invocations: Similar to RPC
+   - Compare discussion on details of request/reply protocol \slideref{sec:rpp_protocol}[s:rpc_execution]
  - Issues: retry request message, duplication filtering, reexecute/history for retransmitting reply messages
  - Possible resulting semantics: maybe, at-least-once, at-most-once (exactly-once not possible in distributed systems!) 
-*** RMI implementation 
+
+*** RMI protocol implementation 
+
  In principle: Very similar to RPC implementation 
  - In detail: Middleware needs to provide some extra functionality to deal with remote object references, details of object lifetime, etc. 
- - E.g., how to obtain a remote object reference in the first place? A binder service can provide such bootstrapping (e.g., RMIregistry) 
+ - E.g., how to obtain a remote object reference in the first place?
+   - A binder service can provide such bootstrapping (e.g., RMIregistry) 
 
    
-* Examples: Java RMI, zerorpc 
-*** Overview
- Basics: Data exchange, sockets 
- - Client/server
- - Mechanisms 
- - Remote procedure call
- - Remote method invocation & distributed objects
- - Case study: Java RMI 
- - Case study: ZeroRPC
- - Case studies
+* Examples: Java RMI, zerorpc
 *** Case study: Java RMI 
  Goal: Extend Java’s object model to a distributed one 
  - Some design decisions
@@ -445,165 +448,417 @@ Local method invocations: Executed exactly once
  - No separate interface definition language necessary 
  - Classes not locally available can be loaded via the network 
  - Dedicated service to lookup remote object references – rmiregistry 
-*** Java RMI – remote interfaces and parameters  
+
+*** Remote interfaces   
  Remote interfaces in RMI 
  - Defined by extending the Remote interface (from java.rmi package)
- - Methods in interface must (at least) throw RemoteException
- - Remote interfaces can have remote objects as parameters
+   - Methods in interface must (at least) throw ~RemoteException~
+   - Remote interfaces can have remote objects as parameters
+
+*** Parameter passing 
  - Parameter and result passing
- - Marshalling happens via serialization ! any input parameter or result must implement the Serializable interface 
- - Missing classes are downloaded 
- - Remote references can be passed between remote interfaces ! method invocations on these references will result in remote method invocations; reference is passed by-value 
- - Non-remote objects are serialized, copied, and passed by-value 
- - 
-*** Java RMI – RMIregistry 
- RMIregistry provides remote references to remote objects 
- - An instance must run on any computer hosting remote objects 
- - Essentially a table, mapping textual object names to real remote references 
- - Accessed via the Naming class 
- - Core methods
- - bind/rebind: put an entry into the table, making the invoker’s local object remotely accessible 
- - lookup: provides a remote object reference, matching a given textual description to the invoking client 
- - Location of the server computer/rmiregistry must be known to the client program! 
- - I.e., IP address & port number (usually default 1099 is used)
-*** Java RMI – Overview 
+   - Marshalling happens via serialization ! any input parameter or result must implement the Serializable interface 
+   - Missing classes are downloaded 
+   - Remote references can be passed between remote interfaces ! method invocations on these references will result in remote method invocations; reference is passed by-value 
+   - Non-remote objects are serialized, copied, and passed by-value 
+
+***  RMIregistry 
+- RMIregistry provides remote references to remote objects 
+  - An instance must run on any computer hosting remote objects 
+  - Essentially a table, mapping textual object names to real remote references 
+- Accessed via the ~Naming~ class 
+  - Core methods
+    - ~bind/rebind~: put an entry into the table, making the invoker’s local object remotely accessible 
+    - ~lookup~: provides a remote object reference, matching a given textual description to the invoking client 
+  - Location of the server computer/rmiregistry must be known to the client program! 
+  - I.e., IP address & port number (usually default 1099 is used)
+
+*** Java RMI flow of invocations
 
 
- Lookup()
 
- Clientrechner
- Clientprogramm
- Call remote method
+#+CAPTION: Call sequence of a JavaRMI method invocation
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:rmi_sequence
+[[./figures/rmi.pdf]]
 
- - Stub
+** Zerorpc 
 
- Registry
- Serverrechner
- 1099
- ObjImpl_Stub.class
- ObjImpl_skel.class
- ObjImpl.class
- - rebind(Obj)
-
- 2. Wo ist das entfernte Objekt?
- 3. Entferntes Objekt gefunden
-
- 4. Anforderung Stub
-
- 5. Lieferung Stub
-
-
- 6. Rufe entfernte Methode auf
-
-
- 7. Gebe das Ergebnis zurück
- 1. Registrierung
-*** Overview
- Basics: Data exchange, sockets 
- - Client/server
- - Mechanisms 
- - Remote procedure call
- - Remote method invocation & distributed objects
- - Case study: Java RMI 
- - Case study: ZeroRPC
- - Case studies
 *** zerorpc 
- 89
-*** zerorpc: HelloWorld 
- Distributed Systems, Ch. 2:  Basic Interaction Patterns
- 90
- Port number identifies object 
-*** zerorpc: Streaming Reponses 
- Distributed Systems, Ch. 2:  Basic Interaction Patterns
- 91
-*** zerorpc: Basic structure 
- 92
+An example for a simple RPC/RMI libarary: zerorpc
 
+
+**** Zerorpc                                                        :B_quote:
+     :PROPERTIES:
+     :BEAMER_env: quote
+     :END:
+zerorpc is a light-weight, reliable and language-agnostic library for distributed communication between server-side processes. It builds on top of ZeroMQ and MessagePack. Support for streamed responses – similar to Python generators – makes zerorpc more than a typical RPC engine. Built-in heartbeats and timeouts detect and recover from failed requests. Introspective capabilities, first-class exceptions and the command-line utility make debugging easy.
+
+
+http://www.zerorpc.io
+
+*** HelloWorld 
+
+
+From http://www.zerorpc.io
+
+Note: port number identifies object 
+
+\tiny
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+
+***** Server                                                          :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+BEGIN_SRC python
+import zerorpc
+
+class HelloRPC(object):
+    def hello(self, name):
+        return "Hello, %s" % name
+
+s = zerorpc.Server(HelloRPC())
+s.bind("tcp://0.0.0.0:4242")
+s.run()
+#+END_SRC
+
+***** Client                                                          :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+BEGIN_SRC python 
+import zerorpc
+
+c = zerorpc.Client()
+c.connect("tcp://127.0.0.1:4242")
+print c.hello("RPC")
+#+END_SRC
+
+
+*** Streaming  
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+\tiny
+***** Server                                                          :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+BEGIN_SRC python
+import zerorpc
+
+class StreamingRPC(object):
+    @zerorpc.stream
+    def streaming_range(self, fr, to, step):
+        return xrange(fr, to, step)
+
+s = zerorpc.Server(StreamingRPC())
+s.bind("tcp://0.0.0.0:4242")
+s.run()
+#+END_SRC
+
+***** Client                                                          :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+BEGIN_SRC python 
+import zerorpc
+
+c = zerorpc.Client()
+c.connect("tcp://127.0.0.1:4242")
+
+for item in c.streaming_range(10, 20, 2):
+    print item
+#+END_SRC
+
+
+*** Basic structure 
+
+- Wire layer (transport)
+  - Combines 0mq for actual data exchange; msgpack for serialization of messages 
+- Event layer 
+  - Heart-beating, events, multiplexing 
+  - Congestion control via buffering 
+- RPC Layer as such 
+  - Events: request, response, error 
+  - STREAM support: Server keeps sending responses 
+
+
+** Thrift 
 
 *** Case study: Apache Thrift 
 
-- Java :-( ); 
+- Java :-(); 
 - https://thrift.apache.org
 
 
+
+** Tornado                                                         :noexport:
 
 *** Python Tornado 
 
 
 
 
-* WebServices: A tale from the past 
+* WebServices: A tale from the past
 
 *** One upon a time: Web services 
 
+- Situation: Many interesting services offered in the WWW
+  - Travel example: Web sites for flight booking, rental cars,
+    hotels, ... 
+  - Shipping company example: Ordering application and shipping cost
+    application – manual reentering vs. program integration 
+
+- But only accessible for humans – not easy to access such web sites
+  from a program for further processing  
+  - (Just imagine parsing a complex HTML page of a flight booking site
+    to identify available flights ...) 
+
+
 *** Web services to the rescue… 
- Remedy: Web services
+
+Remedy: Web services
  - Provide a standard way of interacting between clients and servers that can be easily integrated into arbitrary programs
  - Use standard Web-based infrastructure to do so
  - Instead of RPC-like mechanisms 
- - 
- - 
- - 
-*** Web Service: Definition (ca. 2004)  
- 96
-*** Infrastructure and components for Web services 
- Required
- - A transport protocol between client and server
- - Often: HTTP (over TCP over IP) – but alternatives exist 
- - A representation syntax how to format service invocations and answers 
- - Often: SOAP, written out in XML 
- - A means to describe & find web services – WSDL & UDDI, covered later
 
+*** Web Service: Definition (ca. 2004)  
+
+
+**** Web Service \cite{WebServi22:online}                                       :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+A Web service is a software system designed to support interoperable machine-to-machine interaction over a network.
+
+
+It [Web Service] has an interface described in a machine-processable format (specifically WSDL). Other systems interact with the Web service in a manner prescribed by its description using SOAP-messages, typically conveyed using HTTP with an XML serialization in conjunction with other Web-related standards.
+
+
+
+
+
+*** Infrastructure and components for Web services 
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+ Required
+ - A *transport protocol* between client and server
+   - Often: HTTP (over TCP over IP) – but alternatives exist 
+ - A *representation syntax* how to format service invocations and answers 
+   - Often: \ac{SOAP}, written out in XML 
+ - A means to *describe* & *find* web services
+   - \ac{WSDL} & \ac{UDDI}
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Structure of Web service components
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:webservice_structure
+[[./figures/wsdl.pdf]]
+
+
+
+*** Representation: SOAP 
+
+- A formalism to describe messages, to be used in request/reply
+  protocol
+- Self-describing messages 
+- /Extremely/ talkative 
+- Being carried over HTTP, easily  traverses firewalls 
+
+*** Describing and finding Web services 
+
+- We need an IDL: WSDL
+  - Defines interfaces, parameter passing semantics, ... 
+    - similar to RPC, RMI ideas
+  - XML-based notation
+  - Also defines bindings (no registry needed, but no late binding possible)
+  - Relatively complicated, multi-stage definition 
+- We need to find WDSLs and binding 
+  - Late Binding /through the backdoor/
 
 *** Comparison: Web services and distributed object model
- At first glance: Very similar – Web service is but an interface to a remote object
- - 
+
+ - At first glance: Very similar – Web service is but an interface to a remote 
  - But some subtle differences exist
- - Web services are essentially a single remote object – they cannot be instantiated to form “new services”, no remote object references, no garbage collection, … 
- - Transport protocols and syntax can be vastly different 
- - Distributed object systems usually use proprietary protocols for interaction between objects, not HTTP/XML/SOAP 
- - 
- - 
+   - Web services are essentially a single remote object – they cannot
+     be instantiated to form “new services”, no remote object
+     references, no garbage collection, ... 
+   - Transport protocols and syntax can be vastly different 
+   - Distributed object systems usually use proprietary protocols for interaction between objects, not HTTP/XML/SOAP 
+
+*** A look back 
+
+- WebServices (as XML/SOAP/WSDL/UDDI) was once considered the saviour
+  of complex IT systems 
+- But turned out way too complicated 
 
 
-* Today's tale: REST                                               :noexport:
+* Today's tale: REST
 
 *** A variation on the web services theme: REST
- Web services can use complex interfaces 
- - Specified with SOAP, WSDL
- - Allow complex interaction relationships between users and providers of such services
- - 
- - Beauty in simplicity?
- - Use a very restricted interface set: create, read, update, delete (CRUD)
- - Sounds like GET, PUT, DELETE, POST ? 
- - Concentrate on the manipulation of data through such a simple interface
- - When accessing a data resource, the entire resource is provided (i.e., web page is downloaded) and can then be locally manipulated instead of complex interface operations 
- - 
- -  ! Realized in Representational state transfer (REST)
- - Fielding, Architectural Styles and the Design of Network-based Software Architectures, 2000
+
+- Web services can use complex interfaces 
+  - Specified with SOAP, WSDL
+  - Allow complex interaction relationships between users and
+    providers of such services 
+- Beauty in simplicity?
+  - Use a very restricted interface set:  \ac{CRUD}
+    - Sounds like GET, PUT, DELETE, POST? 
+  - Concentrate on the manipulation of data through such a simple interface
+    - When accessing a data resource, the entire resource is provided
+      (i.e., web page is downloaded) and can then be locally
+      manipulated instead of complex interface operations  
+
+- Realized in Representational state transfer (REST) \cite{Fielding:2000:ASD:932295}
+
 *** REST architecture: Constraints 
- 114
+
+- Client/server
+- Stateless 
+  - I.e., server stores no client context between invocations 
+- Caching 
+  - Responses must define their cacheability 
+- Layered system 
+  - Client might talk to server or intermediary; unable to distinguish 
+- Code on demand 
+- Uniform interface
+  - The KEY property of REST 
+
+    
 *** REST: Uniform interface 
- 115
+
+- Identification of resources 
+  - All resources are identified using a common namespace, e.g., URI
+- Manipulation of resources through representations 
+  - Based on a resource’s representation as obtained from server, client can process it (manipulate,...) 
+- Self-descriptive messages 
+  - Messages specify enough information to allow their processing (e.g., character set, media type, ...) 
+- \ac{HATEOAS}
+  - Resource representations contain enough information to discover
+    further resources  
+  - Client has no hard-coded information about structure or dynamics of the REST service 
+
+
+
 *** Representations contain information to discover resources??
- 116
+
+- What does that mean? 
+- Practically speaking: 
+  - A root resource exists 
+  - Possible to ask it for a list of further, comprised resources 
+  - And each resources might provide again such a list of comprised
+    resources (resource tree")  
+- Example: PAUL 
+  - Root could tell: There are classes, room, students, lecturers,
+    ... 
+  - The "Lecturer" resource could provide a list of lecturers
+  - Each individual lecturer could then provide details, e.g., a list
+    of classes she/he teaches  
+
+
 *** REST as specialisation of WebServices 
- 117
+- REST-compliant Web services: the primary purpose of the service is
+  to manipulate XML representations of Web resources using a uniform
+  set of "stateless" operations 
+  - W3C, Web Services Architecture
+- Combining:  *RESTful web services*
+  - A web service that adheres to the REST architectural constraints 
+    - Base URL from which to discover further resources 
+    - Media types explicitly specified
+    - Use HTTP and standard HTTP request types to specify operations 
+  - Think in terms of collections of individual resources 
+
+
+
+
 *** RESTful: Collections vs. HTTP methods 
- https://en.wikipedia.org/wiki/Representational_state_transfer, retrieved 2016-11-14
- nullipotent
- idem-
- - potent
- idem-
- - potent
- server 
- - chooses URI
- client
- - chooses URI
+ 
+\tiny 
+ 
+#+ATTR_LATEX: :center 1 :booktabs 1 :align p{0.1\linewidth}p{0.15\linewidth}p{0.1\linewidth}p{0.1\linewidth}p{0.2\linewidth}p{0.1\linewidth}
+| Uniform Resource Locator (URL)                            | GET                                                                                                                   | PUT                                                                                 | PATCH                                          | POST                                                                                                                          | DELETE                                         |
+|-----------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------+------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------|
+| Collection, such as https://api.example.com/resources/    | List the URIs and perhaps other details of the collection's members.                                                  | Replace the entire collection with another collection.                              | Not generally used                             | Create a new entry in the collection. The new entry's URI is assigned automatically and is usually returned by the operation. | Delete the entire collection.                  |
+|-----------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------+------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------|
+| Element, such as https://api.example.com/resources/item17 | Retrieve a representation of the addressed member of the collection, expressed in an appropriate Internet media type. | Replace the addressed member of the collection, or if it does not exist, create it. | Update the addressed member of the collection. | Not generally used. Treat the addressed member as a collection in its own right and create a new entry within it.             | Delete the addressed member of the collection. |
+
+
+From \cite{RESTRepresen19:online}
+
+
+
+
 *** RESTful: URL patterns 
- 119
+
+- Compare URL patterns conventional and rest based 
+- E.g., PAUL, resource “classes” 
+  - Both patterns distinguish between collections and individual elements 
+
+
+*** RESTful: URL patterns (2) 
+
+- Conventional patterns: actions/verbs are part of the URL; with
+  query/update in the HTTP action  
+  - http://paul.upb.de/classes/ : gives list 
+  - http://paul.upb.de/classes/add/   :  gives a form where to add new
+    one (GET), or uploads the form (POST) 
+  - http://paul.upb.de/classes/175/   :  gives details on class 175
+  - http://paul.upb.de/classes/175/update  : gives details on class
+    175 (GET) or uploads new details (POST)  
+- RESTful: no actions in URL, expressed ONLY via HTTP action
+  - http://paul.upb.de/classes/  :  gives list (GET); creates new one
+    individual in this collection (POST)  
+  - http://paul.upb.de/classes/175/  : gives details on class 175
+    (GET), creates new one or update existing one (PUT)  
+
+
+
+
 *** RESTful: URL patterns practically 
- 120
+
+- In principle, nice idea 
+  - A couple of pitfalls – e.g., how to obtain a Web form to fill in
+    data for a new resource? Not nicely handled via REST 
+- But problem with HTML/browser implementation
+  - Typical: circumvented by Javascript in browser  
+    
+
+
+**** HTML snippet                                            :B_exampleblock:
+     :PROPERTIES:
+     :BEAMER_env: exampleblock
+     :END:
+
+\small 
 
 #+BEGIN_SRC  html
  <html>
@@ -616,67 +871,409 @@ Local method invocations: Executed exactly once
  </html>
 #+END_SRC
 
- No DELETE, PUT, 
- - ... supported!
+But:  No DELETE, PUT,  ... supported!
+
+
 *** RESTful: Interface descriptions? 
- 121
-*** Swagger examples 
+
+- In a sense: no interface description needed (in strict REST, HATEOAS) 
+- In practice: you DO want to know what services exist, at which URIs,
+  what their semantics is  
+  - We DO need a description formalism 
+- Options? 
+  - WSDL? – sure, but failed in practice
+  - Google, Apache, ... examples – sure 
+  - SWAGGER (http://swagger.io) – currently extremely popular 
+    - Foundation for OpenAPI specification 
+    - Specification written as YAML file 
+    - Tool chain + decent formalism + open source = success! 
+    - Write API, get code and documentation automatically generated 
+  - See also:
+    http://apievangelist.com/2016/09/16/a-look-at-the-state-of-api-documentation-solutions/  
 
 *** Swagger examples 
+
+
+#+CAPTION: Screenshot of Swagger tutorial API example
+#+ATTR_LaTeX: :width 0.9\linewidth
+#+NAME: fig:swagger_screenshot
+[[./figures/swagger-screenshot.png]]
+
+
 
 *** Examples
- Several popular sites provide Web services 
- - Yahoo, google, ebay, Amazon, … 
+ - Several popular sites provide Web services 
+   - Yahoo, google, ebay, Amazon, … 
  - Example: Access to Google’s Map api 
- - You’ll need: 
- - a programming language that can curl a URL 
- - Interpret the resulting JSON
- - 
+   - You’ll need: 
+     - a programming language that can curl a URL 
+     - Interpret the resulting JSON
+
+
+**** Example: Google Map Service                             :B_exampleblock:
+     :PROPERTIES:
+     :BEAMER_env: exampleblock
+     :END:
+#+BEGIN_SRC python
  import requests
- - import json
- - 
- - r = requests.get(“https://maps.googleapis.com/maps/api/
- - geocode/json?address=Warbugrstr. 100, Paderborn")
- - 
- - print json.dumps(r.json(), indent=4)
+ import json
+ 
+ r = requests.get("https://maps.googleapis.com/maps/api/geocode/json?address=Warbugrstr. 100, Paderborn") 
+ 
+ print json.dumps(r.json(), indent=4)
+#+END_SRC
+
+
+
+* An architecture style: microservices
+
+** Microservices 
+
+*** Application scenario: Fake News Detector 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+
+
+- Based on AI breakthroughs, the German government commissions
+  development of \ac{FAD}
+- Functionality:
+  - Read in data from social media networks, preprocess (remote or locally)
+  - Apply various AI algorithms to it
+    - Must be easily replaceable
+  - Detect Fake News Sources
+  - Trigger alarms at intelligence  services 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+
+
+#+CAPTION: Fake News Detector System
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:fad
+[[./figures/fad.pdf]]
+
+
+
+*** Monolithic architecture 
 
 
 
 
-* An architecture style: microservices                             :noexport:
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+- Conventional architecture: Monolithic 
+  - One big blob of functionality supporting all and everything in your application 
+    - E.g.:3-tier web application with multitude of different clients
+      (apps, mobile browser, ...)  
+    - Problem: Code becomes unwieldy; needs unrealistic systems 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+
+
+
+#+CAPTION: HAL9000-based FAD system
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:fad_hal
+[[./figures/fad_hal.pdf]]
+
+*** So far: coarse-grained functional particion 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+
+- Many webservers, many data analysis systems 
+- Coupled by an intermediate storage system 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+
+
+#+CAPTION: FAD based on coarse-grained partitioning
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:fad_coarse
+[[./figures/fad_coarse.pdf]]
+
+
+
+
 
 *** Microservices: Architecture pattern 
- 126
-*** Microservices: Architecture pattern – So? 
- 127
+
+- Alternative: *\ac{ms}* 
+  - Chop up big binary into independently runable instances, typically
+    focused on a single functionality  
+  - Link them together by *loose coupling*
+  - Advantages: Simpler development, simpler scaling, better fault-tolerance 
+  - See, e.g., http://microservices.io/patterns/microservices.html 
+- *Recursive pattern*
+- System vs. service: Commonly distinguished as stateful vs. stateless 
 
 
-*** TODO Case study: Reactive Systems  
+*** Chaining
 
-- Check, does this really belong here? 
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+- Key feature: Multiple microservices can be chained together into a
+  new (micro-)service
+- Different styles
+  - *Orchestration*: Chaining done by one MS calling others
+  - *Choreography*: MS talks directly to the next one 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Orchestration style
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=1
+#+NAME: fig:ms_orchestration
+[[./figures/orch_choreo.pdf]]
+
+
+#+CAPTION: Choreography style
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=2
+#+NAME: fig:ms_choreography
+[[./figures/orch_choreo.pdf]]
+
+
+
+*** Scalability: up and out 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+
+- Simple example: linear chain of microservices 
+  - Computation time per request: 10ms, 100ms, 10ms
+- We need more computational power at middle service
+  - *Scale up*: Get a faster machine
+  - *Scale out*: Run multiple instance
+    - Challenge: *Splitting* and *merging* 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+#+CAPTION: Scaling out a microservice
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+NAME: fig:ms_scaling
+[[./figures/orch_choreo.pdf]]
+
+
+*** Challenges 
+
+
+- When to run how many instances of which service doing which work? 
+  - Buzzword: Stateless, autoscaling, load balancing  
+- How to deal with crashing services? 
+  - Buzzword: Automatic restart, Circuit breaker, Database per Service
+- How to organize dependable, efficient message exchange between
+  individual services?  
+  - Buzzword: Messages/Events and for data handling, \ac{CQRS} 
+- Stateful services?
+  - Buzzword: (NoSQL-)Databases, CQRS
+
+
+*** Database for microservices 
+
+- Ok, so we have many fine-grained, scaled-out microservices 
+- All communicating via a big, central database??
+  - Needs a HAL9000 machine, again -- nothing gained 
+
+
+#+BEAMER: \pause
+- We have to get rid of the central database
+- Stateful services need to store their own state in their own
+  database
+  - /System of systems/ rather than /service of service/
+
+#+BEAMER: \pause
+- Coupling of these services/systems happens typically via \ac{DES}
+  - Compare Section~\ref{sec:des}
+
+
+*** CQRS 
+
+- Observation: Simple model of CRUD data stores insufficient for
+  complex scenarios 
+  - Read access: various aggressions, filters, ...
+  - Update access: validation necessary, ensure consistency, ... 
+- Might end up in different models to be used when querying or
+  updating data
+- Idea: separate the responsibilities at these actions; introduce
+  different data models
+  - Separate the responsibility for command and query
+  - Nicely fits into DES 
+- Mostly a software engineering issue, cp. e.g. \cite{CQRS61:online}
+
+
+*** Microservices: So? 
+
+Analogy 
+- Windows: Rich clients, doing all kinds of things, but are not reusable 
+- Unix: Small, highly focused tools that can be easily connected
+  together (think: Pipelining of shell commands) 
+  - Every Unix user wondered what the big deal about microservices is;
+    that is how Unix works since the 1960s ... 
+
+
+
+** Case study: Reactive 
+*** Case study: Reactive Systems  
+
+Case Study: Reactive Systems design pattern for distributed applications 
+- Pushed by company TypeSafe http://www.typesafe.com 
+- Warning: commercials ahead 
+
 
 *** Reactive Systems – “Manifesto”
- 129
+
+- Claim: Future distributed systems need to fulfil certain properties 
+  - *Responsive*: Ability to respond to requests in timely manner, with
+    reliable upper bounds on response times  
+    - Sometimes formalized as: probability to meet a deadline 
+  - *Resilient*: Responsiveness maintained in presence of failures 
+    - Key mechanisms: Replication, containment, isolation, delegation 
+    - Clients not burdened with handling failures 
+  - *Elastic*: Responsiveness maintained under varying load by changing allocated resources
+    - Predictive as well as reactive 
+  - *Message-driven*: asynchronous message passing between components; provides loose coupling and isolation 
+  - *Hierarchical structure*: Large systems made up of smaller ones 
+- http://www.reactivemanifesto.org/ 
+- Exercise: Compare this against the (decades old) list of
+  transparency properties and reveal this list as marketing 
+
+
 *** Typesafe reactive platform 
- 130
- Programs, in Java or Scala, 
- - running on JVM 
- Data engine 
- Message-driven 
- - middleware, based on actors
- Web framework 
+Interesting aspect: Typesafe built a platform to support such applications 
+- http://www.typesafe.com/products/typesafe-reactive-platform 
+
+
+
+#+CAPTION: Typesafe components
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:typseafe
+[[./figures/typesafe.png]]
+
+
+
 *** Typesafe: Actors programming model 
- 131
+
+
+
+- At the core of Akka: Actor programming model 
+  - Encapsulates state and behaviour 
+  - No shared mutable state 
+  - Only interact with each other via messages, atomically consumed
+  - Only accessible via a reference, which hides location from other actors 
+  - Key aspect: onReceive message 
+  - Hierarchies: parent actor creates child actors, supervises them
+    (e.g., for failures)   
+    - Default supervision: restart on failure; can be customized 
+    - Resume: state is maintained
+    - All waiting messages for actor still there; only one message lost 
+- What of this is new? 
+
+
 *** Typesafe: ConductR – Cluster runtime 
  132
 
 
-*** Example: Snort as microservice or NFV 
+- Interesting feature: A runtime for actors on a cluster
+- Features 
+  - Automatic load balancing 
+  - Automatic restarts 
+  - Interacts with clients via HTTP/Rest/JSON interfaces 
+- Uses
+  - Docker as container for components 
+- In conclusion: The beef is in the tools, not the philosophy 
+
+
+*** TODO Example: Snort as microservice or NFV                     :noexport:
 
 - Not sure there is time for that? 
 
 
-* Notes 
+* Conclusion 
+
+*** Conclusion 
+
+- The simple idea of procedure calls translates to distributed
+  settings
+- Take care of
+  - Execution semantics/failures
+  - Parameter passing semantics
+- Distributed object models are a fairly straightforward extension
+- Reducing to simpler set of actions results in the RESTful model
+- RESTful services can be nicely combined into microservices
+  - With plenty of software engineering considerations 
+
+
+* Notes                                                            :noexport:
 
 - https://capnproto.org/rpc.html
 

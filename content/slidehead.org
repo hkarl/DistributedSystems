@@ -17,6 +17,7 @@
 #+LATEX_HEADER: \usepackage{minted}
 #+LATEX_HEADER: \setminted{breaklines,autogobble,escapeinside=??,frame=lines,linenos=false,mathescape=true}
 #+LATEX_HEADER: \usepackage{adjustbox}
+#+LATEX_HEADER: \usepackage{booktabs}
 #+LATEX_HEADER: \usepackage{acronym}
 #+LATEX_HEADER: \usepackage[style=numeric,bibstyle=numeric,url=false,natbib=true,backend=biber]{biblatex}
 #+LATEX_HEADER: \setbeamertemplate{bibliography item}{\insertbiblabel}
