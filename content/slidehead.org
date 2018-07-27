@@ -25,6 +25,9 @@
 #+LATEX_HEADER: \setbeamertemplate{subsection in toc}[subsections numbered]
 #+LATEX_HEADER: \usepackage{../templates/msc}
 #+LATEX_HEADER: \graphicspath{{./figures/}}
+#+LATEX_HEADER: \usepackage{amsmath,amssymb}
+#+LATEX_HEADER: \DeclareMathOperator{\E}{\mathbb{E}}
+#+LATEX_HEADER: \DeclareMathOperator{\Pr}{\mathbb{Pr}}
 #+LATEX_HEADER: \addtobeamertemplate{navigation symbols}{}{ \hspace{1em}    \usebeamerfont{footline}  \insertframenumber / \inserttotalframenumber }
 #+LATEX_HEADER: \newcommand{\zrc}{\framezoom<1><2>(0.5\textwidth,0.01cm)(0.5\textwidth,0.01cm)}  % zoom right column }
 #+BIBLIOGRAPHY: bib plain
