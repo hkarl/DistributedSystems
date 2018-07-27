@@ -1,4 +1,10 @@
 #+BIBLIOGRAPHY: ../bib plain
+* Distributed storage 
+  :PROPERTIES:
+  :CUSTOM_ID: ch:distributed-storage
+  :END:
+
+
 ** Model: distributed storage, distributed objects  
 
 *** Distributed storage models 

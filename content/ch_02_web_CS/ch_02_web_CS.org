@@ -259,7 +259,6 @@ Good frameworks support:
 
 
 
-
 ****                                                           :BMCOL:
      :PROPERTIES:
      :BEAMER_col: 0.5
@@ -291,7 +290,7 @@ Good frameworks support:
 
 
 ** Some Web framework examples
-*** A short list  
+*** A short list of frameworks   
 
 - Python world: 
   - \href{http://werkzeug.pocoo.org}{Werkzeug}
@@ -299,12 +298,11 @@ Good frameworks support:
     - Based on werkzeug 
   - \href{https://twistedmatrix.com/documents/17.5.0/core/howto/basics.html}{Twisted}
   - \href{http://www.tornadoweb.org/en/stable/}{Tornado}
-- Javascript world (\href{see also}{https://nordicapis.com/13-node-js-frameworks-to-build-web-apis/}):
+- Javascript world (\href{https://nordicapis.com/13-node-js-frameworks-to-build-web-apis/}{compare}):
   - \href{https://expressjs.com}{Express}
   - \href{https://github.com/fastify/fastify}{Fastify}
   - \href{https://www.meteor.com/developers}{Meteor}
-- Java (\href{https://zeroturnaround.com/webframeworksindex/}{see
-  also}, \href{https://www.dailyrazor.com/blog/best-java-web-frameworks/}{comparison}) 
+- Java (\href{https://zeroturnaround.com/webframeworksindex/}{compare}, \href{https://www.dailyrazor.com/blog/best-java-web-frameworks/}{comparison}) 
   - \href{https://spring.io}{Spring} 
   - \href{https://www.playframework.com}{Play}
 
