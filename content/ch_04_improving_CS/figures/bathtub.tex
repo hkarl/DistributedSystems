@@ -1,0 +1,28 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary{decorations.pathreplacing}
+
+\begin{document}
+
+    \begin{tikzpicture}
+      \draw (0,0) grid (7, 5);
+      \draw [thick, ->] (0,0) -- (6.5, 0); 
+      \draw [thick, ->] (0,0) -- (0, 4.5); 
+      \node at (7, -0.5) {$t$}; 
+      \node at (-0.5, 5) {$h(t)$}; 
+      % \draw [thick](0,4) -- (1, 1) -- (5, 1) -- (6,4); 
+      \draw [thick, red] plot  [smooth ] coordinates {(0,4) (0.5, 3.5)
+        (1, 1) (5,
+        1)  (6.2,4.2)}; 
+      \draw [thick, decorate, decoration={brace}] 
+      (0.95, -0.5) -- (0, -0.5) node
+      [below,midway] {Burn in};
+      \draw [thick, decorate, decoration={brace}] (6, -0.5) -- (5.05, -0.5) node
+      [below,midway] {EoL};
+      \draw [thick, decorate, decoration={brace}] (4.95, -0.5) -- (1, -0.5) node
+      [below,midway] {Regular operation};
+    \end{tikzpicture}
+
+\end{document}

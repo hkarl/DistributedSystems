@@ -2,6 +2,7 @@
 \documentclass[tikz]{standalone}
 
 \input{../../templates/tikzFigureHeader}
+\usepackage{fontawesome}
 
 \begin{document}
 \begin{tikzpicture}[auto, xscale=3,
@@ -28,6 +29,14 @@ height=3cm,draw,label={Server group}] (sg) {};
 
 \draw [<->] (c1) -- (sg); 
 \draw [<->] (c2) -- (sg); 
+
+% data base 
+\node[block] at (3,2) (db) {\Huge \faDatabase};
+\node at ([yshift=+6pt]db.north) {Data base};
+\draw [<->] (s1.east) -- (db); 
+\draw [<->] (s2.east) -- (db); 
+\draw [<->] (s3.east) -- (db); 
+
 
 \end{tikzpicture}
 \end{document}

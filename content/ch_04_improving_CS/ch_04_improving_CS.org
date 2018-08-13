@@ -1,27 +1,43 @@
 #+BIBLIOGRAPHY: ../bib plain
 
-* Overall requirements 
+* Overall requirements                                             :noexport:
+
+*** The story so far 
+
+- Basic structure of client/server systems
+- RPC, RMI, microservices and friends as a programming abstraction
+- Who to make these structures fit for real-life deployment?
+  - Where things go wrong 
+
 *** Issues and requirements 
- - High performance 
- - Fault tolerance (nothing bad happens when something goes wrong) 
- - Availability (good things still happen when something goes wrong) 
+ - High performance
+   - Throughput
+   - Latency
+   - Average, maximum, quantiles? 
+ - Dependability 
+   - Fault tolerance (nothing bad happens when something goes wrong)  
+   - Availability (good things still happen when something goes wrong)
+   - Security (good things still happen despite attacks) 
 
 
 
 
-*** Issues and requirements 
- - High performance 
- - Fault tolerance (nothing bad happens when something goes wrong) 
- - Availability (good things still happen when something goes wrong) 
-
-* Dependability 
+* Dependability                                                    :noexport:
   :PROPERTIES:
   :CUSTOM_ID: sec:dependability
   :END:
 
-** Models 
-*** Laprie 
-*** Fault Model – Fault assumptions 
+** Fault Models 
+*** Taxonomy
+
+- Basic taxonomy shaped by Avizienis, Laprie et
+  al. \cite{avizienis04:_dependable_taxonomy} 
+- We need to identify
+  - what can go wrong in what way: fault, error, failure
+  - how to quantify that in metrics 
+
+
+*** Fault assumptions 
  Everything is completely reliable 
  - (not realistic)
  - Processes can fail
@@ -37,34 +53,78 @@
  - Whether this is failure or not depends on communication model
 
 *** What can go wrong? Taxonomy 
- 17
-*** Fault model – System metrics, dependability  
- Dependability (Zuverlässigkeit)
- - Umbrella term, used to talk about a wide range of metrics and properties in an informal fashion
- - Definitions by Laprie, Avizienis, et al. 
+
+
+- *Fault*: a defect in the system under consideration 
+  - May or may not lead to observable misbehavior 
+  - E.g.: an alpha particle flips a bit in a memory cell 
+- *Error*: Discrepancy between intended and actual behavior of system 
+  - At runtime, errors are the manifestation of a fault in an
+    unexpected state 
+  - Do not necessarily cause failure 
+  - E.g.: memory cell was written with a 1, subsequent read returns a
+    0 owing to the bit flit fault  
+- *Failure*: System displays behavior contrary to specification 
+  - Caused by error
+  - Observable from outside of the system 
+  - E.g., incorrect memory value might cause observable misbehavior,
+    or it might be correct (e.g., redundancy)  
+- Hence: proper terminology would be to talk about *error-tolerant* systems 
+
+
+*** System metrics: dependability  
+
+**** Dependability, Zuverlässigkeit                            :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+ - Umbrella term, used to talk about a wide range of metrics and
+   properties in an informal fashion 
  - Maintainability: ability to undergo modifications and repairs
- - Performability: ability of a system to perform according to specifications even in the presence of failures 
+ - Performability: ability of a system to perform according to
+   specifications even in the presence of failures  
  - Safety: absence of catastrophic consequences for users/environment
- - Distinction: system is “fail safe” or not (train, aircraft) 
+ - Distinction: system is "fail safe" or not (train, aircraft) 
  - Typical aspects: reliability, availability 
- - 
-*** Fault model – System metrics, dependability  
- Reliability (Verlässlichkeit)
+
+*** System metrics: reliability 
+
+**** *Reliability*, Verlässlichkeit                            :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+
  - Assuming a system is operational at time 0
  - Reliability at time t is the probability that the system has been continuously operational in time [0,t] 
  - Often expressed in vaguer forms: Mean time to failure (MTTF)
- - 
- - Availability (Verfügbarkeit)
- - Assuming a system can be repaired, alters between operational and failed modes 
+
+*** System metrics: availability  
+
+**** *Availability*, Verfügbarkeit                             :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+
+ - Assuming a system can be repaired, alters between operational and
+   failed modes  
  - Readiness for correct service 
- - Steady-state availability is the probability of the system being operational at an arbitrarily chosen point in time
- - Repairable system: Mean time to repair (MTTR), mean time between failures (MTBF)
- - 
- - 
-*** Computing reliability 
- 20
+ - *Steady-state availability* is the probability of the system being
+   operational at an arbitrarily chosen point in time 
+
+
+**** Repairable system 
+ - Key idea: \ac{MTTF}, \ac{MTTR}, \ac{MTBF} 
+   - Side discussion: how meaningful are MTTFs anyway? 
+
 *** Availability requirements
- Example: AT&T ESS 4 telephone switch
+
+**** AT&T ESS 4 telephone switch                             :B_exampleblock:
+     :PROPERTIES:
+     :BEAMER_env: exampleblock
+     :END:
+
  - Switch for about 700,000 calls per hour, introduced 1976
  - 72,000 trunks
  - Requirements
@@ -78,27 +138,351 @@
  - Maintenance performed in operational system
 
 
+** Determining metrics 
+
+
+
+*** A stochastic model  
+
+- Faults are random events, we need a stochastic model 
+- First, simplest model: Lifetime is exponentially distributed \ac{RV}
+- Formally:
+  - Let $X$ be a \ac{RV} that describes the time a system is
+    continuously operational
+  - $X \sim \exp(\lambda)$ for some parameter $\lambda$
+  - Note the memoryless property here! 
+- Reliability: $r(t) = \Pr(X > t)$
+  - Also called the *survival function* 
+
+*** Expected lifetime 
+
+**** Compute expected lifetime                                    :B_example:
+     :PROPERTIES:
+     :BEAMER_env: example
+     :END:
+
+For a given lifetime RV $X \sim \exp(\lambda)$, compute $\E[X]$
+
+
+#+BEAMER: \pause
+
+**** Expected lifetime for exponential RV 
+
+$$ \E[X] = \int_{x=0}^\infty x f_X(x) \mathrm{d} x = 
+\int_{x=0}^\infty \lambda x e^{-\lambda x } \mathrm{d} x = \frac{1}{\lambda} $$ 
+
+
+#+BEAMER: \pause
+
+**** MTTF                                                      :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+The expected lifetime is also called the *\acf{MTTF}*
+
+
+
+*** Example: Disks in a data center 
+
+- Suppose: Data center uses 10.000 hard disks 
+- Each hard disk has a mean time to failure (MTTF) of 500.000 hours
+  - I.e.: time to failure is an exponentially distributed r.v. with
+    mean 500.000 hours  
+  - All the disks fail independently 
+- Compute the *expected* time to *first* failure of *any* hard disk! 
+
+#+BEAMER: \pause
+
+- Hint: What is the distribution function of  a RV that is the minimum
+  of independent exponentially distributed RVs? 
+
+
+*** Example: Disks in a data center (2) 
+
+- Let $X_i, i=1\ldots, 10000$ be the lifetime RVs (time to failure) of
+  each disk
+  - We know $X \sim \exp(\frac{1}{500.000\,\mathrm{h}} t)$
+- The time of the first failure is the minimum of all the failure
+  times: $Y = \min_{i=1,\ldots10000}{X_i}$ 
+  - We want: $\E[Y]$
+  - $$P(Y > t) = P(\min_{i=1}^n{X_i} > t) = \prod_{i=1}^n P(X_i > t )
+    = \prod_{i=1}^n    \mathrm{e}^{-\lambda t} = \mathrm{e}^{-n \lambda t}  $$
+  - But that is just (1-CDF) of an exponential RV with rate
+    $n\cdot\lambda$
+- Hence: $\E[Y] = \frac{1}{n/(500.000\,\mathrm{h})}$
+  - In example: $\E[Y] = 50\,\mathrm{h}$ 
+
+
+*** Repairable system: MTTR and MTBF 
+
+- Assume repair also is an exponentially distributed RV with rate
+  $\mu$
+  - Similar to above: $1/\mu$ is *\acf{MTTR}*
+
+#+BEAMER: \pause
+
+- How long does it take, on average, from one failure to the next?
+  - *\acf{MTBF}*
+  - Expected value of the sum of two random variables
+- If repair and failure times are stochastically independent:
+  Expectation of sum is sum of expectation
+  - Then: *MTBF = MTTF + MTTR* 
+
+*** Computing availability 
+- Question: What is *steady-state availability*?
+  - At a randomly chosen point in time, what is probability to find
+    system operational?
+  - Averaged over long time horizons? 
+
+#+BEAMER: \pause
+- This is a two-state Markov process, states /works/ and /in repair/
+  - Transition rate /works/ $\rightarrow$ /in repair/: $\lambda$ 
+  - Transition rate /in repair/ $\rightarrow$ /works/: $\mu$
+
+
+#+CAPTION: Markov model for repairable system
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:steadystate_markov
+[[./figures/steadystate_markov.pdf]]
+
+*** Computing availability 
+
+- We need the limiting probabilities for this Markov chain
+- Recall in the limit: rate of entering a state = rate of leaving a
+  state
+- Here, just two states: 
+  - $$\lambda P(\mathrm{works}) = \mu P(\mathrm{in repair}) = \mu (1-
+    P(\mathrm{works})  ) $$
+  - Simplifies:  
+$$ P(\mathrm{works}) = \frac{\mu}{\mu + \lambda} = 
+\frac{\frac{1}{\lambda}}{\frac{1}{\lambda} + \frac{1}{\mu} } =
+\frac{\mathrm{MTTF}}{\mathrm{MTTF} + \mathrm{MTTR}} $$ 
+
+*** Measuring dependability metrics 
+
+- What if you do not trust your assumptions, want to validate them? 
+- Have to observe actual system
+- Idea: Buy many disks, run them for three years, see how many fail
+  - Time to market??
+
+#+BEAMER: \pause
+- Idea 2: Stress testing
+  - Run disks in challenging environments, extrapolate behavior from
+    there 
+
+
+#+BEAMER: \pause
+- Challenge: Life gets complicated when survival probabilities are
+  heavy-tailed 
+
+*** Realistic failure assumptions 
+
+- The nice Poisson assumptions are of course not true in reality
+- More typical behaviour: Bath-tub curve
+  - Hardware fails easily when very young or very old
+  - Works ok in the middle of its lifetime
+
+
+#+BEAMER: \pause
+
+**** Hazard rate                                               :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+For a lifetime RV $X$, define *hazard rate* (also *failure rate*)
+function $h(t)$ as  the rate of failures in interval $(t, t + \delta
+t)$, given that system has survived up to time $t$, for $\delta t
+\rightarrow 0$. 
+
+$$ h(t) = \lim _{\delta t \rightarrow 0} \frac{P(X < t + \delta t| X >
+t)}{\delta t} $$ 
+
+*** Hazard rate
+
+Under typical independence assumptions: 
+$$ h(t) = 
+\lim _{\delta t \rightarrow 0} 
+\frac{F_X(t+ \delta t)- F_X(t)}{1- F_X(t)}
+\cdot \frac{1}{\delta t} = \frac{f_X(t)}{1-F_X(t)}
+$$
+
+
+**** Hazard rate, exponential distribution                        :B_example:
+     :PROPERTIES:
+     :BEAMER_env: example
+     :END:
+
+For exponentially distributed lifetimes with rate $\lambda$, the
+hazard rate is  
+
+$$h(t) = \frac{f_X(t)}{1-F_X(t)} = 
+\frac{\lambda \mathrm{e}^{-\lambda t} }{\mathrm{e}^{-\lambda t}}$$ 
+
+It is *constant* over time! 
+
+#+BEAMER: \pause
+How does this relate to the memorylessness property? 
+
+*** Bathtub hazard curves 
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+Real-life devices often have a bathtub-style hazard rate: 
+- Initial burn-in
+- Regular operation 
+- End of life  
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Bathtub curve for hazard rates
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:bathtub
+[[./figures/bathtub.pdf]]
+
+
+
+
+** Redundancy --  Standby 
+
+*** Redundancy for high availability  
+
+- Dealing with failures: Provide *redundant* resources 
+- Simplest case: Stochastically independent
+  - Increases availability exponentially in number of instances
+  - But simplest cases rarely exist 
+- Dimensions
+  - Time redundancy: time permitting, redo in case of failure  
+  - Physical redundancy: provide spare resources 
+  - (Information redundancy -- extra bits, to protect against
+    storage/transmission errors) 
 
 
 *** Standby categories 
 
-- Cold, warm, hot standby 
+How to operate redundant resources? 
+
+- *Cold* standby
+  - Redundant resource powered off, needs to be
+    installed and booted at failure time 
+- *Warm* standby
+  - Redundant resource installed and running, but does
+    not process anything  
+  - At failure, put necessary state from failed resource; trigger
+    processing  
+- *Hot* standby
+  - Redundant resource installed and running, but does not process
+    anything 
+  - Necessary state is mirrored continuously (ideally, within fixed
+    deadlines) 
+- *Active/active*
+  - Both actual and redundant resource are up and running, process all
+    requests
+  - Only output of actual system is acted upon  
+
+*** Abstraction level? 
+
+- Previous slide talked about /systems/
+- Could be:
+  - Actual computer, hardware 
+  - Virtual machine 
+  - Process
+  - Service, consisting of multiple cooperating processes
+  - ... 
+- Redundancy needed on corresponding level
+  - And with sufficient hardware behind it 
+
+*** Organising redundant processes 
+
+- Common approach: Grouping processes together
+  - Flat group
+  - Hierarchical group
+- We will reconsider process groups once we talk about replicated data
+  and consistency \ref{ch:distributed-storage}
+
+*** How much redundancy? 
+
+- Depends on dimension (time, physical), assumed error models, ...
+- Example: Triple modular redundancy
+  - Assumes that voter is simpler/more reliable than actual execution 
+
+*** Stochastic multiplexing of redundant resources 
+
+Problem: how many standby resources do we need? 
+- One for each actual resource? Expensive!
+- Enough to ensure a reasonable level of stochastic availability? 
 
 
-  
-** Example: RPC and faults 
-   :PROPERTIES:
-   :CUSTOM_ID: sec:rpc_faults
-   :END:
+#+BEAMER: \pause
 
-*** RPC execution protocols 
-    :PROPERTIES:
-    :CUSTOM_ID: s:rpc_protocols
-    :END:
+Approach: *Stochastic multiplexing* 
+- Dimension for average need, not for peak need 
 
-Lorem ipsum 
+** Failure  detection 
 
-* Security 
+*** Failure detection 
+
+- Decide: When to trigger handover to standby system? When to blame a
+  system of failure?  
+- Problem: Decide too late (false negatives) 
+- Problem: Decide too eagerly (false positives)
+- Introduce *failure detector*  supervising  a given system  \cite{birman12:_guide_reliab_distr_system}
+ 
+
+
+*** Failure detector 
+
+
+  - Has one of three opinions about system state:
+    - *Trust*
+    - *Suspect*
+    - *Permanently suspect*
+  - Opinion change not generally at same time as system state change 
+
+
+#+CAPTION: Failure detector diverges from ground truth
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:failure_detector
+[[./figures/failure_detector.pdf]]
+
+
+*** Practical detectors: Activity  
+
+- *Passive*:
+  - Opportunistically use ordinary messages as sign the sender is
+    alive 
+  - Wait for periodic /I am alive/ messages
+- *Active* 
+  - *Heartbeating*: Periodically send a ping, if not answered a few
+    times, declare other node dead
+  - *Heartbeating with secondary channel*
+    - Issue: link might be down, but node is still up 
+    - Ask neighbours to confirm death
+    - Communicate via other means (e.g., via file system) 
+
+*** Practical detectors: Scope 
+
+- Only to/with neighbors
+- Forward liveness information to all nodes - *gossiping* 
+
+
+
+* TODO Security                                                    :noexport:
 
 *** See separate class 
 
@@ -138,57 +522,414 @@ Details in Jager's class. Here just some teasers.
 
 
 
-* Three-tier vs. four-tier  architectures 
+* Multi-tier  architectures                                        :noexport:
 
-Here just opverview, details in next part 
+*** Tiers in Web applications 
+
+- Recall structure of Web applications so far:
+  - Browser/Client: Requests information, processing
+  - Web server: stores state, manipulates state if necessary
+    - Possibly: Web framework in close collaboration with web server
+  - Possibly, a data base to hold state 
+
+
+*** Three-tier structure
+
+This three-tier structure \cite{eckerson1995three-tier-architecture} is typical 
+
+- *Presentation tier*: User interface, concerned with presenting data,
+  options, ...
+  - Web: The browser, plus Javascript code or similar 
+- *Logic tier*: Logical decisions, processes commands, updates state;
+  coordinates data movement between other tiers 
+  - Web: conventionally, in Web framework; more and more also as part
+    of browser programs
+- *Data tier*: ground truth for all state
+  - Web: typically, data base; perhaps file system
+
+
+*** Three tiers and its challenges 
+
+- Server failures
+  - Presentation: only issue for one user
+  - Logic, data: issue! 
+- Server bottleneck
+  - Often: logic tier
+  - Observation: reading access significantly more frequent than
+    modifying access
+  - Idea: put consistency-sensitive parts into data tier, multiple
+    servers at data tier  
+- Delays: client and server far away 
+
+*** Client/Server – Several servers  
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+ Replication of a server can solve some problems
+ - Single point of failure, bottleneck
+ - New problems 
+   - Selection of a particular server of a group 
+   - Consistency between servers
+   - Group communication!
+ - Example: replicated web server for big suppliers; Network Information System
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: Server group
+#+ATTR_LaTeX: :width 0.85\linewidth
+#+NAME: fig:server_group
+[[./figures/serverGroup.pdf]]
+
+
+
+
+
+*** Server group with data base 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- To address consistency, put all data used by multiple servers into a
+  data base  
+- Hope: read/write ratio is ok 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Server group with data base
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:serverGroupDataBase
+[[./figures/serverGroup_Database.pdf]]
+
+*** Server group: consistency 
+
+Replication of a server can lead to consistency problems 
+ - Example: Web server of a department store that receives orders 
+ - Observation: „reading“ access significantly more frequent than
+   modifying access 
+ - Idea: separate consistency-sensitive parts 
+ - Separation of data management from actual logic of application
+   (ordering procedure, business logic) 
+ - Representation of contents delegated to Web browser anyway 
+
+
+*** Client/Server – Latencies & proxy server                       :noexport:
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+ - Problem: latency between client and server is high ® long response times
+ - Possible solution: bring the server nearer to the client! 
+   - Or at least a decent proxy 
+ - New problem: 
+   - How to find a proxy? 
+   - How to keep proxy up-to-date? 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Proxy between client and server
+#+ATTR_LaTeX: :width 0.85\linewidth
+#+NAME: fig:proxy
+[[./figures/proxy.pdf]]
+
+
 
 
 *** Client/Server – Latencies & proxy server
- Problem: latency between client and server is high ® long response times
+
+ - Problem: latency between client and server is high $\rightarrow$  long response times
  - Possible solution: bring the server nearer to the client! 
- - Or at least a decent proxy 
+   - Or at least a decent proxy 
  - New problem: 
- - How to find a proxy? 
- - How to keep proxy up-to-date? 
-*** Client/Server – Several servers
- Replication of a server can solve some problems
- - Single point of failure, bottleneck
- - 
- - New problems 
- - Selection of a particular server of a group 
- - Consistency between servers
- - Group communication!
- - Example: replicated web server for big suppliers; Network Information System
- Server group
- - 
-
- Client2
+   - How to find a proxy? 
+   - How to keep proxy up-to-date? 
 
 
-* Improving throughput  
+#+CAPTION: Proxy between client and server
+#+ATTR_LaTeX: :width 0.85\linewidth
+#+NAME: fig:proxy
+[[./figures/proxyServer.pdf]]
+
+*** Three-tier architecture -- summary 
+
+
+
+#+CAPTION: Three-tier architecture with proxy and server group
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:three_tier_proxy_group
+[[./figures/three_tier.pdf]]
+
+
+
+*** Other tier structures                                          :noexport:
+
+- Several other /tier structures/ have been proposed
+- Example: Four-tier structure, Forrester 
+
+
+
+
+* Improving throughput                                             :noexport:
+
+** Structure 
 
 *** The server side
- Problem: Performance
- - Mainly: Latency of disk access
- - Solution 1: Multithreaded server application
- - 
- Server actions
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+ Recall simple web server: 
  - Wait for TCP connection
  - Parse and execute HTTP command 
- - E.g., get file from disk
  - Send result to client over TCP connection
  - Release connection
+
+
+Problem: Performance
+ - Mainly: Latency of disk access
+ - Solution 1: Multithreaded server application
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: Multi-threaded webserver
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:mtServer
+[[./figures/mtServer.pdf]]
+
+
+
+*** Scale monolith 
+
+- Improving  performance of a monolithic (even multi-threaded) web
+  server: Buy bigger machine 
+  - More cores, higher clock, more memory, ...
+  - *Scale up* 
+- But natural limits
+- Need to overcome limits of a single machine 
+
+*** Scale microservices 
+
+- Recall microservices: Independent building blocks
+  - Can run multiple instances, distribute load over those instances
+  - *Scale out* 
+- Question for web servers conceived of as microservices
+  - Where is performance bottleneck?
+  - Can these bottlenecks be scaled out independently?
+
+
+#+BEAMER: \pause
+- Bottleneck: Front ends 
+  - They *are* largely independent 
+ 
 *** Server farms
- To improve performance, use multiple servers (server farm)
- - Front end: accept request, hand off to separate processing node for actual execution
- - 
- - 
- - 
- - 
- - 
- - 
-*** TODO Server farms and hand-off, load balancing 
- Problem: Serving request via different processing node will have the client receive the answer from a different node than the request was sent to
+
+To improve performance, use multiple servers (server farm)
+ - Front end: accept request, hand off to separate processing node for
+   actual execution 
+
+
+#+CAPTION: Server farm with dedicated frontend machine
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:serverFarm
+[[./figures/serverFarm.pdf]]
+
+** Load balancing 
+
+*** Load balancing (LB) 
+
+- How to practically distribute requests over servers in a farm?
+  - *\ac{LB}*
+  - To make it non-trivial: consecutive client requests create state
+    on worker, need to go to same worker! 
+- Problem 1, mechanism: How to spread multiple clients' requests over
+  multiple workers? 
+- Problem 2, policy: Which worker to pick for a given client?
+  - Later, let's suppose we already know which worker to use 
+
+
+*** Naive LB approach
+
+
+#+CAPTION: Naive load balancing approach 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=1
+#+NAME: fig:test
+[[./figures/LB.pdf]]
+
+- Fails: Client receives answer from unexpected IP address
+  - Will discard packet 
+
+
+#+BEAMER: \pause
+- Question: Why does faking the front end's IP in worker reply not
+  work? 
+
+
+*** LB solution 1: Reply via front end 
+
+- Simple solution: Worker sends back reply via front end
+  - Details of TCP connections needs some attention ("fate sharing") 
+
+
+#+CAPTION: Load balancing: Reply via front end
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+NAME: fig:lb_via_frontend
+[[./figures/LB.pdf]]
+
+*** LB solution 1: Reply via front end, pros and cons
+
+- Pros:
+  - Simple
+  - Does not break TCP semantics if done correctly
+- Cons:
+  - Keeps considerable overhead on front end
+  - Needs to hold *state* to map client to worker (if consecutive
+    requests are related to each other) 
+
+
+*** LB solution 2: Redirect from frontend 
+
+FE answers with a redirect to point to chosen server
+- Use HTTP response status 3xx 
+- Incurs additional round trip time! 
+
+#+CAPTION: Load balancing: Redirect 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+NAME: fig:lb_rewrite
+[[./figures/LB.pdf]]
+
+
+*** LB solution 3: Rewrite addresses 
+
+FE rewrites addresses in first delivered HTML page to point to chosen
+worker node
+
+
+#+CAPTION: Load balancing: Rewrite HTML page
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=4
+#+NAME: fig:lb_rewrite
+[[./figures/LB.pdf]]
+
+
+*** LB solution 4: Choose via DNS 
+
+Idea: inform DNS about multiple IP addresses  for the same name 
+- Let DNS choose worker! 
+
+#+CAPTION: Load balancing: DNS picks worker 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=5
+#+NAME: fig:lb_rewrite
+[[./figures/LB.pdf]]
+
+
+** DNS: a little detour 
+
+*** DNS: A records  
+
+- *\ac{DNS}* maps names - *\ac{FQDN}* - to IP addresses
+  - DNS server reply to *resolution requests* by sending corresponding
+    IP address 
+- Think of it a distributed table
+  - Typical entry: an *A record* (IP v4), *AAAA record* (IP v6)
+  - ~IN~ here means: Internet 
+
+#+BEGIN_EXAMPLE
+www.bla.com IN A 1.2.3.2 
+#+END_EXAMPLE
+
+
+*** DNS: CNAME 
+
+- DNS supports aliases: use a name as a synonym for another name
+  - Maps an FQDN to another FQDN (never to an IP address) 
+
+- Example: Host web and ftp server on same IP address, only one change
+  necessary 
+
+#+BEGIN_EXAMPLE
+bla.com     IN A      1.2.3.2 
+ftp.bla.com IN CNAME  bla.com 
+web.bla.com IN CNAME  bla.com 
+#+END_EXAMPLE
+
+
+
+*** DNS: Multiple CNAMEs 
+
+- DNS can also provide *multiple aliases for one name* 
+  - Then, randomly picks one (round robin) 
+
+
+#+BEGIN_EXAMPLE
+worker1.bla.com     IN A      1.2.3.101  
+worker2.bla.com     IN A      1.2.3.102
+worker3.bla.com     IN A      1.2.3.103  
+web.bla.com         IN CNAME  worker1.bla.com 
+web.bla.com         IN CNAME  worker2.bla.com 
+web.bla.com         IN CNAME  worker3.bla.com 
+#+END_EXAMPLE
+
+
+- We will come back to DNS later in more detail 
+
+*** DONE Server farms and hand-off, load balancing                 :noexport:
+
  Solution 1: Send the answer back via the front-end
  - (Solution 2: TCP handoff)
  - Solution 3: Redirects of URLs – frontend tells client to fetch the page from another server (HTTP response status 3xx)
@@ -209,116 +950,362 @@ Here just opverview, details in next part
  - 	IN CNAME www6.foo.com. 
 
 
-*** Multiple web servers, data bases
- Usually, Web servers not simply serve web pages but also access/depend on/manipulate data bases
- - Stocks, inventory, order information, … 
- - How to keep database consistent with server farms?
- - Usual solution: separate actual web serving and data base into a three-tier architecture
- Server farm
+** LB policy 
 
- Client n
+*** LB policy: Which worker to pick? 
 
 
 
- Backend
- - Database
- Web 
- - browser
- Business
- - logic
- Often: separated again into “presentation tier” and “logic tier” (web server, application server like J2EE, database server)
+- DNS approach suggested: random choice
+- Alternatives? 
+#+BEAMER: \pause
+
+- Possible policies
+  - Random selection
+  - Pull-based: Front end asks workers
+    - Periodically, at each request, ...
+  - Push-based: Workers send their load status to front end 
+- Tradeoffs!
+  - Latency, amount of work,  data volume 
 
 
-*** Spearate out consistency aspects into database layer - four-tier architecture 
-*** Four-tier architectures
- Replication of a server can lead to consistency problems 
- - Example: Web server of a department store that receives orders 
- - Observation: „reading“ access significantly more frequent than modifying access
- - Idea: separate consistency-sensitive parts 
- - Separation of data management from actual logic of application (ordering procedure, business logic)
- - Representation of contents delegated to Web browser anyway 
- - Three tiers: data management, business logic, presentation
-*** Four-tier architectures
- Server group
- - 
- - 
- - 
- - 
- - 
- - 
- - 
- - 
- - 
+*** How good is random choice? 
 
- Client n
+- Goal: We'd like similar load levels at all workers
+- Analogy: *Balls in Bins*
+  - Requests are balls, put into bins
+  - Desirable: for $m$ balls and $n$ bins, we'd like a maximum load of
+    $m/n$ 
 
+#+BEAMER: \pause
 
+- Characteristics:
+  - With random ball placement, all balls might end up in the same bin
+  - But very unlikely!
+  - Statements about *expected* maximum load? 
 
+*** Random balls in bins,  $m=n$ 
 
+For the case of $m=n$, with high probability, expected maximum load is 
 
- Backend
- - Database
- Web 
- - browser
- Web server & 
- - Business logic
+$$ \frac{\log n}{\log \log n} \cdot (2 + o(1))$$ 
 
+I.e., it is logarithmic in $n$. Not good! 
 
-*** Practical: django, nginx, postgresql 
+Note: with high probability means $1-o(1)$, i.e., approaching 1. 
 
+*** Random balls in bins,  $m > n \log n$ 
 
+For $m > n \log n$, expected maximum load is 
 
-*** Issue: object/relational mapping 
+$$ \frac{m}{n} + \Theta\left( \sqrt{\frac{m \log n}{n}} \right),  $$
 
-- ORM models 
-- Django as example 
+which is just (approximately) $\log n$ more than ideal case
+\cite{Raab1998:ballsinbins}! 
+
+*** Does poling help? 
+
+- Suppose we allow some limited checking of server load - does that
+help? 
+- E.g., front end checks $d$ randomly selected servers and uses the
+  less loaded one 
 
 
-* Improving  latency 
+#+BEAMER: \pause
 
-Note: client-side programmability already big step towards it. 
+For $m \geq n$, expected maximum load is 
+
+$$  \frac{\log \log n}{\log d} + \frac{m}{n} + \Theta(1) $$ 
+
+Improving on blind random choice already for $d=2$!
+\cite{berenbrink2006:heavily_loaded_allocations} 
+
+*** Online versions? 
+
+- Scenarios so far: static
+- "Online" version: each time step, one ball is added, a random ball
+  is removed
+- Basically, gives similar results 
+
+*** Summary policy: Random load balancing 
+
+- For blind random choice: need logarithmically more requests than
+  servers for ok performance
+  - Plausible: logarithmic in server number worse than optimal 
+  - But that is a plausible requirement
+- Limited checking gives substantial improvement 
 
 
-*** Web caches
- Despite server farms, latency of web access remains a problem
- -  ! Use caches (proxies)
+
+* Improving  latency
+
+
+*** Latency and proxies 
+
+- Recall: Clients far away from servers can suffer from large latency 
+- Idea: Bring server closer to client by means of a *proxy* 
+
+
+#+CAPTION: Proxy between client and server
+#+ATTR_LaTeX: :width 0.85\linewidth
+#+NAME: fig:proxy2
+[[./figures/proxy.pdf]]
+
+
+- Note: client-side programmability already big step towards it. 
+
+
+*** Example proxies: Web caches
+
  - Overcomes problems of 
- - Server connected via slow/congested lines (in “flash crowd” situations)
- - Overcrowded peering points between backbone providers 
- - 
+   - Server connected via slow/congested lines (in “flash crowd” situations)
+   - Overcrowded peering points between backbone providers 
+
  - Location
- - At client side, in end system
- - At local network (e.g., UPB)
- - In the Internet service provider
- - 
+   - At client side, in end system
+   - At local network (e.g., UPB)
+   - In the Internet service provider
+
  - Obvious issue: Placement, size, freshness of cache
- - Invalidation, timeout of cache entries, … 
+   - Invalidation, timeout of cache entries, … 
 
 *** Issues in caching 
 
-- Read write ratios 
+- Goal: *consistent caches*
+  - Cache should deliver the same value as the original source would
+    (or refer to source) 
+- When to update? (a cache consistency protocol) 
+  - Based on simple timeout value
+    - E.g., Squid: $T_\mathrm{timeout}$ = 20% of time between cache
+      entry and last modification
+  - Upon request, ask original server for status
+    - Hopefully, smaller and faster than asking for actual value
+  - Server pushes update to all proxies that have a copy
+    - But how would server know that? Know about timeouts
+- Read/write ratios 
 
-*** An aside: Content distribution networks (CDN)
- CDN: Originally, a set of coordinated caches (in a sense) 
- - Remove load from large websites (e.g., news) or hide websites (governments) 
- - Examples: Akamai, Digital Island 
- - Caches are complemented by redirectors, selecting most appropriate cache server for a given request
- - Today: Evolved into application-delivery networks 
- - From static web content to HD streaming, applications, Java J2EE edge computing 
- - One simple technique: Redirection
- - Based on combining DNS redirection and URL rewriting 
- - In a sense: redirectors should perform an application-level routing decision 
- -  ! Overlay networks 
 *** HTTP proxy 
 
-- forward vs. reverse proxy 
+HTTP proxies use specific terminology: 
 
--  For the curious: 
-  - Compare against layer 5 proxies like SOCKS
+- *Forward proxy*
+  - Works on behalf of clients
+  - Acts as a client towards servers 
+- *Reverse proxy*
+  - Works on behalf of servers
+  - Acts as a server towards clients
+  - Often, can manipulate content (e.g., compression) 
+- Technically, the differences are not that big
+- HTTP proxies can add additional header fields to inform servers
+  - E.g., ~X-Forwarded-For~ 
 
-*** Server-side caching (reverse proxy) 
 
-*** Memcached as example of shared-nothing distributed cache 
+*** Example: Memcached 
+
+- Scenario: Use memory instead of disks to quickly access
+  files/values repeatedly 
+  - Web server creates a dynamic page, puts it in cache to reuse again
+    instead of recompute it
+
+#+BEAMER: \pause
+
+- Naive approach: Each server in a server group caches on its own
+  - Inefficient: memory usage unequal; cached pages not accessible for
+    other servers; same page cached multiple times  
+
+*** Distributed, shared-nothing cache: Memcached 
+
+- Approach: Multiple nodes jointly form a cache
+- Effectively: a distributed key/value store
+  - Under a key, store/retrieve an arbitrary value
+
+*** Mapping keys to servers  
+
+- Main question: Use which node to store value for a given key? 
+- Naive approaches:
+  - A random node (but how to retrieve value?)
+  - Round-robin (but how to retrieve it?)
+
+#+BEAMER: \pause
+
+- Better: Hashing!
+  - Idea: Use hash of key to determine on which server to store 
+
+*** Simple hashing 
+
+- First approach: Compute hash of key, modulo server number
+  - Gives number of server where to store key/value pair 
+
+#+BEGIN_SRC python
+selected_server = hash(key) % number_of_servers
+#+END_SRC
+
+
+#+BEAMER: \pause
+
+- Great if nothing changes
+- What if servers are added/removed? Rebalancing overhead misses? 
+
+
+*** Simple hashing, server added 
+
+Suppose we go from four to five servers -- which keys end up on
+different server? 
+
+
+#+BEAMER: \pause
+Almost all! 
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+
+\tiny
+
+| Key | % 4 | % 5 | Moves |
+|-----+-----+-----+-------|
+|  17 |   1 |   2 |     1 |
+|  18 |   2 |   3 |     1 |
+|  19 |   3 |   4 |     1 |
+|  20 |   0 |   0 |     0 |
+|  21 |   1 |   1 |     0 |
+|  22 |   2 |   2 |     0 |
+|  23 |   3 |   3 |     0 |
+|  24 |   0 |   4 |     1 |
+|  25 |   1 |   0 |     1 |
+|  26 |   2 |   1 |     1 |
+|     |     |     |       |
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+
+
+
+
+#+CAPTION: Simple hashing, adding a server
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=1
+#+NAME: fig:simple_hashing_adding
+[[./figures/consistentHashing/hashing.pdf]]
+
+
+
+
+*** Consistent hashing \cite{Karger:1997:consistent_hashing}
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- Alternative to  using simple modulo operation to determine server 
+- Idea: Let each server use a fixed number of key-like values
+  - Sort these values across all servers
+  - Each server is responsible for the key values in the interval from
+    its values to the next largest one 
+- Typical visualization: think of the space of possible key values as
+  a ring (modulo largest key value) 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+Color indicates responsible server 
+
+
+#+CAPTION: Consistent hashing
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+NAME: fig:consistent_hashing 
+[[./figures/consistentHashing/hashing.pdf]]
+
+
+*** Consistent hashing, adding server 
+
+When adding a server, most values keys stay with the same server 
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Consistent hashing, four servers
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+NAME: fig:consistent_hashing_four  
+[[./figures/consistentHashing/hashing.pdf]]
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Consistent hashing, five servers
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+NAME: fig:consistent_hashing_five  
+[[./figures/consistentHashing/hashing.pdf]]
+
+
+*** Adding or removing? 
+
+- For both simple and consistent hashing, behaviour under adding or
+  removing servers is basically similar
+- Consistent hashing performs better with more points per server
+  (better uniformity of resulting intervals)
+  - Common rule of thumb: 100 to 200 points per server 
+
+
+*** Memcached
+
+- Implementation of a distributed, consistent hashing scheme to be
+  used as a cache
+- Clients need to know points of each server, to be able to contact
+  correct server
+- Gracefully deals with server addition/failure
+  - Failure: Data is *not* preserved; server responsibility is
+    reshuffled 
+
+*** Memcached: Other features 
+
+- Easily scales, minimal configuration to add a new node
+- Heterogeneous nodes can be integrated (e.g., different amount of
+  memory) 
+- Node failures are gracefully dealt with
+- Client bindings for many languages
+- Cross-platform implementations
+- Multi-fetch (obtain values for multiple keys with one request,
+  saving RTTs) 
+
+Compare \url{https://linuxtechme.wordpress.com/2012/03/29/470/}
+
+*** Memcached as example of shared-nothing distributed cache       :noexport:
 
    - How to deal with that in webserver section already? Probbably better
      here? Or because so simple, in webserver? Or under P2P??
@@ -334,7 +1321,7 @@ Note: client-side programmability already big step towards it.
    - http://engineering.khanacademy.org/posts/memcached-fms.htm
 
 
-*** Technique: Consistent hashing  
+*** Technique: Consistent hashing                                  :noexport:
 
    - Consistent hashing in Memcache
      - http://www.mikeperham.com/2009/01/14/consistent-hashing-in-memcache-client/
@@ -346,13 +1333,33 @@ Note: client-side programmability already big step towards it.
  - MemcacheDB? 
 
 
-*** foreshadowing: Consistency 
-
-- What happens if the caches coordinated? 
-- See Redis, see consistency chapter later on 
-
-
 *** Other examples for proxies 
 
 - Example: Squid http://www.squid-cache.org
-- Example: Apache Traffic SErver http://trafficserver.apache.org
+- Example: Apache Traffic Server http://trafficserver.apache.org
+
+
+*** Foreshadowing: Consistency 
+
+- What happens if the caches coordinate? 
+- See Redis, see consistency chapter later on 
+
+*** An aside: \acf{CDN}
+
+ - CDN \cite{Pallis:2006:CDN}: Originally, a set of coordinated caches
+   (in a sense)
+   - Remove load from large websites (e.g., news) or hide websites (governments) 
+   - Examples: Akamai, Digital Island 
+   - Caches are complemented by redirectors, selecting most appropriate
+     cache server for a given request 
+ - Today: Evolved into *application-delivery networks* 
+   - From static web content to HD streaming, applications, Java J2EE
+     edge computing  
+ - One simple technique: Redirection
+ - Based on combining DNS redirection and URL rewriting 
+ - In a sense: redirectors should perform an *application-level routing decision*
+   - Overlay networks 
+
+
+* TODO Summary 
+

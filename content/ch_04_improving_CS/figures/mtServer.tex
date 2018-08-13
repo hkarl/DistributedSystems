@@ -1,0 +1,34 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+\begin{tikzpicture}[auto, xscale=3,
+block/.style = {rectangle, draw=black, thick, align=left}]
+
+
+\node[block] at (1,1) (fe) {Front end}; 
+\node[block] at (0,1) (router) {Router}; 
+
+\draw (-0.5,0) -- (6.5,0);
+\draw (router.south) -- (0,0); 
+\draw (fe.south) -- (1,0); 
+
+
+\foreach \x \in in {1, ..., 6}  {
+  \node[block] at (\x, -1) (wt\x) {Worker machine} ;
+  \draw [-] (\x, 0) -- (wt\x.north);
+}
+
+
+
+\node [above left= of router] (incoming) {}; 
+\node [left = of router]  (outgoing) {}; 
+\draw [<-] (router) -- (incoming) node [above] {Incoming requests}; 
+\draw [->] (router) -- (outgoing) node [below] {Outgoing reply}; 
+
+
+
+\end{tikzpicture}
+\end{document}

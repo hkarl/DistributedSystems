@@ -1,0 +1,23 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary{automata, positioning}
+
+
+\begin{document}
+
+    \begin{tikzpicture}
+        % Add the states
+        \node[state]             (w) {works};
+        \node[state, right=of w] (r) {in repair};
+
+        % Connect the states with arrows
+        \draw[every loop]
+            (w) edge[bend left] node[above] {$\lambda$} (r)
+            (r) edge[bend left] node[below] {$\mu$} (w)
+            (w) edge[loop left] node {$1-\lambda$} (w)
+            (r) edge[loop right] node {$1-\mu$} (r);
+    \end{tikzpicture}
+
+\end{document}

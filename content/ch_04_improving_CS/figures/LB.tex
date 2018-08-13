@@ -1,0 +1,151 @@
+
+\documentclass[tikz]{standalone}
+
+
+\input{../../templates/tikzFigureHeader}
+\usepackage{varwidth}
+
+\begin{document}
+
+% Page 1: naive version of load balancing 
+
+  \begin{msc}{Naive, incorrect load balancing}
+    \declinst{d}{IP 9.10.11.12}{DNS}    
+    \declinst{c}{IP 5.6.7.8}{Client}
+    \declinst{r}{IP 1.2.3.1}{Router}
+    \declinst{f}{IP 1.2.3.2}{Front end}
+    \declinst{w}{IP 1.2.3.101}{Worker}
+    \mess{www.bla.com?}{c}{d}
+    \nextlevel 
+    \mess{1.2.3.2}{d}{c}
+    \nextlevel 
+    \mess{GET from 1.2.3.2}{c}{r}
+    \nextlevel 
+    \mess{GET from 1.2.3.2}{r}{f}
+    \nextlevel 
+    \mess{GET from 1.2.3.2}{f}{w}
+    \nextlevel 
+    \mess{Reply}{w}{c}
+    \msccomment[side=left]{ 
+        Client confused, gets reply from IP 1.2.3.101
+      }{c}
+  \end{msc}
+
+% Page 2: Return via front end 
+
+  \begin{msc}{LB: reply  via front end}
+    \declinst{d}{IP 9.10.11.12}{DNS}    
+    \declinst{c}{IP 5.6.7.8}{Client}
+    \declinst{r}{IP 1.2.3.1}{Router}
+    \declinst{f}{IP 1.2.3.2}{Front end}
+    \declinst{w}{IP 1.2.3.101}{Worker}
+    \mess{www.bla.com?}{c}{d}
+    \nextlevel 
+    \mess{1.2.3.2}{d}{c}
+    \nextlevel 
+    \mess{GET from 1.2.3.2}{c}{r}
+    \nextlevel 
+    \mess{GET from 1.2.3.2}{r}{f}
+    \nextlevel 
+    \mess{GET from 1.2.3.2}{f}{w}
+    \nextlevel 
+    \mess{Reply}{w}{f}
+    \nextlevel 
+    \mess{Reply}{f}{r}
+    \nextlevel 
+    \mess{Reply}{r}{c}
+  \end{msc}
+
+
+% Page 3: Redirect from FE via HTTP 3xx
+
+  \begin{msc}{LB: front end redirects}
+    \declinst{d}{IP 9.10.11.12}{DNS}    
+    \declinst{c}{IP 5.6.7.8}{Client}
+    \declinst{r}{IP 1.2.3.1}{Router}
+    \declinst{f}{IP 1.2.3.2}{Front end}
+    \declinst{w}{IP 1.2.3.101}{Worker}
+    \mess{www.bla.com?}{c}{d}
+    \nextlevel 
+    \mess{1.2.3.2}{d}{c}
+    \nextlevel 
+    \mess{GET from 1.2.3.2}{c}{r}
+    \nextlevel 
+    \mess{GET from 1.2.3.2}{r}{f}
+    \nextlevel 
+    \mess{Redirect to 1.2.3.101}{f}{r}
+    \nextlevel 
+    \mess{Redirect to 1.2.3.101}{r}{c}
+    \nextlevel 
+    \mess{GET from 1.2.3.101}{c}{r}
+    \nextlevel 
+    \mess{GET from 1.2.3.101}{r}{w}
+    \nextlevel 
+    \mess{Reply}{w}{r}
+    \nextlevel 
+    \mess{Reply}{r}{c}
+  \end{msc}
+
+% Page 4: Rewrite content of pages to point to some work
+
+  \begin{msc}{LB: rewrite HTML to point to worker}
+    \declinst{d}{IP 9.10.11.12}{DNS}    
+    \declinst{c}{IP 5.6.7.8}{Client}
+    \declinst{r}{IP 1.2.3.1}{Router}
+    \declinst{f}{IP 1.2.3.2}{Front end}
+    \declinst{w}{IP 1.2.3.101}{Worker}
+    \mess{www.bla.com?}{c}{d}
+    \nextlevel 
+    \mess{1.2.3.2}{d}{c}
+    \nextlevel 
+    \mess{GET from 1.2.3.2}{c}{r}
+    \nextlevel 
+    \mess{GET from 1.2.3.2}{r}{f}
+    \nextlevel 
+    \msccomment[side=right]{Rewrite home.html:  1.2.3.101 instead
+    of www.bla.com}{f}
+    \nextlevel   
+    \mess{Reply}{f}{r}
+    \nextlevel 
+    \mess{Reply}{r}{c}
+    \nextlevel 
+    \msccomment[side=left]{Next request}{c}
+    \nextlevel 
+    \mess{GET from 1.2.3.101}{c}{r}
+    \nextlevel 
+    \mess{GET from 1.2.3.101}{r}{w}
+    \nextlevel 
+    \mess{Reply}{w}{r}
+    \nextlevel 
+    \mess{Reply}{r}{c}
+  \end{msc}
+
+% Page 5: DNS-based LB 
+
+  \begin{msc}{LB: add workers to DNS}
+    \declinst{d}{IP 9.10.11.12}{DNS}    
+    \declinst{c}{IP 5.6.7.8}{Client}
+    \declinst{r}{IP 1.2.3.1}{Router}
+    \declinst{f}{IP 1.2.3.2}{Front end}
+    \declinst{w}{IP 1.2.3.101}{Worker}
+    % Prepare 
+    \mess{Add workers}{f}{d}
+    \nextlevel[3]
+    % USe 
+    \mess{www.bla.com?}{c}{d}
+    \nextlevel 
+    \mess{1.2.3.101}{d}{c}
+    \nextlevel 
+    \mess{GET from 1.2.3.101}{c}{r}
+    \nextlevel 
+    \mess{GET from 1.2.3.101}{r}{w}
+    \nextlevel 
+    \mess{Reply}{w}{r}
+    \nextlevel 
+    \mess{Reply}{r}{c}
+    
+  \end{msc}
+
+
+
+\end{document}
