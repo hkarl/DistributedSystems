@@ -169,9 +169,14 @@
 #+include: "../ch_25_comparisons/ch_25_comparisons.org"
 
 
-\appendix
+
+
 
 * Appendix  
+
+
+\appendix 
+
 
 ** References 
 
