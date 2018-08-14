@@ -1039,6 +1039,7 @@ Improving on blind random choice already for $d=2$!
 
 * Improving  latency
 
+** Simple caching 
 
 *** Latency and proxies 
 
@@ -1202,7 +1203,107 @@ Almost all!
 
 
 
+** Consistent hashing 
+   :PROPERTIES:
+   :CUSTOM_ID:     sec:consistent_hashing
+   :END:
+
+
+*** Towards better hashing: nodes and keys 
+
+- Keys and node identifiers: both chosen as \ac{GUID}
+- Node responsibility: from it's own GUID to the next bigger one by
+  any node
+
+*** Distance  
+    
+- *Distance* of two GUIDs: difference, modulo largest possible GUID
+  - Visualize: GUIDs placed on a ring; difference only in one
+    direction 
+
+$$ \delta(a, b) = \begin{cases} 
+b -a & \text{ if } b > a \\
+a -b + \mathrm{GUID}_\mathrm{max} & \text {else} \\
+\end{cases}$$
+
+
+*** Distance: Example 
+
+- GUIDs from 0, ..., 63, a = 30, b=48 
+
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+$\delta(30, 48) = 18$ 
+
+
+
+#+CAPTION: Distance between two GUIDs
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=1
+#+NAME: fig:guid_distance1
+[[./figures/strawman.pdf]]
+
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+$\delta(48, 30) = (30-48) + 64 = 46$ 
+
+#+CAPTION: Distance between two GUIDs
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=2
+#+NAME: fig:guid_distance1
+[[./figures/strawman.pdf]]
+
+
+*** Responsible regions 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+First idea: 
+- Server is responsible for all key GUIDs larger than its own GUID
+- Up to next largest server GUID 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Responsible regions for two servers
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+NAME: fig:responsible_regions
+[[./figures/strawman.pdf]]
+
+
+
 *** Consistent hashing \cite{Karger:1997:consistent_hashing}
+    :PROPERTIES:
+    :CUSTOM_ID:     s:consistent_hashing
+    :END:
 
 
 
@@ -1217,7 +1318,7 @@ Almost all!
       :END:
 
 - Alternative to  using simple modulo operation to determine server 
-- Idea: Let each server use a fixed number of key-like values
+- Idea: Let each server use a *fixed number* of key-like values
   - Sort these values across all servers
   - Each server is responsible for the key values in the interval from
     its values to the next largest one 
