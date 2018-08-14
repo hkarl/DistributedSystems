@@ -1,6 +1,6 @@
 #+BIBLIOGRAPHY: ../bib plain
 
-* Overall requirements                                             :noexport:
+* Overall requirements
 
 *** The story so far 
 
@@ -22,7 +22,7 @@
 
 
 
-* Dependability                                                    :noexport:
+* Dependability
   :PROPERTIES:
   :CUSTOM_ID: sec:dependability
   :END:
@@ -522,7 +522,7 @@ Details in Jager's class. Here just some teasers.
 
 
 
-* Multi-tier  architectures                                        :noexport:
+* Multi-tier  architectures
 
 *** Tiers in Web applications 
 
@@ -712,7 +712,7 @@ Replication of a server can lead to consistency problems
 
 
 
-* Improving throughput                                             :noexport:
+* Improving throughput
 
 ** Structure 
 
@@ -1361,5 +1361,14 @@ Compare \url{https://linuxtechme.wordpress.com/2012/03/29/470/}
    - Overlay networks 
 
 
-* TODO Summary 
+* Summary 
 
+** Summary 
+
+- Client/server systems still the workhorse architecture for many
+  situations
+- Dealing with throughput and latency issues requires particular
+  mechanisms
+  - Separate consistency-sensitive from insensitive parts (state!)
+  - To enable scaling up/down
+- Many support mechanisms/libraries exist; do not reinvent wheels 
