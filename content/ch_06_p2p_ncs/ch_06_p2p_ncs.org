@@ -1,74 +1,211 @@
 #+BIBLIOGRAPHY: ../bib plain
 
-** Distributed hashing tables as lookup table 
+* Distributed key-value store 
 
-*** Distribute a consistent hash table? 
-*** Peer-to-peer systems
- Client/server issues
- - Dedicated role of servers breaks symmetry
- - Servers can become bottlenecks, despite all previous tricks 
- - In particular: network bandwidth of server farms, cost issue
- - Idea: Use symmetric responsibilities between all participating nodes 
- - Turn clients vs. servers into peers 
- - Hoped-for benefit: Can remove/alleviate bottlenecks by spreading load around 
- -  → Peer-to-peer systems 
- - Architectural justification: Resources at the “edge of the network” became much cheaper/plentiful (storage, cycles, bandwidth) 
- - 
-*** Typical characteristics and key issues
- Characteristics
- - Each user contributes resources to the system (storage, cycles, bandwidth)
- - All participating nodes have equal functional capabilities & responsibilities 
- - Often: some degree of anonymity of users
- - Issues
- - Algorithms for placement and retrieval of information in a P2P system (almost trivial in a client/server system)
- - Fully decentralized & self-organizing design; no central administration assumed 
- - Dynamically balance load between resources (storage, processing) 
- - Handle unpredictable changes in the network and user population 
-*** Early examples & generations  
- Key peer-to-peer ideas and techniques already present in 
- - Domain Name System 
- - Netnews/Usenet (1986)
- - Xerox Grapevine name/mail delivery service (1982)
- - Algorithms for distributed consensus (Lamport, 1989)
- - Classless inter-domain IP routing
- - “Generations” afterwards
- - First: Napster (around 1998) – partly centralized 
- - Second: Freenet, Gnutella, Kazaa, BitTorrent, … (2000-2004)
- - Improved scalability, anonymity, fault tolerance, … 
- - Third: P2P middleware, e.g., Pastry, Tapestry, CAN, Chord, Kadmelia, …  (2001-…) 
- - Application-independent management of distributed resources 
- - Main difference to 2G: bounded number of hops to target 
-*** Core idea: Resources, GUIDs
- P2P systems work on resources, sending abstract requests to these resources
- - E.g., resource = file, request = download 
- - Resources are identified by a globally unique identifier  (GUID)
- - Typically derived as a hash value on the state of the resource
- - GUIDs contain no information about location of a resource 
- - Changing resource states are difficult to handle
- - GUID are the same for replicas of a given resource! 
-*** Core idea: Overlay routing 
- Routing of requests to resources happens on a flat GUID space, decoupled from the underlying network topology
- - Routing decisions are taken by members of the P2P system, not by the underlying routers
- - Introduces second level of routing 
- - → application-level routing overlay 
- - 
- - Main tasks
- - Route request to a given GUID
- - More precisely: to the nearest copy of a resource with a given GUID
- - Compute GUID for a new resource, announce it to overlay routing 
- - Remove resources upon request 
- - Assign some responsibilities to joining nodes; compensate for leaving nodes 
-*** Comparison: IP routing, P2P overlay routing 
+*** Key-value store so far
+
+Recall memcached: 
+- Key/value store
+- Server in charge of a particular key identified by mapping the key
+  GUID  to logical server identifiers
+  - GUID often computed via hash function 
+- Client needed to know all servers, and all servers' logical
+  identifiers
+  - To locally compute this mapping 
+
+#+BEAMER: \pause
+
+- Simple scheme, but does not scale well
+  - Lot's of state in clients 
+
+*** Key-value stores, without explicit server list 
+
+Can we build such a key-value store without explicit server list at
+clients?
+- A *\ac{DHT}*
+- Possible advantages:
+  - Scales better, less state at clients
+  - Perhaps more robust -- more difficult to take down all servers
+    when not all known
+- Possible risks:
+  - Overhead to map key to server in charge becomes bigger; must not
+    be prohibitively big 
+
+*** And not just key/value store 
+
+- Such a scheme not limited to just key/value store
+- Can be used for any kind of association
+  - E.g., to find servers for some task
 
 
-** Case study: Pastry 
+*** DHT: Structure
+
+- DHT realises a distributed key/value store
+  - Keys:  \ac{GUID} (e.g., 128 or 256 bits), based on value hash
+  - Values: no restrictions, arbitrary data  (e.g., URLs, files, ...)
+- Participating nodes are identified by GUIDs as well
+  - And IP address, port number, ... 
+- A node is responsible to store all key/value pairs for some subset
+  of the GUID space
+  - These subset may overlap, making more than one node responsible  
+
+*** API for DHT 
+
+**** Main API 
+  - ~put (GUID, data)~: The data is stored in replicas at all nodes
+    responsible for the object identified by GUID 
+  - ~remove(GUID)~: Deletes all references to GUID and the associated data
+  - ~value = get (GUID)~: The data associated with GUID is retrieved
+    from one of the nodes responsible for it 
+
+**** Management API 
+
+- ~add_node(GUID)~
+- ~drop_node(GUID)~ 
+
+*** DHT: requirement 
+
+- Nodes should *not* have to know list of all other nodes (as GUID,
+  IP tuples)
+
+  - Knowledge of small subset *must* suffice
+
+    - /Small/: to be defined
+
+  - Knowledge of neighbours induces a *graph* 
+
+- Nevertheless, all key/value pairs must be quickly accessible from all nodes 
+
+
+*** Core idea: routing/forwarding on keys 
+
+**** Approach 
+
+When a node looks for a key: 
+- It can check whether it locally is responsible for that key
+- If not:
+  - Node looks at its neighbors
+  - Try to determine the neighbor whose responsibility has smallest
+    distance  to desired key
+  - Forward the key request to that neighbor 
+
+**** Forwarding and routing 
+
+- This is a request *forwarding* process
+- *Routing*:
+  - Identifying suitable neighbors for a node
+  - Defining what *distance* means 
+
+*** Overlay routing not equal IP routing 
+
+- Observation: We route on key values and node identifiers 
+  - We do *not* route on IP addresses 
+  - Neighbors in this graph can be arbitrarily chosen; they do not have
+    to be (and in general are not) IP neighbors
+- The resulting graph *overlays* the IP graph 
+- Hence: *overlay routing/forwarding* in the *overlay graph* 
+
+* A strawman DHT 
+
+*** Strawman DHT 
+
+- Overlay neighbourhood: Each server only knows (GUID, IP) of server
+  with next higher GUID
+  - Modulo maximum GUID
+- Routing table hence trivial: only a single entry
+- Forwarding hence trivial: desired key locally available, or send to
+  next server 
+
+*** Strawman DHT -- Visualization 
+
+
+#+CAPTION: A simple, ring-based DHT with one routing entry per node
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=1
+#+NAME: fig:strawman_dht_few_nodes
+[[./figures/dht.pdf]]
+
+
+*** Strawman DHT -- Visualization 
+
+
+#+CAPTION: A simple, ring-based DHT with one routing entry per node, more nodes 
+#+ATTR_LaTeX: :width 0.65\linewidth :options page=3
+#+NAME: fig:strawman_dht_many_nodes
+[[./figures/dht.pdf]]
+
+
+
+
+*** Properties 
+
+- This *is* a distributed hash table 
+- But the search overhead is terrible: on average, O(#nodes) search
+  steps to find the server in charge of a randomly selected key
+- (Memory overhead is, good, though: constant) 
+
+* Chord 
+
+*** Tradeoffs? 
+
+- Would a bigger forwarding table help? 
+- What entries in it would speed up forwarding process? 
+
+#+BEAMER: \pause
+- We need to make *big* progress towards the right server 
+- Idea: Cut across the ring? 
+
+*** Cutting across the ring? 
+
+For two example nodes, cross-cutting links are shown 
+
+#+CAPTION: More entries in forwarding table speed up forwarding
+#+ATTR_LaTeX: :width 0.65\linewidth :options page=4
+#+NAME: fig:dht_cutting_across
+[[./figures/dht.pdf]]
+
+
+
+*** Chord 
+
+- This idea is the basis of a real, functional DHT: Chord
+  \cite{Stoica:2001:Chord} 
+- These links are called *fingers* 
+- Selecting these fingers (i.e., routing) is the key insight of Chord 
+
+*** Chord finger tables 
+
+- Assume our GUIDs use $m$ bits
+- We look at node with GUID $n$
+- To define the $i$ th finger entry, find the node in charge of GUID
+  $n + 2^{i-1} \mod 2^m$ 
+
+*** Chord property: logarithmic search 
+
+- With high probability, Chord contacts $\log N$  nodes to find node
+  in charge of a random GUID
+  - $N$ is number of nodes in the Chord ring
+- Proof idea: Distance halving 
+
+*** Node joining and routing table construction 
+
+Basic version only, details later: 
+
+- A joining node selects a random GUID $n$ 
+- It needs to know at least one other node already part of the ring
+- To join:
+  - Use existing Chord routing to find in charge of GUID $n$
+    - (Very unlikely that a node with that idea already exists)
+  - Tell that node it can relinquish responsibility for GUIDs larger
+    $n$ to the new node
+    - Copy those entires to new node
+  - Initialise new node's finger table (talk to neighbors, try to
+    insert $n+ 2^i$, ...) 
+
+* Plexton routing and  Pastry 
 
 *** Case study: Pastry
  Goal: Develop a P2P system supporting this API
  - Objects are stored on nodes 
- - put (GUID, data): The data is stored in replicas at all nodes responsible for the object identified by GUID
- - remove(GUID): Deletes all references to GUID and the associated data
- - value = get (GUID): The data associated with GUID is retrieved from one of the nodes responsible for it
  - 
  - Main problem: More than one node can be responsible for a given GUID (needed for robustness) 
  - → How to determine these nodes?
@@ -141,10 +278,93 @@
  - Typically, UDP 
  - Optimality of such transport protocols for P2P is an open issue
 
-** Other examples  
+
+* Consistent hash table 
+
+
+
+* From DHT to peer-to-peer file storage 
+
+*** data rate asymmetry 
+
+
+*** Early examples & generations  
+ Key peer-to-peer ideas and techniques already present in 
+ - Domain Name System 
+ - Netnews/Usenet (1986)
+ - Xerox Grapevine name/mail delivery service (1982)
+ - Algorithms for distributed consensus (Lamport, 1989)
+ - Classless inter-domain IP routing
+ - “Generations” afterwards
+ - First: Napster (around 1998) – partly centralized 
+ - Second: Freenet, Gnutella, Kazaa, BitTorrent, … (2000-2004)
+ - Improved scalability, anonymity, fault tolerance, … 
+ - Third: P2P middleware, e.g., Pastry, Tapestry, CAN, Chord, Kadmelia, …  (2001-…) 
+ - Application-independent management of distributed resources 
+ - Main difference to 2G: bounded number of hops to target 
+
+
+* Other examples  
 
 
 *** Alternative DHT structure: Kademlia 
  20
 *** Some examples 
  21
+
+* TODO open slides 
+
+*** Comparison: IP routing, P2P overlay routing 
+
+*** Peer-to-peer systems                                           :noexport:
+ Client/server issues
+ - Dedicated role of servers breaks symmetry
+ - Servers can become bottlenecks, despite all previous tricks 
+ - In particular: network bandwidth of server farms, cost issue
+ - Idea: Use symmetric responsibilities between all participating nodes 
+ - Turn clients vs. servers into peers 
+ - Hoped-for benefit: Can remove/alleviate bottlenecks by spreading load around 
+ -  → Peer-to-peer systems 
+ - Architectural justification: Resources at the “edge of the network” became much cheaper/plentiful (storage, cycles, bandwidth) 
+ - 
+*** Typical characteristics and key issues                         :noexport:
+ Characteristics
+ - Each user contributes resources to the system (storage, cycles, bandwidth)
+ - All participating nodes have equal functional capabilities & responsibilities 
+ - Often: some degree of anonymity of users
+ - Issues
+ - Algorithms for placement and retrieval of information in a P2P system (almost trivial in a client/server system)
+ - Fully decentralized & self-organizing design; no central administration assumed 
+ - Dynamically balance load between resources (storage, processing) 
+ - Handle unpredictable changes in the network and user population 
+
+
+*** Terminology: Resources, GUIDs
+
+
+ P2P systems work on resources, sending abstract requests to these resources
+ - E.g., resource = file, request = download 
+ - Resources are identified by a  \ac{GUID}
+ - Typically derived as a hash value on the state of the resource
+ - GUIDs contain no information about location of a resource 
+ - Changing resource states are difficult to handle
+ - GUID are the same for replicas of a given resource! 
+
+
+
+*** Core idea: Overlay routing 
+
+
+
+ Routing of requests to resources happens on a flat GUID space, decoupled from the underlying network topology
+ - Routing decisions are taken by members of the P2P system, not by the underlying routers
+ - Introduces second level of routing 
+ - → application-level routing overlay 
+ - 
+ - Main tasks
+ - Route request to a given GUID
+ - More precisely: to the nearest copy of a resource with a given GUID
+ - Compute GUID for a new resource, announce it to overlay routing 
+ - Remove resources upon request 
+ - Assign some responsibilities to joining nodes; compensate for leaving nodes 
+
