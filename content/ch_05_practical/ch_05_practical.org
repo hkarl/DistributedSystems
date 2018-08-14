@@ -2,29 +2,598 @@
 
 * Deployment tools: Why and what for? 
 
+*** Introduction 
+
+- This chapter is a tiny detour into practical aspects
+- How to automatically deploy, manage, ... a large number of systems? 
+  - Manual ~ssh~ to many \acp{VM}, redoing same things  clearly not an
+    option  
+- How integrate deployment of software with a software development
+  cycle? 
+
+
+*** Tasks 
+
+We need to automate the following tasks: 
+
+**** Installation, configuration 
+
+- Obtaining virtual machines (or Docker or ...) 
+- Installing operating system 
+- Installing application plus libraries
+- Installing accounts, permissions, secrets, ...
+
+**** Managing 
+
+- Booting, supervising, health check
+
+
+**** Deployment 
+
+- Building new application 
+- Test new versions of an application (library, ...)
+- Deploy new versions
+
 *** Categories 
 
-SErver, system, ... 
+- Configuration management 
+  - More precise: System administration automation
+- Build tools
+  - Build script generation tools 
+- Continuous integration tools 
+- Monitoring systems 
+
+* Execution environment 
+
+*** Question 1: Get an execution environment 
+
+- Real hardware: Talk to you sys admin, procurement office, ... 
+- A virtual machine:
+  - Talk to sys admin, your cloud provider, ... 
+  - Some hypervisors allow to request an empty VM
+  - Install operating system
+    - Talk to sys admin
+    - Use \href{https://www.vagrantup.com}{Vagrant}
+- A Docker container
+  - Talk to your sys admin
+  - Or Vagrant, similar to above 
+
+*** Example: Amazon Elastic Cloud 
+
+- To get a new virtual machine on a cloud, follow the cloud provider's
+  instructions
+  - Example
+    \href{https://aws.amazon.com/getting-started/tutorials/launch-a-virtual-machine/}{Amazon
+    Elastic Cloud}
+  - Lot's of clicking through web pages
+  - Gives you at the end an IP address, key pair for ssh access 
+
+** Vagrant 
+
+*** Vagrant 
+
+- \href{https://www.vagrantup.com}{Vagrant} main purpose: Given a VM,
+  install an operating on it, configure it for ssh access
+- Can also talk to multiple *providers* to request a VM in the first
+  place
+  - Supported providers: VirtualBox, VMWareESX, Docker, AWS
+- Mostly intended for local environments, typically with a couple of VMs
+  - Mostly for development purposes 
+
+
+*** Simple example 
+
+#+BEGIN_SRC bash 
+$ vagrant init hashicorp/precise64
+$ vagrant up
+$ vagrant ssh 
+vagrant@precise64:~$ 
+#+END_SRC
+
+*** Vagrant basic process 
+
+  - Describe required configuration in a  ~Vagrantfile~
+  - Describe required provider (and secret keys, accounts, ...) in
+    Vagrantfile
+  - Example:
+    \href{https://www.iheavy.com/2014/01/16/how-to-deploy-on-amazon-ec2-with-vagrant/}{Automatically install an Ubuntu VM on AWS} 
+
+*** Vagrant file 
 
 
 
-*** Detour: Deplyoment tools 
- 53
 
-* Examples for deployment tools 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+- Automatically created by ~init~
+- Edit for more complex configuration 
+- Actually, a Ruby script 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+\footnotesize 
+
+#+BEGIN_SRC ruby
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "centos65"
+  config.vm.network :private_network, ip: "192.168.58.111"
+  config.vm.provider :virtualbox do |vb|
+    vb.customize [
+      "setextradata", :id,
+    ]
+    # SNIP 
+  end
+end
+#+END_SRC
+
+** Terraform 
+
+*** Example: Terraform 
+
+- Different cloud providers have different APIs
+  - Annoying :-(
+- \href{https://www.terraform.io}{Terraform} to the rescue: Hide
+  different APIs behind a tool's common API
+  - Can span an infrastructure across multiple cloud providers (e.g,
+    AWS, Google, Azure, Alibaba)  
+  - Similar, but different purpose than Vagrant
+
+*** Terraform aspects 
+
+- Write description files
+- Plan changes before applying
+- Make infrastructure reproducible 
 
 
-*** Deployment tool example: Ansible 
- 54
+*** Terraform example 
+
+- Create a simple VM on AWS (from
+  \href{https://www.terraform.io/intro/getting-started/build.html}{tutorial})
+
+**** Configuration 
+
+
+#+BEGIN_EXAMPLE
+provider "aws" {
+  access_key = "ACCESS_KEY_HERE"
+  secret_key = "SECRET_KEY_HERE"
+  region     = "us-east-1"
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-2757f631"
+  instance_type = "t2.micro"
+}
+#+END_EXAMPLE
+
+
+*** Terraform example 
+
+In same directory as configuration file: 
+
+**** Init 
+
+#+BEGIN_SRC bash
+$ terraform init
+#+END_SRC
+
+**** Apply 
+
+Create a plan and execute it: 
+
+#+BEGIN_SRC bash
+$ terraform apply 
+#+END_SRC
+
+**** Results 
+
+#+BEGIN_SRC bash 
+$ terraform show 
+#+END_SRC
+
+** IaC 
+
+*** Concept: Infrastructure as Code 
+
+- Common theme: We can describe infrastructure by configuration files
+  - Looks like "code"
+  - With all aspects of code management: versioning, testing,
+    repeatability, automation, ...
+  - *No* interactive configuration! 
+- Buzzword: *Infrastructure as Code*
+  \cite{Fowler2016:InfrastrAsCode:online} 
+  - Applies to computing, storage, networking
+  - Could be scripts, declarative descriptions (like above)
+  - Early examples
+    \href{https://aws.amazon.com/about-aws/whats-new/2011/02/25/introducing-aws-cloudformation/}{AWS    Cloud Formation}  (2011) 
+- Hoped-for benefits: cost, speed, risk 
+
+
+
+* Configuration management 
+
+*** Question to solve 
+
+- Goal: ensure the right software runs in the right version on the
+  right hosts 
+  - Nodes already run an operating system, have basic software, secret
+    keys installed, ...
+  - Example: how do I upgrade/downgrade all my webservers on
+    the US east coast to Apache 2.1? Without the monitoring system to
+    yell?   
+- Common setup: one controlling host, configuring controlled nodes
+- Same ideas as above: describe, make repeatable 
+
+*** Approaches 
+
+- Special software needed on hosts to be configured
+  - \href{https://www.chef.io/chef/}{Chef},
+    \href{https://puppet.com/}{Puppet},
+    \href{https://saltstack.com/}{SaltStack}   
+- Rely on ssh access alone
+  - Example: Ansible (RedHat) 
+
+*** Ansible 
+
+- \href{http://www.ansible.com/}{Ansible}: GPL software for actual
+  configuration management 
+  - GUI for control is rather expensive
+- Basic concepts:
+  - Describe actions ("plays") to take place; YAML
+  - Host list   
+  - Playbooks -> plays -> tasks -> modules; handlers
+  - Modules do actual work, lots of those (> 250)
+    - E.g., module to drive Suse YUM package manager
+    - E.g., module to interact with version control (git pull!) -
+      continuous deployment! 
+
 *** Deployment tool example: Ansible Playbook with one play 
- 55
+
+\small 
+#+BEGIN_SRC yaml
+hosts: webservers  
+  vars:
+    http_port: 80
+    max_clients: 200
+  remote_user: root
+  tasks:
+    name: ensure apache is at the latest version
+      yum: pkg=httpd state=latest
+    name: write the apache config file
+      template: src=/srv/httpd.j2 dest=/etc/httpd.conf
+      notify: restart apache
+    name: ensure apache is running
+      service: name=httpd state=started
+    name: restart apache
+      service: name=httpd state=restarted 
+#+END_SRC
+
+*** Juju Charms 
+
+- \href{https://jujucharms.com}{Juju}: Canonical's multi-purpose tool
+  - Comprises execution environment tools as well
+  - Quote: /An application modelling tool/
+  - Higher level of abstraction than mere configuration management 
+- Juju Charms: Configuration management
+  - Charm: Set of scripts for deploying and operating software
+  - Event-based approach: What to do when some event happens? 
+
+
+* Build tools 
+
+*** Question to solve 
+
+- A big software artefact (library, application, ...) consists of many
+  files
+- After change: how to make sure you compile all the files affected by
+  the change?
+  - Compile all? Too much overhead
+  - Identify dependencies
+- Recompile, link based on these dependencies 
+
+
+*** Build tool types 
+
+- Dependency-based: specify which file depends on which other one
+  - Meaning: dependent file as to be recreated if depended-upon file
+    changes
+  - Usually detected via modification date
+- Rule-based: to a file of type X from a file of type Y, do the
+  following
+- Typically, mixture of the two 
+
+
+*** Example: Make 
+
+- GNU ~make~ - granddaddy of all build tools
+- Specifies both dependencies and rules
+  - Many rules are built-in
+
+*** Example Makefile 
+
+#+BEGIN_EXAMPLE
+# Where is the settings file? PAth is relative to the main directory SETTINGS = settings.cfg
+
+LATEXBIN = pdflatex -interaction=nonstopmode
+BINPATH = bin/
+LATEXPATH = latex/
+
+.PHONY: proposal pdf clean
+
+proposal:
+        cd ${BINPATH} ; python make.py
+
+pdf:
+        cd ${LATEXPATH}; ${LATEXBIN} MainPage; bibtex MainPage; ${LATEXBIN} MainPage; ${LATEXBIN} MainPage 
+        cp ${LATEXPATH}/MainPage.pdf ${PROJECTNAME}.pdf
+
+#+END_EXAMPLE
+
+
+*** Generating makefile 
+
+- Many dependencies can be automatically detected
+  - E.g., ~a.c~ includes ~b.h~ creates a dependency
+  - No need to specify all that by hand, use tool
+  - Often called ~makemake~
+- Various tools 
+  - ~configure~
+    - Typical ~./configure; make; make install~ workflow 
+  - ~autoconf~, ~automake~: create Makefiles depending on current
+    architecture, operating system
+  - ~qmake~, for Qt framework
+  - ~Meson~, ... 
+
+*** Non-make based 
+
+- Plenty of tools, often specialised for particular languages,
+  frameworks, ...
+- Examples:
+  - \href{https://en.wikipedia.org/wiki/Apache_Maven}{Maven} for Java 
+  - \href{https://en.wikipedia.org/wiki/Cabal_(software)}{Cabal} for
+    Haskell applications
+  - \href{https://en.wikipedia.org/wiki/SCons}{SCons}
 
 
 * Continuous integration tools 
-*** Continuous integration 
- 56
-*** Continuous integration example: Jenkins 
- 57
+
+
+*** Question to solve 
+
+- When to run build tools?
+- Where to run them?
+- What to do with the generated artefact?
+  - Under which conditions? 
+
+
+*** When to build? 
+
+- Suppose developer as made a change to source code
+- Obviously, this ends up in some \ac{VCS}
+  - \href{https://subversion.apache.org}{SVN},
+    \href{https://git-scm.com}{GIT},
+    \href{https://www.mercurial-scm.org}{Mercurial}, ...  
+- With build tools, translation into executable is automated
+- Hence: Trigger build upon every commit!
+
+
+*** Where to run these builds? 
+
+- On developer machine?
+  - Sure, for local testing
+- But once in VCS, need central instance
+- Build in central infrastructure, entire project
+  - Needs *build servers*
+
+*** Trust the executable? 
+
+- Do you trust the resulting project executable?
+  - Of course not!
+- Needs automated test suite!
+  - So run tests
+  - Many tests!
+  - Even more tests!
+- Run tests automatically, report results
+- Needs test execution suit 
+
+
+*** Test-driven development 
+
+- Buzzword: *Test-driven development*
+  \cite{Beck2002:TestDrivenDevelopment} 
+- Comes with additional guidelines (write tests first, ...)
+  - \ac{KISS}
+  - \ac{YAGNI}
+  - Fake it till you make it 
+  
+
+*** What if tests succeed? 
+
+- All tests succeeded!
+- Now: Deploy new version!
+  - Means: Integrate it into production system
+  - Do so continuously
+- Hence: *\ac{CI}* approach
+  \cite{Booch1991:OOD}
+  \cite{Fowler2006:Continuo50:online} 
+
+
+*** Continuous integration workflow 
+    
+
+
+#+CAPTION: Continuous integration main workflow
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:ci_workflow
+[[./figures/ci_workflow.pdf]]
+
+
+
+*** Continuous integration infrastructure 
+
+- A developer's local machine for development, local tests
+- Qualification infrastructure
+  - Builds, runs tests
+  - Possibly in multiple stages 
+- Production infrastructure 
+
+
+
+
+
+*** Continuous integration example: \href{http://jenkins-ci.org/}{Jenkins} 
+
+ - Continuous integration server written in Java, server-based
+ - Not hosted; you have to setup a server yourself 
+   - Hosting available as extra service  
+ - Integrates with common VC systems, tightly integrates with  Apache
+   Maven as build system  
+ - Various triggers for builds 
+ - Non-trivial setup (especially for non-Maven sprojects) 
+
+
 *** CI example: Travis 
-*** Web development/deployment: Resources to look at
- 58
+
+- \href{https://travis-ci.org}{Travis}: hosted CI service 
+- Nicely integrates with Github 
+- Main configuration steps:
+  - Create an account on Travis (easier: use Github account to log in) 
+  - Add GitHub repositories to Travis 
+  - Add a configuration file to repository (.travis.yml) 
+  - Configure when to run a Travis run 
+    - E.g., when changes pushed, when pull request exists 
+
+*** CI example: Travis 
+
+Travis will,  upon trigger: 
+
+- Create a virtual machine for each run 
+- Install required software 
+- Checkout the respective version of your repository into the VM 
+- Build it (.yml-file gives various hooks when to trigger actions:
+  ~before_install~, ~install~, ~before_script~)  
+- Start a test script 
+- Report results
+- Can also automatically deploy new version to production system 
+
+
+*** Travis screenshots 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Travis screenshot, example 1
+#+ATTR_LaTeX: :width 0.85\linewidth
+#+NAME: fig:travis1
+[[./figures/travis1.png]]
+
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Travis screenshot, example 2
+#+ATTR_LaTeX: :width 0.85\linewidth
+#+NAME: fig:travis2
+[[./figures/travis2.png]]
+
+
+
+ 
+* Monitoring systems 
+
+** Categories 
+
+
+*** Question to solve 
+
+- So you have deployed hundreds of servers running your hot Web
+  application
+- Are you sure your *servers* (bare metal or virtual) are still up and
+  running?
+  - Beware: impossibility of perfect failure detectors
+- Are you sure your *services* are still running?
+  - Basic system (HTTP, SSH, ...) as well as application? 
+  - If when your servers are up
+- Are you sure your *performance* is as expected? 
+
+
+#+BEAMER: \pause
+You need online monitoring! 
+
+
+
+*** Example: \href{https://www.nagios.org}{Nagios} 
+
+- Open-source (collection of) software to monitor servers, networks,
+  applications
+- Flexible plugins
+- Flexible alerts and reports
+- Some support for capacity planning 
+- Structure: Nagios server tries to access supervised systems,
+  services 
+
+*** Nagios tactical map 
+
+From \href{http://nagioscore.demos.nagios.com/nagios/}{Nagios Core demo}: 
+
+#+CAPTION: Nagios tactial map screenshot 
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:nagios_tactical
+[[./figures/nagios_tactical.png]]
+
+
+
+* Summary
+
+*** Summary 
+
+- Practical tool knowledge goes a long way to make for efficient
+  deployments
+- Tools impact workflows for developers and operations 
+
+**** DevOps 
+
+- Integrating both development and operations into a single process 
+- More an organisational than a technical aspect 
+
+*** Tools you should know for Web development 
+
+Know at least one example for each category
+
+- Web frameworks: Django, Ruby on Rails,
+- Web servers: Nginx, Apache
+- Version control: Git 
+- Build tools: make, Maven, SCons
+- Infrastructure management: Vagrant, Terraform 
+- Configuration management: Ansible, Chef, Puppet
+- CI: Jenkins, Travis-CI
+- Monitoring: Nagios
+- (Project management: Trello, Asana, Agilefant)
+- (Project communication: Slack, gitter) 
+

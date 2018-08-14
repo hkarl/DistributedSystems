@@ -1,4 +1,4 @@
-#+TITLE: Prctical tools: A remark in passing
+#+TITLE: Practical deployment tools: A remark in passing
 #+include: "../slidehead.org"
 
 \begin{frame}
