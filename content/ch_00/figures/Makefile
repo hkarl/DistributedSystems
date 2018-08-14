@@ -11,4 +11,4 @@ $(PICS): %.pdf: %.tex
 	pdflatex -shell-escape $< 
 
 clean:
-	-rm *aux *log
+	-rm *aux *log *.synctex.gz 
