@@ -54,7 +54,7 @@ book.pdf: book.tex
 	-${PDFLATEX} book
 	-${BIBCOMMAND} book
 	-${PDFLATEX} book
-	${PDFLATEX} book
+	-${PDFLATEX} book
 	cp $@ ../../output 
 
 #########################
