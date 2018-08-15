@@ -1,6 +1,6 @@
 #+BIBLIOGRAPHY: ../bib plain
 
-* Distributed key-value store 
+* Distributed key-value store
 
 *** Key-value store so far
 
@@ -105,7 +105,7 @@ When a node looks for a key:
 - The resulting graph *overlays* the IP graph 
 - Hence: *overlay routing/forwarding* in the *overlay graph* 
 
-* A strawman DHT 
+* A strawman DHT
 
 *** Strawman DHT 
 
@@ -143,7 +143,7 @@ When a node looks for a key:
   steps to find the server in charge of a randomly selected key
 - (Memory overhead is, good, though: constant) 
 
-* Chord 
+* Chord
 
 *** Tradeoffs? 
 
@@ -179,6 +179,10 @@ For two example nodes, cross-cutting links are shown
 - To define the $i$ th finger entry, find the node in charge of GUID
   $n + 2^{i-1} \mod 2^m$ 
 
+
+#+BEAMER: \pause
+- In addition: keep track of local neighbors in routing table 
+
 *** Chord property: logarithmic search 
 
 - With high probability, Chord contacts $\log N$  nodes to find node
@@ -201,16 +205,130 @@ Basic version only, details later:
   - Initialise new node's finger table (talk to neighbors, try to
     insert $n+ 2^i$, ...) 
 
-* Plexton routing and  Pastry 
 
-*** Case study: Pastry
+* Plaxton routing and  Pastry 
+
+
+** Plaxton routing 
+
+*** An alternative distance definition 
+
+- We still use GUIDs of, say 128 bits
+- We write them as hexadecimal numbers, e.g., 65A1FC
+- When comparing two GUIDs, we go digit-by-digit in this hexadecimal
+  representation 
+
+*** An alternative routing table 
+
+- Based on hexadecimal GUIDs, we organise the routing table in rows
+  and columns
+  - 16 columns, one per possible digit value
+  - 128 / 16 = 8 rows, numbered 0 to 7 
+- A table entry stores information about one (or several) other nodes
+  - At least: their GUID and IP 
+
+\footnotesize 
+|   | 0 | 1 | 2 | 3 | 4 | 5 | 6 |          7 | 8 | 9 | A | B | C | D | E | F |
+|---+---+---+---+---+---+---+---+------------+---+---+---+---+---+---+---+---|
+| 0 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+| 1 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+| 2 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+| 3 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+| 4 |   |   |   |   |   |   |   | (GUID, IP) |   |   |   |   |   |   |   |   |
+| 5 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+| 6 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+| 7 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+
+
+*** An alternative routing table 
+
+Content of cells? 
+
+- Let's look at a node $v$ with GUID $v_1 v_2 v_3 \ldots v_8$
+- In row $r$ and column $c$, we store information about nodes whose
+  GUID 
+  - Is the same as $v$'s in the first $r$ digits
+  - But differs in digit $r+1$ 
+  - And that $r+1$ digit is $c$
+- (Hence: There is never an entry in row $r$ and column $v_{r+1}$) 
+
+*** Example table structure for $v = 65A1FC$
+
+\footnotesize  
+|   |      0 |      1 |       2 |       3 |     4 |    5 |     6 |     7 |     8 |      9 | A  | B      | C      | D | E | F |
+|---+--------+--------+---------+---------+-------+------+-------+-------+-------+--------+----+--------+--------+---+---+---|
+| 0 |   0... |   1... |    2... |    3... |  4... | 5... |    -- |  7... |  8... |        |    |        |        |   |   |   |
+| 1 |  60... |  61... |   61... |   63... | 64... |   -- | 66... | 67... | 67... |        |    |        |        |   |   |   |
+| 2 | 650... | 651... |  652... |  653... |   ... |      |       |       |       | 659... | -- | 65B... | 65C... |   |   |   |
+| 3 | 65A0.. |     -- | 65A2... | 65A3... |       |      |       |       |       |        |    |        |        |   |   |   |
+| 4 |        |        |         |         |       |      |       |       |       |        |    |        |        |   |   |   |
+| 5 |        |        |         |         |       |      |       |       |       |        |    |        |        |   |   |   |
+| 6 |        |        |         |         |       |      |       |       |       |        |    |        |        |   |   |   |
+| 7 |        |        |         |         |       |      |       |       |       |        |    |        |        |   |   |   |
+
+*** Routing table plus local neighbors 
+
+- In addition, keep information about some local neighbors
+  - Local in the overlay graph, *not* in the IP sense! 
+
+
+*** Forwarding 
+
+Forwarding based on this routing table towards a destination GUID $n$: 
+1. Check whether $v$ is in charge of $n$
+2. If not, check whether any of the local neighbors is in charge;
+   forward directly if so
+3. If not, find first row where $v$ and $n$ differ
+4. Use the entry in the largest column below $n$
+5. If none, backtrack to row with fewer coinciding digits
+
+Note: Variants exist 
+
+*** Forwarding flow chart 
+
+
+#+CAPTION: Flow chart for Plaxton routing
+#+ATTR_LaTeX: :height 0.85\textheight
+#+NAME: fig:flowchart_plaxton
+[[./figures/plaxton_fc.pdf]]
+
+
+
+*** Generalisation 
+
+- This generalises to any grouping of bits in a GUID
+  - Does not have to be four bits grouped into a hexadecimal digit
+- Trades off routing table site vs. number of hops
+  - With correspondingly more or less columns and rows 
+
+
+*** Plaxton routing: Properties 
+- This is called *Plaxton routing* \cite{Plaxton1999:Routing}
+  - Used in many peer-to-peer systems, e.g., Pastry
+    \cite{Rowstron:2001:PSD:646591.697650}, Tapestry
+    \cite{Zhao2004:Tapestry}
+- Properties
+  - Number of nodes visited for search request $\log(N)$, $N$=#nodes in overlay graph
+    - With a full routing table, each step corrects a fixed number of
+      bits in GUID
+  - Needed property: Keys and node GUIDs are uniformly distributed in
+    GUID space 
+
+
+
+
+
+** Pastry 
+
+
+*** Case study: Pastry                                             :noexport:
  Goal: Develop a P2P system supporting this API
  - Objects are stored on nodes 
  - 
  - Main problem: More than one node can be responsible for a given GUID (needed for robustness) 
  - → How to determine these nodes?
  - Akin to looking up GUID in a hash table → distributed hash table 
-*** Pastry entities
+*** Pastry entities                                                :noexport:
  Nodes store objects/resources
  - Have a 128-bit secure GUID, computed as a hash value on the node’s public key 
  - 
@@ -224,7 +342,7 @@ Basic version only, details later:
  - Uniformly randomly distributed in entire space
  - Clashes are extremely unlikely (ignored here)
  - Provide no clue as to value from which they were computed)
-*** Pastry routing – simplified version 
+*** Pastry routing – simplified version                            :noexport:
  GUID space is assumed to carry a metric, closed to a ring
  - I.e., distance (2n -1,  0) = 1 
  - Each node maintains a leaf set of size 2l 
@@ -232,9 +350,9 @@ Basic version only, details later:
  - 
  - Trivial routing: Route a request to that neighbor in the leaf set that has the smallest distance to the object GUID
  - Will eventually deliver the message, but is inefficient 
-*** Pastry routing – simplified version
+*** Pastry routing – simplified version                            :noexport:
  The dots depict live nodes. The space is considered as circular: node 0 is adjacent to node (2128-1). The diagram illustrates the routing of a message from node 65A1FC to D46A1C using leaf set information alone, assuming leaf sets of size 8 (l = 4). This is a degenerate type of routing that would scale very poorly; it is not used in practice. 
-*** Pastry routing – sophisticated version 
+*** Pastry routing – sophisticated version                         :noexport:
  To reduce number of steps, additional knowledge about nodes far away in GUID space is required
  - To quickly get the request into the right vicinity 
  - Stored in a routing table
@@ -246,75 +364,258 @@ Basic version only, details later:
  - Look in the corresponding row
  - Each row has 16 columns; look in column corresponding to target GUID’s digit
  - This table entry has GUID and IP address of next hop node 
-*** First four rows of a Pastry routing table 
+*** First four rows of a Pastry routing table                      :noexport:
 
  D
-*** Pastry routing example 
+*** Pastry routing example                                         :noexport:
 
-*** Pastry routing algorithm 
+*** Pastry routing algorithm                                       :noexport:
+
+
+*** Pastry 
+
+- Popular DHT implementation based on Plexton routing  
+  - Uses Plaxton routing table
+  - Plus leaf set for immediate neighbors
+- Details mechanisms like host integration, host failure, ... 
 
 *** Host integration
- For a joining node: how to get leaf set, routing table? 
+
+ - For a joining node: how to get leaf set, routing table? 
  - Joining protocol
- - Compute GUID for this new node, say, GUID=X 
- - Contact some Pastry node with GUID, say, A  (X knows A’s IP!)
- - Preferably, network-wise nearby node 
- - X sends join message to A 
- - A sends this join to GUID X via Pastry in normal way, finding node Z which has GUID closest to X among already existing nodes 
- - X and Z will become neighbors
- - A, Z, and all nodes in between update X with their routing tables 
- - 
- - Additional mechanisms for host failure, fault tolerance, dependability, locality, topological embedding, etc. exist – see literature 
- - 
+   - Compute GUID for this new node, say, GUID=X 
+   - Contact some Pastry node with GUID, say, A  (X knows A’s IP!)
+     - Preferably, network-wise nearby node 
+   - X sends join message to A 
+   - A sends this join to GUID X via Pastry in normal way, finding
+     node Z which has GUID closest to X among already existing nodes  
+   - X and Z will become neighbors
+   - A, Z, and all nodes in between update X with their routing tables 
+
+ - Additional mechanisms for host failure, fault tolerance,
+   dependability, locality, topological embedding, etc. exist;  see literature 
+
+*** Bootstrapping? 
+
+- How does a new node know about an existing Pastry member node?
+
+#+BEAMER: \pause
+- Options 
+  - Manual configuration
+  - "Well-known" web page 
+  - Broadcast
+  - Expanding ring multicast
+- None of them is nice or workable! 
+
 *** Things to note about Pastry (and similar systems)
- “Closeness” between nodes only refers to the distance defined on the GUID space 
- - A highly abstract notion
- - Going from two neighbors in GUID can involve many hops in the underlying IP network 
- - 
+
+ - “Closeness” between nodes only refers to the distance defined on the GUID space 
+   - A highly abstract notion
+   - Going from two neighbors in GUID can involve many hops in the underlying IP network 
+
  - Neighborhood/distance definition in the overlay routing structure is a crucial difference between P2P systems
- - Pastry: Consider underlying topology by choosing closest node as a neighbor when alternatives are known 
- - 
- - Pastry requires an underlying transport protocol 
- - Typically, UDP 
- - Optimality of such transport protocols for P2P is an open issue
+   - Pastry: Consider underlying topology by choosing closest node as a neighbor when alternatives are known 
+
+*** Host integration, with topology? 
+
+- Wouldn't it make sense to have nodes nearby in overlay graph also
+  be nearby in actual network?
+  - So that number of overlay hops somehow relates to number of IP
+    hops (sometimes called *underlay*) ?
+  - So-called *topological embedding* 
 
 
-* Consistent hash table 
+#+BEAMER: \pause
+
+- One option:
+  - During node integration, node chooses several GUIDs as candidates
+  - Tries to measure IP ~ping~ times to the respective neighbor nodes
+    - Possibly doing a tentative integration to obtain routing tables
+      from prospective neighbors
+  - Pick GUID where best correlation between overlay/underlay exists 
 
 
+*** Node departure, failure 
 
-* From DHT to peer-to-peer file storage 
+- Orderly departure
+  - Inform neighbor with smaller ID to take over departing node's part
+    of ID space; copy values
 
-*** data rate asymmetry 
+#+BEAMER: \pause
+
+- Failure?
+  - Redundancy beforehand: each node stores its follower's part of ID
+    space
+    - Or its two followers, ... -- depending on level of paranoia 
+
+#+BEAMER: \pause
+
+- Can result in lots of copying to a single node -- spread out
+  workload?
+  - *Churn* -- when nodes join and leave often 
+
+
+*** Consistent hashing in DHT? 
+
+- We've seen a technique to deal with that: consistent hashing
+  - Reminder: Node has multiple, /virtual/ IDs under which it acts
+  - Ameliorates reconfiguration burden
+- Same technique applies here: Each node chooses multiple (even many)
+  IDs for which it assumes responsibility 
+
+
+*** Comparison: IP routing vs overlay routing 
+
+
+- Scale
+  - IPv4 is limited to 232 addressable nodes. The IPv6 name space is
+    much more generous (2128), but addresses in both versions are
+    hierarchically structured and much of the space is pre-allocated
+    according to administrative requirements.  
+  - Peer-to-peer systems can address more objects. The GUID name space
+    is very large and flat (>2128), allowing it to be much more fully
+    occupied.  
+- Load balancing
+  - Loads on routers are determined by network topology and associated
+    traffic patterns. 
+  - Object locations can be randomized and hence traffic patterns are
+    divorced from the network topology. 
+
+*** Comparison: IP routing vs overlay routing (2)
+
+- Network dynamics (addition/deletion of objects/nodes)
+  - IP routing tables are updated asynchronously on a best-efforts
+    basis with time constants on the order of 1 hour. (?) 
+  - Routing tables can be updated synchronously or asynchronously with
+    fractions of a second delays. 
+- Fault tolerance
+  - Redundancy is designed into the IP network by its managers,
+    ensuring tolerance of a single router or network connectivity
+    failure. n-fold replication is costly. 
+  - Routes and object references can be replicated n-fold, ensuring
+    tolerance of n failures of nodes or connections. 
+
+*** Comparison: IP routing vs overlay routing (3) 
+- Target identification
+  - Each IP address maps to exactly one target node. (except for
+    anycast routing) 
+  - Messages can be routed to the nearest replica of a target object. 
+- Security and anonymity
+  - Addressing is only secure when all nodes are trusted. Anonymity
+    for the owners of addresses is not achievable. 
+  - Security can be achieved even in environments with limited
+    trust. A limited degree of anonymity can be provided. 
+
+
+* From DHT to peer-to-peer 
+
+*** Peer to peer 
+
+- Originally, DHTs evolved in the context of *\ac{P2P}* systems
+- Idea: store and share data without a central instance
+  - Music, videos, ...
+- At some point, considered a vital threat to entire entertainment
+  industry
+  - And had a lion share of Internet traffic (late 1990s to about  mid/late 2000s)
+    - 40ß% to 70% of all Internet traffic in 2009 
 
 
 *** Early examples & generations  
- Key peer-to-peer ideas and techniques already present in 
- - Domain Name System 
- - Netnews/Usenet (1986)
- - Xerox Grapevine name/mail delivery service (1982)
- - Algorithms for distributed consensus (Lamport, 1989)
- - Classless inter-domain IP routing
+ - Key peer-to-peer ideas and techniques already present in 
+   - Domain Name System 
+   - Netnews/Usenet (1986)
+   - Xerox Grapevine name/mail delivery service (1982)
+   - Algorithms for distributed consensus (Lamport, 1989)
+   - Classless inter-domain IP routing
  - “Generations” afterwards
- - First: Napster (around 1998) – partly centralized 
- - Second: Freenet, Gnutella, Kazaa, BitTorrent, … (2000-2004)
- - Improved scalability, anonymity, fault tolerance, … 
- - Third: P2P middleware, e.g., Pastry, Tapestry, CAN, Chord, Kadmelia, …  (2001-…) 
- - Application-independent management of distributed resources 
- - Main difference to 2G: bounded number of hops to target 
+   - First: Napster (around 1998) – partly centralized 
+   - Second: Freenet, Gnutella, Kazaa, BitTorrent, … (2000-2004)
+     - Improved scalability, anonymity, fault tolerance, … 
+   - Third: P2P middleware, e.g., Pastry, Tapestry, CAN, Chord, Kadmelia, …  (2001-…) 
+     - Application-independent management of distributed resources 
+     - Main difference to 2G: bounded number of hops to target 
+
+*** Data rate asymmetry 
+
+- Apart from robustness, second reason for file sharing systems:
+  Convergecast!
+  - Different parts of a file can be downloaded from multiple peers
+- Justified by typical asymmetric data rates in residential setups
+  - \ac{ADSL}: larger download than upload rate 
 
 
 * Other examples  
 
+*** Bittorrent 
+
+- Perhaps the most alive of the remaining P2P systems
+- Emphasis splitting of big files into pieces
+  - With cryptographic hashes for integrity 
+  - Non-sequential downloads, random or rarest-first 
+- Deals well with transient peers (churn)
+- P2P aspect: value in key/value sense is list of locations for a
+  piece (so-called /trackerless mode/) 
+
+
+
+*** Mainline DHT  
+
+- DHT as used in (many clients for) Bittorrent 
+- Based on Kademlia 
+- Many implementations exist, e.g., https://github.com/the8472/mldht ,
+  https://github.com/nictuku/dht (in golang) 
 
 *** Alternative DHT structure: Kademlia 
- 20
-*** Some examples 
- 21
 
-* TODO open slides 
 
-*** Comparison: IP routing, P2P overlay routing 
+- Notion of “distance” between nodes different from Pastry’s
+  - Distance: Compute XOR of two keys; interpret result as an integer 
+  - This is a metric (symmetric, triangle inequality) 
+  - Works for distance between nodes as well as distance between node
+    and data item (same key structure) – similar to Pastry 
+- Routing table 
+  - For each bit position of the key, store a list of neighbours 
+    - List entry typically: neighbour key, IP address, port 
+  - Nodes in bit n’s list: first n-1 bits are identical with own key 
+  - List length typically limited by globally known constant 
+- Extension: don’t do XOR on individual bits, but on groups of bits 
+
+*** \href{https://github.com/savoirfairelinux/opendht}{OpenDHT} 
+
+Kademlia-based , nice interface 
+
+\footnotesize
+#+BEGIN_SRC python 
+import opendht as dht
+
+node = dht.DhtRunner()
+node.run()
+
+# Join the network through any running node,
+# here using a known bootstrap node.
+node.bootstrap("bootstrap.ring.cx", "4222")
+
+# blocking call (provide callback arguments to make the call non-blocking)
+node.put(dht.InfoHash.get("unique_key"), dht.Value(b'some binary data'))
+
+results = node.get(dht.InfoHash.get("unique_key"))
+for r in results:
+    print(r)
+#+END_SRC
+
+
+* Summary 
+
+*** Summary 
+
+- DHT are a key technique/building block  in many distributed systems
+  - Robust, efficient, powerful mapping technique
+- While evolved in P2P context, they have outgrown that limited use
+  case
+- P2P file sharing today more a niche application 
+
+* DONE graveyard                                                   :noexport:
+  
 
 *** Peer-to-peer systems                                           :noexport:
  Client/server issues
