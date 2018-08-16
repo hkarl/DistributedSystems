@@ -1,0 +1,216 @@
+
+\documentclass[tikz]{standalone}
+
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+
+  \begin{msc}{Timestamps cannot express causality}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+     
+     \mess{$m_A$}{a}[0.4]{b}[4]
+     \mess{}{a}{c}[3]
+     \nextlevel[2]
+
+     \mess{$m_C$}{c}[0.2]{a}[1]
+     \mess{}{c}{b}[1]
+     \nextlevel[1]
+  \end{msc}
+  
+  \begin{msc}{Imperfect timestamps hide causality}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+     
+     \mess{$m_A$}{a}[0.4]{b}[4]
+     \msccomment[l]{$C_A = 17$}{a}
+     \mess{}{a}{c}[1]
+     \nextlevel[2]
+
+     \mess{$m_C$}{c}[0.2]{a}[1]
+     \msccomment[r]{$C_C = 15$}{c}
+     \mess{}{c}{b}[1]
+     \nextlevel[1]
+  \end{msc}
+
+
+  
+  \begin{msc}{Example events}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+     
+     \action{a}{a}
+     \nextlevel
+
+     \action{b}{b}
+     \action{e}{c}
+     \mess{}{a}{b}[3]
+     \nextlevel[2]
+
+     \action{c}{b}
+     \nextlevel[2]
+
+     \action{d}{b}
+     \nextlevel
+     \mess{}{b}{c}[3]
+
+     \nextlevel[2]
+     \action{f}{c}
+     \nextlevel 
+   \end{msc}
+  
+ \begin{msc}{Example events}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+%-----------
+     
+     \action{2}{a}
+     \nextlevel 
+     \mess{}{a}{b}[2]
+     \nextlevel[2] 
+     
+     \action{3}{b}
+     \action{1}{c}
+     \nextlevel[1] 
+     \mess{}{c}{b}[4]
+     \nextlevel[1] 
+
+     \action{4}{b}
+     \nextlevel 
+     \mess{}{b}{c}[5]
+     \nextlevel[2] 
+     
+     \action{8}{b}
+     \nextlevel[3] 
+     
+     \action{5}{c}
+     \nextlevel[2] 
+     
+     \action{9}{b}
+     \nextlevel[1] 
+     \mess{}{b}{a}[8]
+     \nextlevel[2] 
+     
+     \action{6}{c}
+     \nextlevel[1] 
+     \mess{}{c}{a}[2]
+     \nextlevel[2] 
+
+     \action{7}{a}
+     \nextlevel[3]
+
+     \action{10}{a}
+     \nextlevel[2]
+
+   \end{msc}
+  
+ \begin{msc}{Example events -- Rubberband}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+%-----------
+     \action{1}{c}
+     \nextlevel[1] 
+     \mess{}{c}{b}[17]
+     \nextlevel[1] 
+     
+     \action{2}{a}
+     \nextlevel 
+     \mess{}{a}{b}[2]
+     \nextlevel[2] 
+     
+     \action{3}{b}
+     \nextlevel[2] 
+
+     \action{4}{b}
+     \nextlevel 
+     \mess{}{b}{c}[2]
+     \nextlevel[2] 
+
+     \action{5}{c}
+     \nextlevel[2] 
+
+     \action{6}{c}
+     \nextlevel[1] 
+     \mess{}{c}{a}[2]
+     \nextlevel[2] 
+
+
+     \action{7}{a}
+     \nextlevel[3]
+     
+     \action{8}{b}
+     \nextlevel[3] 
+     
+     
+     \action{9}{b}
+     \nextlevel[1] 
+     \mess{}{b}{a}[2]
+     \nextlevel[2] 
+     
+
+     \action{10}{a}
+     \nextlevel[2]
+
+   \end{msc}
+  
+
+
+ \begin{msc}{Example events with Lamport times}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+%-----------
+     
+     \action{(1,A)}{a}
+     \nextlevel 
+     \mess{ 1 }{a}{b}[2]
+     \nextlevel[2] 
+     
+     \action{(2,B)}{b}
+     \action{(1,C)}{c}
+     \nextlevel[1] 
+     \mess{1}{c}{b}[4]
+     \nextlevel[1] 
+
+     \action{(3,B)}{b}
+     \nextlevel 
+     \mess{3}{b}{c}[5]
+     \nextlevel[2] 
+     
+     \action{(4,B) }{b}
+     \nextlevel[3] 
+     
+     \action{(4,C)}{c}
+     \nextlevel[2] 
+     
+     \action{(5,B)}{b}
+     \nextlevel[1] 
+     \mess{5}{b}{a}[8]
+     \nextlevel[2] 
+     
+     \action{(5,C)}{c}
+     \nextlevel[1] 
+     \mess{5}{c}{a}[2]
+     \nextlevel[2] 
+
+     \action{(6,A)}{a}
+     \nextlevel[3]
+
+     \action{(7,A)}{a}
+     \nextlevel[2]
+
+   \end{msc}
+  
+\end{document}

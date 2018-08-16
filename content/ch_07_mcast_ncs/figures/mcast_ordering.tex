@@ -1,0 +1,295 @@
+
+\documentclass[tikz]{standalone}
+
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+  \begin{msc}{Reliable multicast}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+
+     \mess{}{a}{b}[1]
+     \mess{}{a}{c}[4]
+
+     \nextlevel[2]
+
+     \mess{}{a}{b}[1]
+     \mess{}{a}{c}[1]
+
+     \nextlevel[3]
+     %-----------
+     \condition{not valid}{a,b,c}
+     \nextlevel[2]
+
+
+     \mess{}{a}{b}[1]
+     \lost[r]{}{}{a}
+
+  \end{msc}
+  \begin{msc}{FIFO multicast}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+
+     %-----------
+     \condition{not valid}{a,b,c}
+     \nextlevel[2]
+
+     \mess{1}{a}[0.2]{b}[1]
+     \mess{1}[b]{a}[0.1]{c}[4]
+     \nextlevel[2]
+
+     \mess{2}{a}{b}[1]
+     \mess{2}[b]{a}[0.25]{c}[1]
+     \nextlevel[3]
+
+     \condition{valid}{a,b,c}
+     \nextlevel[2]
+     
+     \mess{1}{a}[0.2]{b}[1]
+     \mess{1}[b]{a}[0.1]{c}[4]
+     \nextlevel[2]
+
+     \mess{2}{a}{b}[1]
+     \mess{2}[b]{a}[0.25]{c}[1]
+     \nextlevel[1]
+     \mess[r]{delay 2}{c}{c}[2]
+
+  \end{msc}
+
+  \begin{msc}{FIFO multicast, holdback}
+  % example: +
+     \declinst{ba}{}{B App} 
+     \declinst{bm}{}{B MCast} 
+     \declinst{a}{}{A} 
+     \declinst{cm}{}{C MCast} 
+     \declinst{ca}{}{C App} 
+
+     %-----------
+     
+     \mess{1}{a}[0.2]{bm}[1]
+     \mess{1}[b]{a}[0.1]{cm}[5]
+     
+
+     \nextlevel[1]
+     \mess{1}{bm}{ba}
+     \nextlevel[1]
+
+     \mess{2}{a}{bm}[1]
+     \mess{2}[b]{a}[0.25]{cm}[1]
+     \nextlevel[1]
+     \mess{2}{bm}{ba}
+     \msccomment[r]{Buffer msg. 2}{cm}
+     \nextlevel[2]
+
+     \mess{1}{cm}{ca}
+     \nextlevel[1]
+     \mess{2}{cm}{ca}
+     
+     % \mess[r]{delay 2}{c}{c}[2]
+
+  \end{msc}
+
+  %----------------------------------------------------------------
+
+  \begin{msc}{Atomic}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+
+     %-----------
+     \condition{not valid}{a,b,c}
+     \nextlevel[2]
+
+     \mess{A}{a}{a}[1]
+     \mess{A}{a}[0.2]{b}[1]
+     \mess{A}[b]{a}[0.1]{c}[4]
+
+     \nextlevel[1]
+
+     \mess{C}{c}[0.2]{a}[1]
+     \mess{C}[b]{c}[0.3]{b}[2]
+     \mess[r]{C}{c}{c}[1]
+
+     \nextlevel[4]
+     \condition{valid}{a,b,c}
+     \nextlevel[2]
+
+     \mess{A}{a}{a}[1]
+     \mess{A}{a}[0.2]{b}[1]
+     \mess{A}[b]{a}[0.1]{c}[4]
+
+     \nextlevel[1]
+
+     \mess{C}{c}[0.2]{a}[1]
+     \mess{C}[b]{c}[0.3]{b}[2]
+     \mess[r]{C}{c}{c}[4]
+
+
+     \nextlevel[5]
+     \condition{also valid}{a,b,c}
+     \nextlevel[2]
+
+     \mess{A}{a}{a}[3]
+     \mess{A}{a}[0.2]{b}[1]
+     \mess{A}[b]{a}[0.1]{c}[4]
+
+     \nextlevel[1]
+     \mess{A}{b}{b}[3]
+
+     \mess{C}{c}[0.2]{a}[1]
+     \mess{C}[b]{c}[0.3]{b}[2]
+     \mess[r]{C}{c}{c}[1]
+     
+     % \mess{2}{a}{b}[1]
+     % \mess{2}[b]{a}[0.25]{c}[1]
+     % \nextlevel[3]
+
+     % \condition{valid}{a,b,c}
+     % \nextlevel[2]
+     
+     % \mess{1}{a}[0.2]{b}[1]
+     % \mess{1}[b]{a}[0.1]{c}[4]
+     % \nextlevel[2]
+
+     % \mess{2}{a}{b}[1]
+     % \mess{2}[b]{a}[0.25]{c}[1]
+     % \nextlevel[1]
+     % \mess[r]{delay 2}{c}{c}[2]
+
+  \end{msc}
+
+
+  \begin{msc}{Confusing causality}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+
+     \mess{A}{a}{a}[1]
+     \mess{A}{a}[0.2]{b}[1]
+     \mess{A}[b]{a}[0.1]{c}[5]
+
+     \nextlevel[3]
+
+
+     \mess{B}{b}[0.8]{a}[1]
+     \mess{B}{b}{b}[1]
+     \mess{B}[t]{b}[0.8]{c}[1]
+
+
+  \end{msc}
+
+
+
+  \begin{msc}{Changing group membership}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+     \dummyinst{d}
+     
+     \condition{view: A, B, C}{a,b,c}
+     \nextlevel[2]
+     
+     \create{}{}{d}{}{D}
+     \nextlevel[2]
+
+     \condition{view: A, B, C, D }{a,b,c,d}
+     \nextlevel[3]
+
+     \stop{b}
+     \nextlevel[2]
+
+     \condition{view: A, C, D }{a,b,c,d}
+     \nextlevel[2]
+  \end{msc}
+
+
+  \begin{msc}{A dies before delivery}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+     
+     \condition{view: A, B, C}{a,b,c}
+     \nextlevel[2]
+
+     \lost[r]{}{}{a}
+     \nextlevel[1]
+     \lost[r]{}{}{a}
+
+     \stop{a}
+     \nextlevel[2]
+
+     \condition{view: B, C }{b,c}
+     \nextlevel[2]
+  \end{msc}
+
+  \begin{msc}{A dies, still delivered}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+     
+     \condition{view: A, B, C}{a,b,c}
+     \nextlevel[2]
+
+     \mess{}{a}{b}[1]
+     \mess{}{a}{c}[3]
+     \nextlevel[2]
+
+     \stop{a}
+     \nextlevel[2]
+
+     \condition{view: B, C }{b,c}
+     \nextlevel[2]
+  \end{msc}
+
+  \begin{msc}{A dies, message from the dead}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+     
+     \condition{view: A, B, C}{a,b,c}
+     \nextlevel[2]
+
+     \mess{}{a}{b}[5]
+     \mess{}{a}{c}[6]
+     \nextlevel[2]
+
+     \stop{a}
+     \nextlevel[1]
+
+     \condition{view: B, C }{b,c}
+     \nextlevel[2]
+  \end{msc}
+  
+  \begin{msc}{A dies, message from the possibly dead}
+  % example: +
+     \declinst{a}{}{A} 
+     \declinst{b}{}{B} 
+     \declinst{c}{}{C} 
+     
+     \condition{view: A, B, C}{a,b,c}
+     \nextlevel[2]
+
+     \mess{}{a}{b}[1]
+     \mess{}{a}{c}[6]
+     \nextlevel[2]
+
+     \stop{a}
+     \nextlevel[1]
+
+     \condition{view: B, C }{b,c}
+     \nextlevel[2]
+  \end{msc}
+  
+
+\end{document}

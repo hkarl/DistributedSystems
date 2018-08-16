@@ -1,65 +1,484 @@
 #+BIBLIOGRAPHY: ../bib plain
 
 
-New approach: Immediately talk about implementation approaches. Use
-that to introduce vector clocks during the causal bcast! 
 
-Make clear: Here, nothing goes wrong at first. 
+* Multicasting
+
+*** From unicast to multicast 
+
+- So far, we looked at unicast messages
+  - Simple semantics, easy to make dependable
+- Would *multicasting* be useful?
+  - Multicast: The ability to address a single message to a *group of
+    receivers*
+- Example scenarios:
+  - For dependability, multiple processes keep state; update needs to
+    be sent to all of them
+  - Job assignment sent to multiple processes, exactly one of them can
+    volunteer for the job 
 
 
-** Ordering semantics 
+*** Example use case: Server groups 
 
-*** Group Communication
- Abstraction: process group
- - A logical destination for a multicast message whose membership can be kept transparent to the sender
- - Group communication = sending of messages to all members of a group
- - Group operations
- - Create/join a group
- - Leave a group
- - Get information on group members (a “view”)
- - View: Sequence of group members, local property of each member
- - Send multicast message to all members
- - Suspect a failed process
- - Leads to a new view
- create
- B joins
- C joins
- New view
-*** Request Ordering
- Reliable Multicast
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+- Recall the server group scenario from Section
+  \slideref{sec:cs:multitier}[s:cs:servergroup]
+- Multicast useful
+  - From client to all servers in group
+    - Typically, sender does *not* receiver message
+  - From server to all servers in group
+    - Typically, sender *does* receive message as well 
+
+ 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Server group
+#+ATTR_LaTeX: :width 0.85\linewidth
+#+NAME: fig:server_group
+[[../ch_04_improving_CS/figures/serverGroup.pdf]]
+
+
+*** Multicast vs. replicated unicasts? 
+
+- Replicated unicasts: Sender has to take care of each message
+  separately 
+- Multicast: A single action for sender
+  - Convenient 
+  - Underlying communication system (e.g., IP) distributed message
+  - Much cheaper than mutliple unicasts (e.g., Ethernet, wireless) 
+  - But: Likely imperfect 
+
+*** Imperfections in multicast 
+
+- Delays might vary strongly between receivers
+  - To the point of being delivered out of order 
+- Multicast message might not reach all receivers, just some
+- Sender or recevier(s) might crash 
+
+*** Idea: Multicast protocol 
+
+- To deal with imperfections of underlying multicast mechanism, let's
+  build an additional protocol layer to repair these issues 
+- Distinguish:
+  - *Origination* vs. *delivery* between application and multicast
+    protocol
+  - *Transmission* and *reception* between underlying network and
+    multicast protocol 
+
+
+*** Idea: Multicast protocol 
+
+#+CAPTION: Distinguish origination, delivery, transmission, reception
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:mcast_origination
+[[./figures/mcast_protocol.pdf]]
+
+*** Terminology: Group Communication
+ - Abstraction: process group
+   - A logical destination for a multicast message whose membership can be kept transparent to the sender
+   - Group communication = sending of messages to all members of a group
+ - Group operations (for now): 
+   - Send multicast message to all members
+   - Assumption: no group members join or leave
+ - Network: Unordered, unreliable multicast (best effort) 
+
+
+
+* Ordering semantics
+
+** Reliable 
+
+***  Reliable multicast
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
  - All group members get a multicast message or no member 
- - Both possible if sender fails
+   - Either option acceptable  if sender fails
  - Simplest requirement possible
- - Terminating reliable multicast
- - Always deliver a message, even if sender has crashed
- - 
- FIFO multicast
+
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: Reliable message ordering
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=1
+#+NAME: fig:mc:reliable
+[[./figures/mcast_ordering.pdf]]
+
+
+
+
+
+*** Reliable multicast -- formally 
+
+**** VALIDITY
+
+If a process transmits a message m, then it eventually delivers m.
+
+**** UNIFORM AGREEMENT
+
+If a process delivers a message m, then all  processes
+eventually deliver m. 
+
+**** UNIFORM INTEGRITY
+
+For any message m, every process delivers m at most once, and only if
+m was previously transmitted by sender(m). 
+
+
+
+
+\cite{Defago:2004:McastSurvey}
+
+*** Implementing reliable multicast 
+
+**** Simple techniques
+
+- Sequence numbers
+- Acknowledgements and timeouts
+- Downside: Sender needs to know members of unicast group 
+  - Basically, replicated unicast
+
+
+#+BEAMER: \pause
+
+**** WARNING                                                   :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+Remember: No group changes so far!
+
+
+*** Fancy techniques
+
+- Possibly negative acknowledgements when message $n+1$ received but
+  message $n$ is still missing 
+- Receiver could ask neighbours for retransmissions instead of sender 
+
+**** Challenge: Acknowledgement implosion 
+
+- What happens in large groups?
+  - One message transmission causes lots of acknowledgements --
+    *implosion*
+
+#+BEAMER: \pause
+
+- Possible techniques
+  - Build tree among group, collect acknowledgements along tree
+  - ... 
+
+
+
+
+** FIFO 
+***  FIFO multicast
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
  - Between any pair of sender & receiver, the messages are ordered FIFO
- - Per-originator perspective
+   - Per-originator perspective
+   - Typically, also reliable multicast required 
  - No statements about message ordering regarding more than two nodes!
- - 
-*** Request Ordering
- Atomic order
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: FIFO message ordering
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=2
+#+NAME: fig:mc:fifo
+[[./figures/mcast_ordering.pdf]]
+
+
+*** Holdback 
+
+- FIFO example shows key technique: *holdback*
+- Multicast protocol must not deliver immediately upon reception, must
+  potential delay messages
+  - Must buffer messages 
+  
+
+#+CAPTION: Holdback in multicast
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=3
+#+NAME: fig:mc:holdback
+[[./figures/mcast_ordering.pdf]]
+
+
+
+*** Implementing FIFO 
+
+- Simple extension to reliable mutlicast
+- When message is received out of order, hold back, do not deliver to
+  application 
+
+** Atomic 
+*** Atomic order
  - If r1 and r2 are requests, then either 
- - r1 is processed before r2 at all shared destinations 
- - or vice versa
+   - r1 is processed before r2 at all shared destinations 
+   - or vice versa
  - Example: Deposit to a replicated bank account from one site, add interest from another site
  - Quite expensive in larger systems
  - Not necessarily FIFO
- - 
+
+*** Atomic order 
+
+#+CAPTION: Atomic message ordering
+#+ATTR_LaTeX: :height 0.9\textheight :options page=4
+#+NAME: fig:mc:atomic
+[[./figures/mcast_ordering.pdf]]
+
+
+
+
+
+*** Total order 
+
  - Total order = Atomic + FIFO
- - Typically, atomic is combined with FIFO, resulting in total order 
- - 
-*** Request Ordering
- Causal Order
- - (Message deliveries are guaranteed to conform to the happened-before ordering (see later))
- - If r1 and r2 are messages, sending of r1 happened-before sending of r2, 
- - then r1 is guaranteed to be processed before r2  (at all shared destinations)
- - Much cheaper than total order
- - Example: News system – ordering of questions and replies
- - Does this lead to uniform numbers?
- - Potential problems: two copies of account balance, overlapping deposit and interest messages (which needs total order)
-*** Hierarchy of Request Orderings
+
+
+*** Total order multicast -- formally 
+
+**** VALIDITY
+
+If a process TO-transmits a message m, then it eventually TO-delivers m.
+
+**** UNIFORM AGREEMENT
+
+If a process TO-delivers a message m, then all  processes
+eventually TO-deliver m. 
+
+**** UNIFORM INTEGRITY
+
+For any message m, every process TO-delivers m at most once, and only if
+m was previously TO-transmitted by sender(m). 
+
+
+**** UNIFORM TOTAL ORDER 
+
+If processes p and q both TO-deliver messages m and m’, then p TO-delivers m before m’ *if and only if* q TO-delivers m before m’
+
+
+\cite{Defago:2004:McastSurvey}
+
+
+*** Usage: State machine replication \cite{Schneider:1990:StateMachines} 
+
+- Think of
+  - Process group members as state machines
+  - Messages as events
+- With atomic order, all state machines see same sequence of events
+  - Deterministic state machines will then go through the same state
+    changes
+- We will revisit this approach in the replication chapter 
+
+*** Implementing TO -- ideas 
+
+- Central sequencer
+  - Single point of failure, bottleneck
+  - But simple
+  - Fixed or rotating among nodes 
+- Distributed algorithms
+  - Many options
+  - Often, token-passing based 
+
+*** Implementing TO with central sequencer 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+***** Sequencer                                                       :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+
+****** Sequencer 
+
+\footnotesize 
+#+BEGIN_SRC python
+def Receive(p, m, i): 
+    Transmit("order", p, i)
+    to all participants,
+    using reliable,
+    in-order unicast
+
+#+END_SRC
+
+*****           Participant                                           :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+****** Participant p 
+
+\footnotesize
+
+#+BEGIN_SRC python
+def init(): i = 0 
+
+def Originate(m):
+    Transmit(p, m, i) to 
+    all participants and sequencer 
+    Put (p, m, i) in queue 
+    i++; 
+
+def Receive(q, m, j):
+    Put (q, m, j) in queue
+
+def Receive("order", q, j):
+    Deliver message (q, m, j) from local queue 
+#+END_SRC
+
+
+*** Total order with token passing 
+\small 
+
+#+BEGIN_SRC python
+def init(): 
+    Sendqueue = []
+    DeliverQueue = [] // sorted (m, seqnr) pairs
+        NextDeliver = 1  
+def Originate(m):
+    Sendqueue += m
+def Token_received(): 
+    For m in Sendqueue: 
+        Transmit(m, token.seqnr++)
+    Send(token, neighboring node)  // reliable unicast 
+def Receive(m, seqnr):
+    Insert (m, seqnr) in DeliverQeue, sorted by seqnr 
+    While (m, seqnr) == (. , NextDeliver):
+        Deliver(m)
+        NextDeliver++
+#+END_SRC
+
+
+
+
+** Causal 
+
+*** Preserve causality? 
+
+- Atomic and total order have high overhead
+- Relax or different requirement? 
+
+#+BEAMER: \pause
+- Maybe *cause* and *effect* should be preserved?
+  - Suppose delivery of message r1 causes message r2 to be originated
+  - At a third node, it would be confusing to see message r2 before r1
+    - Causality apparently reversed 
+
+*** Preserve causality -- example 
+
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+ - Example: News system, whatsapp messages, ...  – ordering of
+   questions and replies 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Confusing cause and effect
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=5
+#+NAME: fig:mc:confusing_cause_effect
+[[./figures/mcast_ordering.pdf]]
+
+
+***  Preserving causality -- problems 
+
+- Multicast protocol cannot *know* whether r1 really caused r2
+  - The application might know, but it is unlikely to tell
+- The only thing the multicast protocols  sees is the *order*
+  - Deliver r1, then r2 originates
+- We hence have to *conjecture* about causality: *potential causality* 
+
+
+#+BEAMER: \pause
+
+- But maybe that is good enough for typical applications
+- We ere on the side of safety here (overestimate causality) 
+
+*** Preserving causality -- problems 
+
+- From the perspective of a third node, we need to know whether such
+  messages r1 and r2 are in such a cause/effect relationship
+  - Even if only potentially
+- Knowing that r1 originated before r2 is not good enough 
+  - They might not have anything to do with each other
+- Not trivial implementation problem! 
+
+
+
+***  Causal Order
+
+To summarise idea: 
+
+ - If r1 and r2 are messages, delivery  of r1 might have caused
+   origination of 
+   r2, then r1 is guaranteed to be delivered  before r2  (at all shared
+   destinations)
+ - Hopefully:  cheaper than total order
+ - Implementing it: not trivial, needs a detour 
+
+
+
+*** Hierarchy of Request Orderings                                 :noexport:
  Reliable
  - Multicast
  Atomic
@@ -75,73 +494,419 @@ Make clear: Here, nothing goes wrong at first.
  FIFO
  FIFO
  Causal
-*** Request Ordering
- Sync order
+
+
+* Changing group membership
+
+** Dynamic membership 
+
+*** Groups can change! 
+
+
+- So far: group membership did not change 
+  - Unrealistic
+- Nodes can join or leave a group deliberately
+- Nodes can fail
+
+*** Views on a group
+
+- Shouldn't a group member know the current membership?
+  - E.g., to know, when receiving a message, who else also got it? 
+
+**** Views                                                     :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+- Sequence of group members currently considered alive 
+- By a node - local property 
+  - By sender,  when a  message was sent
+    - Local property of sender, attached to message
+    - Intention: This message should be delivered to all nodes in the
+      view 
+
+
+*** More operations on groups
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+ - Create/join a group
+ - Leave a group
+ - Get current view 
+ - Suspect a failed process
+   - Leads to a new view
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Dynamic group memberships 
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=6
+#+NAME: fig:mc:confusing_cause_effect
+[[./figures/mcast_ordering.pdf]]
+
+
+
+*** Questions with dynamic groups 
+
+- How to inform nodes about changing group membership?
+  - Obviously, by multicast message?
+  - How do these management messages relate to normal messages? 
+- Do the ordering semantics for multicast messages stay the same?
+- Do the protocols stay the same?
+
+*** Reliable multicast with failures? 
+
+- Always deliver a message -- but in presence of failing nodes?
+- Cases:
+  - Receiver fails *before* delivering
+  - Receiver fails *after* delivering
+  - Sender fails *after* transmitting to everybody 
+  - Sender fails *before* transmitting to everybody  (but to somebody) 
+
+*** Reliable multicast with failures --- critical case 
+
+- Critical: receiver has delivered, then crashes 
+  - It have done something irreversible in between!
+  - E.g., triggered some actor that has to be used together with other
+    actors 
+- Requirement: if *one* process has delivered, all other processes
+  must deliver
+  - But that's unrealistic -- they might crash as well? 
+- Better:  if *one* process has delivered, all other *correct*
+  processes   must deliver
+
+
+*** Terminating reliable multicast -- formally 
+
+**** VALIDITY
+
+If a *correct* process transmits a message m, then it eventually
+delivers m. 
+
+**** UNIFORM AGREEMENT
+
+If a (*correct or incorrect!*)  process delivers a message m, then all
+*correct* processes eventually deliver m. 
+
+**** UNIFORM INTEGRITY
+
+For any message m, every (*correct or incorrect!*) process delivers m at
+most once, and only if m was previously transmitted by sender(m). 
+
+*** Total order multicast in presence of faults 
+
+**** VALIDITY
+
+If a *correct* process TO-transmits a message m, then it eventually
+TO-delivers m. 
+
+**** UNIFORM AGREEMENT
+
+If a (*correct or incorrect!*)  process TO-delivers a message m, then
+*all* correct processes eventually TO-deliver m. 
+
+**** UNIFORM INTEGRITY
+
+For any message m, every (*correct or incorrect*)  process TO-delivers
+m at most once, and only if m was previously TO-transmitted by
+sender(m). 
+
+**** UNIFORM TOTAL ORDER 
+
+If (*correct or incorrect*) processes p and q both TO-deliver messages
+m and m’, then p TO-delivers m before m’ if and only if q TO-delivers
+m before m’
+
+
+
+** View synchronous 
+
+*** Messages vs views?  
+
+- A view expresses  information about which processes are alive
+  and part of the group when message was sent 
+- But group membership can change, add or drop processes
+  - Even while message is in transit! 
+- So: Which messages should be allowed to be delivered in which view? 
+
+*** Messages and views, plausible sequences 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- A's message reaches no other process
+- Equivalent to A dying before sending it 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: View change, plausible sequence 1 
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=7
+#+NAME: fig:mc:view_plausible1
+[[./figures/mcast_ordering.pdf]]
+
+
+
+*** Messages and views, plausible sequences 2
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- A's message reaches all other processes in the view 
+- Equivalent to A managing to deliver it correctly before dying
+- B and C deliver message when they both still consider A to be alive 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: View change, plausible sequence 2 
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=8
+#+NAME: fig:mc:view:plausible2
+[[./figures/mcast_ordering.pdf]]
+
+
+*** Messages and views, disallowed sequences 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- A's message reaches all *other* processes in the view 
+- But B and C deliver message when they both already where informed
+  about A's death
+- A can communicate from the grave? "Message from the dead" 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: View change, disallowed sequence 1
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=9
+#+NAME: fig:mc:view:disallowed1
+[[./figures/mcast_ordering.pdf]]
+
+
+*** Messages and views, disallowed sequences 2
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- A's message reaches all other processes 
+- But here even worse:
+  - B still thinks this message is ok and would act upon it 
+  - But C sees a message from the dead
+  - Inconsistent! 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: View change, disallowed sequence 2
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=10
+#+NAME: fig:mc:view:disallowed2
+[[./figures/mcast_ordering.pdf]]
+
+
+*** View changes by multicast messages 
+
+- Natural idea: distribute view changes to all group members as a
+  multicast message
+  - A joining node $v$ can distribute a new view $Q = Q_\mathrm{old}
+    \cup \{v\}$
+  - A node $v'$ declaring node $v$ as dead distributes 
+    $Q = Q_\mathrm{old} \setminus \{v\}$ 
+
+
+#+BEAMER: \pause
+
+**** Conflict? 
+
+- But what happens when a view change message $Q$ and a message $m$
+  with old view $Q_\mathrm{old}$ are both in transit? 
+
+*** View-synchronous group communication
+
+- Rules to deal with conflicts between view messages and ordinary
+  messages
+
+**** View synchronous communication \cite{Birman:1987:ViewSync}                    :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+  - View messages must be delivered in the same order on all processes
+    (total order for view messages) 
+  - *Agreement*: if process $p$ delivers message $m$ in view $v$ and
+    then delivers view $v’$, then all processes that are both in $v$ and
+    $v’$ deliver $m$ in $v$
+  - *Integrity*: No message is delivered twice 
+  - *Validity*: if a message $m$ cannot be delivered to a process $q$,
+    the *correct* processes deliver a new view immediately after the
+    delivery of $m$ and this new view does not contain $q$
+
+
+
+***  Sync order
+
+Think of view messages as establishing dividing lines between past and
+future (*epochs*) 
+
  - Suppose the desired order guarantee can be expressed per request
- - If m1 is sync-ordered and m2 is sent with any ordering request, then either
- - m1 is processed at all nodes before m2
- - m1 is processed at all nodes after m2
- - m1 acts as a synchronization point
- - 
- - Sync-ordered request flushes outstanding but unprocessed requests from anywhere
- - Dividing line between past and future
-*** View-synchronous group communication
- Sync order important for handling crashes 
- - View messages should allow local decisions about the state of other group members
- - View messages must be delivered in the same order on all processes
- - How do views and normal messages relate to each other?
- - View-synchronous communication requires some additional guarantees
- - Agreement: if process p delivers message m in view v and then delivers v’, then all processes that are both in v and v’ deliver m in v 
- - Integrity: No message is delivered twice 
- - Validity: if a message m cannot be delivered to a process q, the correct processes deliver a new view immediately after the delivery of m and this new view does not contain q 
- - In such a system, simple programming is possible based on the information contained in the view messages
-*** View-synchronous group communication
- Possible sequences
-*** View-synchronous group communication
- Disallowed sequences in view-synchronous comm.:
- No „messages 
- - from the dead“!
+   - If m1 is sync-ordered and m2 is sent with any ordering request,
+     then either 
+     - m1 is processed at all nodes before m2
+     - m1 is processed at all nodes after m2
+   - m1 acts as a synchronization point
+ - Sync-ordered request flushes outstanding but unprocessed requests
+   from anywhere 
+ - In an epoch, all messages go to (more or less) the same set of
+   processes  
 
-** Implementation options 
 
-*** Implementing Request Ordering
- Implementing Request Ordering
- Application
- Multicast 
- - protocol
- Lower layer communication
- Originate
- Transmit
- Deliver
- Receive
- Hold-back
- - queues
-*** Implementing Request Ordering – Context 
- 33
-*** Example: Reliable order using deliver/transmit 
- 34
- Compare, e.g.:  X. Défago, A. Schiper, and P. Urbán, “Total order broadcast and multicast algorithms,” ACM Comput. Surv., vol. 36, no. 4, pp. 372–421, 2004.
-*** Example: Total order using deliver/transmit 
- 35
-*** Implementing Request Ordering: Total order 
- Simple mechanism: a central sequencer
- - Relatively easy to implement for all ordering semantics 
- - Often bad idea, thwarts many of the main purposes of replication
- - Distributed algorithms 
- - Many algorithms, typically Token passing
- - Store retransmission requests and information which messages have been received by which nodes in a rotating token
- - All nodes can compute delivery order from the token
- Défago et al.
- Who decides order? 
-*** Total order with central sequencer 
- Distributed Systems, Ch. 3: Advanced Interaction Patterns
- 37
-*** Total order with token passing 
- 38
+* Implementing causal bcast: Logical time 
 
-** Implementation for causal bcast: Logical time 
 
-*** Logical and real time
+** Timestamps 
+
+*** Causally order multicast 
+
+- Let us come back to causal multicast 
+- We still lack
+  - A precise definition of what *potential causality* is and how it
+    could be detected
+  - An implementation technique for such multicasts 
+- We need to think about sequences of events for that 
+
+
+*** Timestamps? 
+
+- First idea: timestamps to capture causality
+  - /An earlier event is the cause of a later event/
+
+
+#+BEAMER: \pause
+- Obviously, nonsense 
+
+*** Time unequal causality 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- Message $m_A$ from A sent before message $m_C$  C
+- But sending of $m_A$ certainly did not cause sending of $m_C$
+- Hence there should be no reason for B to believe so, even though
+  sending time of $m_A$ earlier than that of $m_C$  
+
+- Possibly: /a later event cannot be cause of earlier event/? 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Time cannot express causality
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=1
+#+NAME: fig:time_not_causal
+[[./figures/logicalTime.pdf]]
+
+*** Imperfect timestamps hide causality 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+- What if timestamps are not perfect
+  - Local clocks of machines might not by synchronized 
+- Let $C_A$, $C_C$ denote local clock values 
+- B will take wrong conclusions! 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Imperfect timestamps confuse causality 
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=2
+#+NAME: fig:imperfect_timestamps
+[[./figures/logicalTime.pdf]]
+
+*** Timestamps no good 
+
+**** Timestamps no good!                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+Timestamps are no option when thinking about causality 
+
+
+
+
+** Logical time 
+
+*** Logical and real time                                          :noexport:
  Crucial problem: There is no uniform notion of time in a distributed system
  - Only local clocks available – but they drift 
  - 
@@ -149,232 +914,552 @@ Make clear: Here, nothing goes wrong at first.
  - Try to do without information about the real, actual time – order of events is often sufficient $\rightarrow$ Logical time
  - Try to compensate for drift of real clocks $\rightarrow$ Clock synchronization 
  - 
+
 *** Logical Time in Asynchronous Networks
- Logical time as substitute?
- - Idea: maybe absolute order in physical time is not necessary, only causality relationships between events need to be preserved 
- - $\rightarrow$ assign logical times to express this relationship
- - Local events are ordered unambiguously in time for each process
- - The logical times of all events have to respect all dependencies between events
- - Enabling assumption: the order of events in different regions of the network is irrelevant! 
- - 
+
+ - *Logical* time as substitute?
+   - Idea: assign logical timestamps to express causal  relationship
+     between events 
+   - Local events are ordered unambiguously in time for each process
+   - How to order events between processes? 
  - Assumptions: Distributed systems based on message exchange 
-*** Partial Order of events
- Let a be an execution, p a process, m a message
- - Execution: Sequence of events on all processes resulting from running a distributed program 
- - Partial order of events
- - Let $\rightarrow_1$ be a partial order on the set of events
- - $\rightarrow_1$ expresses direct dependency
- - For each event x, y at the same process it holds: 
- - 		x $\rightarrow_1$ y iff x happened before y 
- - For each m: send(m) $\rightarrow_1$ receive (m)
- - No other event pairs are in $\rightarrow_1$
- - Happened-before 
+
+
+*** Events in message-passing systems 
+
+*Events*: Anything that is happening inside a single process
+  - Computation, user interaction, ... -- not relevant 
+  - Sending a message
+  - Receiving a message 
+
+
+*** Ordering events
+
+- Ordering local events: Any process can easily decide for two *local*
+  events $x$, $y$ which happened before another one and might hence
+  have caused it
+  - Express that as $x \rightarrow_1 y$ *if and only if* $x$ happened
+    *immediately* before $y$
+- Ordering messages:
+  - We also are sure that sending happens before receiving
+  - For any message $m$, $\mathrm{send}(m) \rightarrow_1
+    \mathrm{receive}(m)$ 
+
+*** One-step partial order 
+
+**** Partial order $\rightarrow_1$                             :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+- Formally, $\rightarrow_1$ is a *partial order* on the set of all
+  events
+  - A subset of $E \times E$ ($E$: set of all events) 
+- Only the event pairs from previous slide are in $\rightarrow_1$ 
+
+
+*** Happened-before 
+
+- How to extend? 
+
+
+**** Happened-before $\rightarrow$                             :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+
  - Let $\rightarrow$ be the transitive closure of $\rightarrow_1$
  - $\rightarrow$ is called happened-before relation 
- - (other names: causal ordering, potential causal ordering)
+   - Other names: causal ordering, potential causal ordering
+
+
+#+BEAMER: \pause
+
+**** Transitive closure                                        :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+Recall: For a relation $R_1 \subset E\times E$, the *transitive
+closure* is the relation $R \subset E\times E$ such that
+
+$$\forall e_1, e_2: (e_1, e_2) \in R \leftrightarrow (e_1, e_2) \in
+R_1 \vee \exists e: (e_1, e) \in R_1 \wedge (e, e_2) \in R$$ 
+
+
+
+*** Happened-before equals causality? 
+
+
+  - The happened-before relation represents only *potential* causality
+    - All messages that *possibly* had influence on a given event
+      contribute to this partial order
+  - It orders pairs of events that were not  cause/effect
+    - But that is not decidable from perspective of a group
+      communication protocol!
+  - So ere on the side of safety 
+
+
 *** Happened-before relationship, concurrent events
+
+- Happened-before $\rightarrow$ is still a partial order
+
+**** Concurrent events                                         :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+- Two events $e_1$ and $e_2$ are *concurrent* if and only if  neither
+   $e_1 \rightarrow e_2$  nor  $e_2 \rightarrow e_1$   
+
+
+*** Happened-before, example 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
  It holds:
  - a $\rightarrow$ f (via b, c, d)
  - But: a and e are not ordered by $\rightarrow$; a and e are concurrent
- - Two events e1 and e2 are concurrent iff neither e1 $\rightarrow$ e2 nor e2 $\rightarrow$ e1 
- - The happened-before relation represents only potential causality
- - All messages that possibly had influence on a given event contribute to this partial order
-*** Partial order and logical time
- A logical time L is an assignment of every event in a to a totally ordered set T 
- - T represents points in time such that
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Example events 
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=3
+#+NAME: fig:example_events
+[[./figures/logicalTime.pdf]]
+
+
+
+*** Happened-before and causal multicast 
+
+With happened-before, we can finally define: 
+
+**** Causal multicast                                          :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+
+A multicast ordering is said to be *causal* if  
+- for any two messages $m_1, m_2$ with $\mathrm{send}(m_1)
+  \rightarrow \mathrm{send}(m_2)$,
+- $m_1$ will be delivered before $m_2$
+  - (at all shared destinations of $m_1, m_2$) 
+
+*** Happened-before: Useful? 
+
+- So far, happened-before is a just a concept
+  - No way to use it in a real system
+- Recall: we want to decide, in a process, for two events, whether
+  they are (potentially) causally related
+  - Maybe let's come back to logical timestamps? 
+
+
+
+
+
+
+*** Logical time
+
+**** Logical time                                              :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+A *logical time L* is an assignment of every event to a totally
+ordered set T  
+ - T represents points in time 
  - No two events are assigned the same logical time
- - The events of a process p have increasing times in their order of occurrence in p
- - L(send(m)) $<$ L(receive(m)) for all messages m
- - For any value t Î T there are only finitely many events that get assigned a previous time (progress condition) 
- - Such an L is called compatible with $\rightarrow$ 
- - Formally: $\forall  x,y \in \alpha: x \rightarrow y \text{ implies } L(x) < L(y)$
- - 
- - Does the contraposition hold? Is L uniquely determined 
- - by $\rightarrow$ ?
- - 
-*** Partial Order for Logical Time
- L has freedoms compared to $\rightarrow$
- - Events in different processes can be assigned different times 
- - if they are concurrent to each other 
- - Real time does not have this freedom, but this is the key property to algorithmically compute L
- - 
- - Crucial property: for a single process alone, a logical time is indistinguishable from a real time
- - Formal: for every execution a with logical time L there is another execution a’ so that
+ - The events of a process p have increasing times in their order of
+   occurrence in p 
+ - $L(\mathrm{send}(m)) < L(\mathrm{receive}(m))$ for all messages $m$
+ - For any value $t \in T$,  there are only finitely many events that
+   get assigned a previous time (progress condition)  
+
+*** Logical time and happened before 
+
+**** Compatible                                                :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+ - Such a logical time  $L$ is *called* compatible with $\rightarrow$ 
+ - Formally: $\forall  x,y \in \alpha: x \rightarrow y \text{ implies
+   } L(x) < L(y)$ 
+
+
+**** Contraposition? 
+
+ - Does the contraposition hold? Is $L$ uniquely determined  by
+   $\rightarrow$ ?
+
+
+
+*** Logical time given a partial order
+
+- Recall: happened-before is determined by event sequences 
+- But: $L$ has freedoms compared to $\rightarrow$
+  - Events in different processes can be assigned different times if
+    they are concurrent to each other   
+  - Real time does not have this freedom, but this is the key property
+    to algorithmically compute $L$ 
+
+*** Indistinguishable 
+
+Crucial property: from the perspective of a single process alone, a
+logical time is indistinguishable from real time 
+ - Formally: for every execution with logical time L there is another
+   execution  so that 
  - Events occur (in real time) in the order of logical time L 
  - For every process: a’ is indistinguishable from a
- - So-called „rubberband transformation“ 
+ - So-called *rubberband transformation*
+
 *** Assignment of Logical Time – Example  
- 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
- 10
+
+#+CAPTION: Events with logical time stamps 
+#+ATTR_LaTeX: :height 0.9\textheight :options page=4
+#+NAME: fig:time_not_causal
+[[./figures/logicalTime.pdf]]
+
+
 *** Assignment of Logical Time – Rubberband 
- 11
 
 
 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
 
- P1
- P2
- P3
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
+#+CAPTION: Events with logical time stamps 
+#+ATTR_LaTeX: :height 0.9\textheight :options page=4
+#+NAME: fig:time_not_causal
+[[./figures/logicalTime.pdf]]
 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
-
-
-
-
-
-
-
- 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
- 10
-*** Logical Time for Asynchronous Algorithms
- How to algorithmically compute an assignment of a logical time to every event in a distributed system?
- - LamportTime transformation of a given algorithm A to L(A)
- - To each process in A a variable “clock” is added, initially 0
- - Clock is increased at every event (in particular, send or receive)
- - Logical time of an event:  
- - 	(clock value immediately after the event, process index)
- - Send:
- - Clock is incremented
- - Clock value is attached to the message (as timestamp)
- - Receive:
- - clock = MAX(clock, timestamp of the message) + 1
- - 
- - Result: Generated series of times is indeed a logical time and compatible with happened-before on given events 
-*** Lamport Algorithm – Totally ordered clocks 
-
-
-
-
-
- P1
- P2
- P3
+#+CAPTION: Events with logical time stamps -- rearranged
+#+ATTR_LaTeX: :height 0.9\textheight :options page=5
+#+NAME: fig:time_not_causal
+[[./figures/logicalTime.pdf]]
 
 
 
 
 
 
+** Lamport algorithm 
+
+*** How to compute logical timestamps? 
+
+- So far: we guessed logical timestamps
+  - And checked whether they are consistent with the happened-before
+    relationship 
+- To make this concept practical, we need an algorithm to compute
+  these logical timestamps in a distributed setting
+  - Each event needs a timestamp 
 
 
+*** LamportTime algorithm 
 
 
+LamportTime transformation of a given distributed  algorithm A to L(A) 
 
- (0,1)
+ - To each process, add a variable ~clock~, initially 0
+ - Logical time of an event: (clock value immediately after the event,
+   process index)
+   - With lexicographic ordering; process index breaks ties 
+ - Increment ~clock~  at every normal event
+ - Send event: 
+   - Increment clock 
+   - Attach clock value to message
+ - Receive event:
+   - clock = MAX(local clock,  clock value in  message) + 1
 
- (0,2)
- (0,3)
- (1,1)
- (6,1)
- (7,1)
- (2,2)
- (3,2)
- (4,2)
- (5,2)
- (1,3)
- (4,3)
- (5,3)
-*** Overview
- Logical time 
- - Happened-before relationship, Lamport Time
- - Vector clocks & causal multicast 
- - Real-time clock synchronization 
- - 
-*** Causal Precedence
- More general question: construction of the whole causal precedence relation?
- - For example: decide whether two events are concurrent (causally independent) or not?
- - Is LamportTime sufficient?
- - Recall: e $\rightarrow$ e’ implies L(e) < L(e’)
- - But: 	 L(e) < L(e’) does not imply e $\rightarrow$ e’ 
- - 
- - Extension to LamportTime necessary!
+*** LamportTime algorithm 
+
+- Result: Logical time and compatible with happened-before on given
+  events  
+
+- Interpretation of clock value: There exists an event  path of that
+  length   from initialisation to current event 
+
+*** Lamport Algorithm –- Example 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Events with logical time stamps 
+#+ATTR_LaTeX: :height 0.9\textheight :options page=4
+#+NAME: fig:time_not_causal
+[[./figures/logicalTime.pdf]]
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Events with LamportTime as timestamps 
+#+ATTR_LaTeX: :height 0.9\textheight :options page=6
+#+NAME: fig:time_not_causal
+[[./figures/logicalTime.pdf]]
+
+
+*** LamportTime properties 
+
+- For any two events $e, e'$, $e \rightarrow e’$ implies $L(e) <
+  L(e’)$
+  - Proof: Induction on $\rightarrow$
+- But: $L(e) < L(e’)$ does *not* imply  $e \rightarrow e’$!
+  - Counterexamples see previous figure 
+
+*** LamportTime for Causal multicast? 
+
+- Recall: to build causal multicast, we need to know whether
+  $\mathrm{send}(m_1)  \rightarrow \mathrm{send}(m_2)$
+- To know whether or not to hold back $m_2$
+- But with only the timestamps for $m_1$, $m_2$, we cannot decide that 
+
+#+BEGIN_CENTER
+\Huge \Sadey 
+#+END_CENTER
+
+*** So?  
+
+- We need more information in the logical timestamp than available via
+  just LamportTime
+- We need not only the length of the longest event path leading up to
+  an event, we need the entire previous structure of events!
+
+
+** Vector clocks 
+
 *** Vector Clocks
- For n processes, every process i contains a vector VC with n entries, initially all 0
- - To every event e a vector time VC(e) is attached 
- - Idea: each element VC(e)[ j ] represents the number of events that preceded e on processor j
- - Rules for change of VC on processor i:
- - If e is an internal or send event it applies 
- - 		VC[i ] := VC[i ] +1, all other entries remain equal
- - If e is a receive event it applies
- - 			VC := max{VC, send vector time of the message}
- - 			VC[i] := VC[i]+1
- - Claim: Vector clocks allow to reconstruct the entire causal structure of an execution (e.g. concurrency of events)
- - Formally: VC(e) < VC (e‘) if and only if e $\rightarrow$ e‘ !
-*** Comparing Vector Clocks
- Two vector clocks are equal if they are identical in all components:
- - 
- - 
- - 
- - One vector clock is smaller than or equal to another if all components are smaller or equal:
- - 
- - 
- - 
- - Vector clocks are smaller if they are (smaller or equal) and unequal:
-*** Graphical Interpretation of Vector Clocks
- Vector clocks represent the entire cone of previous events
- - Comparing vector clocks of two events allows to decide whether one event is causally related to another or independent
- - Two events are independent (or concurrent) if neither 
- - e $\rightarrow$ e’ nor e’ $\rightarrow$ e
- - This is equivalent to neither VC(e) $<$ VC(e’) nor VC(e’) $<$ VC(e)
 
+**** Vector clocks                                             :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+ - For n processes, every process i contains a *vector* VC with n
+   entries, initially all 0 
+ - To every event e, a vector time VC(e) is attached 
+   - Idea: each element VC(e)[ j ] represents the number of events that preceded e on processor j
+ - Rules for change of VC on processor i:
+   - If e is an internal or send event:
+     - VC[i] := VC[i ] +1
+     - All other entries remain equal
+   - If e is a receive event it applies
+     - VC := max{VC, send vector time of the message}; componentwise 
+     - VC[i] := VC[i]+1
+ 
+
+*** Vector clocks and causal structure 
+
+- Claim: Vector clocks allow to reconstruct the entire causal
+  structure of an execution (e.g. concurrency of events) 
+- Formally: 
+  $$ VC(e) < VC (e‘) \text{ if and only if } e \rightarrow  e‘ $$ 
+
+*** Comparing Vector Clocks
+- Two vector clocks are equal if they are identical in all components:
+  $$ VC(e) = VC (e‘) \Leftrightarrow  \forall k: VC(e)[k] = VC(e')[k]
+  $$     
+
+- One vector clock is smaller than or equal to another if all
+  components are smaller or equal: 
+  $$ VC(e) \leq VC (e‘) \Leftrightarrow  \forall k: VC(e)[k] \leq
+  VC(e')[k] 
+  $$     
+- Vector clocks are smaller if they are (smaller or equal) and
+  unequal:
+  $$ VC(e) < VC (e‘) \Leftrightarrow  VC(e) \leq VC(e') \wedge VC(e)
+  \not= VC(e')  $$     
+  
+*** Vector clocks and independence 
+
+Two events are independent concurrent if 
+- neither   $e \rightarrow e’$
+- nor $ e’ \rightarrow e$ 
+
+
+
+*** Graphical Interpretation of Vector Clocks
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+Vector clocks represent the entire /cone/ of previous events
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Cone of events
+#+ATTR_LaTeX: :width 0.85\linewidth
+#+NAME: fig:vectorcone
+[[./figures/vectorcone.pdf]]
+
+
+
+
+** Causal ordering 
 
 *** Realizing Causal Ordering: CBCAST protocol
- Open question from chapter 3: 
- - How is causally ordered group communication implemented?
- - 
- - CBCAST protocol
- - Based on vector timestamps
- - UDP/IP-based, IP multicast used if possible
- - 
- - CBCAST algorithm
- - Let p1, p2, …, pn be group members
- - Let VTj  be a vector timestamp
- - VTj [i] represents the count of  multicast messages sent by pi that causally lead up to the latest message delivered to pj
-*** Causal Ordering in ISIS: CBCAST 
- Update VT 
- - Initially all VTi  are the zero vector
- - When pi multicasts a message, increment VTi [i] by one, add resulting VTi to message as vector timestamp vt
- - Upon message reception at pj, merge local timestamp of pj with timestamp received in the message
- - Merging timestamps: Maximum per element
- - Message is delivered at pj if (let vt be the message’s timestamp)
- - Message must be next in sequence expected from pi:
- - vt[i] = VTj[i]+1
- - All causally prior messages that have been delivered at pi  must have been delivered at pj : 
- - VTj [k] $\geq$ vt[k] (for k $\neq$ i)
- - 
+
+ - Open question: How to implement causally ordered group
+   communication implemented?
+ - \ac{CBCAST} protocol
+   - Based on vector clocks 
+   - UDP/IP-based, IP multicast used if possible
+*** CBCAST protocol  
+
+CBCAST algorithm
+   - Let p1, p2, …, pn be group members
+   - Let VTj  be a vector clock 
+   - VTj [i] represents the count of  multicast messages sent by pi
+     that causally lead up to the latest message delivered to pj 
+
+*** CBCAST protocol  
+
+Update VT 
+ - Initially, all VTi  are the zero vector
+ - When pi multicasts a message
+   - increment VTi[i] by one
+   - add resulting VTi to message as vector timestamp vt
+ - Upon message *reception* at pj, merge local timestamp of pj with
+   timestamp received in the message 
+   - Merging timestamps: Maximum per element
+ - Message is *delivered* at pj if (let vt be the message’s timestamp)
+   - Message must be next in sequence expected from pi:  vt[i] =
+     VTj[i]+1 
+   - All causally prior messages that have been delivered at pi  must
+     have been delivered at pj :   VTj [k] $\geq$ vt[k] (for k $\neq$
+     i) 
+
 *** CBCAST Example
 
-*** An architectural aside 
- 22
 
 
-** Case study: VSync 
+#+CAPTION: An example CBCAST execution
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:cbcast_example
+[[./figures/cbcast_example.pdf]]
 
-*** Case study: Vsync  
- 40
- http://vsync.codeplex.com/
-*** Overview
- Peer-to-peer networking 
- - Group communication
- - Distributed event systems & publish/subscribe 
- - Message queuing 
- - Odds & ends
- - 
 
+ 
+* Case studies
+
+
+
+
+*** Early example: ISIS 
+
+
+- One of the earliest examples (1985) of a process-group system
+  dealing with membership changes \cite{Birman:1985:ISIS}
+  - Innovated virtual synchrony as model
+  - Provided many different multicast ordering semantics 
+- Experiences: \cite{Birman:1994:ISIS}
+  - Atomic multicast several times slower than causal multicasts;
+    blocking sender
+  - Ease of programming, dependability matter
+  - Many small groups; possibly in hierarchies
+  - Typically, server groups use ISIS; clients use conventional means
+    to talk to servers 
+  - Evolved into VSync 
+
+*** Case study: \href{http://vsync.codeplex.com/}{Vsync}  
+
+- Library to build (cloud) applications using replicated data
+  - Based on group communication and virtual synchrony 
+  - Built on top of .NET in C#, with some language bindings; works on
+    Mono as well  
+  - Goal: make building distributed, dependable, scalable applications
+    easier 
+- Key abstraction: *Object group* 
+  - Several programs running concurrently, each has instance of object  
+  - These instances form a distributed object 
+  - Reads and writes/method invocations happen via group communication
+    primitives  
+    - Hooked into getter and setter methods 
+    - E.g., guaranteeing total order even if multiple updates to same
+      object group happen concurrently  
+    - E.g., reads are load-balanced across instances in a group  
+  - Checkpointing 
+ 
+*** Case study: Derecho 
+
+- Evolution/rewrite:
+  \href{https://github.com/Derecho-Project/derecho-unified}{Derecho}
+- How to speed up VSync? Circumvent network stack
+  - Built to leverage \ac{RDMA}
+    - Directly access another machine's memory; high-throughput,
+      low-latency networking; bypassing kernel buffers, ... by having
+      network interface card directly access main memory
+  - Provides *replicated objets* as core building blocks 
+
+
+   
+* Summary 
+
+*** Summary 
+
+- Group communication is a key building block for distributed systems
+- Different ordering semantics are needed to support different
+  applications
+- Efficient implementations can be nontrivial and require concepts
+  like vector clocks
+- Various frameworks exist to use this approach in own applications 
+
+
+*** Combination of multicast ordering semantics \cite{Hadzilacos:1993:MCastSemantics} 
+
+- Reliability usually always required 
+- Multicast ordering semantics characterised by two aspects:
+  - Atomicity yes/no
+  - Nothing/FIFO/causality
+- All six combinations plausible and useful 
