@@ -78,10 +78,16 @@
 
 
 ** Distributed event systems and publish/subscribe
+   :PROPERTIES:
+   :CUSTOM_ID: ch:pubsub
+   :END:
 
 #+include: "../ch_08_des_pubsub/ch_08_des_pubsub.org"
 
 ** Message queueing
+   :PROPERTIES:
+   :CUSTOM_ID: ch:mq
+   :END:
 
 #+include: "../ch_09_msqQueuing/ch_09_msqQueuing.org"
 

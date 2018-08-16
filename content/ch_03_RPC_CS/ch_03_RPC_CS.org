@@ -1153,7 +1153,7 @@ But:  No DELETE, PUT,  ... supported!
 
 #+BEAMER: \pause
 - Coupling of these services/systems happens typically via \ac{DES}
-  - Compare Section~\ref{sec:des}
+  (Chapter \ref{ch:pubsub}) or Message Queuing (Chapter \ref{ch:mq})
 
 
 *** CQRS 
