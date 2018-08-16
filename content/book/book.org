@@ -65,8 +65,8 @@
 
 #+include: "../ch_05_practical/ch_05_practical.org" 
 
-
-* Non-client/server systems					   :noexport:
+ 
+* Non-client/server systems
 
 ** Peer-to-Peer systems 
 
