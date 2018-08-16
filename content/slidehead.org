@@ -14,6 +14,7 @@
 #+LATEX_HEADER: \usepackage{xr-hyper}
 #+LATEX_HEADER: \usepackage{tikz}
 #+LATEX_HEADER: \usetikzlibrary{tikzmark}
+#+LATEX_HEADER: \usepackage{tikzsymbols}
 #+LATEX_HEADER: \usepackage{minted}
 #+LATEX_HEADER: \setminted{breaklines,autogobble,escapeinside=??,frame=lines,linenos=false,mathescape=true}
 #+LATEX_HEADER: \usepackage{adjustbox}
