@@ -523,6 +523,9 @@ Details in Jager's class. Here just some teasers.
 
 
 * Multi-tier  architectures
+  :PROPERTIES:
+  :CUSTOM_ID: sec:cs:multitier
+  :END:
 
 *** Tiers in Web applications 
 
@@ -562,8 +565,9 @@ This three-tier structure \cite{eckerson1995three-tier-architecture} is typical
 - Delays: client and server far away 
 
 *** Client/Server – Several servers  
-
-
+    :PROPERTIES:
+    :CUSTOM_ID: s:cs:servergroup
+    :END:
 
 ****                                                              :B_columns:
      :PROPERTIES:
@@ -601,8 +605,6 @@ This three-tier structure \cite{eckerson1995three-tier-architecture} is typical
 
 
 *** Server group with data base 
-
-
 
 ****                                                              :B_columns:
      :PROPERTIES:
