@@ -1,4 +1,5 @@
 #+TITLE: Distributed event systems and publish/subscribe
+
 #+include: "../slidehead.org"
 
 \begin{frame}

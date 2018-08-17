@@ -1,5 +1,170 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+* Publish/Subscribe 
+  :PROPERTIES:
+  :CUSTOM_ID: sec:pubsub
+  :END:
+
+** API 
+
+***  APIs so far 
+
+- Send/receive
+- Unicast or multicast
+- Blocking or nonblocking 
+
+
+#+BEAMER: \pause
+
+- But open question: When to receive?
+- Receiver might want to be told if something interesting has happened
+- But how to know whom to tell?? 
+
+
+*** Events in focus? 
+
+- Suppose there are processes that want to learn about  some
+  *events*
+  - It is unknown when these events happen
+  - Not every processes cares about all events 
+- Examples for events 
+  - Failure, load changes, ... 
+  - Stock price changes
+  - Tweet posted
+  - ... 
+
+*** Describing events 
+
+- Assumption: 
+  - Events associated with some arbitrary content 
+  - (Sets of) events can somehow be described, identified
+
+- Possible descriptions: 
+  - *Topic-based*: simple text metadata for an event
+    - E.g., which company?
+  - *Subject-based*: events with key/value-pairs as metadata
+  - *Content-based*: directly look at content 
+
+*** Subscribe, publish, notify 
+
+- Interested process signals its interest in particular events
+  - It *subscribes*
+- Process *publish* an event 
+- Expectation: Every process with a *matching* subscription is
+  *notified* about the event
+  - Ideally: *exactly once* 
+ 
+**** \ac{P/S} system                                           :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+A publish/subscribe system provides subscribe, publish and notify (as
+upcall) interfaces and ensures that all notifications take place. 
+
+Earliest example perhaps \cite{Birman:1987:VirtualSync}
+
+*** Key characteristics 
+ - *Loose coupling* 
+   - *Decoupling in time (asynchronous)*: subscription, publication, notification can happen at different points in time 
+   - *Decoupling in identity*: Neither publisher nor subscribers need to (or should) know their identities
+   - *Decoupling in space*: Where the matching of subscriptions and publications takes place is irrelevant 
+ - Heterogeneous 
+
+*** No memory 
+
+- Pub/sub systems do not keep memory!
+  - No notifications of publications that happened before a
+    subscription  
+
+
+** Matching 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:ps:matching
+   :END:
+
+*** Matching in topic-based P/S
+
+- Metadata of 
+  - Subscription: List of topics
+  - Publication: List of topics
+- Match: If the intersection of subscription and publication list of
+  topics is not empty 
+
+*** Matching in subject-based P/S 
+    :PROPERTIES:
+    :CUSTOM_ID: s:ps:subject-based
+    :END:
+
+- Multiple semantics exist; here one example
+  - Used by TIBCO/Rendezvous 
+- Metadata of
+  - Publication: a list of key/value pairs
+    - Values: real numbers 
+  - Subscription: a list of pairs of key + value or interval
+- Match:
+  - For every key/value in subscription, that key/value must be in
+    publication
+  - For every key/interval in subscription, there must be a key/value
+    pair with the same key and the value must lie in the interval 
+- Example
+  - P = { (a,5), (b, 17), (c, 7.5) }  matches S = { (a, 5), (c, [2,10)} 
+
+*** Matching in subject-based P/S 
+    :PROPERTIES:
+    :CUSTOM_ID: s:ps:subject-based:siena 
+    :END:
+
+- Extension: SIENA \cite{Carzaniga:2001:WideAreaEventNotification}
+- Publications metadata: list of *typed* key/value pairs 
+  - Values can have multiple types, e.g., string, boolean, int, ...
+- Subscriptions: predicates
+  - Disjunction of conjunctions of *constraints* on key/value pairs
+  - Constraint: which key, an operator, value
+    - E.g., ~price < 100~; ~name = "UPB"~
+  - Example predicate: ~[name="UPB" AND (class="Vorlesung" OR
+    class="Uebung") AND when > 2016]~
+
+#+BEAMER: \pause
+
+- A predicate *selects* a message if all attributes in message match
+  predicate  
+  - We write $p(m) = \text{ True}$ for short 
+
+
+*** Matching in content-based P/S 
+
+- Look at content of publication instead of publication metadata
+- Subscription specifies which content is relevant
+  - By a regular expression
+  - By an arbitrary function (mapping content to True/False) 
+
+
+*** Matching 
+
+- Many more variants exist
+  - Eg., geographic scoping on source of event
+  - Filters
+  - Rate limits (up to so many notifications per second) 
+
+- We will assume a simple function  ~match(P, S)~ that is True if
+  publication ~P~ matches subscription ~S~ 
+
+
+** Naive implementation
+
+*** Centralised server 
+
+- A centralised implementation is almost trivial
+  - All subscriptions and publications go to server
+  - Matches, and notifies accordingly
+  - Called a *matching server*, a *rendezvous server* 
+- It *does* decouple in time, identity, and space
+  - As long as it does not fail, gets overloaded
+  - All processes only need to know this server's identity, not of
+    their peers 
+
+
 * Distributed event systems 
   :PROPERTIES:
   :CUSTOM_ID: sec:des
@@ -7,46 +172,408 @@
 
 
 ** Idea 
-
-*** Events and publish/subscribe systems (blackboards) 
- Other application scenario: Objects can undergo changes (“events”), other objects want to be notified about such changes
- - Example: Object = stock price of IBM, can go up or down	
- - Distributed event-based systems
- - Objects can subscribe to event notifications of other objects 
- - They “register interest” in the event 
- - Objects can publish such notifications; subscribers are notified 
- - Events may be typed, scoped, have attributes, provide wildcards, … 
- - Notifications can have various delivery semantics (reliable, …)
- - Key characteristics 
- - Heterogeneous 
- - Decoupling in time (asynchronous): subscription, publication, notification can happen at different points in time 
- - Decoupling in identity: Neither publisher nor subscribers need to (or should) know their identities
- - Decoupling in space: Where the matching of subscriptions and publications takes place is irrelevant 
-*** Classification of pub/sub systems 
- 43
-*** Example: Dealing room system 
+*** A distributed set of matching servers 
 
 
+- How to improve performance, scalability, dependability
+- Use multiple matching servers; distribute work 
 
-** Case study: Pub/sub with 0mq 
+*** Group of centralized servers 
 
-*** Case study: Pub/sub with 0mq  
- 45
- http://learning-0mq-with-pyzmq.readthedocs.org/en/latest/pyzmq/patterns/pubsub.html
-*** 0mq – Publisher 
- http://zguide.zeromq.org/py:wuserver
-*** 0mq – Subscriber 
- http://zguide.zeromq.org/
- - py:wuclient
-*** Case study: Jini distributed event specification 
- Subscribers can subscribe to event notification from objects across Java virtual machines, across computers 
- - 
- - Jini implementation 
- - Event generators implement interface EventGenerator with 
- - method register
- - Subscribe to event generator by providing an object implementing the RemoteEventListener interface as target for notifications 
- - Event generators call notify with an object of class RemoteEvent, delivered via JavaRMI 
- - 
- - See (Jini = Apache River): 
+- Scale up a single server? Server group? 
+- Suppose we could map metadata to one server in group
+- Idea: Send subscription and publication to all mapped servers?
+  - How to deal with multiple topics? Multiple key/value pairs?
+  - How to deal with duplicate notifications? 
+- Which server deals with which pub or sub: *event routing* 
+
+#+BEAMER: \pause
+- Scales up, but still does not deal with failures 
+
+
+*** Flooding 
+
+- Simplest option:
+  - Flood *either* subscriptions *or* notifications to
+    all server
+  - The other type is sent to *exactly* one server
+- Issues:
+  - Dependability
+  - Load balancing
+  - ... 
+
+
+** Content-based routing 
+*** Name-based event routing 
+
+- Build an actual event routing structure
+  - Use metadata (or content) of pubs and subs to select matching
+    server(s) in charge
+  - Idea again: an *overlay structure*, reflecting application-level
+    relationships
+    - *Not* (necessarily) a P2P overlay 
+- Also called *content-based routing* 
+  - Closely related to ideas of *information-centric networking*
+    \cite{Ahlgren:2012:SurveyInfCentric} 
+
+*** Recall: Routing vs. Forwarding 
+
+- Routing: The *construction* of tables that tells a node via which
+  neighbour(s) a desired destination can be reached
+- Forwarding: The *usage* of such tables to forward a message towards
+  its destination, via one or several neighbours 
+
+
+*** Name-based event routing: CBCB 
+
+- We consider one example structure: \ac{CBCB} event routing 
+  \cite{Carzaniga:2004:ContentBasedNetworking,Carzaniga:2001:WideAreaEventNotification} 
+
+- We assume the key/value-or-intervals subject-based scheme as example 
+  (\slideref{sec:ps:matching}[s:ps:subject-based:siena])
+
+  - Scheme can be generalised 
+
+*** CBCB setup 
+
+- $N$ matching servers
+- Arbitrary number of "clients", sending publications, subscriptions 
+- Broadcast layer among servers: Ensure message reaches all
+  destinations
+- Routing layer: Avoid sending message to not interested nodes 
+
+
+*** CBCB broadcast layer 
+
+- Construct a spanning tree among that comprises all $N$ servers
+  - Possibly using additional nodes as routers
+- Use this tree to forward messages between servers
+
+
+**** Extension 
+
+- Other broadcast tree constructions possible; but paths need to be
+  symmetric 
+
+
+*** CBCB  predicates 
+
+- Recall: A predicate $p$  *selects* a message $m$  if message attributes match
+  - We write $p(m) = \text{ True}$ for short 
+- Use that to compare two predicates $p_1$, $p_2$: More or less
+  general predicates 
+
+
+#+BEAMER: \pause
+
+**** Covering                                                  :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+$p_1$ *covers* $p_2$ if $\forall m: p_2(m) \Rightarrow p_1(m)$ 
+
+We write $p_2 \prec p_1$ 
+
+
+*** CBCB routing table 
+
+- Idea: each node stores, for each neighbour in broadcast tree, the
+  most general covering predicate 
+- When subscription with predicate comes in, add that to existing
+  predicate (initially empty)
+- When covering attribute on an interface changed, propagate to
+  neighbours 
+- Note: There are more details necessary to make this work; just
+  general idea 
+
+
+*** CBCB forwarding 
+
+- For each neighbour in the broadcast tree, routing function produced
+  a covering predicate
+- Forward a message $m$ to all neighbours in the tree where the
+  predict selects $m$ 
+
+** Gossiping 
+
+*** Gossiping 
+
+- Core idea:
+  - Do not try to build a routing structure at all
+  - Instead, rely on random forwarding (random walk) among matching
+    servers 
+- Reality check:
+  - Limit random walks by separating via topics, ...
+
+#+BEAMER: \pause
+
+- We will revisit gossiping later 
+
+
+* Case studies 
+
+
+** Amazon SNS 
+
+
+*** Amazon Simple Notification Service 
+
+- Amazon \ac{SNS} toolbox for Pub/Sub
+  - https://aws.amazon.com/sns/
+  - https://aws.amazon.com/blogs/compute/building-scalable-applications-and-microservices-adding-messaging-to-your-toolbox/
+- Integrated with other Amazon Web Services
+** Jini 
+
+*** Jini/River
+- Subscribers can subscribe to event notification from objects across
+  Java virtual machines, across computers   
+- Jini implementation 
+  - Event generators implement interface EventGenerator with 
+  - method register
+  - Subscribe to event generator by providing an object implementing
+    the RemoteEventListener interface as target for notifications  
+  - Event generators call notify with an object of class RemoteEvent,
+    delivered via JavaRMI  
+- See (Jini = Apache River): 
  - https://river.apache.org/
  - http://www.jini.org/wiki/Jini_Distributed_Events_Specification
+
+** Pub/sub with 0mq 
+
+*** Case study: Pub/sub with 0mq  
+
+
+- Support multiple subscribers subscribing to multiple publishers 
+- Topic-based systems
+  - Data published with topic
+  - Subscribers usually set filters on topics they are interested in
+- 
+   \href{http://learning-0mq-with-pyzmq.readthedocs.org/en/latest/pyzmq/patterns/pubsub.html}{Structure}
+
+#+CAPTION: 0mq pub/sub structure
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:0mq_pubsub
+[[./figures/zeromq_pubsub.png]]
+
+
+*** 0mq –- Publisher 
+ http://zguide.zeromq.org/py:wuserver
+
+\small 
+#+BEGIN_SRC python
+import zmq
+from random import randrange
+
+context = zmq.Context()
+socket = context.socket(zmq.PUB)
+socket.bind("tcp://*:5556")
+
+while True:
+    zipcode = randrange(1, 100000)
+    temperature = randrange(-80, 135)
+    relhumidity = randrange(10, 60)
+
+    socket.send_string("%i %i %i" %
+                       (zipcode, temperature, relhumidity))
+#+END_SRC
+
+*** 0mq –- Subscriber 
+ http://zguide.zeromq.org/py:wuclient
+
+\footnotesize 
+#+BEGIN_SRC python
+import sys, zmq
+
+context = zmq.Context()
+socket = context.socket(zmq.SUB)
+
+socket.connect("tcp://localhost:5556")
+
+zip_filter = sys.argv[1] 
+
+socket.setsockopt_string(zmq.SUBSCRIBE, zip_filter)
+
+total_temp = 0
+for update_nbr in range(5):
+    string = socket.recv_string()
+    zipcode, temperature, relhumidity = string.split()
+    total_temp += int(temperature)
+
+print("Average temperature for zipcode '%s' was %dF" % (
+      zip_filter, total_temp / (update_nbr+1)))
+#+END_SRC
+
+*** 0mq pub/sub - Evaluation 
+
+- Great and simple to use for simple scenarios
+- But: 
+  - Filtering happens *at subscriber*! 
+  - Hard to make this scale to truly distributed, large-scale setups
+  - \href{http://zguide.zeromq.org/php:chapter5}{Longer discussion} on
+    how to scale up  and build advanced pub/sub patterns in 0mq 
+
+** Redis 
+
+*** Redis 
+
+**** \href{https://redis.io}{REDIS website}
+
+Redis is an open source (BSD licensed), in-memory data structure
+store, used as a database, cache and message broker. 
+
+It supports data structures such as strings, hashes, lists, sets,
+sorted sets with range queries, bitmaps, hyperloglogs and geospatial
+indexes with radius queries. 
+
+Redis has built-in replication, Lua scripting, LRU eviction, transactions and different levels of on-disk persistence, and provides high availability via Redis Sentinel and automatic partitioning with Redis Cluster. 
+
+***  Installation, startup 
+
+**** Install 
+
+See \href{https://redis.io/download}{downloads}: 
+
+#+BEGIN_SRC bash
+$ wget ... 
+$ tar ... 
+$ make 
+#+END_SRC
+ 
+
+**** Startup 
+
+#+BEGIN_SRC bash
+$ src/redis-server 
+#+END_SRC
+
+*** Usage: command line 
+
+#+BEGIN_SRC bash 
+$ src/redis-cli
+redis> set foo bar
+OK
+redis> get foo
+"bar"
+#+END_SRC
+
+*** Usage: clients
+
+**** Install python client
+
+#+BEGIN_SRC bash 
+$ mkvirtualenv redis -p python3
+$ pip install redis 
+#+END_SRC
+
+**** Usage 
+
+#+BEGIN_SRC python 
+import redis 
+r = redis.Redis(host='localhost', port=6379,) 
+r.set('foo', 'bar')
+value = r.get('foo')
+print(value)
+#+END_SRC
+
+
+*** \href{https://redis.io/topics/pubsub}{Redis and Pub/sub} 
+
+
+- Simple topic-based pub/sub
+  - Topics are called ~channels~
+- Subscribe on multiple channels ~SUBSCRIBE~
+  - Blocks until notification arrives
+  - Subscribed client show only subscribe, unsubscribe, ping 
+- Publish value on channel ~PUBLISH~
+- Plus ~UNSUBSCRIBE~ 
+
+*** Pattern-based pub/sub 
+
+- Redis supports simple patterns for topics based on wildcard globbing  
+- Leads to multiple notifications to same client if publication
+  matches multiple patterns 
+
+*** Example (1) 
+
+\scriptsize
+#+BEGIN_SRC python
+import redis, threading, time
+
+class Listener(threading.Thread):
+    def __init__(self, name, channels):
+        threading.Thread.__init__(self, name=name)
+        self.pubsub = redis.Redis().pubsub()
+        self.pubsub.psubscribe(channels)
+    
+    def run(self):
+        for item in self.pubsub.listen():
+            if item['type'] == "psubscribe":
+                print(self.name, ": someone subscribed on channel {}",
+                      item['channel'])
+                continue 
+                
+            if item['data'] == b"KILL":
+                self.pubsub.unsubscribe()
+                print (self.name, ": unsubscribed and finished")
+                break
+            else:
+                print("{} : channel {}, received: {}".format(
+                    self.name, item['channel'], item['data']))
+#+END_SRC
+
+
+*** Example (2) 
+
+#+BEGIN_SRC python
+if __name__ == "__main__":
+    r = redis.Redis()
+    clients = [Listener('A', ['test.1', 'control']),
+               Listener('B', ['test.2', 'control']),
+               Listener('C', ['test.*', '*.', 'control'])]
+    [client.start() for client in clients]
+
+    time.sleep(1)
+    r.publish('test.1', 'for 1')
+    time.sleep(1)
+    r.publish('test.2', 'for 2 ')
+    r.publish('test.', 'for neither')
+
+    r.publish('control', 'KILL')
+#+END_SRC
+
+*** Example (3): Output 
+
+\scriptsize 
+#+BEGIN_SRC bash
+$ python redis_ps.py
+A : someone subscribed on channel {} b'test.1'
+A : someone subscribed on channel {} b'control'
+B : someone subscribed on channel {} b'test.2'
+B : someone subscribed on channel {} b'control'
+C : someone subscribed on channel {} b'test.*'
+C : someone subscribed on channel {} b'*.'
+C : someone subscribed on channel {} b'control'
+C : channel b'test.1', received: b'for 1'
+A : channel b'test.1', received: b'for 1'
+C : channel b'test.2', received: b'for 2 '
+B : channel b'test.2', received: b'for 2 '
+C : channel b'test.', received: b'for neither'
+A : unsubscribed and finished
+B : unsubscribed and finished
+C : channel b'test.', received: b'for neither'
+C : unsubscribed and finished
+$ 
+#+END_SRC
+
+* Summary 
+
+*** Summary 
+
+- Publish/subscribe another basic building block for distributed
+  systems & applications
+- Powerful and useful programming pattern
+  - Generalises callbacks from non-distributed programming 
+- Versatile, with many variants
+- For large-scale setups, non-trivial distributed matching and event
+  routing can be necessary 
