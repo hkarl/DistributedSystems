@@ -1,0 +1,84 @@
+
+\documentclass[tikz]{standalone}
+
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+  \begin{msc}{Normal operation}
+    \declinst{a}{}{A}
+    \declinst{b}{}{B}
+
+    \mess{P1}{a}{b}[1]
+    \nextlevel[2]
+    \mess{A1}{b}{a}[1]
+    \nextlevel[2]
+
+    \mess{P2}{a}{b}[1]
+    \nextlevel[2]
+    \mess{A2}{b}{a}[1]
+    \nextlevel[2]
+  \end{msc}
+
+
+  \begin{msc}{Packet delayed}
+    \declinst{a}{}{A}
+    \declinst{b}{}{B}
+
+    \mess{P1}{a}{b}[1]
+    \nextlevel[2]
+    \mess{A1}{b}{a}[1]
+    \nextlevel[2]
+
+    \mess{P2}{a}[0.1]{b}[7]
+    \nextlevel[3]
+
+    \timeout{}{a}
+
+    \mess{P2}{a}{b}[1]
+    \nextlevel[2]
+    \mess{A2}{b}[0.2]{a}[1]
+    \nextlevel[2]
+
+    \msccomment[r]{Ignore duplicate}{b}
+
+  \end{msc}
+\setlength{\instdist}{4cm}
+  \begin{msc}{Paket and ACK delayed}
+    \declinst{a}{}{A}
+    \declinst{b}{}{B}
+
+    \mess{P1 (SN 0)}{a}{b}[1]
+    \nextlevel[2]
+    \mess{A0}{b}[0.1]{a}[13]
+    \nextlevel[2]
+    \timeout{}{a}
+
+    \mess{P1 (SN 0)}{a}{b}[1]
+    \nextlevel[1]
+    \msccomment[r]{Ignore duplicate}{b}
+    \nextlevel[1]
+    \mess{A0}{b}[0.1]{a}[1]
+    \nextlevel[2]
+
+    \mess{P2 (SN 1)}{a}{b}[1]
+    \nextlevel[2]
+    \mess{A1}{b}[0.1]{a}[1]
+    \nextlevel[2]
+
+    \mess{P3 (SN 0)}{a}[0.1]{b}[10]
+    \nextlevel[4]
+
+    \mess{P4 (SN 1)}{a}{b}[1]
+    \nextlevel[1]
+    \msccomment[r]{INCORRECTLY considered duplicate}{b}
+    \nextlevel[1]
+    \mess{A1}{b}[0.1]{a}[1]
+    \nextlevel[2]
+
+
+    % \msccomment[r]{Ignore duplicate}{b}
+
+  \end{msc}
+
+\end{document}

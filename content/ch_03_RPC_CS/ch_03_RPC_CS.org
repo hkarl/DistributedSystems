@@ -349,6 +349,102 @@ What if things go wrong?
 - Means to *restart a server*
   - Typical: *heartbeating* 
 
+** Acknowledgements 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:acknowledgements
+   :END:
+
+*** Detour: Acknowledgement protocol 
+
+- Scenario: Simple ACK protocol with timeouts
+  - Sequence numbers 0 or 1
+  - Messages never lost, but can be delayed arbitrarily 
+- Operation:
+  - When packet expected sequence arrives, ACK it and use packet 
+  - Else, it is a retransmission -- resend ACK and drop packet 
+- Does this work? 
+
+
+*** Benign scenarios 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: No problems
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=1,keepaspectratio
+#+NAME: fig:ack:noproblem
+[[./figures/acks.pdf]]
+
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Paket delay gets repaired
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=2,keepaspectratio
+#+NAME: fig:ack:paketdelay
+[[./figures/acks.pdf]]
+
+*** Infeasible scenario 
+
+
+#+CAPTION: Uncoverable problem 
+#+ATTR_LaTeX: :height 0.8\textheight :options page=3,keepaspectratio
+#+NAME: fig:ack:unrecoverable
+[[./figures/acks.pdf]]
+
+
+*** Repair? 
+
+- Problem in Figure \ref{fig:ack:unrecoverable} due to insufficient
+  sequence numbers
+- Bigger sequence number space would solve this problem
+
+**** Solved? 
+
+- But then, just make scenario correspondingly bigger
+  - Yes, it does get less and less likely!
+- Only possibility!
+
+**** Impossible!                                                  :B_theorem:
+     :PROPERTIES:
+     :BEAMER_env: theorem
+     :END:
+
+With finite sequence numbers and arbitrary delays, dependable packet
+delivery is not possible! But risk can be made arbitrarily small by
+increasing sequence number space. 
+
+*** Consequence? 
+
+- For hint that *exactly once* delivery is perhaps not as simple as it
+  looks like
+- In fact, it is *fundamentally impossible*!
+  - We will revisit this in the context of consensus 
+
+*** Consequence of impossiblity? 
+
+- *Exactly once* is unachievable
+  - Do not believe marketing
+- *At least once* strictly speaking also
+  - Once the cable is cut, it is cut
+  - Assumptions: Network partitions do not last arbitrarily long
+- *At most once* feasible as well 
+
 
 ** RPC binding 
 
@@ -371,10 +467,6 @@ We will revisit *binding* and *service discovery* later
  - New programming model! 
  - Collection of software realizing such a new programming model is a middleware 
  - Can achieve, e.g., transparency towards location, communication protocols, hardware, operating system, different programming languages, … 
-
-
-
-
 
 
 
