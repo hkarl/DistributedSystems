@@ -6,6 +6,9 @@
   :END:
 
 ** API 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:pubsub:api
+   :END:
 
 ***  APIs so far 
 
@@ -65,6 +68,9 @@ upcall) interfaces and ensures that all notifications take place.
 Earliest example perhaps \cite{Birman:1987:VirtualSync}
 
 *** Key characteristics 
+    :PROPERTIES:
+    :CUSTOM_ID: s:pubsub:characteristics
+    :END:
  - *Loose coupling* 
    - *Decoupling in time (asynchronous)*: subscription, publication, notification can happen at different points in time 
    - *Decoupling in identity*: Neither publisher nor subscribers need to (or should) know their identities
@@ -495,6 +501,8 @@ print(value)
   matches multiple patterns 
 
 *** Example (1) 
+
+Based on \href{https://gist.github.com/jobliz/2596594}{this gist} 
 
 \scriptsize
 #+BEGIN_SRC python
