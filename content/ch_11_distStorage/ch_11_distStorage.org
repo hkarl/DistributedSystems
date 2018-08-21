@@ -1,11 +1,7 @@
 #+BIBLIOGRAPHY: ../bib plain
-* Distributed storage 
-  :PROPERTIES:
-  :CUSTOM_ID: ch:distributed-storage
-  :END:
 
 
-** Model: distributed storage, distributed objects  
+* Model: distributed storage, distributed objects  
 
 *** Distributed storage models 
  - Replicated storage 
@@ -49,7 +45,7 @@
  - More common, easier for developers  
 
 
-** Data-centric consistency models 
+* Data-centric consistency models 
 
 *** Data-centric consistency models
  Basic model: Processes read 
@@ -197,92 +193,7 @@
 *** Some implementation ideas 
  26
 
-
-** Client-centric consistency models 
-
-
-
-
-*** Eventual consistency
- Typical situation 
- - Replicated data store; many users read, few users write
- - Only very few users allowed to write to specific data
- - Examples: DNS, WWW, many database applications 
- - 
- - Insight: in many such systems, it is acceptable to read out-of-date data (favor availability over consistency) 
- - Access to inconsistent data 
- - Trying to cast, e.g., WWW in the previous consistency models is pointless 
- - 
- - Reasonable goal: eventual consistency
- - 	In the absence of updates, all replicas converge 
- - toward identical copies of each other 
-*** Eventual consistency
- Consider a mobile user accessing an eventually consistent replicated data store 
- - Write performed in one replica; move happens; reads data back from other replica ! Not what was written!
- - This client observes strange behavior! 
- Desirable: one client should see a consistent behavior
- - But behavior of different clients with respect to each other is ignored!
- -  ! Client-centric consistency 
- - Notation 
- - xi[t] : value of (replica of) x as stored at location Li at time t 
- - Write sequence WS (xi[t]) : series of writes by client resulting in xi[t]
- - If operations in WS (xi[t1]) have also happened at Lj at time t2, denote this as WS (xi[t1], xj[t2]) 
-
-
-
-*** Monotonic reads
- Monotonic-read consistency 
- - 	If a process reads the value of a data item x, any successive read operation on x by that process will always return that same value or a more recent value
- - Irrespective of the replicas where these reads happen
- - Note that “more recent” is well defined, since there is only a single process involved 
- - Example: email mailbox, accessed by a mobile user 
- Monotonic-read
- - consistent
- Not monotonic-read
- - consistent
-*** Monotonic writes 
- Monotonic-write consistency
- - 	A write operation by a process on a data item x 
- - is completed before any successive write operation 
- - on x by the same process
- - Irrespective of location where writes are issued
- - “Complete” refers to all involved replicas
- - “Successive” is well defined 
- - A write on a given copy is performed only if that copy has been brought up to date already with other writes (possibly issued at other locations) 
- - Example: Partial updates to a software library
- - Note: relationship to FIFO consistency! 
-*** Monotonic writes 
- Monotonic-write consistent (W(x1) issued at L1, has to happen at L2 before W(x2) may take place)
- Not monotonic-write consistent (W(x1) is missing at L2 
- - before W(x2) happens)
-*** Read your writes
- Read-your-writes consistency 
- - 	The effect of a write operation by a process on 
- - data item x will always be seen by a successive 
- - read operation on x by the same process 
- - Example: updating web page, web browser afterwards loads old version from local replica 
- - 
- Read your writes observed
- No read your writes behavior; 
- - updates W(x1) not reflected at L2
-*** Writes follow reads
- Writes-follow-reads consistency 
- - 	A write operation by a process on a data item x following a previous read operation on x by the same process is guaranteed to take place on the same or a more recent value of x that was read. 
- - Writes are performed on versions of data item that is up to date at least with the value most recently read by the process 
- - Example: Newsgroup posting 
- Write-follows-reads consistent
- Not write-follows-reads consistent
-*** Implementing client-centric consistency – Naïve version
- 35
-*** Implementing client-centric consistency – Improvements
- 36
-*** Overview
- Replication – Overview 
- - Data-centric consistency models
- - Client-centric consistency models
- - Distribution protocols
- - Consistency protocols
- - 
+* Implementation 
 *** Replica placement
  Issue: Where, when, and by whom are replicas of data items placed? 
  - Permanent replicas
@@ -363,6 +274,15 @@
  - Only coordinator replica of invoking object actually sends out the invocation, to all replicas of the invoked object 
  - Use same mechanism to return only a single answer 
  - Sender-based multicast scheme; alternatives possible 
+
+
+** Quorum-based 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:leader:quorum
+   :END:
+
+
+
 *** Replicated-Write protocols: Quorum-based protocols
  Use voting among replicas, instead of involving all replicas into each update decision 
  - 
@@ -383,7 +303,94 @@
  - scheme (ROWA)
  Note: Just one possible way to determine quorums. 
  - Many alternatives exist!
-** Consistency protocols – Summary 
+
+* Case studies 
+** Zookeeper 
+
+** Kafka revisited  
+
+
+* Client-centric consistency models 
+
+*** Eventual consistency
+ Typical situation 
+ - Replicated data store; many users read, few users write
+ - Only very few users allowed to write to specific data
+ - Examples: DNS, WWW, many database applications 
+ - 
+ - Insight: in many such systems, it is acceptable to read out-of-date data (favor availability over consistency) 
+ - Access to inconsistent data 
+ - Trying to cast, e.g., WWW in the previous consistency models is pointless 
+ - 
+ - Reasonable goal: eventual consistency
+ - 	In the absence of updates, all replicas converge 
+ - toward identical copies of each other 
+*** Eventual consistency
+ Consider a mobile user accessing an eventually consistent replicated data store 
+ - Write performed in one replica; move happens; reads data back from other replica ! Not what was written!
+ - This client observes strange behavior! 
+ Desirable: one client should see a consistent behavior
+ - But behavior of different clients with respect to each other is ignored!
+ -  ! Client-centric consistency 
+ - Notation 
+ - xi[t] : value of (replica of) x as stored at location Li at time t 
+ - Write sequence WS (xi[t]) : series of writes by client resulting in xi[t]
+ - If operations in WS (xi[t1]) have also happened at Lj at time t2, denote this as WS (xi[t1], xj[t2]) 
+
+
+
+*** Monotonic reads
+ Monotonic-read consistency 
+ - 	If a process reads the value of a data item x, any successive read operation on x by that process will always return that same value or a more recent value
+ - Irrespective of the replicas where these reads happen
+ - Note that “more recent” is well defined, since there is only a single process involved 
+ - Example: email mailbox, accessed by a mobile user 
+ Monotonic-read
+ - consistent
+ Not monotonic-read
+ - consistent
+*** Monotonic writes 
+ Monotonic-write consistency
+ - 	A write operation by a process on a data item x 
+ - is completed before any successive write operation 
+ - on x by the same process
+ - Irrespective of location where writes are issued
+ - “Complete” refers to all involved replicas
+ - “Successive” is well defined 
+ - A write on a given copy is performed only if that copy has been brought up to date already with other writes (possibly issued at other locations) 
+ - Example: Partial updates to a software library
+ - Note: relationship to FIFO consistency! 
+*** Monotonic writes 
+ Monotonic-write consistent (W(x1) issued at L1, has to happen at L2 before W(x2) may take place)
+ Not monotonic-write consistent (W(x1) is missing at L2 
+ - before W(x2) happens)
+*** Read your writes
+ Read-your-writes consistency 
+ - 	The effect of a write operation by a process on 
+ - data item x will always be seen by a successive 
+ - read operation on x by the same process 
+ - Example: updating web page, web browser afterwards loads old version from local replica 
+ - 
+ Read your writes observed
+ No read your writes behavior; 
+ - updates W(x1) not reflected at L2
+*** Writes follow reads
+ Writes-follow-reads consistency 
+ - 	A write operation by a process on a data item x following a previous read operation on x by the same process is guaranteed to take place on the same or a more recent value of x that was read. 
+ - Writes are performed on versions of data item that is up to date at least with the value most recently read by the process 
+ - Example: Newsgroup posting 
+ Write-follows-reads consistent
+ Not write-follows-reads consistent
+*** Implementing client-centric consistency – Naïve version
+ 35
+*** Implementing client-centric consistency – Improvements
+ 36
+
+
+
+*  Summary 
+
+*** Summary 
 Consistency protocols necessary to ensure desired level of consistency between replicas
 - How are replicas handled?
 - How are updates distributed? 

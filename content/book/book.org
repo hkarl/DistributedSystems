@@ -101,6 +101,9 @@
 * Distributed data storage and transactions
 
 ** Distributed storage and consistency
+  :PROPERTIES:
+  :CUSTOM_ID: ch:distributed-storage
+  :END:
 
 #+include: "../ch_11_distStorage/ch_11_distStorage.org"
 
