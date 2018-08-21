@@ -574,6 +574,34 @@ C : unsubscribed and finished
 $ 
 #+END_SRC
 
+** Hedwig 
+
+***  Apache Hedwig 
+
+**** \href{https://wiki.apache.org/hadoop/HedWig}{Website}                                           :B_quotation:
+     :PROPERTIES:
+     :BEAMER_env: quotation
+     :END:
+
+
+Hedwig is a publish-subscribe system designed to carry large amounts
+of data across the internet in a guaranteed-delivery fashion from
+those who produce it (publishers) to those who are interested in it
+(subscribers). The goals of Hedwig are: 
+
+- *Guaranteed Delivery*: The messages may not be lost even when a
+  particular subscriber goes offline for extended periods of time. 
+- *Topic-based*: Publishes and subscribes happen to a topic. The
+  system should scale to $\approx 10^6$ topics with $\approx 10$
+  subscribers on each 
+  topic. 
+- *Incremental Scalability*: It should be possible to scale capacity
+  by adding servers on the fly. The up-front hardware investment
+  should not be huge. 
+- *High availability*: The system should remain available in the
+  presence of single server failure without manual intervention. 
+
+
 * Summary 
 
 *** Summary 
