@@ -16,7 +16,7 @@
 #+LATEX_HEADER: \usetikzlibrary{tikzmark}
 #+LATEX_HEADER: \usepackage{minted}
 #+LATEX_HEADER: \setminted{breaklines,autogobble,escapeinside=??,frame=lines,linenos=false,mathescape=true}
-#+LATEX_HEADER: \usepackage{adjustbox}
+#+LATEX_HEADER: \usepackage[export]{adjustbox}
 #+LATEX_HEADER: \usepackage{acronym}
 #+LATEX_HEADER: \usepackage{../templates/msc}
 #+LATEX_HEADER: \graphicspath{{../ch_00/}{../ch_01_basic_CS/}{../ch_02_web_CS/}{../ch_03_RPC_CS/}{../ch_04_improving_CS/}{../ch_05_practical/}{../ch_06_p2p_ncs/}{../ch_07_mcast_ncs/}{../ch_08_des_pubsub/}{../ch_09_msqQueuing/}{../ch_10_oddsEnds_ncs/}{../ch_11_distStorage/}{../ch_12_distTransactions/}{../ch_13_nosql/}{../ch_14_failures/}{../ch_15_filesystems/}{../ch_16_gfs/}{../ch_17_websearch}{../ch/}{../ch_18_elasticStack/}{../ch_19_virtualization/}{../ch_20_clouds/}{../ch_21_bigdata/}{../ch_22_spark/}{../ch_23_streaming/}{../ch_24_ml/}{../ch_25_comparisons/}}
