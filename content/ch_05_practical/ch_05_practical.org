@@ -569,6 +569,43 @@ From \href{http://nagioscore.demos.nagios.com/nagios/}{Nagios Core demo}:
 
 
 
+*** Log aggregation 
+
+- Imagine you have thousands of VMs/Containers
+- Each produces log files: the OS, the server processes, the
+  application processes
+- Do you really want to manually log in to all of them, one by one?
+
+
+#+BEAMER: \pause
+
+**** Log aggregation                                           :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+The process of collecting logs from disparate systems at a single
+site, with proper performance and dependability (and possibly
+real-time) guarantees.
+
+*** Single-site log aggregation 
+
+- First step: Aggregates logs on a single machine
+  - Instead of each process writing a text file in some weird
+    location
+- Buzzword: syslogd and friedns 
+
+*** Distributed example: GrayLog 
+
+- Example system: \href{https://www.graylog.org}{GrayLog}
+- Comprises
+  - Actual collecting system
+  - Search support (ElasticSearch)
+  - Configuration database 
+- Enterprise grade
+  - Worry about security, compliance with regulations, ... 
+- Architecture: We need more mechanisms, first 
+
 * Summary
 
 *** Summary 
