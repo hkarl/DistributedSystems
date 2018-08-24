@@ -1,0 +1,165 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\usepackage{xparse}
+
+\input{../../templates/tikzFigureHeader}
+\usepackage{marvosym}
+
+\begin{document}
+
+% state machine 
+
+\newcommand{\numnodes}{7}
+\newcommand{\diam}{3cm}
+\pgfmathsetmacro{\scopesgrid}{2*\diam+1.5cm}
+
+\newcommand{\leader}[1]{
+  \node [star, draw, green, fill=green!60] at (#1*360/\numnodes:0.5cm + \diam) {}; 
+}
+
+\newcommand{\fail}[1]{
+  \node [text=red] at (#1*360/\numnodes:0.5cm + \diam) {\Huge\Lightning}; 
+}
+
+\newcommand{\suspect}[1]{
+  \node [text=blue] at (#1*360/\numnodes:0.5cm + \diam) {\Huge \textbf{?}}; 
+}
+
+\newcommand{\asknodes}[1]{
+  \pgfmathsetmacro{\Start}{#1+1}
+  \foreach \i in {\Start,...,\numnodes} {
+    \draw [->, blue] (#1) to [bend left=20] (\i);
+  }
+}
+
+\newcommand{\answernodes}[1]{
+  \pgfmathsetmacro{\End}{#1-1}
+  \foreach \i in {1,...,\End} {
+    \draw [->, green] (#1) to [bend left=20] (\i);
+  }
+}
+
+
+% \newcommand{\mygraph}[1]{% 
+\NewDocumentCommand \mygraph {o} {
+  \draw [dotted] (0,0) circle (\diam); 
+
+  \foreach \i in {1,...,\numnodes} {
+    \node [circle, draw, fill=white] (\i) at (\i*360/\numnodes:\diam) {\i};
+  }
+
+  \IfNoValueF{#1} {
+    \node at (-\diam, \diam) {Step #1};
+  }
+}
+
+\begin{tikzpicture}
+  \mygraph
+  \leader{7}
+  \fail{6}
+  \suspect{4}
+  \asknodes{4}
+  \answernodes{7}
+\end{tikzpicture}
+
+% regular process: 
+\begin{tikzpicture}
+  \begin{scope}
+    \mygraph[1]
+    \leader{7}
+    \suspect{4}
+  \end{scope}
+  \begin{scope}[xshift=\scopesgrid]
+    \mygraph[2]
+    \leader{7}
+    \suspect{4}
+    \asknodes{4}
+  \end{scope}
+  \begin{scope}[yshift=-\scopesgrid]
+    \mygraph[3]
+    \leader{7}
+    \suspect{4}
+    \suspect{6}
+    \asknodes{6}
+    \answernodes{6}
+  \end{scope}
+  \begin{scope}[xshift=\scopesgrid, yshift=-\scopesgrid]
+    \mygraph[4]
+    \leader{7}
+    \answernodes{7}
+  \end{scope}
+\end{tikzpicture}
+
+% failed intermediate node 
+\begin{tikzpicture}
+  \begin{scope}
+    \mygraph[1]
+    \leader{7}
+    \fail{6}
+    \suspect{4}
+  \end{scope}
+  \begin{scope}[xshift=\scopesgrid]
+    \mygraph[2]
+    \leader{7}
+    \fail{6}
+    \suspect{4}
+    \asknodes{4}
+  \end{scope}
+  \begin{scope}[xshift=0.5*\scopesgrid, yshift=-\scopesgrid]
+    \mygraph[3]
+    \leader{7}
+    \fail{6}
+    \answernodes{7}
+  \end{scope}
+\end{tikzpicture}
+
+
+% failed leader 
+\begin{tikzpicture}
+  \begin{scope}
+    \mygraph[1]
+    \leader{7}
+    \fail{6}
+  \end{scope}
+  \begin{scope}[xshift=\scopesgrid]
+    \mygraph[2]
+    \leader{7}
+    \fail{6}
+    \fail{7}
+  \end{scope}
+  \begin{scope}[xshift=2*\scopesgrid]
+    \mygraph[3]
+    \leader{7}
+    \fail{6}
+    \fail{7}
+    \suspect{4}
+  \end{scope}
+  \begin{scope}[xshift=0*\scopesgrid, yshift=-\scopesgrid]
+    \mygraph[4]
+    \leader{7}
+    \fail{6}
+    \fail{7}
+    \suspect{4}
+    \asknodes{4}
+  \end{scope}
+  \begin{scope}[xshift=2/2*\scopesgrid, yshift=-\scopesgrid]
+    \mygraph[5]
+    \leader{7}
+    \fail{6}
+    \fail{7}
+    \suspect{5}
+    \asknodes{5}
+    \answernodes{5}
+  \end{scope}
+  \begin{scope}[xshift=4/2*\scopesgrid, yshift=-\scopesgrid]
+    \mygraph[6]
+    \fail{6}
+    \fail{7}
+    \leader{5}
+  \end{scope}
+\end{tikzpicture}
+
+
+\end{document}
+

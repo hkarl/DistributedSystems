@@ -1,51 +1,1599 @@
 #+BIBLIOGRAPHY: ../bib plain
 
-** Message queuing semantics 
+* Message queuing semantics                                        :noexport:
+
+*** Pub/sub idiosyncrasies 
+
+- Pub/sub model has some properties not always desirable
+  - Messages go to *all* matching subscribers
+  - As long as they *are* subscribed at publication time
+  - If no matching subscriber during publication, message is dropped
+    - A feature, not a bug
+- Alternative model?
+  - Ensure that a message is sent to *exactly one* subscriber,
+    irrespective when that subscription happens?
+  - Entails: store a message! 
 
 *** (Distributed) Message queuing 
- Interaction paradigm: asynchronous sending of messages between a sender and a receiver
+
+**** \ac{MQ}                                                   :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+Interaction paradigm: asynchronous sending of messages 
+ - Messages addressed to a *queue* (think: P/S topic) 
  - Messages stored internally in queue 
- - Decoupling in time! 
- - Specifying which message to receive based on ideas from pub/sub systems 
- - E.g., filter on content, not just on sender 
+ - Receivers specify queue to receive from
+   - Plus options like filter on content, on sender, ... 
+ - *Atomicity/resilience guarantee*: *Exactly one* receiver picks up a
+   given message, messages are not lost
+   - (Hopefully ...  )
+
+*** Loose coupling? 
+
+Similar to Pub/sub (Section
+\slideref{sec:pubsub:api}[s:pubsub:characteristics]), MQ provides
+loose coupling 
+- *In time*: every looser than P/S; subscription can take place after
+  publication
+- *In identity*: Same 
+- *In space*: Same 
+
+*** Multiple receivers for one queue? 
+
  - Messages typically go to exactly one receiver (out of those subscribing to topic)!
- - Load balancing across receiver  
- - Unlike: to all subscribers, as in Pub/sub systems 
- - Atomicity/resilience guarantee: Exactly one receiver picks up a given message, messages are not lost 
- - Key difference to simple HTTP/REST protocols! 
- - Cum grano salis…. 
- - 
+ - *Load balancing* across receivers for same queue 
  - Detailed semantics often differ between different MQ realizations 
- - 
+
+
+*** Usage areas
+
+Often used to 
+- Build a complex application out of simpler ones (e.g., TypeSafe)
+- Integrate existing applications into a larger one -- so-called
+  Enterprise Integration 
+- Various formalisms exists (e.g., http://www.enterpriseintegrationpatterns.com/) 
+
 *** Message queuing: Challenges 
- 51
-*** Message queuing: Areas, examples
- 52
+
+- Generic platform? Standards? 
+- High dependability 
+  - Manageability? 
+  - Resource protection in message brokers 
+- Performance 
+  - In applications: 
+    - Many senders, many receivers 
+    - Slow receivers 
+  - Load balancing 
+  - Scaling: automatically create new receivers if queues get full? 
+  - Assign new threads to queues/receivers? 
+- Ordering?
+
+
+* Design considerations                                            :noexport:
+
+** High-level architecture 
+
+*** Necessary API 
+    
+#+ATTR_LATEX: :align lp{0.7\textwidth} :booktabs :center
+#+CAPTION: Necessary API for a message queuing system 
+#+NAME: tab:mq:api 
+| Function | Purpose                                                         |
+|----------+-----------------------------------------------------------------|
+| ~append~ | Append message to given queue name                              |
+| ~get~    | Block until message in given queue available                    |
+| ~poll~   | Non-blocking version                                            |
+| ~notify~ | Install callback function, trigger when queue becomes non-empty |
+
+
+
+*** Architecture 
+
+- Full decoupling in time means: Message must be stored and accessible
+  even when neither sender nor receiver are active
+- Hence: need additional entities
+  - Senders, receivers know at least one broker as contact point 
+  - Can deal with dependable storage and matching 
+  - *Queue manager*, *broker*
+- Mappings
+  - Queue name to queue manager(s) in charge
+  - Queue manager to IP address 
+
+*** Broker topologies 
+
+- Broker topologies very similar to P/S considerations
+- Including overlay network of brokers with *application message
+  routing* between them 
+
+
+#+CAPTION: Different broker topologies
+#+ATTR_LaTeX: :height 0.75\textheight :width 0.85\linewidth :options page=5, keepaspectratio
+#+NAME: fig:mq:broker_topos
+[[./figures/mq_broker_topologies.pdf]]
+
+
 *** Standardization: API vs. protocol 
- 53
+
+- API standardisation
+  - Common API across different message queuing implementations 
+  - Application programs need not be changed when migrating 
+- Protocol standardisation
+  - Different MQ implementations usually not able to interoperate 
+    - Unlike, e.g., HTTP, FTP, ... 
+  - Standardize an application-level protocol to be used by different MQ
+    implementations  
+  - Allows different MQ implementations to interact 
+  - Possibly divide functionality between clients and broker; or
+    specify a fully distributed, client-only realisation   
+ 
+
+*** Standardisation and legacy integration 
+
+- We use MQ to integrate legacy applications
+  - Option 1: Each applications need to understand messages of each
+    other application -- unrealistic 
+- Suppose we have a standardised protocol and API
+  - Option 2: only have to translate from application-specific format
+    into application problem
+  - Sometimes possible, but abstraction level makes this problematic
+  - Specific translation modules can take on this job 
 
 
-** Case study: ActiveMQ 
+** Dependability 
+
+*** Exactly-once, without failures 
+
+- Key promise of MQ: messages are delivered exactly once
+- Without failures, this is easy to achieve
+  - Sender hands message to broker, waits for \ac{ACK}
+    - Only once ACK is received, sender releases message locally
+    - Has handed over responsibility to broker
+  - Similar between broker and receiver 
 
 
-*** Example: Advanced Message Queuing Protocol 
- Distributed Systems, Ch. 3: Advanced Interaction Patterns
- 54
- http://www.amqp.org/
-*** AMQP: Topologies 
- 55
-*** AMQP – Type system 
- 56
- http://www.amqp.org/sites/amqp.org/files/amqp.pdf
-*** AMQP – Other functions 
- 57
- http://www.imatix.com/articles:whats-wrong-with-amqp/ 
+*** Exactly-once, with failures? 
+
+- When can broker send ACK? Assuming it could fail?
+
+#+BEAMER: \pause
+- Not before message was written to stable storage
+  - So it could re-access it
+ 
+
+#+BEAMER: \pause
+- Is this good enough? 
+
+*** Exactly-once, with failures? 
+
+- Recall Section \ref{sec:acknowledgements}: Even dependable message
+  transmission is strictly speaking impossible 
+
+**** Exactly-once is impossible                                   :B_theorem:
+     :PROPERTIES:
+     :BEAMER_env: theorem
+     :END:
+
+
+Exactly-once delivery of messages is impossible, even in a message
+queuing context with stable storage. 
+
+*** Practical consequence 
+
+- Rely on high probabilities of correct transmission
+- Marketing: five nines, similar statements
+  - Do not believe *exactly-once* promises 
+
+
+** Protocol: AMQP 
+
+*** A standardized protocol between brokers 
+
+- \ac{AMQP}  (http://www.amqp.org/)
+- Standardized protocol (ISO/IEC 19464, aka AMQP 1.0) 
+- Implemented by various popular MQ realizations (e.g., QPID in Linux,
+  ActiveMQ, RabbitMQ, Windows Azure Service Bus, ...)  
+
+***  Features 
+  - Pub/sub and transactions 
+
+**** From                                                       :B_quotation:
+     :PROPERTIES:
+     :BEAMER_env: quotation
+     :END:
+    http://www.amqp.org/sites/amqp.org/files/2014.05.01%20ISO%2019464%20AMQP-ORG_0.pdf
+    (slide 15)
+    - Efficient: binary connection-oriented protocol
+    - Reliable: fire-and-forget to reliable, *exactly-once* delivery
+    - Portable data representation: cross-platform, full-fidelity
+      exchange
+    - Flexible: peer-peer, client-broker, broker-broker topologies
+    - Broker-model independent: no requirements on broker internals
+    - Designed for Internet-scale deployment 
+
+
+*** AMQP type system 
+
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+- Usual primitive types (int, char, bool)
+- Collection types (list, map, array) 
+- Described types to extend type system 
+- Encoding rules for types
+- E.g., how to represent a map as a sequence of octets 
+- (Compare marshalling) 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: AQMP type system (from \url{http://www.amqp.org/sites/amqp.org/files/amqp.pdf
+}) 
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:aqmp_type
+[[./figures/amqp1.pdf]]
+
+
+*** AQMP other functions 
+
+- Transport layer 
+  - Nodes connected by “links” 
+  - Nodes: responsible for safe storage and/or delivery of Messages 
+  - Nodes connected via connections, sitting on top of TCP 
+  - Responsible node for storing a message changes as message travels
+    from node to node  
+    - Key protocol aspect! 
+    - Message transfer protocol between neighbouring nodes over a link
+    - Various guarantees possible (at-most-once, at-least once) 
+- Transaction layer 
+  - Multiple messages can be grouped into transactions (with usual
+    ACID properties)  
+- Security layer 
+
+*** AQMP issues 
+
+Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
+- Pushed by few companies, yet claiming as open standard -- lacks
+  competition 
+- Bridges a big semantic gap; disputable
+- Pretty complex protocol (KISS!) 
+- Non-backward compatible changes were made; and specification size
+  increased considerably
+  - Quote:  /The 1.0 protocol should have been 90% the size of 0.8,
+    parts chopped out, some new bits added, and with fixes and
+    clarifications./ ... /AMQP's positioning as Enterprise Technology
+    has made the Working Group tolerant of complexity that would not
+    have survived one hour on the Internet./
+    \cite{Hintjens:2008:WhatiswrongwithAMQP} 
+
+
+
+** Protocol: MQTT 
+
+*** MQTT 
+
+- \ac{MQTT}
+  - \href{http://mqtt.org}{Website}: An extremely lightweight
+    pub/sub protocol for machine-to-machine / Internet-of-Things
+    scenarios -- KISS 
+  - \href{https://github.com/mqtt/mqtt.github.io/wiki}{Community page}
+    with examples   
+- Supported via plugins by several of the systems described in Section
+  \slideref{sec:mq:small_case_studies}  and \slideref{sec:mq:kafka}
+- An \ac{OASIS}
+  \href{http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html}{standard}  
+
+
+*** Concepts 
+
+- Pub/sub protocol, with small wire footprint 
+- Topic-based; topic hierarchy via ~/~  and wildcards 
+- Topics implicitly created by publishing
+- Three levels of \ac{QoS} requirements
+  - Separate for publication and subscription, per client
+  - Resulting level as weak as subscription needs, as strong as
+    publication allows 
+  - Claims /exactly once/ level \Innocey 
+- Clients can leave a *will* with broker or with
+  \href{http://mosquitto.org}{Mosquito}  
+  - Sent to other subscribers when client disconnects unexpectedly 
+
+
+*** Examples 
+
+- Home automation
+- Mobile apps
+- Sensor networks 
+- Industrial automation (e.g., Relayr) 
+
+
+
+* Small case studies                                               :noexport:
+  :PROPERTIES:
+  :CUSTOM_ID: sec:mq:small_case_studies
+  :END:
+
+** UNIX MQ 
+
+- Recall KMS discussion
+- In SysV, in POSIX 
+- Check, e.g., ~man mq_overview~ 
+
+** Amazon Simple Queue Service 
+
+*** Amazon Simple Queue Service  Marketing 
+
+**** Quote from \href{https://aws.amazon.com/sqs/}{\href{https://aws.amazon.com/sqs/}{Simple Queue Service } :B_quotation:
+     :PROPERTIES:
+     :BEAMER_env: quotation
+     :END:
+
+\footnotesize 
+Amazon Simple Queue Service (SQS) is a fully managed message queuing
+service that enables you to decouple and scale microservices,
+distributed systems, and serverless applications. SQS eliminates the
+complexity and overhead associated with managing and operating message
+oriented middleware, and empowers developers to focus on
+differentiating work. Using SQS, you can send, store, and receive
+messages between software components at any volume, without losing
+messages or requiring other services to be available. Get started with
+SQS in minutes using the AWS console, Command Line Interface or SDK of
+your choice, and three simple commands. 
+
+
+SQS offers two types of message queues. Standard queues offer maximum
+throughput, best-effort ordering, and at-least-once delivery. SQS FIFO
+queues are designed to guarantee that messages are processed exactly
+once, in the exact order that they are sent. 
+
+*** Amazon Simple Queue Service  Marketing 
+
+- Server-side encryption 
+- Reliably deliver messages
+  - /without loosing messages/ \Innocey 
+- Elastic scaling of the queuing service itself
+- Pay-per-use 
+
+
+** IBM WebSphere 
+
+*** IBM WebSphere 
+
+- Set of products to create and integrate applications 
+
+**** Quote from \href{https://www.ibm.com/developerworks/websphere/products/platformoverview.html}{webpage} :B_quotation:
+     :PROPERTIES:
+     :BEAMER_env: quotation
+     :END:
+
+
+The WebSphere software platform for e-business is a suite of stable,
+secure, and reliable software product offerings for conducting
+e-business and developing e-business applications. 
+
+*** \href{https://www.ibm.com/products/mq}{WebSphere MQ}  
+
+- Message Queuing component of WebSphere 
+- Available as appliance, in cloud, or on z/OS 
+
+**** Claims 
+
+- /\href{https://www.ibm.com/cloud/mq/faq}{Once and once only delivery}/ \Innocey 
+- Transactional
+- Asynchronous 
+
+** ActiveMQ 
+   
+
 *** Case study: ActiveMQ 
- 58
- http://activemq.apache.org/
+- \href{http://activemq.apache.org/}{ActiveMQ} project 
+- Open-source message broker, written in Java, Apache project   
+- Claimed to be /the most widely used messaging platform on the
+  planet/
+- Fairly complex, > 1 millions lines of code 
+
+ 
 *** Example aspect: Broker fault tolerance 
- 59
-*** ActiveMQ: Practical aspects 
- 60
- http://activemq.apache.org/
- - getting-started.html
+
+- Pure master/slave broker 
+  - Nothing shared
+  - Master and slave consume all messages
+    - Master forwards all messages to its slaves 
+    - Slaves do not send any messages 
+    - Master only answers messages after acknowledgment from slave
+  - Master failure detected by heartbeat
+    - Slave restarts all transport connections with all clients 
+
+*** Example aspect: Broker fault tolerance (2) 
+
+- Shared filesystem
+  - Multiple brokers possible; one master randomly selected 
+  - All messages written to filesystem before answering 
+- JDBC master/slave 
+  - Shared database, not just filesystem between brokers 
+  - Clustering necessary to circumvent single point of failure 
+
+
+*** ActiveMQ: \href{http://activemq.apache.org/-getting-started.html}{Practical aspects} 
+
+
+- Fairly heavyweight installation 
+  - Source installation: about 300 MB disk space \Sadey
+- Broker: 
+  - Start as console or daemon 
+  - Starts web-based admin interface as well 
+  - Some non-trivial configuration overheads
+  - /Networks of brokers/ to distribute queues over multiple hosts 
+- Clients: 
+  - Need a broker URL (node + port) 
+  - Available in many languages, over various transport protocols (e.g., AQMP) 
+
+
+ 
+** RabbitMQ 
+
+*** \href{https://www.rabbitmq.com}{RabbitMQ} 
+
+- Quote: /RabbitMQ is the most widely deployed open source message
+  broker./ 
+- Supports multiple protocols; in particular, AMQP-0.9.1
+- Written in Erlang, runs on Erlang VM 
+- Cluster deployments for throughput and availability
+- Lot's of plugins
+- Open source plus commercial distribution (Pivotal) 
+
+
+
+*** Clients, Python 
+**** Plain 
+
+- \href{http://pypi.python.org/pypi/pika}{pika}; reference, but
+  not really thread-safe
+- \href{https://www.amqpstorm.io}{AMQPStorm}: similar functionality,
+  different approach to thread-safety 
+
+**** For projects 
+
+- \href{http://docs.celeryproject.org/en/latest/}{Celery}: distributed
+  task queue (e.g., often used in Django apps)  
+
+*** Example pika 
+
+\tiny 
+**** Sending message 
+
+#+BEGIN_SRC python
+import pika
+connection = pika.BlockingConnection()
+channel = connection.channel()
+channel.basic_publish(exchange='example',
+                      routing_key='test',
+                      body='Test Message')
+connection.close()
+#+END_SRC
+
+**** Blocking consumer 
+
+#+BEGIN_SRC python 
+import pika
+connection = pika.BlockingConnection()
+channel = connection.channel()
+
+for method_frame, properties, body in channel.consume('test'):
+    # Display the message parts and ack the message
+    print(method_frame, properties, body)
+    channel.basic_ack(method_frame.delivery_tag)
+
+    # Escape out of the loop after 10 messages
+    if method_frame.delivery_tag == 10:
+        break
+
+# Cancel the consumer and return any pending messages
+requeued_messages = channel.cancel()
+print('Requeued %i messages' % requeued_messages)
+connection.close()
+#+END_SRC
+
+*** RabbitMQ messaging model 
+
+- /Producers/ send messages to exchanges
+- /Messages/ have /routing keys/ 
+- /Exchanges/ bind to one or multiple queues
+  - Direct: exact match on routing key 
+  - Fanout: Copy to all bound queues (ignore routing key)
+  - Topic: filter routing keys against given topic
+  - Headers: filter on values of message headers 
+- /Queues/ can have multiple /consumers/
+  - Queues survive broker restart (persistent) 
+  - Round-robin among them (as default)
+  - Consumers push or pull 
+
+*** RabbitMQ messaging model -- Example 
+
+
+#+CAPTION: RabbitMQ messaging mode
+#+ATTR_LaTeX: :width 0.85\linewidth
+#+NAME: fig:mq:model
+[[./figures/rabbit_mq.pdf]]
+
+
+
+
+*** RabbitMQ tutorial scenarios 
+
+Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}: 
+
+- Produce message to consumer
+- Work queues/competing consumers -- round-robin among queue
+  subscribers 
+- Publish/subscribe-style; one message to many receivers
+  - Needs /exchanges/: producers send to exchanges, wich forward to
+    multiple queues 
+- Message routing: Subscribe only to some messages 
+- Filtering on topics
+  - Wildcards, on exactly one or zero or more words
+- Even RPC can be recreated
+  - With a
+    \href{https://www.rabbitmq.com/tutorials/tutorial-six-python.html}{good
+    hint at restarting servers} and issues for exactly-once 
+    delivery 
+
+*** Distributed brokers: Clustering 
+
+
+  - Multiple machines forming one logical broker
+  - Queues can sit on one machine or be mirrored across machines in
+    broker 
+  - All queues are visible to any client connected to any machine
+    - Irrespective of where queue is, where client connects
+  - Needs highly dependable communication inside cluster; all brokers
+    connect to all brokers in cluster 
+  - Emphasises consistency and partition tolerance, sacrifices
+    availability (see CAP Theorem, Section  
+    \slideref{sec:CAPTheorem}[s:CAPTheorem]) 
+
+
+*** Distributed brokers:  Federation
+
+  - Individual or clustered brokers can connect in federation mode
+  - Message exchange via AQMP; no need for highly dependable links 
+  - Emphasises availability and partition tolerance, sacrifices
+    consistency (see CAP Theorem, Section  
+    \slideref{sec:CAPTheorem}[s:CAPTheorem]) 
+
+
+*** RabbitMq Performance 
+
+- Easy to get 20kevents / second from one queue on typical hardware
+- Clustered scenarios often between 3 and 7 servers
+- Pushing RabbitMq to
+  \href{https://content.pivotal.io/blog/rabbitmq-hits-one-million-messages-per-second-on-google-compute-engine}{1  million events / second} possible but
+  non-trivial
+  - Context: Apple about 1/2 million iMessages per second 
+
+* Big case study: Kafka                                            :noexport:
+  :PROPERTIES:
+  :CUSTOM_ID: sec:mq:kafka
+  :END:
+
+** Overview 
+
+*** Apache Kafka 
+
+- Kafka: Message queueing system like the ones above
+- Key differentiator: Emphasises *streams* of messages in (soft) real-time
+  contexts 
+  - *Getting* or *transforming* streams of data between distributed
+    applications 
+- Presentation here mostly follows
+  \href{https://kafka.apache.org/documentation/#introduction}{Kafka
+  introduction  documentation}
+
+*** Use cases 
+  - *Real-time data feeds* (e.g., track user activity on a distributed
+    web server farm  
+    - Stream processing often with additional frameworks like Storm on
+      top 
+  - Conventional messaging system (e.g., competes with ActiveMQ) 
+  - Log aggregation (e.g., collect log files from server farm) 
+  - Commit log for distributed data bases 
+
+*** High-level concepts 
+
+  - Broker-based, replicated, running in a *Kafka cluster*
+  - Cluster stores *streams of records*, categorised into *topics*
+  - Record: Key, value, timestamp
+
+
+
+*** Kafka core API 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- *Producer*: Publish stream of records to one or more topics 
+- *Consumer*: Subscribe to one or more topics, processing message stream 
+- *Streams*: Transforming one or more input streams into one of more
+  output streams 
+- *Connector*:  Connect streams on Kafka topic to external systems 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Kafka core APIs
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=1
+#+NAME: fig:kafka_api
+[[./figures/kafka.pdf]]
+
+
+
+
+*** Kafka topics 
+
+- Think of topic as a category, feed name,...
+- Given as meta data when publishing a record
+- Subscribers subscribe to topics
+- One topic can have 0, 1, or more subscribers 
+
+
+*** Partitioned topics 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+Topics are divided into 1 or more *partitions*
+- Partition: ordered, immutable sequence of messages with sequence
+  number 
+  - Partition must fit on one server
+- Producers *append* to partitions
+- Retained in Kafka cluster for configurable time
+  - Unconsumed *and consumed* records
+    - Can act as a limited-term storage system! 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Kafka partitions 
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=2
+#+NAME: fig:kafka_partition
+[[./figures/kafka.pdf]]
+
+*** Consuming from partitions                                      :noexport:
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- Consumption per-consumer, per-partition
+- For each consumer and each partition, an *offset* is stored in Kafka
+  cluster
+- Typically, consumer reads linearly through a partition
+  - But consumer can skip forwards and backwards
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Consuming from a partition
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=3
+#+NAME: fig:kafka_consuming 
+[[./figures/kafka.pdf]]
+
+
+
+*** Consuming from partitions 
+
+
+- Consumption per-consumer, per-partition
+- For each consumer and each partition, an *offset* is stored in Kafka
+  cluster
+- Typically, consumer reads linearly through a partition
+  - But consumer can skip forwards and backwards
+
+
+#+CAPTION: Consuming from a partition
+#+ATTR_LaTeX: :height 0.4\textheight :options page=3
+#+NAME: fig:kafka_consuming 
+[[./figures/kafka.pdf]]
+
+
+*** Producing into partitions 
+
+- Producers publish data
+- They choose topic and partition
+  - Topic: usually from semantics of data
+  - Partition: round-robin, random, or from semantics, ... 
+
+
+*** Consumer groups 
+
+- Consumers are *grouped* by self-assigned labels
+- Rule: *One record in a topic is delivered to /exactly one/ consumer in
+  /each/ group*
+  - /exactly/ \Innocey
+
+
+
+#+CAPTION: Consumer groups in Kafka
+#+ATTR_LaTeX: :height 0.6\textheight :options page=4
+#+NAME: fig:kafka_consumer_groups
+[[./figures/kafka.pdf]]
+
+
+*** Consumer groups:  Spectrum 
+
+- Nicely gives spectrum between broadcasting and load balancing
+  - Load balancing: all consumers in one group
+  - Broadcasting: all consumers in separate groups 
+
+#+BEAMER: \pause
+
+- Perhaps Kafka's most unique and powerful feature! 
+
+
+
+
+*** Consumer groups typical usage 
+
+- Think of it as pub/sub where a group is a subscriber
+- Load balanced inside each group
+- A *logical subscriber*
+- Each group member gets a fair share of records among group members
+- Also works with growing and shrinking groups! 
+
+#+BEAMER: \pause
+
+- Think of the cluster as acting as *serialization point* 
+
+*** Ordering 
+
+- *Total* order *within* partition
+  - Recall: total = fifo + atomic 
+- *Not* between partitions of the same topics
+- Not between topics 
+
+
+#+BEAMER: \pause
+- What does that mean for consumer groups? 
+
+*** Partitions and fault tolerance
+
+- A partition can be *replicated* across multiple servers to provide
+  fault tolerance
+- One of those servers acts as *leader*, zero or more as *followers*
+  - Typically not the same ones for different partitions to balance
+    work load
+- Leader: handles reads and writes; followers passively replicate
+
+
+#+BEAMER: \pause
+
+**** Questions 
+- How to decide leader vs. follower? See Section
+  \slideref{sec:leader_election}
+- How to *passively replicate*? See Section \slideref{sec:TODO}
+
+
+
+** Usage 
+
+*** Some hands-on impression 
+
+- Compare
+\href{https://kafka.apache.org/documentation/#quickstart}{Quick Start}
+guide 
+- These are \ac{CLI} examples;
+  \href{https://cwiki.apache.org/confluence/display/KAFKA/Clients}{language
+  bindings exist}, of course
+  - Main languages with feature parity: Java, Python (\href{https://github.com/dpkp/kafka-python}{1}, \href{https://github.com/confluentinc/confluent-kafka-python}{2}), \href{https://github.com/edenhill/librdkafka}{C/C++}
+
+**** Create topic 
+
+#+BEGIN_SRC bash
+$ bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+#+END_SRC
+
+
+**** Send message 
+
+#+BEGIN_SRC bash
+$ bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+This is a message
+This is another message
+^C
+#+END_SRC
+
+*** Some hands-on impression (2) 
+
+**** Consume message 
+
+#+BEGIN_SRC bash
+$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+This is a message
+This is another message
+#+END_SRC
+
+*** Some hands-on impression (3) 
+
+
+**** Add servers to cluster 
+
+
+ (After editing some config files) 
+
+#+BEGIN_SRC bash 
+$ bin/kafka-server-start.sh config/server-1.properties &
+$ bin/kafka-server-start.sh config/server-1.properties &
+#+END_SRC
+
+**** Replicated topic 
+
+
+#+BEGIN_SRC bash
+$ bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 1 --topic my-replicated-topic
+#+END_SRC
+
+
+*** Some hands-on impression (4) 
+
+**** Check 
+
+
+#+BEGIN_SRC bash 
+$ bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic
+Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
+    Topic: my-replicated-topic  Partition: 0    Leader: 1   Replicas: 1,2,0 Isr: 1,2,0
+#+END_SRC
+
+
+
+#+BEAMER: \pause
+
+**** What's happening here? 
+
+- What happens when we add servers? 
+- What is this zookeeper?
+
+
+** Design 
+
+*** Kafka design 
+
+- Mostly follows
+  \href{https://kafka.apache.org/documentation/#design}{Design discussion} 
+- Challenges to solve
+  - How to persist massages?
+  - How to get total order?
+  - How to deal with failing servers? How to replicate? 
+  - Efficiency! High throughput! 
+
+
+*** Persistence and file system 
+- Persistence: File system! 
+  - But design for sequential read/writes, avoid random access 
+    - E.g.: 6 SATA disks, JBOD: 600 MB/s linear writes; 100 kB/s
+      random writes 
+  - Operating systems: aggressive caching 
+    - E.g., 30 GB of disk cache on 32 GB memory machine
+    - Cache stays warm even if process is restarted! 
+  - No need to store data twice (in disk cache; in process heap) 
+  - File system avoids Java JVM garbage collection issues!
+  - Gives huge capacity at constant overhead (in data size) 
+
+*** Consequence: write quickly! 
+
+- Write all data to persistent log files immediately 
+- But do not tell OS to flush to disk
+- Keeps data in kernel's cache
+
+
+**** Issue: Persistence? 
+
+- Is data now persistent?
+  - Not necessarily really *written* yet 
+
+**** Issue: Data structures? 
+
+- Do not *seek*!
+- Linear data structures with constant operations; linear reads and
+  appends 
+
+**** Issue: Space? 
+
+- Disks are cheap; messages can be retained even after having been
+  consumed 
+
+
+*** Efficiency 
+
+  - Eliminate bad disk access patterns (see above: only linear
+    reads/writes) 
+  - Batch messages together to avoid IO overhead
+    - With optional compression to leverage redundancy in message
+      headers 
+  - Consistent message layout so that no reformatting is necessary 
+  - Zero copy system calls
+    - From pagefile to socket: \href{sendfile system call}{sendfile}
+      in Linux, e.g.
+    - Send data from pagecache directly to network card without
+      needless copying 
+
+
+*** Producer 
+
+- Push message directly to partition leader
+- Producer can find out by asking any server about which server leads
+  which partition of which topic 
+- Producers accumulate data locally into bigger batches before sending
+  to server
+  - Tradeoff: Latency vs. throughput 
+- Publishing a message to multiple topics: all-or-none
+  (/transactional/ semantics) 
+
+*** Consumer 
+
+- Design issue: push vs. pull? 
+- Kafka: pull!
+  - Consumer sends ~fetch (from, who much)~ messages to partition leader
+  - Batching built-in
+  - Delays acceptable if no/not enough data is available
+- Only state to keep per partition: where in partition is a consumer?
+
+*** Guarantees between consumers? 
+
+- Suppose consumers can fail, and another consumer (in group) should
+  take over
+- How does this new consumer know up to which message a partition has
+  been consumed?
+  - Option 1: Consumer writes its message count to log *before*
+    consuming messages
+    - Failure between writing and consuming might lead new consumer to
+      miss some messages -- /at most once/ 
+  - Option 2: Consumer writes its message count to log *after*
+    consuming messages
+    - Failure between consuming and writing might lead new consumer to
+      consume some messages twice -- /at least once/ 
+
+*** Guarantees between consumers? (2) 
+
+- Exactly once?
+  - Feasible if streaming from one topic to another (joint
+    transactions)
+  - Sometimes feasible if output of consumed messages can also store
+    how much has been consumed
+    - But that is just pushing the problem elsewhere 
+
+
+*** Replication 
+
+- Partitions are replicated (to a selectable number of servers)
+  - Default operation!
+- Leader and followers have same state per partition 
+  - Leader might have un-replicated messages at end of queue
+  - In normal operation, followers behave like consumers towards
+    leader
+  - If followers falls too far behind leader or dies, it is removed
+    from list of followers
+  - Else, follower is *in synch* 
+- Fault assumption: Fail-stop with recovery 
+
+*** Committed message 
+
+- Message is *committed* when leader and all in-sync followers have
+  applied it to their queue
+- Only committed messages are ever given out to (non-follower)
+  consumers
+- Producer can
+  - wait for message commit nowhere, by leader only, or on all in-sync
+    followers 
+  - or proceed after only leader has acknowledged 
+- Leader chooses order between messages from multiple producers
+  - *Serialisation point*; simplifies atomic order!
+
+*** Failing leader 
+
+- Follows protect against failing leader
+  - Idea: detect, choose new leader, switch to that 
+- Suppose leader fails and it has promised that message $m$ has been
+  committed
+  - Then, only a follower that has also already committed $m$ can be
+    chosen as new leader
+  - Tradeoff between commit latency and number of electable followers 
+- Note: when all in-sync replicas fail, data not available 
+
+**** Questions 
+
+- How to elect leaders? \slideref{sec:leader_election}
+- How to take committed messages into account during such a process?
+  \slideref{sec:leader:quorum} 
+
+
+*** Other aspects 
+
+- Log compaction
+- Quotas
+  - For network, request rate, ... 
+
+
+
+
+** Comparison  and consequences 
+
+*** Kafka performance 
+
+- Typical numbers for Kafka are 100 kmessages/second per node (on
+  typical server hardware)
+- 
+   \href{https://engineering.linkedin.com/kafka/benchmarking-apache-kafka-2-million-writes-second-three-cheap-machines}{Three cheap machines in 2014}: 2 million writes per second
+- In cloud scenarios,
+  \href{https://hackernoon.com/benchmarking-kafka-performance-part-1-write-throughput-7c7a76ab7db1}{slightly  different numbers} (50.000 -- 300.000 on three nodes)
+- Scales well when adding servers to cluster! 
+- New kid on the block: \href{https://pulsar.apache.org}{Pulsar}
+  claims to
+  \href{https://streaml.io/about/newsreleases/apache-pulsar-outperforms-apache-kafka-on-openmessaging-benchmark}{outpace  Kafka}   
+
+*** Comparison  
+
+- Message queueing systems abound, but differ in detailed semantics
+- \href{http://openmessaging.cloud}{OpenMessaging standard} 
+- Complex systems like Kafka not always the best choice
+  - Simple semantics, simpler setup, when sophisticated semantics are
+    not required  
+  - E.g.,
+    \href{http://tomasz.janczuk.org/2015/09/from-kafka-to-zeromq-for-log-aggregation.html}{log
+    aggregation via 0mq might be superior to Kafka}  -- in this
+    example, dropping messages when no subscriber was alive was ok 
+- 
+   \href{https://content.pivotal.io/rabbitmq/understanding-when-to-use-rabbitmq-or-apache-kafka}{RabbitMq  vs. Kafka}  \cite{Dobbelaere:2017:KVR:3093742.3093908}
+  - Probably, the two most popular choices today
+  - Hard-and-fast metrics difficult as guarantees differ 
+
+
+
+
+
+*** Pulsar                                                         :noexport:
+
+- https://streaml.io/blog/pulsar-streaming-queuing 
+- https://streaml.io/blog/pulsar-segment-based-architecture
+
+*** Message queuing and microservices 
+
+- To restate the obvious: Message queues are a *great* fit with
+  microservice architecture
+
+- But not necessarily one bus to connect them all 
+
+- Groups  of microservices can choose their own instance} of MQ system  
+
+- Choice my depend on
+  \href{https://content.pivotal.io/blog/messaging-patterns-for-event-driven-microservices}{microservice  pattern} 
+
+
+
+* Leader election   
+  :PROPERTIES:
+  :CUSTOM_ID: sec:leader_election
+  :END:
+
+** The problem  
+
+*** Kafka: Leaders and followers 
+
+- Recall: Kafka cluster provides leader and followers to handle a
+  partition 
+- Leader in charge of applying updates
+- What happens if leader fails?
+
+
+
+#+BEAMER: \pause
+
+- We need a new leader out of the followers 
+
+*** More generally: Leader election
+
+ - Suppose a distributed system consists of a collection of
+   homogeneous participants 
+ - How to pick one out of this group?
+ - Purpose: this one might take over certain duties, additional tasks,
+   coordinate other system participants, ... 
+   - "Break symmetry"  
+ - Crucial requirement: This choice is unambiguously known to all
+   group members!  
+ - *Leader election problem* 
+
+** Simple algorithms 
+
+*** Leader election algorithms – assumptions 
+
+ - Basic assumptions
+   - Each participant has a unique identifier
+   - Goal is to choose that member with the largest identifier as leader
+     - Set of all identifiers unknown to all participants 
+ - Fault assumptions
+   - Processes may or may not fail, may behave in a hostile fashion 
+   - Messages may or may not be lost, corrupted, ... 
+   - Different algorithms can handle different fault assumptions 
+ - Time assumptions
+   - *Synchronous* time model -– all processes operate in lock-step,
+     bounded message transit time?  
+   - *Asynchronous* model -– no such bounds available? 
+
+*** Leader Election in a Synchronous Ring
+
+ Assumptions
+ - G is a ring consisting of $n$ nodes
+ - Nodes are numbered 1 to $n$
+ - Nodes do not know their indices, nor those of their neighbors 
+ - Node can distinguish its clockwise neighbor from its
+   counterclockwise neighbor  
+
+*** Leader Election in a Synchronous Ring
+
+ Task
+ - Find an algorithm so that at the end of each execution exactly one
+   node declares itself the leader 
+ - Possible variations 
+   - All other nodes additionally declare themselves the non-leader
+   - G is unidirectional or bidirectional
+   - n is known or not 
+   - Processes can be identical or different (by \ac{UID})
+   - Possible with identical processes?
+
+*** LCR Leader-Election-Algorithmus
+ Simple algorithm by \ac{LCR} (cp. e.g. \cite[ch. 15]{Lynch:1996:DA:525656})
+ - Assumptions: G unidirectional, $n$ *unknown*, only leader performs
+   output, nodes know their UID 
+ - Algorithm (informal)
+   - Each node sends its UID to its neighbor. A received UID is
+     compared to a node’s own UID.  
+   - If new UID < own UID: ignore new UID, send largest UID so far 
+   - If new UID > largest so far occurred UID: pass this UID on
+   - If new UID = own UID: claim leadership
+ - Invariant: Each node sends in every round the largest so far
+   occurred UID to its neighbor 
+
+*** LCR Leader Election
+ Proof of correctness: induction over number of rounds
+ - Time complexity: $O(n)$
+ - Message complexity: $O(n^2)$ 
+ - Time complexity is acceptable, but many messages 
+ - Algorithm with substantially fewer messages possible?
+   - Compare: Peterson leader election; randomized leader election 
+
+*** LCR example: Starting point  
+
+- Graph with nodes having unique IDs
+- We are interesting in having node with largest ID as leader 
+
+
+#+CAPTION: LCR example ring
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=1
+#+NAME: fig:LCR_ring_start
+[[./figures/leaderelect_ring.pdf]]
+
+
+*** LCR example: first steps 
+
+- Communicate anticlockwise
+
+#+CAPTION: LCR example ring: First two steps 
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=2
+#+NAME: fig:LCR_ring
+[[./figures/leaderelect_ring.pdf]]
+
+*** LCR example: Complete process 
+
+- Communicate anticlockwise
+
+#+CAPTION: LCR example ring: First two steps 
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=3
+#+NAME: fig:LCR_ring_complete
+[[./figures/leaderelect_ring.pdf]]
+
+
+
+** In general graphs 
+*** Leader Election in Arbitrary Graphs
+
+ FloodMax algorithm in *synchronous* model 
+ - Assumption: diameter $d$ of the graph is known
+ - Every process sends in every round the so far largest UID to its
+   neighbors 
+ - After $d$ rounds, the process is leader that has not seen a greater
+   UID than its own  
+ - Improvement
+   - Process sends only messages to its neighbors if it received a
+     value larger than its own 
+   - After $d$ rounds the winner is again determined
+ - Issue: Synchronization!
+
+*** Leader Election in Arbitrary Graphs
+
+Leader Election possible even if neither the number of nodes nor the diameter of the graph are known? 
+
+ - Yes! 
+   - One possibility: search the whole graph
+   - How? Tip: breadth-first search
+ - Or by intermediate steps – first determine the diameter
+   - How? Tip: breadth-first search
+
+*** Leader Election in Asynchronous Networks
+
+ Adaptation of optimized FloodMax
+ - In the beginning, each process sends its UID to every neighbor 
+ - When a process sees a UID that is greater than the so-far greatest,
+   it sends it to its neighbors  
+ - Properties
+   - Eventually, all processes will receive the largest UID
+   - But when to terminate???
+   - In the synchronous model it was simple by counting the rounds, but
+     here unclear!  
+     - Would knowledge about the graph’s diameter help?
+   - Different solutions possible (spanning tree and the like), but more
+     expensive than in the synchronous model 
+
+*** Spanning Tree 
+ Spanning tree for the execution of broadcasts
+ - Spanning tree: partial graph that contains all nodes but only edges
+   to create a tree 
+ - Size or diameter of the graph are unknown
+ - Algorithm
+   - The root node sends a search message to each neighbor 
+   - Processes that receive a search message
+     - Mark themselves as part of the tree
+     - Set the sending node as father node in the tree
+     - Send a search message to each neighbor (except for father)
+   - Already marked nodes ignore search messages
+ - Note: All messages carry an UID for originator; used to separate
+   different runs 
+
+
+*** Spanning tree state machine 
+Core building block of leader election 
+
+
+#+CAPTION: Finite state machine for spanning tree
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=1
+#+NAME: fig:spanning_tree_FSM 
+[[./figures/leaderelect_graph_FSM.pdf]]
+
+
+
+
+*** Spanning Tree – Properties 
+ - Algorithm terminates when no search messages are on the way
+   - Detected by counting messages from neighbors 
+ - Algorithm creates spanning tree
+ - In a synchronous network this algorithm even creates a
+   breadth-first spanning tree!  
+ - Send message with search messages for broadcast
+ - Child pointer ascertainable by “reflected” search messages 
+ - Convergecast: leaves send information along the tree to the root
+   - Useful for distributed termination, e.g. with a leader election:
+     each node starts a Broadcast along tree 
+
+*** Example election: Graph 
+
+#+CAPTION: Example graph for leader election 
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=2
+#+NAME: fig:leader_elect_example_graph
+[[./figures/leaderelect_graph.pdf]]
+
+*** Example election 
+
+#+CAPTION: Example graph for leader election, step 1 
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=3
+#+NAME: fig:leader_elect_step1
+[[./figures/leaderelect_graph.pdf]]
+
+
+#+CAPTION: Example graph for leader election, step 2 
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=4
+#+NAME: fig:leader_elect_step2
+[[./figures/leaderelect_graph.pdf]]
+
+*** Example election 
+
+#+CAPTION: Example graph for leader election, step 3
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=5
+#+NAME: fig:leader_elect_step3
+[[./figures/leaderelect_graph.pdf]]
+
+
+#+CAPTION: Example graph for leader election, step 4
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=6
+#+NAME: fig:leader_elect_step4
+[[./figures/leaderelect_graph.pdf]]
+
+
+*** Example election 
+
+#+CAPTION: Example graph for leader election, step 5 
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=7
+#+NAME: fig:leader_elect_step5
+[[./figures/leaderelect_graph.pdf]]
+
+
+#+CAPTION: Example graph for leader election, step 6
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=10
+#+NAME: fig:leader_elect_step6
+[[./figures/leaderelect_graph.pdf]]
+
+
+*** Example election 
+
+#+CAPTION: Example graph for leader election, step 7
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=11
+#+NAME: fig:leader_elect_step7
+[[./figures/leaderelect_graph.pdf]]
+
+
+#+CAPTION: Example graph for leader election, step 8
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=12
+#+NAME: fig:leader_elect_step8
+[[./figures/leaderelect_graph.pdf]]
+
+
+*** Example election 
+
+#+CAPTION: Example graph for leader election, step 9
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=13
+#+NAME: fig:leader_elect_step9
+[[./figures/leaderelect_graph.pdf]]
+
+
+#+CAPTION: Example graph for leader election, step 10
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=14
+#+NAME: fig:leader_elect_step10
+[[./figures/leaderelect_graph.pdf]]
+
+*** Example election 
+
+#+CAPTION: Example graph for leader election, step 11 
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=15
+#+NAME: fig:leader_elect_step11
+[[./figures/leaderelect_graph.pdf]]
+
+
+#+CAPTION: Example graph for leader election, step 12
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=16
+#+NAME: fig:leader_elect_step12
+[[./figures/leaderelect_graph.pdf]]
+
+*** Example election 
+
+#+CAPTION: Example graph for leader election, step 13
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=17
+#+NAME: fig:leader_elect_step13
+[[./figures/leaderelect_graph.pdf]]
+
+
+#+CAPTION: Example graph for leader election, step 14
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=18
+#+NAME: fig:leader_elect_step14
+[[./figures/leaderelect_graph.pdf]]
+
+
+*** Example election 
+
+#+CAPTION: Example graph for leader election, step 15
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=19
+#+NAME: fig:leader_elect_step15
+[[./figures/leaderelect_graph.pdf]]
+
+
+#+CAPTION: Example graph for leader election, step 16
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=20
+#+NAME: fig:leader_elect_step16
+[[./figures/leaderelect_graph.pdf]]
+
+
+*** Example election 
+
+#+CAPTION: Example graph for leader election, step 17 
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=21
+#+NAME: fig:leader_elect_step17
+[[./figures/leaderelect_graph.pdf]]
+
+
+#+CAPTION: Example graph for leader election, step 18
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=22
+#+NAME: fig:leader_elect_step18
+[[./figures/leaderelect_graph.pdf]]
+
+*** Example election 
+
+#+CAPTION: Example graph for leader election, final step
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=23
+#+NAME: fig:leader_elect_final_step
+[[./figures/leaderelect_graph.pdf]]
+
+**** Result 
+
+#+CAPTION: Result for leader election, with spanning tree 
+#+ATTR_LaTeX: :width 0.55\linewidth :options page=24
+#+NAME: fig:leader_elect_result
+[[./figures/leaderelect_graph.pdf]]
+
+
+
+** Bully 
+
+*** Different scenario for leader election 
+
+- Suppose
+  - Have UIDs (with total order, e.g., numbers)  
+  - All processes can talk to each directly
+    - No need for spanning tree
+  - But processes can fail and recover at indeterminate times 
+- In typical operation, node only talks to its leader, but not to
+  other nodes 
+- When node detects a failed leader, which other nodes to talk to to
+  become leader?
+  - All with higher ID
+  - But they might be down as well 
+
+*** Bully algorithm
+ Assumption 
+ - All nodes know already the unique IDs of all other nodes
+ - So leader choice is trivial, but ... 
+ - ... nodes, including coordinators, may fail 
+ - Algorithm
+   - Once a node suspects the coordinator of having failed, it sends
+     an ELECTION message to all nodes with a larger ID  
+   - If initiator does get no answer at all, it becomes the new coordinator 
+   - If this initiator gets an answer from one of these nodes, that
+     node will take over coordinator role 
+     - How to handle multiple answering nodes? 
+     - Recursive process of becoming initiators again, until one node
+       does not get any answers any more  
+
+
+*** Finite state machine 
+
+Simplified; no messages shown 
+
+
+#+CAPTION: Bully algorithm finite state machine 
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:bully:fsm
+[[./figures/bully_fsm.pdf]]
+
+
+
+*** Bully example: Spurious suspicion 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.3
+      :END:
+
+- Node 4 in correctly suspects leader
+- Causes 6 to worry
+- Leader 7 calms everybody 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.7
+      :END:
+
+
+
+#+CAPTION: Bully example: Spurious suspicion
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+NAME: fig:bully:spurious
+[[./figures/bully.pdf]]
+
+
+
+
+*** Bully: Spurious with failed follower 
+
+
+#+CAPTION: Spurious suspicion with a failed intermediate node
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=3
+#+NAME: fig:bully:failed_intermediate
+[[./figures/bully.pdf]]
+
+*** Bully: Spurious with failed leader 
+
+
+#+CAPTION: Spurious suspicion with a failed leader
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=4
+#+NAME: fig:bully:failed_leader
+[[./figures/bully.pdf]]
+
+
+** Practical? 
+
+*** Simple libraries? 
+
+- Are there simple libraries to provide leader election? 
+
+#+BEAMER: \pause
+- Some, e.g.,  \href{https://github.com/sile/evel}{evel} 
+- But we really should be doing this right
+  - ZooKeeper
+  - etcd 
+
+* Summary 
+
+*** MQs are great 
+
+- Powerful programming model 
+- Decoupling allows scaling up
+- Fault tolerance is a *real* challenge
+- Lot's of powerful tools available, with different tradeoffs
+  (cp. \href{http://queues.io}{Queues IO website})  
+
+
+
+*** Do you REALLY need MQs? 
+
+- Beware the overhead!
+  - Latency, storage cost, processing cost
+- Decoupling/late binding might not make much difference to your
+  application
+- Choose with care; plenty of discussions
+  \href{https://techblog.bozho.net/you-probably-dont-need-a-message-queue/}{online}  
+
+*** Support machinery 
+
+- To build really correct MQ systems, lot's of support machinery,
+  algorithms is necessary
+- We touched upon leader election as a first step
+- But:
+  - How to actually replicate data storage?
+  - How to make sure leader, followers are in sync with each other? 
+- Part III will focus on these issues
+

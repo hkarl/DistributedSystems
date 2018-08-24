@@ -1,0 +1,33 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+
+\usetikzlibrary{arrows,automata}
+
+\begin{document}
+
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=4cm,
+                    semithick]
+
+
+\node[initial, state] (e) {Electing}; 
+\node[state] (l) [above right = of e] {Leader}; 
+\node[state] (f) [below right = of e] {Follower}; 
+\node[state] (d) [below right = of l] {Down}; 
+
+
+\path (l) edge node {fail} (d) 
+         (f) edge node  [swap]{fail} (d)
+         (d) edge node  [near start] {recover} (e)
+         (l) edge node [near start] {overruled} (f)
+         (e) edge  [bend left=10] node [near start, auto] {overruled} (f)
+         (e) edge node {all agreed} (l)
+         (f) edge [bend left=10] node [align=center, near start] {suspect\\leader} (e) 
+         (f) edge [bend left=70] node [align=center] {smaller\\leader } (e) 
+         (e) edge [bend left=20]node [near start, auto] {fail} (d)
+         ; 
+\end{tikzpicture}
+ 
+
+\end{document}

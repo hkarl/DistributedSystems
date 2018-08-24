@@ -1,0 +1,95 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+
+\newcommand{\diam}{2}
+
+\newcommand{\mygraph}{% 
+
+  \draw [dotted]  (0,0)  circle   (\diam cm);
+
+  \foreach \angle/\value [count = \i] in {0/17, 45/22, 80/5, 140/12, 170/7, 210/19, 260/9, 300/13} {
+    \node [circle, draw, fill=white] (p\i) at (\angle:\diam) {\value}; 
+        \ifnum\i=1
+        \xdef\Lst{\value}
+        \else
+        \xdef\Lst{\Lst,\value}
+        \fi
+  }
+
+}
+\begin{tikzpicture}
+  \mygraph{0}
+\end{tikzpicture}
+
+\newcommand{\drawedges}[1]{  
+  \mygraph 
+  \foreach  [evaluate = {\j=int(mod(\i, 8)+1)}] \i in {1,...,8}  {
+    \pgfmathsetmacro{\X}{{#1}[\i-1]} 
+      \draw [->] (p\i) to [bend right=45] node[midway,auto,swap]  {\X}
+      (p\j) ; 
+    }
+}
+
+% jsut the first two steps: 
+\begin{tikzpicture}
+  \begin{scope}[xshift=0cm, yshift=0cm]
+    \node at (-\diam cm -1cm, \diam cm + 1cm) {Step 0:};
+    \drawedges{\Lst}
+  \end{scope}
+
+\begin{scope}[xshift=3*\diam cm, yshift=0 * \diam cm]
+  \node at (-\diam cm -1cm, \diam cm + 1cm) {Step 1:};
+  \drawedges{17,22,22,12,12,19,19,13}
+\end{scope}
+\end{tikzpicture}
+
+% all steps: 
+
+\begin{tikzpicture}
+  \begin{scope}[xshift=0cm, yshift=0cm]
+    \node at (-\diam cm -1cm, \diam cm + 1cm) {Step 0:};
+    \drawedges{\Lst}
+  \end{scope}
+
+\begin{scope}[xshift=3*\diam cm, yshift=0 * \diam cm]
+  \node at (-\diam cm -1cm, \diam cm + 1cm) {Step 1:};
+  \drawedges{17,22,22,12,12,19,19,13}
+\end{scope}
+
+
+\begin{scope}[xshift=6*\diam cm, yshift=0 * \diam cm]
+  \node at (-\diam cm -1cm, \diam cm + 1cm) {Step 2:};
+  \drawedges{17,22,22,22,12,19,19,19}
+\end{scope}
+
+\begin{scope}[xshift=9*\diam cm, yshift=0 * \diam cm]
+  \node at (-\diam cm -1cm, \diam cm + 1cm) {Step 3:};
+  \drawedges{19,22,22,22,22,19,19,19}
+\end{scope}
+
+\begin{scope}[xshift=0*\diam cm, yshift=-3 * \diam cm]
+  \node at (-\diam cm -1cm, \diam cm + 1cm) {Step 4:};
+  \drawedges{19,22,22,22,22,22,19,19}
+\end{scope}
+
+\begin{scope}[xshift=3*\diam cm, yshift=-3 * \diam cm]
+  \node at (-\diam cm -1cm, \diam cm + 1cm) {Step 5:};
+  \drawedges{19,22,22,22,22,22,22,19}
+\end{scope}
+
+\begin{scope}[xshift=6*\diam cm, yshift=-3 * \diam cm]
+  \node at (-\diam cm -1cm, \diam cm + 1cm) {Step 7:};
+  \drawedges{19,22,22,22,22,22,22,22}
+\end{scope}
+
+
+\begin{scope}[xshift=9*\diam cm, yshift=-3 * \diam cm]
+  \node at (-\diam cm -1cm, \diam cm + 1cm) {Step 8:};
+  \drawedges{22,22,22,22,22,22,22,22}
+\end{scope}
+\end{tikzpicture}
+\end{document}
