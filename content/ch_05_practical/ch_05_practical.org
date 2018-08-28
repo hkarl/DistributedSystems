@@ -47,7 +47,7 @@ We need to automate the following tasks:
 
 *** Question 1: Get an execution environment 
 
-- Real hardware: Talk to you sys admin, procurement office, ... 
+- Real hardware: Talk to your sys admin, procurement office, ... 
 - A virtual machine:
   - Talk to sys admin, your cloud provider, ... 
   - Some hypervisors allow to request an empty VM
@@ -202,6 +202,31 @@ $ terraform apply
 
 #+BEGIN_SRC bash 
 $ terraform show 
+#+END_SRC
+
+
+*** Alternatives to Terraform 
+
+- \href{https://medium.com/@anthonypjshaw/multi-cloud-what-are-the-options-part-1-low-level-abstraction-libraries-ce500f29120f}{Overview} 
+- \href{https://libcloud.apache.org}{Apache Libcloud}
+  - Simple Python library, supporting over 50 cloud providers
+
+\tiny
+#+BEGIN_SRC python 
+from libcloud.compute.types import Provider
+from libcloud.compute.providers import get_driver
+
+cls = get_driver(Provider.RACKSPACE)
+driver = cls('username', 'api key', region='iad')
+
+sizes = driver.list_sizes()
+images = driver.list_images()
+
+size = [s for s in sizes if s.id == 'performance1-1'][0]
+image = [i for i in images if 'Ubuntu 12.04' in i.name][0]
+
+node = driver.create_node(name='libcloud', size=size, image=image)
+print(node)
 #+END_SRC
 
 ** IaC 
