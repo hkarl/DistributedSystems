@@ -252,6 +252,10 @@ Remember: No group changes so far!
   application 
 
 ** Atomic 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:mcast:atomic_order
+   :END:
+
 *** Atomic order
  - If r1 and r2 are requests, then either 
    - r1 is processed before r2 at all shared destinations 
@@ -322,8 +326,9 @@ If processes p and q both TO-deliver messages m and m’, then p TO-delivers m b
   - Often, token-passing based 
 
 *** Implementing TO with central sequencer 
-
-
+    :PROPERTIES:
+    :CUSTOM_ID: s:mcast:total_oder_sequencer
+    :END:
 
 ****                                                              :B_columns:
      :PROPERTIES:
@@ -399,6 +404,9 @@ def Receive(m, seqnr):
 
 
 ** Causal 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:mcast:causal_ordering
+   :END:
 
 *** Preserve causality? 
 
@@ -811,6 +819,9 @@ future (*epochs*)
 
 
 * Implementing causal bcast: Logical time 
+  :PROPERTIES:
+  :CUSTOM_ID: sec:mcast:logical_time
+  :END:
 
 
 ** Timestamps 
@@ -1347,6 +1358,9 @@ Vector clocks represent the entire /cone/ of previous events
 
 
 ** Causal ordering 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:mcast:cbcast
+   :END:
 
 *** Realizing Causal Ordering: CBCAST protocol
 
@@ -1390,7 +1404,7 @@ Update VT
 [[./figures/cbcast_example.pdf]]
 
 
- 
+
 * Case studies
 
 
