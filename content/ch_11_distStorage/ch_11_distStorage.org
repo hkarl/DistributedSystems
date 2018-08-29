@@ -1197,6 +1197,7 @@ Nodes arranged in hierarchical name space
 Nodes are replicated, access is: 
 - *sequentially consistent*
 - *atomic*: all replicas are updated or none at all
+  - Careful: not the same use as in /atomic mcast/! 
 - *Single System Image*
 - *Dependable*: applied updates are persistent (provided enough
   servers stay alive)
