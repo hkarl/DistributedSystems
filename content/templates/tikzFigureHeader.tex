@@ -2,13 +2,27 @@
 \usepackage[T1]{fontenc}
 \usepackage{helvet}
 \usepackage{../../templates/msc}
+\usepackage{tikzsymbols}
+\usepackage{tikzpeople}
+
 
 \renewcommand{\familydefault}{\sfdefault}
 
 \tikzset{
-every picture/.style={
-line width=1pt
-}}
+        every picture/.style={
+        line width=1pt
+        },
+         database/.style={
+               cylinder,
+               cylinder uses custom fill,
+      cylinder body fill=yellow!50,
+      cylinder end fill=yellow!50,
+      shape border rotate=90,
+      aspect=0.25,
+      draw
+    }
+}
+
 
 \usepackage{tikz}
 \author{Holger Karl}
