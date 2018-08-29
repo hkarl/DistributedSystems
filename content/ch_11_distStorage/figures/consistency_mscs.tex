@@ -1,0 +1,224 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary{backgrounds}
+
+
+\newcommand{\mscread}[2] {
+  \lost[side=right]{}{#1}{#2}  
+}
+
+\newcommand{\mscwrite}[2] {
+  \found{}{#1}{#2} 
+}
+
+
+\begin{document}
+
+\begin{msc}{Problem with strict consistency}
+  \declinst{A}{}{A}
+  \declinst{B}{}{B}
+
+  \found{}{r(X)}{A} 
+  \nextlevel
+  \mess{read(X)}{A}{B}[4]
+  \nextlevel[2]
+  
+  % \mess{write(X, 42)}{envright}{B}
+  \found[side=right]{}{w(X,42)}{B}
+\end{msc}
+
+%------------------------------
+
+
+\begin{msc}{Strictly consistent}
+  \declinst{A}{}{A}
+  \declinst{B}{}{B}
+  
+  \found{}{w(X,42)}{A}
+  \nextlevel[2]
+  
+  \lost[side=right]{}{r(X): 42}{B}
+\end{msc}
+
+
+\begin{msc}{Not strictly consistent}
+  \declinst{A}{}{A}
+  \declinst{B}{}{B}
+  
+  \found{}{w(X,42)}{A}
+  \nextlevel[2]
+  
+  \lost[side=right]{}{r(X): 17}{B}
+  \nextlevel[2]
+  \lost[side=right]{}{r(X): 42}{B}
+\end{msc}
+
+%-------------------------
+
+\begin{msc}{Sequentially consistent}
+  \declinst{A}{}{A}
+  \declinst{B}{}{B}
+  \declinst{C}{}{C}
+  \declinst{D}{}{D}
+  
+
+  \found{}{w(X,42)}{A}
+  \nextlevel[1]
+  \found{}{w(X,17)}{B}
+  \nextlevel[1]
+  
+  \mscread{r(X): 17}{C}
+  \nextlevel[1]
+  \mscread{r(X): 17}{D}
+  \nextlevel[1]
+  \mscread{r(X): 42}{C}
+  \mscread{r(X): 42}{D}  
+\end{msc}
+
+\begin{msc}{Not sequentially consistent}
+  \declinst{A}{}{A}
+  \declinst{B}{}{B}
+  \declinst{C}{}{C}
+  \declinst{D}{}{D}
+  
+
+  \mscwrite{w(X,42)}{A}
+  \nextlevel[1]
+  \mscwrite{w(X,17)}{B}
+  \nextlevel[1]
+  
+  \mscread{r(X): 17 }{C}
+  \nextlevel[1]
+  \mscread{r(X): 42}{D}
+  \nextlevel[1]
+  \mscread{r(X): 42}{C}
+  \mscread{r(X): 17}{D}  
+\end{msc}
+
+%-----------------
+
+\begin{msc}{Causally consistent}
+  \declinst{A}{}{A}
+  \declinst{B}{}{B}
+  \declinst{C}{}{C}
+  \declinst{D}{}{D}
+  
+
+  \mscwrite{w(X,42)}{A}
+  \nextlevel[1]
+
+  \mscread{r(X): 42}{B}
+  \mscread{r(X): 42}{C}
+  \mscread{r(X): 42}{D}
+  \nextlevel[1]
+  
+  \mscwrite{w(X,17)}{B}
+  \nextlevel[1]
+
+  \mscwrite{w(X,99)}{A}
+  \nextlevel[1]
+
+  
+  \mscread{r(X): 17}{C}
+  \mscread{r(X): 99}{D}
+
+  \nextlevel[1]
+  \mscread{r(X): 99}{C}
+  \mscread{r(X): 17}{D}  
+\end{msc}
+
+
+\begin{msc}{Not causally consistent}
+  \declinst{A}{}{A}
+  \declinst{B}{}{B}
+  \declinst{C}{}{C}
+  \declinst{D}{}{D}
+  
+
+  \mscwrite{w(X,42)}{A}
+  \nextlevel[1]
+
+  \mscread{r(X): 42}{B}
+  \nextlevel[1]
+
+  \mscwrite{w(X,17)}{B}
+  \nextlevel[1]
+  
+  \mscread{r(X): 17}{C}
+  \mscread{r(X): 42}{D}
+
+  \nextlevel[1]
+  \mscread{r(X): 42}{C}
+  \mscread{r(X): 17}{D}  
+\end{msc}
+
+\begin{msc}{FIFO consistent}
+  \declinst{A}{}{A}
+  \declinst{B}{}{B}
+  \declinst{C}{}{C}
+  \declinst{D}{}{D}
+  
+
+  \mscwrite{w(X,42)}{A}
+  \nextlevel[1]
+
+  \mscread{r(X): 42}{B}
+  \nextlevel[1]
+
+  \mscwrite{w(X,17)}{B}
+  \nextlevel[1]
+  
+  \mscwrite{w(X,99)}{B}
+  \nextlevel[1]
+
+  \mscread{r(X): 17}{C}
+  \mscread{r(X): 42}{D}
+  \nextlevel[1]
+
+  \mscread{r(X): 42}{C}
+  \mscread{r(X): 17}{D}  
+  \nextlevel[1]
+
+  \mscread{r(X): 99}{C}
+  \mscread{r(X): 99}{D}  
+
+\end{msc}
+
+
+\begin{msc}{Weakly consistent}
+  \declinst{A}{}{A}
+  \declinst{B}{}{B}
+  \declinst{C}{}{C}
+  
+
+  \mscwrite{Acq(L)}{A}
+  \nextlevel[1]
+
+  \mscwrite{w(X,42)}{A}
+  \nextlevel[1]
+
+  \mscwrite{w(X,17)}{A}
+  \nextlevel[1]
+
+  \mscwrite{Rel(L)}{A}
+  \nextlevel[1]
+
+  \mscwrite{Acq(L)}{B}
+  \nextlevel[1]
+
+  \mscwrite{r(X): 17)}{B}
+  \nextlevel[1]
+
+  \mscwrite{Rel(L)}{B}
+  \nextlevel[1]
+
+  \mscwrite{r(X): 42)}{C}
+  \nextlevel[1]
+
+\end{msc}
+
+
+
+\end{document}

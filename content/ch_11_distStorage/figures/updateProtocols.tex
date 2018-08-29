@@ -1,0 +1,453 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary{chains}
+\usetikzlibrary{positioning, calc}
+
+\begin{document}
+
+% servers takes two args: number of storage and box extension 
+\tikzset{pics/storage/.style 2 args ={code={
+    \begin{scope} [start chain]
+      \coordinate (base) at (0, #2) ; 
+      
+      \foreach \i in {1,...,#1} {
+        \node[database, on chain] (s\i) {S\i}; 
+      }
+
+      \coordinate (top) at ($(s1.north west)+(0,0.5)$); 
+
+      \node[draw, rounded corners, fit= (top) (s#1) (base)] {}; 
+
+    \end{scope}
+}},
+pics/readerPic/.style = {code={
+  \node[alice, above= 1.5cm of s#1] (r) {};
+  \node[above= 0cm of r] {Reader};
+}},
+pics/writerPic/.style = {code={
+  \node[bob, above= 1.5cm of s#1] (w) {};
+  \node[above= 0cm of w] {Writer};
+}},
+}
+
+% \begin{tikzpicture}
+
+%   \pic{storage={5}{-2}};
+
+%   \draw [->, rounded corners] (s1) -- +(0, -1) -|  (s3);
+% \end{tikzpicture}
+
+
+\newcommand{\sendcommand}[3]{
+  \draw [->, bend left] (#1)  to node [auto] {#3} (#2); 
+}
+
+% Remote - write: no replication 
+% \begin{tikzpicture}
+%   \pic{storage={4}{-2}};
+%   \node [below=0.75cm of s2] (ic) {In charge}; 
+%   \draw [->, dotted, thin] (ic) -- (s2);
+
+%   \pic{readerPic={3}}; 
+% %   
+
+
+%   \sendcommand{r}{s3}{R1}
+%   \sendcommand{s3}{s2}{R2}
+%   \sendcommand{s2}{s3}{R3}
+%   \sendcommand{s3}{r}{R4}
+
+%   \pic{writerPic={1}}; 
+%   \sendcommand{w}{s1}{W1}
+%   \sendcommand{s1}{s2}{W2}
+%   \sendcommand{s2}{s1}{W3}
+%   \sendcommand{s1}{w}{W4}
+
+% \end{tikzpicture}
+
+
+% primary backup with blocking update 
+% \begin{tikzpicture}
+%   \pic{storage={4}{-2}};
+%   \node [below=0.75cm of s2] (ic) {primary}; 
+%   \draw [->, dotted, thin] (ic) -- (s2);
+
+
+%   \pic{writerPic={1}}; 
+%   \sendcommand{w}{s1}{W1}
+%   \sendcommand{s1}{s2}{W2}
+%   \sendcommand{s2}{s1}{W3}
+%   \sendcommand{s2}{s3}{W3}
+%   \sendcommand{s2}{s4}{W3}
+
+
+%   % ACK 
+%   \sendcommand{s1}{s2}{W4}
+%   \sendcommand{s3}{s2}{W4}
+%   \sendcommand{s4}{s2}{W4}
+
+%   % ACK to writer 
+%   \sendcommand{s1}{w}{W4}
+
+% %   \pic{readerPic={3}}; 
+% % %   
+% %   \sendcommand{r}{s3}{R1}
+% %   \sendcommand{s3}{s2}{R2}
+% %   \sendcommand{s2}{s3}{R3}
+% %   \sendcommand{s3}{r}{R4}
+
+
+% \end{tikzpicture}
+
+%==========================
+
+
+\begin{msc}{Single server, no replication}
+  \declinst{w}{}{Writer}
+  \declinst{s1}{}{S1}
+  \declinst{s2}{}{S2}
+  \declinst{s3}{}{S3}
+  \declinst{s4}{}{S4}
+  \declinst{r}{}{Reader}
+
+  \node[alice, above=0cm of msc@nodew] {}; 
+  \node[database, above=0cm of msc@nodes1] {}; 
+  \node[database, above=0cm of msc@nodes2, red] {P}; 
+  \node[database, above=0cm of msc@nodes3] {}; 
+  \node[database, above=0cm of msc@nodes4] {}; 
+  \node[bob, above=0cm of msc@noder] {}; 
+
+  \mess{Write}{w}{s1}
+  \nextlevel 
+
+  \mess{Write}{s1}{s2}
+  \nextlevel 
+  
+  \mess{Ok}{s2}{s1}
+  \nextlevel 
+  
+  \mess{Ok}{s1}{w}
+  \nextlevel 
+
+  \mess{Read}{r}{s4}
+  \nextlevel 
+  \mess{Read}{s4}{s3}
+  \nextlevel 
+  \mess{Read}{s3}{s2}
+  \nextlevel 
+  \mess{Result}{s2}{s3}
+  \nextlevel 
+  \mess{Result}{s3}{s4}
+  \nextlevel 
+  \mess{Result}{s4}{r}
+
+\end{msc}
+
+% %-----------------------------------
+
+
+\begin{msc}{Primary/backup with blocking write}
+  \declinst{w}{}{Writer}
+  \declinst{s1}{}{S1}
+  \declinst{s2}{}{S2}
+  \declinst{s3}{}{S3}
+  \declinst{s4}{}{S4}
+  \declinst{r}{}{Reader}
+
+  \node[alice, above=0cm of msc@nodew] {}; 
+  \node[database, above=0cm of msc@nodes1] {}; 
+  \node[database, above=0cm of msc@nodes2, red] {P}; 
+  \node[database, above=0cm of msc@nodes3] {}; 
+  \node[database, above=0cm of msc@nodes4] {}; 
+  \node[bob, above=0cm of msc@noder] {}; 
+
+  \mess{Write}{w}{s1}
+  \nextlevel 
+
+  \mess{Write}{s1}{s2}
+  \nextlevel 
+
+  \mess{}{s2}{s1}[1]
+  \mess{Update}{s2}{s3}[1]
+  \mess{}{s2}{s4}[1]
+  \nextlevel[2] 
+  
+  \mess{}{s1}{s2}[0.5]
+  \mess{ACK}{s3}{s2}[0.5]
+  \mess{}{s4}{s2}[0.5]
+  \nextlevel[2] 
+
+  \mess{Ok}{s2}{s1}
+  \nextlevel 
+  
+  \mess{Ok}{s1}{w}
+  \nextlevel 
+
+  \mess{Read}{r}{s4}
+  \nextlevel 
+  \mess{Result}{s4}{r}
+
+\end{msc}
+
+\begin{msc}{Primary/backup with nonblocking write}
+  \declinst{w}{}{Writer}
+  \declinst{s1}{}{S1}
+  \declinst{s2}{}{S2}
+  \declinst{s3}{}{S3}
+  \declinst{s4}{}{S4}
+  \declinst{r}{}{Reader}
+
+  \node[alice, above=0cm of msc@nodew] {}; 
+  \node[database, above=0cm of msc@nodes1] {}; 
+  \node[database, above=0cm of msc@nodes2, red] {P}; 
+  \node[database, above=0cm of msc@nodes3] {}; 
+  \node[database, above=0cm of msc@nodes4] {}; 
+  \node[bob, above=0cm of msc@noder] {}; 
+
+  \mess{Write}{w}{s1}
+  \nextlevel 
+
+  \mess{Write}{s1}{s2}
+  \nextlevel 
+
+  \mess{Ok}{s1}{w}
+  \nextlevel 
+
+  \mess{}{s2}{s1}[1]
+  \mess{Update}{s2}{s3}[1]
+  \mess{}{s2}{s4}[1]
+  \nextlevel[2] 
+  
+  \mess{}{s1}{s2}[0.5]
+  \mess{ACK}{s3}{s2}[0.5]
+  \mess{}{s4}{s2}[0.5]
+  \nextlevel[2] 
+  
+  \mess{Read}{r}{s4}
+  \nextlevel 
+  \mess{Result}{s4}{r}
+
+\end{msc}
+
+
+\begin{msc}{Single server, migrated}
+
+  % \draw [help lines] (0,0) grid (10,-10);
+  \declinst{w}{}{Writer}
+  \declinst{s1}{}{S1}
+  \declinst{s2}{}{S2}
+  \declinst{s3}{}{S3}
+  \declinst{s4}{}{S4}
+  \declinst{r}{}{Reader}
+
+  \node[alice, above=0cm of msc@nodew] {}; 
+  \node[database, above=0cm of msc@nodes1] {}; 
+  \node[database, above=0cm of msc@nodes2, red] {P}; 
+  \node[database, above=0cm of msc@nodes3] {}; 
+  \node[database, above=0cm of msc@nodes4] {}; 
+  \node[bob, above=0cm of msc@noder] {}; 
+
+  
+  \mess{Read}{r}{s4}
+  \nextlevel 
+  \mess{Get}{s4}{s3}
+  \nextlevel 
+  \mess{Get}{s3}{s2}
+  \nextlevel 
+  \mess{Move}{s2}{s3}
+
+  % \action[database]{}{s2};
+  \node [database] at (msc@nodes2 |-  0,-4.5) {};
+  \nextlevel 
+
+  \mess{Move}{s3}{s4}
+  \nextlevel[2] 
+
+  \node [database, red] at (msc@nodes4 |-  0,-5) {P}; 
+
+  \mess{Result}{s4}{r}
+  \nextlevel[2] 
+  \mess{Read}{r}{s4}
+  \nextlevel 
+  \mess{Result}{s4}{r}
+
+\end{msc}
+
+
+\begin{msc}{Migrate primary plus backup}
+
+  % \draw [help lines] (0,0) grid (10,-10);
+  \declinst{w}{}{Writer}
+  \declinst{s1}{}{S1}
+  \declinst{s2}{}{S2}
+  \declinst{s3}{}{S3}
+  \declinst{s4}{}{S4}
+  \declinst{r}{}{Reader}
+
+  \node[alice, above=0cm of msc@nodew] {}; 
+  \node[database, above=0cm of msc@nodes1] {}; 
+  \node[database, above=0cm of msc@nodes2, red] {P}; 
+  \node[database, above=0cm of msc@nodes3] {}; 
+  \node[database, above=0cm of msc@nodes4] {}; 
+  \node[bob, above=0cm of msc@noder] {}; 
+
+  \mess{Write}{w}{s1}
+  \nextlevel 
+  \mess{Get}{s1}{s2}
+  \nextlevel 
+  
+  \mess{Move}{s2}{s1}
+  \nextlevel 
+
+  \node [database] at (msc@nodes2 |-  0,-4) {}; 
+  \node [database, red] at (msc@nodes1 |-  0,-4) {P}; 
+
+  \nextlevel[1] 
+
+  \mess{}{s1}{s2}[1]
+  \mess{Update}{s1}{s3}[1]
+  \mess{}{s1}{s4}[1]
+  \nextlevel [2]
+
+  \mess{}{s2}{s1}[1]
+  \mess{Ack}{s3}{s1}[1]
+  \mess{}{s4}{s1}[1]
+  \nextlevel [2]
+
+  \mess{ok}{s1}{w}
+  \nextlevel 
+  
+  \mess{Read}{r}{s4}
+  \nextlevel 
+  \mess{Result}{s4}{r}
+
+\end{msc}
+
+
+\begin{msc}{Active replication}
+
+  % \draw [help lines] (0,0) grid (10,-10);
+  \declinst{w}{}{Writer}
+  \declinst{s1}{}{S1}
+  \declinst{s2}{}{S2}
+  \declinst{s3}{}{S3}
+  \declinst{s4}{}{S4}
+  \declinst{w2}{}{Writer}
+
+  \node[alice, above=0cm of msc@nodew] {}; 
+  \node[database, above=0cm of msc@nodes1] {}; 
+  \node[database, above=0cm of msc@nodes2] {}; 
+  \node[database, above=0cm of msc@nodes3] {}; 
+  \node[database, above=0cm of msc@nodes4] {}; 
+  \node[bob, above=0cm of msc@noder] {}; 
+
+  \mess{Write}{w}{s1}
+  \nextlevel 
+
+
+  \mess{}{s1}{s2}[3]
+  \mess{Update}{s1}{s3}[3]
+  \mess{}{s1}{s4}[3]
+  \nextlevel [1]
+
+  \mess{Write}{w2}{s4}
+  \nextlevel 
+
+  \mess{}{s4}{s1}[3]
+  \mess{Update}{s4}{s2}[3]
+  \mess{}{s4}{s3}[3]
+  \nextlevel [1]
+
+
+
+\end{msc}
+
+
+\begin{msc}{Active replication of objects}
+
+  % \draw [help lines] (0,0) grid (10,-10);
+  \declinst{w}{}{Caller}
+  \declinst{s1}{}{S1}
+  \declinst{s2}{}{S2}
+  \declinst{s3}{}{S3}
+  \declinst{s4}{}{S4}
+
+  \node[alice, above=0cm of msc@nodew] {}; 
+  \node[database, above=0cm of msc@nodes1] {o}; 
+  \node[database, above=0cm of msc@nodes2] {o}; 
+  \node[database, above=0cm of msc@nodes3] {o}; 
+  \node[database, above=0cm of msc@nodes4] {o}; 
+
+  \mess{o.m1()}{w}{s1}
+  \nextlevel 
+
+
+  \mess{}{s1}{s2}[2]
+  \mess{}{s1}{s3}[2]
+  \mess{o.m1()}{s1}{s4}[2]
+  \nextlevel [3]
+
+  \mess{}{s2}{s1}[2]
+  \mess{}{s2}{s3}[2]
+  \mess{o.m2()}{s2}{s4}[2]
+
+  \mess{}{s3}{s1}[2]
+  \mess{}{s3}{s2}[2]
+  \mess{o.m2()}{s3}{s4}[2]
+
+  % \nextlevel [1]
+
+  \mess{o.m2()}{s4}{s1}[2]
+  \mess{}{s4}{s2}[2]
+  \mess{}{s4}{s3}[2]
+
+  \nextlevel [1]
+
+\end{msc}
+
+\begin{msc}{Active replication of objects with coordinator}
+
+  % \draw [help lines] (0,0) grid (10,-10);
+  \declinst{w}{}{Caller}
+  \declinst{s1}{}{S1}
+  \declinst{s2}{}{S2}
+  \declinst{s3}{}{S3}
+  \declinst{s4}{}{S4}
+
+  \node[alice, above=0cm of msc@nodew] {}; 
+  \node[database, above=0cm of msc@nodes1] {o, p}; 
+  \node[database, above=0cm of msc@nodes2, red] {\textbf{p}}; 
+  \node[database, above=0cm of msc@nodes3] {p, q}; 
+  \node[database, above=0cm of msc@nodes4, red] {\textbf{q}}; 
+
+  \mess{o.m1()}{w}{s1}
+  \nextlevel 
+
+
+  \mess{}{s1}{s1}[2]
+  \mess{}{s1}{s2}[2]
+  \mess{p.m2()}{s1}{s3}[2]
+  \nextlevel [3]
+
+  \mess{}{s2}{s3}[2]
+  \mess{q.m3()}{s2}{s4}[2]
+
+  \nextlevel [3]
+  
+  \mess{reply q.m3()}{s4}{s1}[2]
+  \mess{}{s4}{s2}[2]
+  \mess{}{s4}{s3}[2]
+  \nextlevel [4]
+
+  \mess{reply p.m2()}{s2}{s1}
+  \nextlevel [1]
+
+  \mess{reply o.m1()}{s1}{w}
+
+\end{msc}
+
+
+
+\end{document}

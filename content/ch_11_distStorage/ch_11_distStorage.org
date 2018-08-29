@@ -1,181 +1,592 @@
 #+BIBLIOGRAPHY: ../bib plain
 
 
-* Model: distributed storage, distributed objects  
+* Replication vs. consistency
 
-*** Distributed storage models 
- - Replicated storage 
- - Also: Caching (or deal with that already in client/server model?)  
-*** Consistency model, update protocols 
+*** The story so far 
 
- - Usual material from Tanenbaum, chapter 6. Serves as introduction to
-   the problem
- - data-centric models 
- - Eventual consistency, client-centric models
- - quorums 
- - There is no "now" https://queue.acm.org/detail.cfm?id=2745385 
+- Multicast: Send message to multiple receivers
+  - Worry about relative ordering of multiple messages
+- Pub/sub: Send message multiple subscribers
+  - Similar; more flexible notion of who receives
+- Message queueing: send message to one out of group
+  - Which one?
+  - Scalability? Dependability? 
+
+*** The story so far
+
+- What happens with these messages?
+  - Trigger action?
+  - Update stored data?
+- Is it the *same* data? or *different* data?
+- *Same data* = *replicated data* 
 
 
-*** Reasons for replication
- Reliability
+*** Reasons to replicate
+
+**** Dependability 
  - Continue to work even after crash 
  - With more replication, reliability can increase
- - Performance
+
+****  Performance
  - Scale with numbers of requests, geographic area 
- - 
- - But: price to be paid
- - Overhead, costs 
- - Consistency
- - Intuition: “All
- - replicas are 
- - the same”
- - Out-of-date problems 
-*** Object replication, not just data replication
- Consider data and their operations jointly in the replication discussion 
- - Starting point: Remotely invocable objects should be able to handle concurrent invocations
- - Option (a): by turning all methods into critical regions (like “synchronized” methods in Java) 
- - Option (b): Object is unaware of concurrency; hosting server process will handle it 
-*** Object replication: responsible entity? 
- Approach 1: Object itself knows it can be replicated
- - No additional support from underlying system
- - Class/Object-specific strategies possible  
- Approach 2: Objects unaware of replication
- - Entails explicit support from a distribution system
- - E.g., to ensure that invocations are passed to all replicas 
- - More common, easier for developers  
 
 
-* Data-centric consistency models 
+** Consistency 
+
+*** Consistency challenge
+
+ - Intuition:
+   - /All replicas always have the same value/ (??) 
+   - /All replicas see  the same updates in the same order/
+ - Overhead, costs \cite{Sheehy:2015:NoNow}
+
+
+*** Consistency challenge: Non-commutative updates 
+
+**** $t=1$: Updates reach nearby storage 
+
+
+
+#+CAPTION: Non-commutative updates reach nearby storage
+#+ATTR_LaTeX: :height 0.2\textheight :options page=1
+#+NAME: fig:distSt:noncommute1
+[[./figures/scenarios.pdf]]
+
+
+
+**** $t=2$: Updates also  reach far storage 
+
+#+CAPTION: Non-commutative updates reach far storage
+#+ATTR_LaTeX: :height 0.2\textheight :options page=2
+#+NAME: fig:distSt:noncommute2
+[[./figures/scenarios.pdf]]
+
+
+*** Distributed storage models 
+ - Replicated *storage*
+   - Strong expectations that content is up-to-date 
+ - Not just a cache
+   - Cache: ok to be out-of-date 
+
+*** Up-to-date? 
+
+- But what does up-to-date really *mean*? 
+- Basically: which values are read, when which updates take place?
+- Formalised as a *consistency model* (see
+  \slideref{sec:distStor:dataCentric}[s:distStor:consistency_model])
+- Needs *protocols* to realise it 
+
+- Challenge: \href{https://queue.acm.org/detail.cfm?id=2745385 }{There is no /now/} 
+
+
+** Object replication 
+
+*** From data to object replication
+
+- When replicating data, we can also replicate objects
+
+- Consider data and their operations jointly in the replication discussion
+
+- Operations: RMI calls 
+
+- Question: What happens when replicated objects have concurrent
+  invocations?
+
+  - Need to deal with *order* of requests, not just *mutex* 
+
+
+*** Option a: Object knows it is replicated 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+Object itself or RMI skeleton deals with  replication
+- Need to implement coordination functionality
+- Can be specific to class or object 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Replication handled by 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+NAME: fig:distStor:replication_object
+[[./figures/scenarios.pdf]]
+
+
+*** Option a: resulting coordination relationship 
+
+
+#+CAPTION: Replication handled by object or RMI skeleton: Coordination relationship 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=5
+#+NAME: fig:distStor:skeleton_relation
+[[./figures/scenarios.pdf]]
+
+
+*** Option b: Additional support outside of RMI library 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+Object/RMI  stays  unaware of replication; responsibility e.g. in
+multicast library 
+- More common approach 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: Replication handled by underlying library 
+#+ATTR_LaTeX: :height 0.95\linewidth :options page=4
+#+NAME: fig:distStor:replication_library
+[[./figures/scenarios.pdf]]
+
+
+
+
+
+*** Option b: resulting coordination relationship 
+
+
+#+CAPTION: Replication handled by underlying library: Coordination relationship 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=6
+#+NAME: fig:distStor:library_relation
+[[./figures/scenarios.pdf]]
+
+
+
+** Assumptions 
+
+*** Assumptions for this chapter 
+
+**** Things work 
+
+- No failures -- but still replicated 
+- Mostly concerned with tradeoff between convenience and efficiency of
+  APIs/programming models 
+
+**** Later: Things fail 
+
+- Question then: what is still achievable, at what cost, in replicated
+  storage? 
+
+
+* Data-centric consistency models
+  :PROPERTIES:
+  :CUSTOM_ID: sec:distStor:dataCentric
+  :END:
+
+** Strong models 
 
 *** Data-centric consistency models
- Basic model: Processes read 
- - or write data in a data store
- - Each process might have a local 
- - copy of each object “nearby” 
- - Write operations are propagated 
- - to all replicas 
- - 
- - Consistency model: A contract between processes and the data store 
- - If processes obey certain rules, the data store will work correctly (“as expected” by the processes), will ensure “consistency” 
- - 
+    :PROPERTIES:
+    :CUSTOM_ID: s:distStor:consistency_model
+    :END:
+
+Basic model: Processes read  or write data in a data store
+   - Each process might have a local  copy of each object “nearby” 
+   - Write operations are propagated  to all replicas 
+
+
+**** Consistency model                                         :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+A contract between processes and the data store.  If processes obey
+certain rules, the data store will work correctly (“as expected” by
+the processes); it  will ensure /consistency/
+\cite{Li:1989:MCS:75104.75105} \cite{Mosberger:1993:MCM:160551.160553}
+\cite{546611} 
+
  - Intuition: Read operation returns value of last write
  - But: without global clock, what is “last write”?
-*** Strict consistency
- Strict consistency: 
- - 	Any read on a data item x returns a value corresponding to the result of the most recent write on x
- - Natural, obvious, but implies existence of global time 
- - Writes are instantaneously visible to all possible reads
- - As this model is common to uniprocessors, most programmers (more or less consciously) expect 
- - a system to behave like this 
- - Some obvious problems in replicated storage 
- - 
-*** Notation for consistency examples
 
- - Process i writes value a to data item x: Wi(x)a 
- - Process i reads from data item x returning value b: Ri(x)b
- - Time shown horizontally, grows to the right 
- - 
- - Examples: 
- - 
- - 
- - 
- Strictly consistent behavior
- Not strictly consistent
+*** Strict consistency
+
+****  Strict consistency:                                      :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+Any read on a data item x returns a value corresponding to the result
+of the /most recent/ write on x 
+
+
+ - Natural, obvious, but implies existence of global time 
+   - Writes are instantaneously visible to all possible reads
+ - As this model is common to uniprocessors, most programmers (more or
+   less consciously) expect  a system to behave like this 
+
+*** Problems of strict consistency 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+Obvious problems in replicated storage
+ - No global time 
+ - What happens when read takes place before write, but read *arrives*
+   at write location afterwards?
+ - Which value to return? 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Problems with strict consistency
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=1
+#+NAME: fig:distStor:strict_problem
+[[./figures/consistency_mscs.pdf]]
+
+
+
+
+*** Examples for strict consistency 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+****** Strictly consistent 
+
+
+#+CAPTION: Strictly consistent example
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=2
+#+NAME: fig:distStor:strictly
+[[./figures/consistency_mscs.pdf]]
+
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+****** Not strictly consistent 
+
+
+First read at B already has to deliver 42. 
+
+#+CAPTION: Not strictly consistent example
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=3
+#+NAME: fig:distStor:strictly
+[[./figures/consistency_mscs.pdf]]
+
 *** Sequential consistency 
+
  Observation: Programmers are already used to pay attention to situations when order of events is important
  - Critical sections in concurrent programs, interleaving of threads, …
  - Use as justification to weaken the consistency model? 
- - 
- - Sequential consistency
- - 	The result of any execution is the same as if the (read and write) operations by all the processes on the data store were executed in some sequential order and the operations of each individual process appear in this sequence in the order specified by its program. 
- - Meaning: Any interleaving of reads and writes is acceptable, but all processes see the same interleaving!
-*** Sequential consistency, example 
- Example 
- - 
- - 
- - 
- - 
- - 
- - 
- - 
- - Note: no notion of time in this definition!
- - 
- - (Note: sequential consistency related to transaction serializability )
-*** Sequential consistency, example 2
- Processes:
- - 
- - 
- - 
- - Some possible executions (Signature= output of P1, P2, P3):
-*** Getting weaker: Causal consistency 
- Sequential consistency still too strong, resulting in unacceptable performance
- - Need to weaken the promises made by the data store to the processes even more 
- - 
- - Causal consistency 
- - 	Necessary condition:
- - Writes that are potentially causally related must be seen by all processes in the same order.  Concurrent writes may be seen in a different order on different machines.
-*** Causal consistency: Example
- Causal consistency: Example
 
- - 
- - 
- - 
- - 
- - 
- - 
- - This sequence is allowed with a causally-consistent store, but not with a sequentially or strictly consistent store
- - Note: W1(x)c and W2(x)b are concurrent, need not be ordered!
- - 
+
+****  Sequential consistency                                   :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+The result of any execution is the same as if the (read and write)
+operations by all the processes on the data store were executed in
+some sequential order and the operations of each individual process
+appear in this sequence in the order specified by its program.  
+ - Meaning: *Any* interleaving of reads and writes is acceptable, but
+   all processes see the *same* interleaving!
+
+*** Sequential consistency, example 
+
+
+
+#+CAPTION: Sequentially consistent example
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=4
+#+NAME: fig:distStor:sequential
+[[./figures/consistency_mscs.pdf]]
+
+*** Sequential consistency, example 
+
+
+
+#+CAPTION: Not sequentially consistent example
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=5
+#+NAME: fig:distStor:not_sequential
+[[./figures/consistency_mscs.pdf]]
+
+
+*** Sequential consistency, example 2
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+- Assume a sequentially consistent system
+  - Assume that ~print~ is atomic 
+- Which output sequences are possible? 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+BEGIN_SRC python
+# Process A: 
+x = 1
+print ("A:", y, z)
+
+# Process B: 
+y = 1
+print ("B:", x, z)
+
+# Process C: 
+z = 1
+print ("C:", y, z)
+#+END_SRC
+
+
+*** Implementing sequential consistency 
+
+- Many implementation options
+- Depends on read/write ratios, how often do readers or writers
+  change, desired degree of replication, ...
+- Shared characteristic: *slow* 
+- See
+  \slideref{sec:distStor:consistency_protocols}[s:distStor:consistency_protocols]
+  for details 
+- But: Devil is in the details \cite{Adve:2010:MMC:1787234.1787255}
+
+
+
+
+** Weaker models 
+
+*** Getting weaker: Causal consistency 
+
+
+Sequential consistency still too strong (=slow)
+- Unacceptable performance
+- Need to weaken the promises made by the data store to the processes
+  even more  
+
+**** Causal consistency                                        :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+Necessary condition:  
+- Writes that are *potentially causally related* must be seen by *all*
+  processes in the same order.   
+- *Concurrent writes may* be seen in a *different order* on different
+  machines. 
+
+
+
+
+*** Causal consistency: Example
+
+#+CAPTION: Causally consistent example
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=6
+#+NAME: fig:distStor:causally_consistent
+[[./figures/consistency_mscs.pdf]]
+
+
+ 
+ - Allowed with  causally consistency, but not
+   with sequential  or strict consistency 
+   - Note: w(X,17) at B  and w(X,99) at A  are concurrent, need not be
+     ordered! 
+
+
 *** Causal consistency: Example 2
 
- Violating causal consistency
- Correct ordering in causal consistency
+#+CAPTION: Not causally consistent example
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=7
+#+NAME: fig:distStor:not_causally_consistent
+[[./figures/consistency_mscs.pdf]]
+
+
+
+*** Causal consistency: Implementation 
+
+- Fairly simple: Distribute writes via a causal (and reliable)
+  multicast
+- Compare in particular CBCAST protocol (Section
+  \ref{sec:mcast:cbcast})  
+
 *** FIFO consistency 
- Causal consistency still requires same order for causally related writes 
+
+Causal consistency still requires same order for causally related
+writes  
  - Dropping even this requirement leads to: 
- - 
- - FIFO consistency 
- - 	Necessary Condition:
- - Writes done by a single process are seen by all other processes in the order in which they were issued, but writes from different processes may be seen in a different order by different processes.
- - 
+
+**** FIFO consistency                                          :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+Necessary Condition:
+ - Writes done by a *single process* are seen by *all* other processes in the *order* in which they were issued,
+ - but writes *from different* processes may be seen in a *different order* by different processes.
+
 *** FIFO consistency: Example 
- FIFO consistency: Example 
+
+#+CAPTION: FIFO consistent example
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=8
+#+NAME: fig:distStor:fifo_consistent
+[[./figures/consistency_mscs.pdf]]
+
+
+
+*** FIFO implementation 
+
+- Trivial
+- Sequence numbers, ordering in receiver per sender 
+
+
+
+** Really weak models 
+
+*** Weakening FIFO? 
+
+ - Even FIFO is too strict for high performance
+   - (Because receiver might have to wait to close a gap in message
+     sequence) 
+   - And it is not even necessarily required! 
+ - Example: Process performs many writes within a critical region 
+   - Other processes must not touch the written data until the writer
+     has left the critical section  
+   - So the order in which writes done inside this critical section
+     happen is not relevant!  
+   - Only after critical section has been left need other processes be
+     informed  
+
 *** Weak consistency – Idea: synchronization variable
- Even FIFO is too strict for high performance
- - And it is not even necessarily required! 
- - Example
- - Process performs many writes within a critical sections
- - Other processes must not touch the written data until the writer has left the critical section 
- - So the order in which writes done inside this critical section happen is not relevant! 
- - Only after critical section has been left need other processes be informed 
+
  - Idea: Tell data store about such synchronization aspects
- - To relieve from needlessly attempting strong consistency 
- - Expressed via synchronization variables 
-*** Weak consistency – Definition 
- Weak consistency 
- - 	Properties:
- - Accesses to synchronization variables associated with a data store are sequentially consistent
- - No operation on a synchronization variable is allowed to be performed until all previous writes have been completed everywhere
- - “Flush the pipeline”, force all writes 
- - No read or write operation on data items are allowed to be performed until all previous operations to synchronization variables have been performed.
- - 
- - Intuition: Spend a lot of effort on synchronization variables; use that to reduce overall effort – enforce consistency on a group of operations, not single read/write; consistency only holds at certain points in time  
+   - To relieve from needlessly attempting strong consistency 
+   - Expressed via synchronization variables 
+
+
+*** Weak consistency  
+
+****  Weak consistency                                         :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+Properties:
+ - Accesses to synchronization variables associated with a data store
+   are sequentially consistent 
+ - No operation on a synchronization variable is allowed to be
+   performed until all previous writes have been completed everywhere 
+   - “Flush the pipeline”, force all writes 
+ - No read or write operation on data items are allowed to be
+   performed until all previous operations to synchronization
+   variables have been performed. 
+
+
+*** Weak consistency, intuition 
+
+ - Spend a lot of effort on synchronization variables; use
+   that to reduce overall effort
+ - Enforce consistency on a group of
+   operations, not single read/write;
+ - Consistency *only holds at
+   certain points in time*, not always  
+
+
+*** Weak consistency, implementation 
+
+- Core idea: related to view-synchronous communication
+- Access to synchronization variables acts as a new view (here:
+  /generation/) 
+- Details: class on high-performance computing 
+
 *** Release consistency 
- Weak consistency does not distinguish between 
- - Starting a synchronized section Ã requires local copy to be brought up-to-date 
- - Ending a synchronized section Ã requires local changes to be put into all non-local replicas 
- - 
- - Release consistency distinguishes between acquire and release operation
- - Overcomes this shortcoming; allows distribution system to improve performance 
+
+Weak consistency does not distinguish between 
+ - Starting a synchronized section;  requires local copy to be brought
+   up-to-date  
+ - Ending a synchronized section; requires local changes to be put
+   into all non-local replicas 
+ - Makes sense to  distinguish between *acquire* and *release*
+   operations, behave differently? 
+
+
+
 *** Release consistency – Definition 
- Release consistency
- - 
- - Rules:
- - Before a read or write operation on shared data is performed, all previous acquires done by the process must have completed successfully.
- - Before a release is allowed to be performed, all previous reads and writes by the process must have completed
- - Accesses to synchronization variables are FIFO consistent (sequential consistency is not required).
- - 
-*** Entry consistency
+
+**** Release consistency                                       :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+
+Rules:
+ - Before a read or write operation on shared data is performed, all
+   previous acquires done by the process must have completed
+   successfully. 
+ - Before a release is allowed to be performed, all previous reads and
+   writes by the process must have completed 
+ - Accesses to synchronization variables are FIFO consistent
+   (sequential consistency is not required). 
+
+
+***  Release consistency, implementation 
+
+- Often used in parallel processing context
+- Specifically: \ac{DSM}
+- Example Page-based DSM 
+  - Pages are unit of consistency
+  - Use write-protection and OS page fault handler to treat
+    access to inconsistent pages
+- Plenty of variations which page is moved where, when, from where
+
+
+*** Entry consistency                                              :noexport:
  Observation: not every critical section needs all data to be consistent – only those that are actually used/modified 
  - Have acquire/release specify which data is to be synchronized 
  - 
@@ -184,133 +595,470 @@
  - Before an exclusive mode access to a synchronization variable by a process is allowed to perform with respect to that process, no other process may hold the synchronization variable, not even in nonexclusive mode.
  - After an exclusive mode access to a synchronization variable has been performed, any other process's next nonexclusive mode access to that synchronization variable may not be performed until it has performed with respect to that variable's owner. 
  - 
+
 *** Summary data-centric consistency models
  Joint characteristic: the stricter the synchronization requirement
- - The more convenient the programming model
- - The more overhead it causes in an implementation 
- - 
- - 
-*** Some implementation ideas 
- 26
+ - The more convenient the programming model, the more overhead it
+   causes at runtime 
 
-* Implementation 
+
+
+* Replica management and update protocols 
+
+
+** Replica management 
+
 *** Replica placement
- Issue: Where, when, and by whom are replicas of data items placed? 
+ - Issue: Where, when, and by whom are replicas of data items placed? 
  - Permanent replicas
- - More or less static choice of replica sites; replicas not dropped 
+   - More or less static choice of replica sites; replicas not dropped  
  - Server-initiated replicas
- - Servers can detect popular items; start replication to other servers
- - Replicated items might be replicated, migrated, dropped
+   - Servers can detect popular items; start replication to other
+     servers 
+   - Replicated items might be replicated, migrated, dropped
  - Client-initiated replicas
- - Clients initiate replication of items
- - Common options: cache at client site; some cache intermediate between client and some of the replicating servers (e.g., Web proxy) 
- - 
+   - Clients initiate replication of items
+   - Common options: cache at client site; some cache intermediate
+     between client and some of the replicating servers (e.g., Web
+     proxy)  
+
+*** Replica finding 
+
+- How to find the/a/one replica for a given data item?
+  - Fixed
+  - Computable: e.g., hash function
+  - Searchable: e.g., peer-to-peer approach 
+
 *** Update propagation
- Usually: update of data item initiated at some client, sent to nearest replica, from there onwards to all replicas of the data item 
+ - Usually: update of data item initiated at some client, sent to
+   nearest replica, from there onwards to all replicas of the data
+   item  
  - What is sent?
- - Notification of update – invalidate other replicas 
- - Invalidation protocol
- - Usually suitable for small read/write ratios 
- - Transfer data from one copy to another
- - Usually suitable for large read/write ratios 
- - Propagate the update operations 
+   - Notification of update – invalidate other replicas 
+     - *Invalidation protocol*
+     - Usually suitable for small read/write ratios 
+   - Transfer data from one copy to another
+     - *Update protocol* 
+     - Usually suitable for large read/write ratios 
+   - Propagate the update operations, but not the result as such 
+
+ 
 *** Pull vs. push update propagation protocols
- Push-based (or server-based) update propagation
- - Updates propagated by the site where they happen
- - Usually good for permanent or server-initiated replicas
- - Good when high degree of consistency needed
- - At high read/write ratios
+
+ - Push-based (or server-based) update propagation
+   - Updates propagated by the site where they happen
+   - Usually good for permanent or server-initiated replicas
+   - Good when high degree of consistency needed
+   - At high read/write ratios
  - Pull-based (or client-based)
- - Client checks whether data is valid
+   - Client checks whether data is valid
+
+#+BEAMER: \pause
+
  - Hybrid: Leases
- - During a lease, server will push updates to replicating clients; afterwards, clients have to poll 
- Assumption: one server, several clients with their own cache each
-*** Overview
- Replication – Overview 
- - Data-centric consistency models
- - Client-centric consistency models
- - Distribution protocols
- - Consistency protocols
- - 
+   - During a lease, server will push updates to replicating clients;
+     afterwards, clients have to poll  
+
+*** Pull vs. push: Issues 
+
+| Issue           | Push-based               | Poll-based   |
+|-----------------+--------------------------+--------------|
+| State of server | List of client replica?  | None         |
+| Messages sent   | Update (possibly, fetch) | Poll, update |
+| Response time   | Immediate or fetch delay | Fetch delay  |
+
+Assumption: one server, several clients with their own cache each
+
+** Consistency protocols 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:distStor:consistency_protocols 
+   :END:
+
+
 *** Consistency protocols
- Let’s look at how to actually implement these consistency models! 
- - By a consistency protocol, specific to a given model 
- - 
- - Main classification: Is there a primary copy of each data item or not? 
- - Possibly supported by additional backup replicas 
- - With primary, a natural place for coordinating write operations exists 
- - With primary copy: Is the primary copy fixed to one server, or can it be moved? 
- - Without primary copy: involve all or only some of the replicas? 
- - 
+   :PROPERTIES:
+   :CUSTOM_ID: s:distStor:consistency_protocols 
+   :END:
+
+
+ Let’s take a deeper look how to actually implement these consistency
+ models!  
+ - By a *consistency protocol*, specific to a given model 
+ - Preparing for fault tolerance 
+
+*** Classifying consistency protocols
+
+- Main classification: Is there a *primary copy* of each data item or
+   not?  
+- Possibly supported by additional *backup replicas* 
+  - With primary, a natural place for coordinating write operations
+    exists -- to ensure, e.g., sequential consistency  
+  - With primary copy: Is the primary copy fixed to one server, or can
+    it be moved?  
+  - Without primary copy: involve all or only some of the replicas?  
+
+*** Primary, no replication 
+ - No replication at all, all writes happen only at a single replica 
+   - Client/server
+   - Obvious performance, dependability problems
+
+
+#+BEAMER: \pause
+
+- Consistency guarantee?
+  - Not strict (why?)
+  - Sequential and weaker: yes 
+
+    
+*** Primary, no replication, example 
+
+
+#+CAPTION: Primary without backup 
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=1 
+#+NAME: fig:distStor:primary_no_backup
+[[./figures/updateProtocols.pdf]]
+
+Assumptions for graphs: 
+- Four storage sites; one writer, one reader
+- A possible primary marked by a red \color{red}{P} 
+
 *** Primary-based protocols: Remote-write protocols
- No replication at all, all writes happen only at a single replica 
- - Client/server
- - Obvious performance problems
- - 
- - Primary-backup protocols
- - Write operations only at a single copy
- - Multiple copies for local reads 
- - Obvious performance & fault-tolerance problems
- - Both implement sequential consistency
-*** Primary-based protocols: Local-write protocols
- Option 1: single copy of each data item, but is transferred to the process that wants to write 
- - Consistency is straightforward
- - Issue: Keep track of where each data item is at any one point in time 
- - Forwarding pointers, hierarchical location services 
- - Option 2: migrate primary, but support it by backup replicas 
- - Write locally, reads can continue on remote replicas 
+
+ - Support primary by storing data at backup sites 
+ - Multiple copies exploitable for local reads 
+ - But: Write operations only at a single copy
+   - A *remote-write* protocol 
+
+
+#+BEAMER: \pause
+ - Consistency? depends on details! 
+
+*** Remote-write with blocking write 
+
+#+CAPTION: Primary with backup and blocking write operations
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=2
+#+NAME: fig:distStor:primary_blocking_write
+[[./figures/updateProtocols.pdf]]
+
+- Consistency: not strict, but sequential and weaker
+  - Under which assumptions for update messages? 
+
+*** Remote-write with non-blocking write 
+
+Writer may proceed even if data not written yet 
+
+#+CAPTION: Primary with backup and blocking write operations
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=3
+#+NAME: fig:distStor:primary_non_blocking_write
+[[./figures/updateProtocols.pdf]]
+
+- Consistency: not necessarily sequential; depends on behavior of S1!
+  - Give example; hint: S1 reads after its own write 
+
+
+*** Locality? 
+
+- Observation: Protocols above do not support *locality* of programs
+  - After accessing a variable once, it is likely that this variable
+    or nearby variables are accessed in near future 
+- Non-blocking remote-write protocols: Lot's of update traffic
+- Idea: Move primary: *local write* protocols 
+
+*** Local-write protocol without backup 
+
+Option 1: single copy of each data item, but is transferred to the
+process that wants to write  
+  - Design choices: trigger move at read, only at write; immediately;
+    ... ? 
+  - Consistency is similar to above 
+  - Issue: Keep track of where each data item is at any one point in
+    time
+    - E.g., update P2P tables 
+    - E.g., forwarding pointers
+    - E.g., hierarchical location services 
+
+*** Local-write protocol without backup, example  
+
+#+CAPTION: Local write: migrate single server 
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=4
+#+NAME: fig:distStor:migrate_no_backup
+[[./figures/updateProtocols.pdf]]
+
+Role of primary is transferred from S2 to S4 
+
+*** Local-write protocol with backup 
+
+  - Option 2: migrate primary, but support it by backup replicas 
+  - Write locally, reads can continue on remote replicas
+  - Consistency: details depend on local read
+    - Compare blocking/non-blocking discussion above 
+
+*** Local-write protocol with backup, example  
+
+#+CAPTION: Local write: migrate server plus backup 
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=5
+#+NAME: fig:distStor:migrate_with_backup
+[[./figures/updateProtocols.pdf]]
+
+
+*** Primary-based protocols: Pros and cons 
+
+- Primary acts as a natural serialisation point
+  - Orders multiple updates to ensure, e.g., sequential order
+  - Relatively simple protocols
+- Downside: bottleneck, possibly \ac{SPoF} 
+  - Ameliorate bottleneck by spreading primary role over all sites,
+    according to variable name
+  - Complicates finding replica 
+- Alternative: No primary?
+  - *Active replication* with *replicated writes* 
+
+
 *** Replicated-Write protocols: Active replication 
- Replicated-Write protocols: Active replication 
+
  Idea: Forward a write operation to all replicas 
- - Depending on required consistency model, writes have to be synchronized between different replicas
- - Centralized: sequencer (very similar to primary-based protocols)
- - Distributed ordering of requests: E.g., use the CBCAST protocol to implement causal consistency model!
- - Or which ever multicast ordering fits the need 
- - Additional problem: What about replicated invocations? 
-*** Replicated-Write protocols: Active replication
- Dealing with replicated invocations in general is difficult
- - One approach 
- - Each invocation from one replicated object to another one is assigned a unique identifier by all invoking replicas 
- - Only coordinator replica of invoking object actually sends out the invocation, to all replicas of the invoked object 
- - Use same mechanism to return only a single answer 
- - Sender-based multicast scheme; alternatives possible 
+ - Depending on required consistency model, writes have to be
+   synchronized between different replicas 
+   - If synchronization were done centralised, we gained nothing 
+     - E.g., sequencer in atomic multicast protocols (Slide
+       \slideref{sec:mcast:atomic_order}[s:mcast:total_oder_sequencer]) 
+ - Hence: Distributed ordering of requests needed
+   - E.g., use the CBCAST   protocol to      implement causal
+     consistency model!  
+   - Or which ever multicast ordering fits the need 
 
 
-** Quorum-based 
+*** Replicated-Write protocols: Active replication example 
+
+#+CAPTION: Active replication 
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=6
+#+NAME: fig:distStor:active_replication
+[[./figures/updateProtocols.pdf]]
+
+
+
+
+*** Active replication with replicated objects? 
+
+ - What if we replicate *objects*, not just data?
+   - Which can invoke methods calls
+   - Do we allow each replica of an object to invoke calls?
+   - On all other replicas?
+   - Which in turn invoke on all replicas?
+   - ...? 
+
+*** Active replication with replicated objects -- naive 
+
+#+CAPTION: Naive active replication with with replicated objects
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=7
+#+NAME: fig:distStor:naive_objects
+[[./figures/updateProtocols.pdf]]
+
+
+*** Active replication, objects with coordinator 
+
+
+Possible approach: 
+
+- Each object elects a *cordinator* among its replicas  
+- Only coordinator replica of invoking object actually sends out the
+  invocation, to all replicas of the invoked object 
+- Reply is sent back by the invoked object's coordinator to all
+  replicas of the invoking object  
+
+*** Replicated objects with coordinator example  
+
+Objects o no replicated;  p at S1, *S2*, S3; q at S3, *S4*
+
+#+CAPTION: Replicated objects invoke methods, answer via their coordinators (shown in red)  
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=8
+#+NAME: fig:distStor:replicated_object_coordinator
+[[./figures/updateProtocols.pdf]]
+
+
+** Quorum-based consistency  
    :PROPERTIES:
    :CUSTOM_ID: sec:leader:quorum
    :END:
 
 
+*** So far: Write everywhere 
 
-*** Replicated-Write protocols: Quorum-based protocols
- Use voting among replicas, instead of involving all replicas into each update decision 
- - 
- - Idea: before reading or writing to a data item, more than half the servers must be contacted
- - Servers send version number
- - Updates increase version number
- - Read only possible if version numbers agree/latest version number from this set is used  
-*** Replicated-Write protocols: Quorum-based protocols
- More generally: distinguish read and write quorums
- - N servers in total 
- - To read: get a read quorum NR
- - To write: get a write quorum NW 
- - It must hold:
- - NR + NW > N  and  NW > N/2 
- - 
- Possible write conflict!
- Read-One, Write-All 
- - scheme (ROWA)
- Note: Just one possible way to determine quorums. 
- - Many alternatives exist!
+- Protocols above: write updates everywhere; read locally
+  - Primary-with-backup, active replication protocol
+- Rationale:
+  - Updates have to be distributed
+  - Put effort into writing rather than reading; reads much more
+    frequent than reads
+  - Each site can easily keep track of sequence of updates 
+- Alternatives? 
 
-* Case studies 
-** Zookeeper 
+*** Thought experiment: Write only once? 
 
-** Kafka revisited  
+- Possible alternative: Write only locally? 
+- But that means: Reads do not know where up-to-date ("latest") update
+  on item is
+  - Hence: Need to *read* everywhere
+- Even worse: Concurrent updates are possible
+  - Writes could locally update their data, ignoring older updates
+  - Usually *not desirable*; updates should be aware of existing prior
+    updates  
 
 
-* Client-centric consistency models 
+*** Update rule 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+- *Additional rule*: Before updating, writer should check whether
+  an older update already exists
+  - Ask yourself: Am I possession of all the facts?
+    - Reconsider write if told about updated facts
+- *Version  number* 
+  - Successful update increments version number 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Check version before writing
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=1
+#+NAME: fig:distStor:check_before_update
+[[./figures/quorum.pdf]]
+
+*** Write once with update rule? 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+- Write once still fails, even with this update rule
+- Leads to inconsistent updates 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Write once fails even with check version
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+NAME: fig:distStor:write_once_still_fails
+[[./figures/quorum.pdf]]
+
+
+*** Thought experiment failed
+
+- So /write once/ fails
+- But idea to balance overhead between writing and reading might still
+  make sense! 
+- Question: How can writer make sure it *is* in possession of latest
+  facts?
+  - By asking everybody -- sure
+  - By asking *more than half*! 
+
+
+*** Write at more than  half replicas? 
+
+#+CAPTION: Writing at more than half of all replicas ensures up-to-date values 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+NAME: fig:distStor:write_at_least_half 
+[[./figures/quorum.pdf]]
+
+
+*** Where to read? 
+
+- Readers also have to ensure they get up-to-date version
+  - Easy when writes happen everywhere
+- With partial writes: Ask enough replicas to ensure that one with the
+  newest version is included
+  - Use value with largest version number 
+
+
+***  Quorum-based protocols
+
+ - Sufficient number of replicas: a *quorum*
+   \cite{Gifford:1979:WVR:800215.806583} 
+ - More generally: distinguish *read and write quorums*
+   - N servers in total 
+   - To read: get a read quorum $N_R$
+   - To write: get a write quorum $N_W$  
+ - A simple rule: 
+   - $N_R + N_W > N$
+   - $N_W > N/2$
+
+#+BEAMER: \pause
+
+ - Note: Many different ways of forum quorums exist (e.g., along
+   trees) 
+
+*** Quorum examples 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.32
+      :END:
+
+#+CAPTION: Failed quorum 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=6
+#+NAME: fig:distStor:check_before_update
+[[./figures/quorum.pdf]]
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.32
+      :END:
+
+#+CAPTION: Read once, write all scheme 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=5
+#+NAME: fig:distStor:check_before_update
+[[./figures/quorum.pdf]]
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.32
+      :END:
+
+
+#+CAPTION: Overlapping read/write quora 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=4
+#+NAME: fig:distStor:check_before_update
+[[./figures/quorum.pdf]]
+
+
+** Epidemic protocols 
+
+
+
+* Client-centric consistency models                                :noexport:
 
 *** Eventual consistency
  Typical situation 
@@ -387,11 +1135,144 @@
  36
 
 
+* Case study
+
+
+** Zookeeper 
+
+*** A case for a coordination service 
+
+- So ensuring consistency is hard
+  - Especially at high throughput, low latency
+  - Or even in presence of failures
+- Provide a service that provides such functionality to distributed
+  applications
+  - Has to be distributed itself 
+- Enter \href{http://zookeeper.apache.org}{*Zookeeper*}
+  - Specifically, \href{https://zookeeper.apache.org/doc/current/zookeeperOver.html}{Zookeeper internals} and \href{}{Zookeeper    Overview}
+    
+*** Zookeeper high-level view 
+
+Following \href{}{Zookeeper Overview}, \cite{Hunt:2010:ZooKeeper}: 
+- Distributed coordination service, comprising multiple servers 
+  - Replicated, *in-memory* storage (with snapshots to disk) 
+  - Geared towards high read/write ratios for high performance 
+- Provide hierarchical name space, to be read and written by client
+  applications
+  - Intended for small data (not a file system) 
+- Client talks to exactly one server 
+
+*** Zookeeper high-level view 
+
+
+
+#+CAPTION: Zookeeper high-level view
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=1
+#+NAME: fig:zk:high_level
+[[./figures/zookeeper.pdf]]
+
+
+*** Zookeeper namespace 
+
+Nodes arranged in hierarchical name space 
+- Akin to file systems, but *not* a file system 
+
+
+#+CAPTION: Zookeeper namespace
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=2
+#+NAME: fig:zk_namespace
+[[./figures/zookeeper.pdf]]
+
+
+*** Nodes 
+
+- Nodes in name space can host data
+  - Not just the leaves
+- Called *znode*
+  - Has metadata, access control, and actual data
+  - All with version number 
+
+*** Guarantees
+
+Nodes are replicated, access is: 
+- *sequentially consistent*
+- *atomic*: all replicas are updated or none at all
+- *Single System Image*
+- *Dependable*: applied updates are persistent (provided enough
+  servers stay alive)
+- *Timely*: updates are consistent within certain time bounds 
+
+
+*** API for znodes 
+
+
+- ~create~ 
+- ~delete~
+- ~exists~ ?
+- ~get data~
+- ~set data~
+- ~get children~
+- ~sync~: wait for updates to be propagated to all replica (blocking) 
+
+
+*** Operation 
+
+- Clients open session with exactly one \ac{ZK} server
+- Read requests served directly from connected server
+- Write requests distributed via an atomic broadcast protocol:
+  \ac{ZAB} \cite{Junquera:2011:ZAB}
+
+
+*** ZAB 
+
+- Leader-based mcast
+  (\href{https://zookeeper.apache.org/doc/r3.4.13/zookeeperInternals.html#sc_atomicBroadcast}{details}) 
+  - All others are *followers* 
+- Properties:
+  - Reliable: if one server delivers message, all servers eventually
+    will deliver it 
+  - Total (atomic+FIFO)  bcast, coordinated by a *leader*
+    server 
+    - Leader decides oder to apply updates
+  - Causal order 
+- Atomic: Leader coordinates *transactions* for updates (see
+  \slideref{sec:transactions}) 
+
+
+*** Leader election and ordering  in ZK: Quorums 
+
+- Leaders are elected via a quorum
+- Leaders make ordering proposals to their followers
+  - If majority ($> n/2+1$) agrees, this ordering is committed and
+    messages in the proposal can be delivered (put into memory and
+    made visible to clients) 
+
+
+*** Using ZK 
+
+- Using ZK means reading from,  writing to, checking existence of
+  nodes (and children) in hierarchical namespace
+- Trick is to exploit guarantees: atomicity, strong ordering 
+
+
+*** ZK, ZAB and failures? 
+
+- Mechanisms so far described are fine as long as there is no failure 
+- What if things go wrong?
+  - Nodes fail (and possibly reboot)
+  - Messages get lost -- possibly for a long time? Separating nodes
+    from each other? 
+
+
 
 *  Summary 
 
 *** Summary 
-Consistency protocols necessary to ensure desired level of consistency between replicas
-- How are replicas handled?
-- How are updates distributed? 
-- Missing: cache-coherence protocols
+
+- Consistency *models* describe expectations a programmer can have how
+  a replicated storage behaves 
+- Consistency *protocols* realise such promises 
+- Even if nothing goes wrong, still a challenge to build efficient
+  solutions
+- Practical approaches like ZooKeeper have become a building block of
+  distributed systems 

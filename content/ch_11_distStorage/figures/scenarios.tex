@@ -1,0 +1,156 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary{backgrounds}
+
+
+
+\begin{document}
+
+\begin{tikzpicture}
+
+  \node [database] (d1) {Storage 1}; 
+  \node [database, right=of d1] (d2) {Storage 2}; 
+
+  \node [alice, above left=of d1] (a) {}; 
+  \node [bob, above right=of d2] (b) {}; 
+
+  \draw [->] (a.east) to [bend left=30](d1); 
+  \draw [->] (a.east) to [bend left=30]   node [above] {Update A}  ($(a)!.6!(d2.north)$); 
+  \draw [->] (b.west) to [bend right=30] (d2); 
+  \draw [->] (b.west) to [bend right=30] node [above] {Update B} ($(b)!.6!(d1.north)$); 
+  % \draw [->] (b) to [bend right=30] (d2); 
+  % \draw [red, ->] (b) to [bend right=30] ($(b)!1!(d2.north)$); 
+  % \draw [green, ->] (b) to [bend right=30] ($(b)!.5!(d2.north)$); 
+
+
+\end{tikzpicture}
+
+
+
+\begin{tikzpicture}
+
+  \node [database,align=center] (d1) {Storage 1\\ with A}; 
+  \node [database, align=center, right=of d1] (d2) {Storage 2\\ with B}; 
+
+  \node [alice, above left=of d1] (a) {}; 
+  \node [bob, above right=of d2] (b) {}; 
+
+  \draw [->] (a.east) to [bend left=30](d1); 
+  \draw [->] (a.east) to [bend left=30]   node [above] {Update A} (d2);  
+  \draw [->] (b.west) to [bend right=30] (d2); 
+  \draw [->] (b.west) to [bend right=30] node [above] {Update B} (d1); 
+  % \draw [->] (b) to [bend right=30] (d2); 
+  % \draw [red, ->] (b) to [bend right=30] ($(b)!1!(d2.north)$); 
+  % \draw [green, ->] (b) to [bend right=30] ($(b)!.5!(d2.north)$); 
+
+
+\end{tikzpicture}
+
+
+%========================
+
+
+\tikzset{
+  oneskeleton/.pic={
+  \begin{scope}
+    \node [draw, rounded corners, fill=white] (m1) {Method\,1}; \node
+    [draw, rounded corners, fill=white, below=0.2cm of m1] (m2)
+    {Method\,2}; \node [draw, ellipse, fill=white, below=0.1cm of m2]
+    (state) {State};
+
+  \begin{scope}[on background layer]
+    \node [draw, inner sep=0.25cm, fit=(m1) (m2) (state),
+    fill=black!10] (obj) {}; \node [left=0.1cm of obj] (lobj)
+    {\rotatebox{90}{Object}};
+  \end{scope}
+
+  \end{scope}
+
+  \node [below=0.3cm of obj, circle, fill] (dispatch) {};
+  \node [left=0.1cm of dispatch] (ldispatch) {Ordering};
+
+  \coordinate (m1tmp) at ($(m1.east) + (+0.5,0)$); 
+  \coordinate (m2tmp) at ($(m2.east) + (+0.5,0)$); 
+
+  \draw  [->] (dispatch.east) -- (dispatch.east -| m1tmp) -- (m1tmp)  -- (m1.east); 
+  \draw  [->] (dispatch.east) -- (dispatch.east -| m2tmp) -- (m2tmp)  -- (m2.east); 
+
+  \node [draw, fit = (obj) (lobj) (dispatch) (ldispatch), minimum width=4cm ] (rmiSkel) {}; 
+  \node [left=0.1cm of rmiSkel] (lrmiSkel) {\rotatebox{90}{RMI Skeleton}}; 
+
+  \node [below=0.75cm of rmiSkel, draw, minimum width=4cm] (ns) {Network Stack};
+  \draw [->] (ns.north -| dispatch) --(dispatch);
+  \draw [->] ($(ns.north  -| dispatch)+(0.5,0)$) --(dispatch); 
+  \draw [->] ($(ns.north  -| dispatch)+(-0.5,0)$) --(dispatch); 
+},
+  onenode/.pic={
+  \node [draw, rounded corners, fill=white] (m1)  {Method\,1}; 
+  \node [draw, rounded corners, fill=white, below=0.2cm of m1] (m2)  {Method\,2}; 
+  \node [draw, ellipse, fill=white, below=0.1cm of m2] (state)  {State}; 
+
+  \begin{scope}[on background layer]
+    \node [draw, inner sep=0.25cm, fit=(m1) (m2) (state),
+    fill=black!10] (obj) {}; \node [left=0.1cm of obj] (lobj)
+    {\rotatebox{90}{Object}};
+  \end{scope}
+  \node [below=0.3cm of obj, circle, fill] (dispatch) {};
+  \node [left=0.1cm of dispatch] (ldispatch) {Dispatch};
+
+  
+  \coordinate (m1tmp) at ($(m1.east) + (+0.5,0)$); 
+  \coordinate (m2tmp) at ($(m2.east) + (+0.5,0)$); 
+
+  \draw  [->] (dispatch.east) -- (dispatch.east -| m1tmp) -- (m1tmp)  -- (m1.east); 
+  \draw  [->] (dispatch.east) -- (dispatch.east -| m2tmp) -- (m2tmp)  -- (m2.east); 
+
+  \node [draw, fit = (obj) (lobj) (dispatch) (ldispatch), minimum width=4cm ] (rmiSkel) {}; 
+  \node [left=0.1cm of rmiSkel] (lrmiSkel) {\rotatebox{90}{RMI Skeleton}}; 
+
+  \node [below=0.5cm of rmiSkel, draw, minimum width=4cm, minimum height=2\baselineskip] (mutexBox) {Ordering  \hspace{2cm} };
+  \node [circle, fill] at (mutexBox -| dispatch) (mutex) {};
+
+  \node [below=0.5cm of mutexBox, draw, minimum width=4cm] (ns) {Network Stack};
+  \draw [->] (ns.north -| dispatch) --(mutex); 
+  \draw [->] ($(ns.north  -| dispatch)+(0.5,0)$) --(mutex); 
+  \draw [->] ($(ns.north  -| dispatch)+(-0.5,0)$) --(mutex); 
+
+  \draw [->] (mutex) -- (dispatch); 
+}}
+
+
+\begin{tikzpicture}
+  \pic{oneskeleton};
+\end{tikzpicture}
+
+
+\begin{tikzpicture}
+  \pic (O1) {onenode};   
+\end{tikzpicture}
+
+\begin{tikzpicture}
+  \pic (O1) {oneskeleton}; 
+  \pic [xshift = 6cm] (O2) {oneskeleton}; 
+  \pic [xshift = 12cm] (O3) {oneskeleton}; 
+ 
+  \draw[red,thick] (O1dispatch) to[out=-10, in =190] (O2dispatch); 
+  \draw[red,thick] (O2dispatch) to[out=-10, in =190] (O3dispatch); 
+  \draw[red,thick] (O1dispatch) to[out=-10, in =190] (O3dispatch); 
+  
+\end{tikzpicture}
+
+
+\begin{tikzpicture}
+  \pic (O1) {onenode}; 
+  \pic [xshift = 6cm] (O2) {onenode}; 
+  \pic [xshift = 12cm] (O3) {onenode}; 
+ 
+  \draw[red,thick] (O1mutex) to[out=-10, in =190] (O2mutex); 
+  \draw[red,thick] (O2mutex) to[out=-10, in =190] (O3mutex); 
+  \draw[red,thick] (O1mutex) to[out=-10, in =190] (O3mutex); 
+  
+\end{tikzpicture}
+
+
+\end{document}
