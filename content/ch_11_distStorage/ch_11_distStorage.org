@@ -1188,7 +1188,7 @@ Nodes arranged in hierarchical name space
 
 - Nodes in name space can host data
   - Not just the leaves
-- Called *znode*
+- Called *zone*
   - Has metadata, access control, and actual data
   - All with version number 
 
@@ -1203,7 +1203,7 @@ Nodes are replicated, access is:
 - *Timely*: updates are consistent within certain time bounds 
 
 
-*** API for znodes 
+*** API for zones 
 
 
 - ~create~ 
@@ -1276,3 +1276,11 @@ Nodes are replicated, access is:
   solutions
 - Practical approaches like ZooKeeper have become a building block of
   distributed systems 
+
+*** What's next? 
+
+- We really need to look what happens when things fail 
+- But first: let's understand better what *atomic* means in a
+  distributed setting
+  - Which will be a step towards understanding failure behaviour  
+
