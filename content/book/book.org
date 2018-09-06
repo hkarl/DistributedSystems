@@ -119,7 +119,7 @@
    :CUSTOM_ID: ch:consensus
    :END:
 
-#+include: "../ch_14_failures/ch_14_failures.org"
+#+include: "../ch_13_consensus/ch_13_consensus.org"
 
 ** Limits of distributed data bases: NoSQL
    :PROPERTIES:
