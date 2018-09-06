@@ -126,7 +126,6 @@
    :CUSTOM_ID: ch:nosql
    :END:
 
-
 #+include: "../ch_14_nosql/ch_14_nosql.org"
 
 ** Distributed file systems
