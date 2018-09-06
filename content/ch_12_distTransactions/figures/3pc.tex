@@ -1,0 +1,346 @@
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary{arrows,automata}
+
+
+\begin{document}
+
+% FSM coordinator: 
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+  semithick, every edge/.append style={every node/.style={align=left}}, 
+  every state/.style={draw, minimum size = 1.5cm}
+]
+
+\node[initial, state] (init) {Init}; 
+\node[state, below=of init] (col) {Collect}; 
+\node[state, accepting, below left=of col] (ab) {Abort}; 
+\node[state, accepting, below right=of col] (pc) {PreCommit}; 
+\node[state, accepting, below =of pc] (com) {Commit}; 
+
+\path (init) edge node {Request commit:\\\texttt{VOTE\_REQUEST}} (col)
+(col) edge node [swap] {\texttt{VOTE\_ABORT} received:\\\texttt{GLOBAL\_ABORT}} (ab) 
+(col) edge node {All \texttt{VOTE\_COMMIT}  received:\\\texttt{PREPARE\_COMMIT}} (pc)
+(pc) edge node {All \texttt{READY\_COMMIT}  received:\\\texttt{GLOBAL\_COMMIT}} (com)
+; 
+% 
+\end{tikzpicture}
+
+
+% FSM participant: 
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+  semithick, every edge/.append style={every node/.style={align=left}}, 
+  every state/.style={draw, minimum size = 1.5cm}
+]
+
+\node[initial, state] (r) {Ready}; 
+\node[state, below=of r] (waiting) {Voted}; 
+\node[state, accepting, below left=of col] (ab) {Abort}; 
+\node[state, accepting, below right=of col] (pc) {PreCommit}; 
+\node[state, accepting, below=of pc] (com) {Commit}; 
+
+\path (r) edge node{\texttt{VOTE\_REQUEST}:\\\texttt{VOTE\_COMMIT}} (col)
+(r) edge node  [swap, auto ]  {\texttt{VOTE\_REQUEST}:\\\texttt{VOTE\_ABORT}} (ab)
+%
+(waiting) edge node [auto] {\texttt{GLOBAL\_ABORT} \\received} (ab) 
+%
+(waiting) edge node {\texttt{PREPARE\_COMMIT}  received:\\\texttt{READY\_COMMIT}} (pc) 
+(pc) edge node {\texttt{GLOBAL\_COMMIT}  received} (com) 
+; 
+% 
+\end{tikzpicture}
+
+  \begin{msc}{3PC example un-blocking}
+    \declinst{a}{}{A} \declinst{c}{}{Coordinator} \declinst{b}{}{B}
+
+    \action{Ready}{a}
+    \action{Init}{c}
+    \action{Ready}{b}
+    \nextlevel[3]
+
+    \mess{\texttt{VOTE\_REQUEST}}{c}{a}
+    \mess{\texttt{VOTE\_REQUEST}}{c}{b} 
+    \nextlevel[1]
+    \action{Collect}{c}
+    \nextlevel[3]
+
+    \mess{\texttt{VOTE\_COMMIT}}{a}{c}
+    \mess{\texttt{VOTE\_COMMIT}}{b}{c} 
+    \nextlevel[1]
+    \action{Voted}{a}
+    \action{Voted}{b}
+    \nextlevel[3]
+
+    \mess{\texttt{PRE\_COMMIT}}{c}{a}
+    \nextlevel[1]
+    \stop{c}
+    \nextlevel[1]
+    \action{PreCommit}{a}
+    \nextlevel[4]
+
+
+    \timeout{TO}{b}
+    \nextlevel[1]
+
+    \mess{??}{b}{a}
+    \nextlevel[1]
+    \mess{\texttt{PRE\_COMMIT}}{a}{b}
+    
+    % timeout 
+    
+  \end{msc}
+
+
+% \begin{comment}
+
+% \begin{msc}{2PC regular abort}
+%   \declinst{a}{}{A} \declinst{c}{}{Coordinator} \declinst{b}{}{B}
+
+%   \nextlevel[1]
+
+%   \mess{\texttt{VOTE\_REQUEST}}{c}{a}
+%   \mess{\texttt{VOTE\_REQUEST}}{c}{b} \nextlevel[2]
+
+%   \mess{\texttt{VOTE\_COMMIT}}{a}{c} \mess{\texttt{VOTE\_ABORT}}{b}{c}
+%   \nextlevel[2]
+
+%   \mess{\texttt{GLOBAL\_ABORT}}{c}{a}
+%   \mess{\texttt{GLOBAL\_ABORT}}{c}{b}
+% \end{msc}
+
+
+
+% \begin{msc}{2PC: Participant crashes}
+%   \declinst{a}{}{A} \declinst{c}{}{Coordinator} \declinst{b}{}{B}
+
+%   \nextlevel[1]
+
+%   \mess{\texttt{VOTE\_REQUEST}}{c}{a}
+%   \mess{\texttt{VOTE\_REQUEST}}{c}{b} \nextlevel[1] \stop{b}
+%   \nextlevel[1]
+
+%   \mess{\texttt{VOTE\_COMMIT}}{a}{c} \nextlevel[1]
+%   \msccomment[side=right]{blocks for B}{c} \nextlevel[1]
+%   \msccomment[side=left]{blocks for Coordinator}{a}
+
+% \end{msc}
+
+% % ------------------------------
+
+% \begin{msc}{2PC coordinator crashes}
+%   \declinst{a}{}{A} \declinst{c}{}{Coordinator} \declinst{b}{}{B}
+
+%   \nextlevel[1]
+
+%   \mess{\texttt{VOTE\_REQUEST}}{c}{a}
+%   \mess{\texttt{VOTE\_REQUEST}}{c}{b} \nextlevel[2]
+
+%   \mess{\texttt{VOTE\_COMMIT}}{a}{c}
+%   \mess{\texttt{VOTE\_COMMIT}}{b}{c} \nextlevel[1] \stop{c}
+
+%   \nextlevel[1] \msccomment[side=left]{blocks for Coordinator}{a}
+%   \msccomment[side=right]{blocks for Coordinator}{b}
+
+% \end{msc}
+% \end{comment}
+
+\begin{msc}{3PC: coordinator crashes, participant partitioned}
+\declinst{a}{}{A}
+\declinst{c}{}{Coordinator}
+\declinst{b}{}{B}
+\declinst{d}{}{D}
+\declinst{e}{}{E}
+
+\nextlevel[1] 
+
+    \action{Ready}{a}
+    \action{Init}{c}
+    \action{Ready}{b}
+    \action{Ready}{d}
+    \action{Ready}{e}
+    \nextlevel[3]
+
+    \mess{\texttt{VOTE\_REQUEST}}{c}{a}
+    \mess{}{c}{b} 
+    \mess{}{c}{e} 
+    \mess{\texttt{VOTE\_REQUEST}}{c}{d} 
+    \nextlevel[1]
+    \action{Collect}{c}
+    \nextlevel[3]
+
+    \mess{\texttt{VOTE\_COMMIT}}{a}{c}
+    \mess{}{b}{c} 
+    \mess{}{d}{c} 
+    \mess{\texttt{VOTE\_COMMIT}}{e}{c} 
+    \nextlevel[1]
+
+    \action{Voted}{a}
+    \action{Voted}{b}
+    \action{Voted}{d}
+    \action{Voted}{e}
+    \nextlevel[3]
+
+    \mess{\texttt{PRE\_COMMIT}}{c}{a}
+    \nextlevel[1]
+    \action[align=center]{Prepare\\Commit}{a}
+    \nextlevel[1]
+    \stop{c}
+    \nextlevel[1]
+    
+    \nextlevel[1]
+    \msccomment[side=left]{Looses connectivity}{a}
+
+\end{msc}
+
+
+
+\begin{msc}{3PC: coordinator crashes,  participant partitioned}
+\declinst{a}{}{A}
+\declinst{c}{}{Coordinator}
+\declinst{b}{}{B}
+\declinst{d}{}{D}
+\declinst{e}{}{E}
+
+\nextlevel[1] 
+
+    \action{Ready}{a}
+    \action{Init}{c}
+    \action{Ready}{b}
+    \action{Ready}{d}
+    \action{Ready}{e}
+    \nextlevel[3]
+
+    \mess{\texttt{VOTE\_REQUEST}}{c}{a}
+    \mess{}{c}{b} 
+    \mess{}{c}{e} 
+    \mess{\texttt{VOTE\_REQUEST}}{c}{d} 
+    \nextlevel[1]
+    \action{Collect}{c}
+    \nextlevel[3]
+
+    \mess{\texttt{VOTE\_COMMIT}}{a}{c}
+    \mess{}{b}{c} 
+    \mess{}{d}{c} 
+    \mess{\texttt{VOTE\_COMMIT}}{e}{c} 
+    \nextlevel[1]
+
+    \action{Voted}{a}
+    \action{Voted}{b}
+    \action{Voted}{d}
+    \action{Voted}{e}
+    \nextlevel[3]
+
+    \mess{\texttt{PRE\_COMMIT}}{c}{a}
+    \nextlevel[1]
+    \action[align=center]{Prepare\\Commit}{a}
+    \nextlevel[1]
+    \stop{c}
+    \nextlevel[1]
+    
+    \nextlevel[1]
+    \msccomment[side=left]{Looses connectivity}{a}
+
+    %----------------
+
+    \timeout{}{b}
+    \timeout{}{d}
+    \timeout{}{e}
+    \nextlevel[1]
+    
+    \condition{ask around}{b,e}
+    \nextlevel[2]
+
+    \action{Abort}{b}
+    \action{Abort}{d}
+    \action{Abort}{e}
+
+    \nextlevel[2]
+
+    \msccomment[side=left]{Should abort}{a}
+
+\end{msc}
+
+
+\begin{msc}{3PC: coordinator works,  participant partitioned}
+\declinst{a}{}{A}
+\declinst{c}{}{Coordinator}
+\declinst{b}{}{B}
+\declinst{d}{}{D}
+\declinst{e}{}{E}
+
+\nextlevel[1] 
+
+    \action{Ready}{a}
+    \action{Init}{c}
+    \action{Ready}{b}
+    \action{Ready}{d}
+    \action{Ready}{e}
+    \nextlevel[3]
+
+    \mess{\texttt{VOTE\_REQUEST}}{c}{a}
+    \mess{}{c}{b} 
+    \mess{}{c}{e} 
+    \mess{\texttt{VOTE\_REQUEST}}{c}{d} 
+    \nextlevel[1]
+    \action{Collect}{c}
+    \nextlevel[3]
+
+    \mess{\texttt{VOTE\_COMMIT}}{a}{c}
+    \mess{}{b}{c} 
+    \mess{}{d}{c} 
+    \mess{\texttt{VOTE\_COMMIT}}{e}{c} 
+    \nextlevel[1]
+
+    \action{Voted}{a}
+    \action{Voted}{b}
+    \action{Voted}{d}
+    \action{Voted}{e}
+    \nextlevel[3]
+
+    \mess{\texttt{PRE\_COMMIT}}{c}{a}
+    \mess{}{c}{b}
+    \mess{}{c}{d}
+    \mess{\texttt{PRE\_COMMIT}}{c}{e}
+    \nextlevel[1]
+    \action[align=center]{Prepare\\Commit}{a}
+    \action[align=center]{Prepare\\Commit}{b}
+    \action[align=center]{Prepare\\Commit}{d}
+    \action[align=center]{Prepare\\Commit}{e}
+    \nextlevel[1]
+    
+    \nextlevel[2]
+    \msccomment[side=left]{Looses connectivity}{a}
+    \nextlevel[2]
+
+    %----------------
+    \lost[side=right]{\texttt{READY\_COMMIT}}{}{a}
+    \mess{}{b}{c} 
+    \mess{}{d}{c} 
+    \mess{\texttt{READY\_COMMIT}}{e}{c} 
+    \nextlevel[1]
+
+    \action{PreCommit}{a}
+    \action{PreCommit}{b}
+    \action{PreCommit}{d}
+    \action{PreCommit}{e}
+    \nextlevel[3]
+
+    \lost[side=left]{\texttt{GLOBAL\_COMMIT}}{}{c}
+    \mess{}{c}{b}
+    \mess{}{c}{d}
+    \mess{\texttt{GLOBAL\_COMMIT}}{c}{e}
+    \nextlevel[1]
+    \action[align=center]{Commit}{b}
+    \action[align=center]{Commit}{d}
+    \action[align=center]{Commit}{e}
+    \nextlevel[1]
+
+    %------------------------
+    \nextlevel[2]
+
+    \msccomment[side=left]{Should commit}{a}
+
+\end{msc}
+
+
+\end{document}

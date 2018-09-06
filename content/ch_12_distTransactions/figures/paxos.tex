@@ -1,0 +1,584 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary{chains}
+\usetikzlibrary{positioning, calc}
+
+\usetikzlibrary{decorations.pathmorphing}
+
+\begin{document}
+
+% servers takes two args: number of storage and box extension 
+\tikzset{pics/storage/.style 2 args ={code={
+    \begin{scope} [start chain]
+      \coordinate (base) at (0, #2) ; 
+      
+      \foreach \i in {1,...,#1} {
+        \node[database, on chain] (s\i) {S\i}; 
+      }
+
+      \coordinate (top) at ($(s1.north west)+(0,0.5)$); 
+
+      \node[draw, rounded corners, fit= (top) (s#1) (base)] {}; 
+
+    \end{scope}
+}},
+pics/readerPic/.style = {code={
+  \node[alice, above= 1.5cm of s#1] (r) {};
+  \node[above= 0cm of r] {Reader};
+}},
+pics/writerPic/.style = {code={
+  \node[bob, above= 1.5cm of s#1] (w) {};
+  \node[above= 0cm of w] {Writer};
+}},
+}
+
+% \begin{tikzpicture}
+
+%   \pic{storage={5}{-2}};
+
+%   \draw [->, rounded corners] (s1) -- +(0, -1) -|  (s3);
+% \end{tikzpicture}
+
+
+\newcommand{\sendcommand}[3]{
+  \draw [->, bend left] (#1)  to node [auto] {#3} (#2); 
++}
+
+  \begin{msc}{Primary/backup with mcast, blocking write}
+    \declinst{a}{}{Client A} \declinst{s1}{}{S1} \declinst{s2}{}{S2}
+    \declinst{b}{}{Client B}
+
+    \node[alice, above=0cm of msc@nodea] {}; \node[database, above=0cm
+    of msc@nodes1] {}; \node[database, above=0cm of msc@nodes2, red]
+    {P}; \node[bob, above=0cm of msc@nodeb] {};
+
+    \mess{$m_1$}{a}{s1}[1] \mess[auto,near start,
+    below]{$m_1$}{a}{s2}[3] \nextlevel[1]
+
+
+    \mess{$m_2$}{b}{s1}[1] \mess{$m_2$}{b}{s2}[1] \nextlevel[3]
+
+    \mess{accept, 1}{s2}{s1}[1] \nextlevel[2]
+
+    \mess{learn, 1}{s1}{s2}[1] \nextlevel[2]
+
+    \mess{choose, 1}{s2}{a}[1] \mess{choose, 1}{s2}{b}[1]
+    \nextlevel[2] \mess{choose, 2}{s2}{a}[1] \mess{choose,
+      2}{s2}{b}[1] \nextlevel[2]
+
+  \end{msc}
+
+
+  \begin{msc}{Primary/backup with mcast, server crash}
+
+    \declinst{a}{}{Client A} \declinst{s1}{}{S1} \declinst{s2}{}{S2}
+    \declinst{b}{}{Client B}
+
+    \node[alice, above=0cm of msc@nodea] {}; \node[database, above=0cm
+    of msc@nodes1] {}; \node[database, above=0cm of msc@nodes2, red]
+    {P}; \node[bob, above=0cm of msc@nodeb] {};
+
+    % \draw[help lines, step=.5] (0,0) grid (msc@nodeb |- 0,-10);
+
+    \mess{$m_1$}{a}{s1}[1] \mess[auto,near start,
+    below]{$m_1$}{a}{s2}[3] \nextlevel[1]
+
+
+    \mess{$m_2$}{b}{s1}[1] \mess{$m_2$}{b}{s2}[1] \nextlevel[3]
+
+    \mess{accept, 1}{s2}{s1}[1] \nextlevel[2]
+
+    \mess{learn, 1}{s1}{s2}[1] \nextlevel[2]
+
+    \mess{choose, 1}{s2}{a}[1] \mess{choose, 1}{s2}{b}[1]
+    \nextlevel[2]
+  
+    \stop{s2} \nextlevel[2]
+
+    \condition{Elect primary}{s1,s2} \nextlevel[2]
+  
+    \node [database, red] at (msc@nodes1 |- 0,-10) {P}; \nextlevel[2]
+
+    \mess{choose, 2}{s1}{a}[1] \mess{choose, 2}{s1}{b}[1]
+    \nextlevel[2]
+
+  \end{msc}
+
+
+
+\begin{msc}{Primary/backup with mcast, network partition}
+  \declinst{a}{}{Client A} \declinst{s1}{}{S1} \declinst{s2}{}{S2}
+  \declinst{b}{}{Client B}
+
+  \node[alice, above=0cm of msc@nodea] {}; \node[database, above=0cm
+  of msc@nodes1] {}; \node[database, above=0cm of msc@nodes2, red]
+  {P}; \node[bob, above=0cm of msc@nodeb] {};
+
+  \mess{$m_1$}{a}{s1}[1] \mess[auto,near start,
+  below]{$m_1$}{a}{s2}[3] \nextlevel[1]
+
+
+  \mess{$m_2$}{b}{s1}[1] \mess{$m_2$}{b}{s2}[1] \nextlevel[3]
+
+  \lost {}{accept, 1}{s2}[1] \nextlevel[2]
+
+  \timeout[r]{}{s2} \lost {}{accept, 1}{s2}[1] \nextlevel[2]
+
+  \timeout[r]{}{s2} \lost {}{accept, 1}{s2}[1] \nextlevel[2]
+
+  \condition{Elect primary}{s1} \nextlevel[4]
+  
+  \node [database, red] at (msc@nodes1 |- 0,-9.5) {P}; \nextlevel[2]
+
+  \mess{\textcolor{green}{choose}, 1}{s2}{b}[1] \mess{}{s2}{a}[2]
+  \mess{\textcolor{blue}{choose}, 1}{s1}{a}[1] \mess{}{s1}{b}[2]
+  \nextlevel[2]
+
+  \draw [red, decorate, decoration={snake}] (5,-4) -- (5, -11);
+
+\end{msc}
+
+\begin{msc}{Primary + 2 backups to work with  network partition}
+  \declinst{a}{}{Client A} \declinst{s1}{}{S1} \declinst{s2}{}{S2}
+  \declinst{s3}{}{S3} \declinst{b}{}{Client B}
+
+  \node[alice, above=0cm of msc@nodea] {}; \node[database, above=0cm
+  of msc@nodes1, red] {P}; \node[database, above=0cm of msc@nodes2]
+  {}; \node[database, above=0cm of msc@nodes3] {}; \node[bob,
+  above=0cm of msc@nodeb] {};
+
+  \mess{$m_1$}{a}{s1}[1] \mess[auto,near start,
+  below]{$m_1$}{a}{s2}[3] \mess[auto,near start,
+  below]{$m_1$}{a}{s3}[3] \nextlevel[1]
+
+
+  \mess{$m_2$}{b}{s1}[1] \mess{$m_2$}{b}{s2}[1] \mess{$m_2$}{b}{s3}[1]
+  \nextlevel[3]
+
+  \lost[r] {}{accept, 1}{s1}[1] \nextlevel[2] \timeout[l]{}{s1}
+
+  \lost[r] {}{accept, 1}{s1}[1] \nextlevel[2] \timeout[l]{}{s2}
+  \nextlevel[2]
+
+  \coordinate (tmp) at ($(msc@nodes1)!0.5!(msc@nodes2)$);
+
+  \draw [red, decorate, decoration={snake}] (tmp |- 0,-4) -- (tmp |-
+  0, -12);
+
+
+  \condition{Elect primary}{s2,s3} \nextlevel[2]
+
+  \node [database, red] at (msc@nodes2 |- 0,-9) {P}; \nextlevel[2]
+  
+  \mess{accept, 1}{s2}{s3}[1] \nextlevel[2]
+
+  \mess{learn, 1}{s3}{s2}[1] \nextlevel[2]
+
+  \mess{\textcolor{blue}{choose}, 1}{s2}{b}[1]
+  % \mess{\textcolor{blue}{choose}, 1}{s1}{a}[1]
+  \nextlevel[2]
+\end{msc}
+
+
+\begin{msc}{Primary + 2 backups to work with partial  network partition}
+  \declinst{a}{}{Client A} \declinst{s1}{}{S1} \declinst{s2}{}{S2}
+  \declinst{s3}{}{S3} \declinst{b}{}{Client B}
+
+  \node[alice, above=0cm of msc@nodea] {}; \node[database, above=0cm
+  of msc@nodes1, red] {P}; \node[database, above=0cm of msc@nodes2]
+  {}; \node[database, above=0cm of msc@nodes3] {}; \node[bob,
+  above=0cm of msc@nodeb] {};
+
+  \mess{$m_1$}{a}{s1}[1] \mess[auto,near start,
+  below]{$m_1$}{a}{s2}[3] \mess[auto,near start,
+  below]{$m_1$}{a}{s3}[3] \nextlevel[1]
+
+
+  \mess{$m_2$}{b}{s1}[1] \mess{$m_2$}{b}{s2}[1] \mess{$m_2$}{b}{s3}[1]
+  \nextlevel[3]
+
+  \lost[r] {}{accept, 1}{s1}[1] \nextlevel[2] \timeout[l]{}{s1}
+
+  \lost[r] {}{accept, 1}{s1}[1] \nextlevel[2] \timeout[l]{}{s2}
+  \nextlevel[2]
+
+  \coordinate (tmp) at ($(msc@nodes1)!0.5!(msc@nodes2)$);
+
+  \draw [red, decorate, decoration={snake}] (tmp |- 0,-4) -- (tmp |-
+  0, -9); \draw [red, dotted, decorate, decoration={snake}] (tmp |-
+  0,-9) -- (tmp |- 0, -11);
+
+
+  \condition{Elect primary}{s2,s3} \nextlevel[2]
+
+  \node [database, red] at (msc@nodes2 |- 0,-9) {P}; \nextlevel[2]
+  
+  \mess{accept, 1}{s2}{s3}[1] \timeout[l]{}{s1} \mess{accept,
+    1}{s1}{s3}[1] \nextlevel[2]
+
+  \msccomment[side=right]{Confused!}{s3}
+
+\end{msc}
+
+
+\begin{msc}{Primary + 2 backups: pledge allegiance after network  partition}
+  \declinst{a}{}{Client A} \declinst{s1}{}{S1} \declinst{s2}{}{S2}
+  \declinst{s3}{}{S3} \declinst{b}{}{Client B}
+
+  \node[alice, above=0cm of msc@nodea] {}; \node[database, above=0cm
+  of msc@nodes1, red] {P}; \node[database, above=0cm of msc@nodes2]
+  {}; \node[database, above=0cm of msc@nodes3] {}; \node[bob,
+  above=0cm of msc@nodeb] {};
+
+  \mess{$m_1$}{a}{s1}[1] \mess[auto,near start,
+  below]{$m_1$}{a}{s2}[3] \mess[auto,near start,
+  below]{$m_1$}{a}{s3}[3] \nextlevel[1]
+
+
+  \mess{$m_2$}{b}{s1}[1] \mess{$m_2$}{b}{s2}[1] \mess{$m_2$}{b}{s3}[1]
+  \nextlevel[3]
+
+  \lost[r] {}{accept, 1}{s1}[1] \nextlevel[2] \timeout[l]{}{s1}
+
+  \lost[r] {}{accept, 1}{s1}[1] \nextlevel[2] \timeout[l]{}{s2}
+  \nextlevel[2]
+
+  \coordinate (tmp) at ($(msc@nodes1)!0.5!(msc@nodes2)$);
+
+  \draw [red, decorate, decoration={snake}] (tmp |- 0,-4) -- (tmp |-
+  0, -16);
+
+
+  % \condition{Elect primary}{s2,s3}
+  % \nextlevel[2]
+  \inlinestart{leaderelect}{Leader election}{s2}{s3} \nextlevel[2]
+  \mess{prepare}{s2}{s3}[1] \nextlevel[2] \mess{promise}{s3}{s2}[1]
+  \nextlevel[4] \inlineend{leaderelect}
+
+
+  \node [database, red] at (msc@nodes2 |- 0,-11) {P}; \nextlevel[2]
+  
+  \mess{accept, 1}{s2}{s3}[1] \nextlevel[2]
+
+  \mess{learn, 1}{s3}{s2}[1] \nextlevel[2]
+
+  \mess{\textcolor{green}{choose}, 2}{s2}{b}[1]
+  % \mess{\textcolor{blue}{choose}, 1}{s1}{a}[1]
+  \nextlevel[2]
+\end{msc}
+
+
+%======================================
+%== ACTUAL PAXOS ==========================
+%======================================
+
+
+% \begin{msc}{Paxos normal operation}
+%   \declinst{c}{}{Client}
+%   \declinst{p}{}{Proposer}
+%   \declinst{a1}{}{Acceptor 1}
+%   \declinst{a2}{}{Acceptor 2}
+%   \declinst{a3}{}{Acceptor 3}
+%   \declinst{l1}{}{Learner 1}
+%   \declinst{l2}{}{Learner 1}
+
+%   % \draw[help lines, step=.5] (0,0) grid (msc@nodel2 |- 0,-10);
+  
+%   %------------------------------
+%   \mess{Request}{c}{p}
+%   \nextlevel[1]
+
+%   %------------------------------
+%   \inlinestart{prepare}{Prepare}{p}{a3}
+%   \nextlevel[2]
+
+%   \mess{Prepare(1, v)}{p}{a1}[1]
+%   \mess{}{p}{a2}[1]
+%   \mess{}{p}{a3}[1]
+%   \nextlevel[2]
+
+%   \mess{Promise(1, v)}{a3}{p}[1]
+%   \mess{}{a2}{p}[1]
+%   \mess{}{a1}{p}[1]
+%   \nextlevel[2]
+
+%   \inlineend{prepare}
+%   \nextlevel[2]
+
+%   %------------------------------
+%   \inlinestart{accept}{Accept}{p}{a3}
+%   \nextlevel[2]
+
+%   \mess{Accept(1, v)}{p}{a1}[1]
+%   \mess{}{p}{a2}[1]
+%   \mess{}{p}{a3}[1]
+%   \nextlevel[2]
+
+%   \mess{Learn(1, v)}{a3}{p}[1]
+%   \mess{}{a2}{p}[1]
+%   \mess{}{a1}{p}[1]
+%   \nextlevel[2]
+
+
+%   \inlineend{accept}
+%   \nextlevel[2]
+
+
+%   %------------------------------
+%   \inlinestart{inform}{Inform}{c}{l2}
+%   \nextlevel[2]
+
+%   \inlineend{inform}
+%   \nextlevel[2]
+
+
+
+% \end{msc}
+
+
+
+%======================================
+%== ACTUAL PAXOS ==========================
+%======================================
+
+  \begin{msc}{Paxos normal operation}
+    \declinst{c}{}{Client} \declinst{p}{}{Proposer}
+    \declinst{a1}{}{Acceptor 1} \declinst{a2}{}{Acceptor 2}
+    \declinst{a3}{}{Acceptor 3} \declinst{l1}{}{Learner 1}
+    \declinst{l2}{}{Learner 2}
+
+    % \draw[help lines, step=.5] (0,0) grid (msc@nodel2 |- 0,-10);
+  
+    % ------------------------------
+    \mess{Request}{c}{p} \nextlevel[1]
+
+    % ------------------------------
+    \inlinestart[fill=yellow!100, fill opacity=0.1, text
+    opacity=1]{prepare}{Prepare}{p}{a3} \nextlevel[2]
+
+    \mess{Prepare(1, v)}{p}{a1}[1] \mess{}{p}{a2}[1] \mess{}{p}{a3}[1]
+    \nextlevel[2]
+
+    \mess{Promise(1, v)}{a3}{p}[1] \mess{}{a2}{p}[1] \mess{}{a1}{p}[1]
+    \nextlevel[2]
+
+    \inlineend{prepare} \nextlevel[2]
+
+    % ------------------------------
+    \inlinestart[fill=green!100, fill opacity=0.1, text
+    opacity=1]{accept}{Accept}{p}{a3} \nextlevel[2]
+
+    \mess{Accept(1, v)}{p}{a1}[1] \mess{}{p}{a2}[1] \mess{}{p}{a3}[1]
+    \nextlevel[2]
+
+    \mess{Learn(1, v)}{a3}{p}[1] \mess{}{a2}{p}[1] \mess{}{a1}{p}[1]
+    \nextlevel[2]
+
+
+    \inlineend{accept} \nextlevel[2]
+
+    % ------------------------------
+    \inlinestart[fill=blue!100, fill opacity=0.1, text
+    opacity=1]{inform}{Inform}{c}{l2} \nextlevel[2] \mess{Learn(1,
+      v)}{a1}{l1}[1] \mess{}{a1}{l2}[1] \nextlevel[1]
+
+    \mess{Learn(1, v)}{a2}{l1}[1] \mess{}{a3}{l2}[1] \nextlevel[1]
+
+    \mess{Learn(1, v)}{a3}{l1}[1] \mess{}{a3}{l2}[1] \nextlevel[2]
+
+
+    \mess{Result(v)}{l1}{c}[1] \nextlevel[1]
+    \mess{Result(v)}{l2}{c}[1] \nextlevel[2]
+
+    \inlineend{inform} \nextlevel[1]
+  \end{msc}
+
+  % ================================ ================================
+  % ================================
+
+\begin{msc}{Paxos failing proposer}
+  \declinst{c}{}{Client} \declinst{p}{}{Proposer 1}
+  \declinst{p2}{}{Proposer 2} \declinst{a1}{}{Acceptor 1}
+  \declinst{a2}{}{Acceptor 2} \declinst{a3}{}{Acceptor 3}
+  \declinst{l1}{}{Learner 1} \declinst{l2}{}{Learner 2}
+
+  % \draw[help lines, step=.5] (0,0) grid (msc@nodel2 |- 0,-15);
+  
+  % ------------------------------
+  \mess{Request}{c}{p} \nextlevel[1]
+
+  % ------------------------------
+  \inlinestart[fill=yellow!100, fill opacity=0.1, text
+  opacity=1]{prepare}{Prepare}{p}{a3} \nextlevel[2]
+
+  \mess{Prepare(1, v)}{p}{a1}[1] \mess{}{p}{a2}[1] \mess{}{p}{a3}[1]
+  \nextlevel[2]
+
+  \mess{Promise(1, v)}{a3}{p}[1] \mess{}{a2}{p}[1] \mess{}{a1}{p}[1]
+  \nextlevel[2]
+
+  \inlineend{prepare} \nextlevel[2]
+
+  % ------------------------------
+  \inlinestart[fill=green!100, fill opacity=0.1, text
+  opacity=1]{accept}{Accept}{p}{a3} \nextlevel[2]
+
+  \mess{Accept(1, v)}{p}{a1}[1] \nextlevel[1] \stop{p}
+
+  \nextlevel[1] \inlineend{accept} \nextlevel[2]
+
+
+  % ------------------------------
+  
+  \inlinestart[fill=red!100, fill opacity=0.1, text
+  opacity=1]{leader}{Leader elect}{p2}{a3} \nextlevel[2]
+  \mess{Prepare(2, v)}{p2}{a1}[1] \mess{}{p2}{a2}[1]
+  \mess{}{p2}{a3}[1] \nextlevel[2]
+
+  \mess{Promise(2, v)}{a3}{p2}[1] \mess{}{a2}{p2}[1]
+  \mess{}{a1}{p2}[1] \nextlevel[2] \inlineend{leader} \nextlevel[2]
+
+  % ------------------------------
+  \inlinestart[fill=green!100, fill opacity=0.1, text
+  opacity=1]{accept}{Accept, attempt 2}{p2}{a3} \nextlevel[2]
+
+  \mess{Accept(2, v)}{p2}{a1}[1] \mess{}{p2}{a2}[1] \mess{}{p2}{a3}[1]
+  \nextlevel[2]
+
+  \mess{Learn(2, v)}{a3}{p2}[1] \mess{}{a2}{p2}[1] \mess{}{a1}{p2}[1]
+  \nextlevel[2] \inlineend{accept} \nextlevel[2]
+
+  % ------------------------------
+  \condition{Inform client from learners as above}{c,l2} \nextlevel{3}
+\end{msc}
+
+%==============================
+%==============================
+%==============================
+
+\begin{msc}{Paxos battling proposers}
+  \declinst{c}{}{Client}
+  \declinst{p}{}{Proposer 1}
+  \declinst{p2}{}{Proposer 2}
+  \declinst{a1}{}{Acceptor 1}
+  \declinst{a2}{}{Acceptor 2}
+  \declinst{a3}{}{Acceptor 3}
+
+  % \draw[help lines, step=.5] (0,0) grid (msc@nodea3 |- 0,-25);
+  
+  %------------------------------
+  \mess{Request}{c}{p}
+  \nextlevel[1]
+
+  %------------------------------
+  \inlinestart[fill=yellow!100, fill opacity=0.1, text opacity=1]{prepare}{Prepare}{p}{a3}
+  \nextlevel[2]
+
+  \mess{Prepare(1, v)}{p}{a1}[1]
+  \mess{}{p}{a2}[1]
+  \mess{}{p}{a3}[1]
+  \nextlevel[2]
+
+  \mess{Promise(1, v)}{a3}{p}[1]
+  \mess{}{a2}{p}[1]
+  \mess{}{a1}{p}[1]
+  \nextlevel[2]
+
+  \inlineend{prepare}
+  \nextlevel[2]
+
+  %------------------------------
+  \inlinestart[fill=green!100, fill opacity=0.1, text
+  opacity=1]{accept}{Accept 1}{p}{a3}
+  \nextlevel[2]
+
+  \mess{Accept(1, v)}{p}{a1}[1]
+  \msccomment[side=left]{Proposer 1 slow}{p}
+  \nextlevel[1]
+  
+  \nextlevel[1]
+  \inlineend{accept}
+  \nextlevel[2]
+
+
+  %------------------------------
+  
+  \inlinestart[fill=red!100, fill opacity=0.1, text
+  opacity=1]{leader}{Leader elect P2}{p2}{a3}
+  \nextlevel[2]
+  \mess{Prepare(2, v)}{p2}{a1}[1]
+  \mess{}{p2}{a2}[1]
+  \mess{}{p2}{a3}[1]
+  \nextlevel[2]
+
+  \mess{Promise(2, v)}{a3}{p2}[1]
+  \mess{}{a2}{p2}[1]
+  \mess{}{a1}{p2}[1]
+  \nextlevel[2]  
+  \inlineend{leader}
+  \nextlevel[2]  
+
+  %------------------------------
+
+  \inlinestart[fill=red!100, fill opacity=0.1, text
+  opacity=1]{leader2}{Leader elect P1 retries}{p}{a3}
+  \nextlevel[2]
+  \mess{Prepare(2, v)}{p}{a1}[1]
+  \mess{}{p}{a2}[1]
+  \mess{}{p}{a3}[1]
+  \nextlevel[2]
+
+  \mess{NACK(2)}{a3}{p}[1]
+  \mess{}{a2}{p}[1]
+  \mess{}{a1}{p}[1]
+  \nextlevel[2]  
+
+  \mess{Prepare(3, v)}{p}{a1}[1]
+  \mess{}{p}{a2}[1]
+  \mess{}{p}{a3}[1]
+  \nextlevel[2]
+
+  \mess{Promise(3)}{a3}{p}[1]
+  \mess{}{a2}{p}[1]
+  \mess{}{a1}{p}[1]
+  \nextlevel[2]  
+
+  \inlineend{leader2}
+  \nextlevel[2]  
+  %------------------------------
+
+  \inlinestart[fill=red!100, fill opacity=0.1, text
+  opacity=1]{leader2}{Leader elect P2 retries}{p}{a3}
+  \nextlevel[2]
+  \mess{Prepare(3, v)}{p2}{a1}[1]
+  \mess{}{p2}{a2}[1]
+  \mess{}{p2}{a3}[1]
+  \nextlevel[2]
+
+  \mess{NACK(3)}{a3}{p2}[1]
+  \mess{}{a2}{p2}[1]
+  \mess{}{a1}{p2}[1]
+  \nextlevel[2]  
+
+  \mess{Prepare(4, v)}{p2}{a1}[1]
+  \mess{}{p2}{a2}[1]
+  \mess{}{p2}{a3}[1]
+  \nextlevel[2]
+
+  \mess{Promise(4)}{a3}{p2}[1]
+  \mess{}{a2}{p2}[1]
+  \mess{}{a1}{p2}[1]
+  \nextlevel[2]  
+
+  \inlineend{leader2}
+  \nextlevel[2]  
+
+  %------------------------------
+
+\end{msc}
+
+
+\end{document}
+

@@ -1,0 +1,160 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary{arrows,automata}
+
+
+\begin{document}
+
+
+  % FSM coordinator:
+  \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node
+    distance=2.8cm, semithick, every edge/.append style={every
+      node/.style={align=left}}, every state/.style={draw, minimum
+      size = 1.5cm} ]
+
+    \node[initial, state] (init) {Init}; \node[state, below=of init]
+    (col) {Collect}; \node[state, accepting, below left=of col] (ab)
+    {Abort}; \node[state, accepting, below right=of col] (com)
+    {Commit};
+
+    \path (init) edge node {Request commit:\\\texttt{VOTE\_REQUEST}}
+    (col) (col) edge node [swap] {\texttt{VOTE\_ABORT}
+      received:\\\texttt{GLOBAL\_ABORT}} (ab) (col) edge node {All
+      \texttt{VOTE\_COMMIT} received:\\\texttt{GLOBAL\_COMMIT}} (com);
+% 
+  \end{tikzpicture}
+
+
+  % FSM participant:
+  \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node
+    distance=2.8cm, semithick, every edge/.append style={every
+      node/.style={align=left}}, every state/.style={draw, minimum
+      size = 1.5cm} ]
+
+    \node[initial, state] (r) {Ready}; \node[state, below=of r]
+    (waiting) {Voted}; \node[state, accepting, below left=of col] (ab)
+    {Abort}; \node[state, accepting, below right=of col] (com)
+    {Commit};
+
+    \path (r) edge
+    node{\texttt{VOTE\_REQUEST}:\\\texttt{VOTE\_COMMIT}} (col) (r)
+    edge node [swap, auto ]
+    {\texttt{VOTE\_REQUEST}:\\\texttt{VOTE\_ABORT}} (ab)
+%
+    (waiting) edge node [auto] {\texttt{GLOBAL\_ABORT} \\received}
+    (ab)
+%
+    (waiting) edge node {\texttt{GLOBAL\_COMMIT} received} (com);
+% 
+  \end{tikzpicture}
+
+
+\begin{msc}{2PC regular success}
+  \declinst{a}{}{A} \declinst{c}{}{Coordinator} \declinst{b}{}{B}
+
+  \nextlevel[1]
+
+  \mess{\texttt{VOTE\_REQUEST}}{c}{a}
+  \mess{\texttt{VOTE\_REQUEST}}{c}{b} \nextlevel[2]
+
+  \mess{\texttt{VOTE\_COMMIT}}{a}{c}
+  \mess{\texttt{VOTE\_COMMIT}}{b}{c} \nextlevel[2]
+
+  \mess{\texttt{GLOBAL\_COMMIT}}{c}{a}
+  \mess{\texttt{GLOBAL\_COMMIT}}{c}{b}
+\end{msc}
+
+\begin{msc}{2PC regular abort}
+  \declinst{a}{}{A} \declinst{c}{}{Coordinator} \declinst{b}{}{B}
+
+  \nextlevel[1]
+
+  \mess{\texttt{VOTE\_REQUEST}}{c}{a}
+  \mess{\texttt{VOTE\_REQUEST}}{c}{b} \nextlevel[2]
+
+  \mess{\texttt{VOTE\_COMMIT}}{a}{c} \mess{\texttt{VOTE\_ABORT}}{b}{c}
+  \nextlevel[2]
+
+  \mess{\texttt{GLOBAL\_ABORT}}{c}{a}
+  \mess{\texttt{GLOBAL\_ABORT}}{c}{b}
+\end{msc}
+
+
+
+\begin{msc}{2PC: Participant crashes}
+  \declinst{a}{}{A} \declinst{c}{}{Coordinator} \declinst{b}{}{B}
+
+  \nextlevel[1]
+
+  \mess{\texttt{VOTE\_REQUEST}}{c}{a}
+  \mess{\texttt{VOTE\_REQUEST}}{c}{b} \nextlevel[1] \stop{b}
+  \nextlevel[1]
+
+  \mess{\texttt{VOTE\_COMMIT}}{a}{c} \nextlevel[1]
+  \msccomment[side=right]{blocks for B}{c} \nextlevel[1]
+  \msccomment[side=left]{blocks for Coordinator}{a}
+
+\end{msc}
+
+% ------------------------------
+
+\begin{msc}{2PC coordinator crashes}
+  \declinst{a}{}{A} \declinst{c}{}{Coordinator} \declinst{b}{}{B}
+
+  \nextlevel[1]
+
+  \mess{\texttt{VOTE\_REQUEST}}{c}{a}
+  \mess{\texttt{VOTE\_REQUEST}}{c}{b} \nextlevel[2]
+
+  \mess{\texttt{VOTE\_COMMIT}}{a}{c}
+  \mess{\texttt{VOTE\_COMMIT}}{b}{c} \nextlevel[1] \stop{c}
+
+  \nextlevel[1] \msccomment[side=left]{blocks for Coordinator}{a}
+  \msccomment[side=right]{blocks for Coordinator}{b}
+
+\end{msc}
+
+%------------------------------
+
+\begin{msc}{2PC: coordinator and participant fail}
+\declinst{a}{}{A}
+\declinst{b}{}{B}
+\declinst{c}{}{Coordinator}
+\declinst{d}{}{D}
+
+\nextlevel[1] 
+
+\mess{}{c}{a}
+\mess{\texttt{VOTE\_REQUEST}}{c}{b}
+\mess{\texttt{VOTE\_REQUEST}}{c}{d}
+\nextlevel[2] 
+
+\mess{\texttt{VOTE\_COMMIT}}{a}{c}
+\nextlevel[1]
+\mess{\texttt{VOTE\_COMMIT}}{b}{c}
+\mess{\texttt{VOTE\_COMMIT}}{d}{c}
+\nextlevel[2]
+
+\mess{\texttt{GLOBAL\_COMMIT}}{c}{a}
+\nextlevel[1]
+\msccomment[side=right]{Die before sending anything else}{c}
+\stop{c}
+
+\nextlevel[1]
+\msccomment[side=left]{Commit!!}{a}
+\stop{a}
+
+
+\nextlevel[2]
+\msccomment[side=left]{Unsure!}{b}
+\msccomment[side=right]{Unsure!}{d}
+
+\end{msc}
+
+
+
+
+
+\end{document}

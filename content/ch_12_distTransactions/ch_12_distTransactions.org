@@ -1,403 +1,1210 @@
 #+BIBLIOGRAPHY: ../bib plain
 
 
-** Reminder: Transactions and ACID 
+* Reminder: Transactions, non-distributed
 
-** Transactions in distributed storage 
+*** All or nothing? 
 
-*** Transactions in distributed data bases 
+- Previous chapter: \ac{ZK} delivers messages all-or-nothing to
+  servers
+- Generalises:
+  - A *set of operations* should be executed *either all or
+    none* of them
+  - And: no other operations should interfere while group executes 
+- Should sound familiar: *transactional semantics*
+  - Database context 
 
- - Two-phase commit 
+*** Transactions 
+
+**** Transaction                                               :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+A *transaction* is a sequence of operations *reading* or *modifying* a
+data store. It 
+is explicitly started and either *successfully completed*
+(*committed*)  or *aborted*. 
+
+Transactions are created by a client of a data store. 
+
+
+**** ACID 
+
+Conventional databases typically promise *\ac{ACID}* when executing
+transactions
+
+*** Transaction properties: Atomicity 
+
+- When a transaction completes successfully, the effect of *all* its
+  modifications is visible in the data store 
+- When a transaction aborts, it has no effect at all
+  - Irrespective whether transaction aborted voluntarily or failed 
+
+
+
+*** Transaction properties: Isolation 
+
+- Transactions operate without effects from concurrently executing
+  transactions being visible to them
+  - Example: T1 reads value X multiple times, which is in the meantime
+    modified by transaction T2
+
+
+*** Transaction property: durability 
+
+
+- Once a transaction is successfully completed, its results must be
+  visible to following transactions
+- Typically: save effects in stable storage (file on disk, ...)
+- Allows to recover from server crash
+  - *Recoverability* 
+
+*** Tradeoff against concurrency
+
+- Data store: allow as many transactions as possible to make progress
+  concurrently
+  - Limited by atomicity, isolation requirements 
+- Goal: ensure *serializability*
+  - Executing transactions has the same effects as serial execution of
+    transactions would have 
+
+*** Example problem: Lost update 
+
+- Account X with initial balance 100€ 
+- Result of this serialization: 110€
+- Should be: 111 € 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+****** Transaction A 
+
+#+BEGIN_SRC python
+tmp = X.get()
+tmp = tmp *1.01 
+# ... 
+X.set(tmp) 
+# ... 
+# ... 
+#+END_SRC
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+****** Transaction B 
+
+
+#+BEGIN_SRC python
+# ...  
+# ...  
+tmp = X.get()
+# ... 
+tmp = tmp + 10
+X.set(tmp) 
+#+END_SRC
+
+
+
+*** Example problem: Inconsistent retrieval  
+
+- Bank with many accounts X, Y, Z ...  -- some of all balances?
+- While transfers take place? 
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+****** Transaction A 
+
+#+BEGIN_SRC python
+total = 0
+tmp = X.get()
+total += tmp 
+tmp = Y.get()
+total += tmp 
+# ...
+#+END_SRC
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+****** Transaction B 
+
+
+#+BEGIN_SRC python
+tmp = Y.get()
+tmp -= 10 
+# ...
+# ...  
+# ...  
+Y.set(tmp) 
+#+END_SRC
+
+
+*** Main technique: locks
+
+- Option: delay one transaction trying to modify data being used by
+  another
+- Technique: *locks*
+  - On entire tables, on rows, ...
+  - Distinguish read lock and write lock 
+- But beware deadlocks!
+
+
+
+*** Transaction property: Consistency 
+
+- A transaction transforms a consistent state in some other consistent
+  state
+  - E.g., banking transaction: no money is lost during transfers
+- Typically responsibility of transaction code/its programmer
+  - Support system can do little about that
+  - We will basically ignore consistency in the following 
+
+
+
+* Transactions in distributed storage
+
+** Requirements 
+*** Transaction with replicated storage
+
+- Scenario: 
+  - A single client performs a transaction
+  - Data is stored in a replicated storage
+  - But behaves as if it were non-distributed
+- No real difference from the client's perspective 
+
+
+
+*** Transaction distributed over clients 
+
+- More interesting scenario: A transaction comprising multiple clients
+  - Each of which performs some actions which could lead to either
+    aborting or committing the transaction
+- Semantics?
+  - If *any single client* cannot complete its local action, the entire
+    distributed transaction cannot complete and must be aborted 
+  - Only possible to commit if all clients can commit 
+
+*** Nested distributed transaction 
+
+- Typical case: Local client actions are (local) transactions
+  themselves
+  - Transactions *nested* inside transactions
+- Common example: Travel booking
+  - Trip can only be booked if both airtrip and hotel and rental car
+    can be booked -- transactions in independent systems 
+
+
+
+
+*** Coordinating distributed transactions 
+
+
+**** Distributed commit protocol                               :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+Protocol to
+  - Collect votes from distributed clients
+  - Check for veto 
+  - Distribute result back to all clients to commit or abort 
+
+Possibly using a central entity (often called a *transaction
+monitor*) or in a distributed fashion 
+
+
+**** Requirements 
+
+- Once a single client has been told to commit, *all* clients must
+  commit 
+- Must not block indefinitely, even in presence of failures 
+
+
+** Two-phase commit 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:distTrans:2pc
+   :END:
+
+*** Core idea: \ac{2PC} \cite{Gray:1978:2pc}
+
+- Elect a coordinator
+- Voting phase: 
+  - Coordinator asks for *votes* from participants (including itself):
+    ~VOTE-REQUEST~ 
+  - Participant tells coordinator whether it can commit ~VOTE-COMMIT~ or
+    has to abort ~VOTE-ABORT~
+- Decision phase: 
+  - Coordinator waits for response from all participants
+    - If a ~VOTE-ABORT~ received, tell all to ~GLOBAL-ABORT~
+    - Else, tell all to  ~GLOBAL-COMMIT~
+  - Participants wait for command from coordinator 
+
+
+*** 2PC FSM 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+****** Coordinator 
+
+
+#+CAPTION: 2PC coordinator finite state machine
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=1
+#+NAME: fig:dT:2pc:fsm:coordinator
+[[./figures/2pc.pdf]]
+
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+****** Participant 
+
+#+CAPTION: 2PC participant finite state machine
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=2
+#+NAME: fig:dT:2pc:fsm:participant
+[[./figures/2pc.pdf]]
+
+
+
+*** 2PC regular run: Commit
+
+#+CAPTION: 2PC regular commit
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=3
+#+NAME: fig:dT:2pc:commit
+[[./figures/2pc.pdf]]
+
+
+
+
+*** 2PC regular run: Abort 
+
+#+CAPTION: 2PC regular abort
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=4
+#+NAME: fig:dT:2pc:commit
+[[./figures/2pc.pdf]]
+
+
+
+*** 2PC with crashing participant 
+
+
+#+CAPTION: 2PC participant crashes
+#+ATTR_LaTeX: :width 0.7\linewidth :options page=5
+#+NAME: fig:dT:2pc:commit
+[[./figures/2pc.pdf]]
+
+
+- A cannot commit as it waits for coordinator 
+- Coordinator blocks for crashes B 
+
+
+*** 2PC with crashing coordinator 
+
+
+#+CAPTION: 2PC coordinator crashes
+#+ATTR_LaTeX: :width 0.7\linewidth :options page=6
+#+NAME: fig:dT:2pc:commit
+[[./figures/2pc.pdf]]
+
+
+- Neither node can commit or abort 
+
+*** Curing blocking: Timeouts 
+
+- Obvious idea: introduce timeouts and move on when blocking 
+  - Recall: ABORT is always safe, yet undesirable option
+  - Ensure that all participants behave equally 
+- Which states are critical?
+
+*** 2PC critical states 
+
+**** Critical coordinator states 
+
+- ~Collect~: Not all participants voted. ~ABORT~
+
+**** Critical participant states 
+
+- ~Ready~: Vote ~ABORT~
+- ~Voted~:
+  - *Cannot* simply abort -- coordinator might already have sent
+    ~COMMIT~ to other nodes!
+  - *Cannot* simply commit -- vice versa
+
+
+
+*** 2PC critical states 
+
+- Idea: Try to find out! Talk to other participant 
+  - Other participant is in ~Commit~, ~Abort~, or ~Ready~: clear
+  - in ~Voted~ itself: Talk to a third node
+- What if all participants in ~Ready~?
+  - We cannot decide \Sadey
+  - Because coordinator might already have committed or aborted before
+    telling anybody!
+  - We are stuck!
+
+#+BEAMER: \pause
+
+- Additional complication: What if participant cannot reach ANY node?
+  Stuck as well! 
+
+*** Blocking protocol 
+
+**** Blocking commit protocol                                  :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+A commit protocol is called *blocking* when 
+- there are states in which no progress can be made (no decision to
+  abort or commit can be reached), owing to node or network failures,
+  and
+- that situation cannot be rectified by joint actions of the surviving
+  node 
+
+2PC is an example. 
+
+
+
+
+
+
+*** Example: Two nodes fail 
+    :PROPERTIES:
+    :CUSTOM_ID: s:distTrans:2pc:twocrashes
+    :END:
+
+
+#+CAPTION: 2PC fails in presence of two node failures
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=7
+#+NAME: fig:distTrans:2pc:two_nodes_fail
+[[./figures/2pc.pdf]]
+
+
+
+*** Summary 2PC 
+
+- 2PC will never make an incorrect decision 
+- But sometimes, it will make no decision at all (blocks)
+  - Or has to wait an indeterminate amount of time for recovery 
+- Put briefly: 2PC is *safe, but not always live*
+
+
+**** Improve? 
+
+- Non-blocking, always correct
+- Even in presence of failures?
+  - Operational participants reach decision based on local state
+  - Recovering sites behave consistently 
+
+** Three-phase commit 
+
+*** Non-blocking! 
+
+- Blocking is unacceptable!
+- Issue is: not enough information to resolve blocking
+  - Just because one node (coordinator) might have taken some rash
+    actions
+- Idea: Delay such actions?
+  - Only actually commit or abort when enough information has been
+    distributed?
+  - Leave enough room to always escape to abort? 
+
+
+*** \ac{3PC} \cite{Skeen:1981:NCP:3pc}
+
+- Similar setup: coordinator and participants 
+- Introduce additional states to delay decision making while
+  collecting information 
+
+*** 3PC FSM 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+****** Coordinator 
+
+
+#+CAPTION: 3PC coordinator finite state machine
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=1
+#+NAME: fig:dT:3pc:fsm:coordinator
+[[./figures/3pc.pdf]]
+
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+****** Participant 
+
+#+CAPTION: 3PC participant finite state machine
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=2
+#+NAME: fig:dT:3pc:fsm:participant
+[[./figures/3pc.pdf]]
+
+
+
+
+
+
+
+*** Why does 3PC help? 
+
+- Apparently, not much difference?
+  - Cannot the same thing happen in ~PreCommit~ as did above?
+- Critical cases:
+  - Coordinator  blocked in ~PreCommit~: All have voted for commit;
+    commit is safe
+  - Participant blocked in ~PreCommit~: contact others
+    - If majority of others nodes  in ~PreCommit~ as well, commit is
+      safe (because coordinator *also* agreed!) 
+    - If majority of  other nodes  in ~Ready~, abort is safe --
+      because  a recovering node might have voted for abort
+  - Note: Recovering participant could at worst recover to
+    ~PreCommit~ but *not* to ~Commit~ as in 2PC! 
+
+
+*** Example unblocking run
+
+
+#+CAPTION: 3PC coordinator fails, remaining nodes can unblock
+#+ATTR_LaTeX: :height 0.65\textheight :options page=3
+#+NAME: fig:dT:3pc:unblocking
+[[./figures/3pc.pdf]]
+
+
+*** 3PC: Liveness
+
+- To be *live*, 3PC needs to make progress even if messages are
+  missing
+  - Basic technique: timeout
+  - *Danger*: Still has to be safe 
+- Meaning: How to behave if no *majority* of other nodes can be
+  reached? 
+
+*** Run with partition 
+
+- Similar scenario to \slideref{sec:distTrans:2pc}[s:distTrans:2pc:twocrashes]
+- Difference: Coordinator crashes, but node A is *partitioned* off
+  from the other nodes (alive, but unable to communicate)
+
+
+*** Run with partition -- Options? 
+
+- Options for B, C, E?
+  - Never received ~PRE_COMMIT~, so they abort 
+- Options for A?
+  - Timeout, then commit -- *majority* of *reachable* nodes in favour
+    of commit!
+  - Timeout, then abort -- *majority* of total nodes not available for
+    comment.
+    - *But they might have committed! A does not know!*
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: 3PC coordinator fails; node A is partitioned 
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=4
+#+NAME: fig:dT:3pc:partition
+[[./figures/3pc.pdf]]
+
+
+*** Indistinguishable for A 
+
+- These two cases are indistinguishable for A
+- But A should behave differently! 
+
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: 3PC coordinator fails; node A is partitioned, A should abort  
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=5
+#+NAME: fig:dT:3pc:partition_Aabort
+[[./figures/3pc.pdf]]
+
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: 3PC coordinator works; node A is partitioned, A should commit
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=6
+#+NAME: fig:dT:3pc:partition_Aabort
+[[./figures/3pc.pdf]]
+
+
+*** Consequence? 
+
+- So far, we have no idea how to be *both safe and live*
+  - In example: A cannot detect whether coordinator has failed or is
+    unreachable
+  - Because there is no upper bound on timeout! 
+- We could probably fix this particular example by modifying protocol
+  rules
+  - But would that really help? Or sign of deeper problem?
+- Let's find out (Section \slideref{sec:distTrans:consensus}) 
+
+** Practical 
+
+*** In practical systems?  
+
+ - 2PC widely used in \ac{RDMS}
    - Examples: MySQL, Postgres, MariaDB
- - What happens when we distribute storage, how to deal with commits
-   then?
-   - ACID: http://www.bailis.org/blog/when-is-acid-acid-rarely/ 
- - Exampels:
-   - https://docs.oracle.com/cd/B19306_01/server.102/b14231/ds_txns.htm
-   - https://www.cs.rutgers.edu/~pxk/417/notes/content/transactions.html
-
- - Three-phase commit 
-
-*** Two-phase commit 
- The finite state machine for the coordinator in 2PC.
- - The finite state machine for a participant.
-*** 2PC with faults 
- 68
-*** From 2PC to 3PC 
- Distributed Systems, Ch 5: Various distributed algorithms
- 69
- Finite state machine for the coordinator in 3PC
- - Finite state machine for a participant
-
-*** TODO NEEDS MORE MATERIAL 
-
-** Consensus and PAXOS 
-*** The need for consensus: 
- - Impossibility results 
- - Paxos commit? here? 
-  
-
-*** Consensus 
- Problem statement
- - Each process starts the algorithm with an initial value
- - Outputs of all processes are required to be the same
- - All processes must decide for some output value
- - Often: a particular value is seen as preferable
- - Different criteria of validity of a solution
- - Areas of application
- - Status of a transaction, equivalence of sensor data, failure detection, ...
- - Consensus is simple to solve in the absence of failures
- - With failures?
- - Communication/link failures?
- - Process failures? 
- - Time model here: Synchronous model!
-*** Consensus with Link Failures – Model 
- Coordinated attack
- - Two armies form up for an attack against each other 
- - One army is split into two parts that have to attack together – alone they will lose 
- - Commanders of the parts communicate via messengers who can be captured 
- - Which rules shall the commanders use to agree on an attack date? 
- - Developed: modeling of data base problems
-*** Consensus with Link Failures
- Consensus is impossible to solve in these conditions!
- - Look at graph G with two nodes and bidirectional edge, each node can decide for 0 or 1 (e.g., abort or commit)
- - Requirements for the solution algorithm
- - Agreement: Both processes decide on the same values.
- - Validity: 
- - If both processes start with 0, then 0 is the only possible decision value. 
- - If both processes start with 1 and all messages are delivered, then 1 is the only possible decision value. 
- - Termination: Both processes eventually decide. 
- - Very weak requirements – only to exclude trivial solutions
- - Just always outputting 0 is not valid solution algorithm 
- - But: not even solvable under such relaxed requirements! 
- - 
- - 
- Proof by contradiction: Assume algorithm exists, 
- - construct sequence of errors such that algorithm 
- - has to violate agreement or validity
-*** Consensus with Link Failure – a Way Out? 
- Consensus with link failures is – even with weak assumptions – not solvable by deterministic algorithms 
- - 
- - Possible way out: randomized algorithms 
- - Algorithm gives a correct result with “high probability”
- - Idea: an opponent (may destroy messages) tries to mislead the algorithm into a false decision
- - Modified agreement condition: for each opponent 				P (some nodes decide 0, others 1) < e
- - e can depend, e.g., on the number of rounds
-*** Overview 
- Leader election 
- - Mutual exclusion
- - Global snapshot
- - Distributed consensus
- - Consensus with link failures
- - Consensus with node failures 
- - Example algorithm: Basic Paxos 
- - 2PC and 3PC
- - Byzantine agreement 
- - 
- - 
-*** Consensus with Process Failures
- Assumptions
- - Communication is error-free
- - Processes stop or
- - Processes show Byzantine (arbitrary) behavior
- - Many other assumptions are possible
- - 
- - In particular: processes can fail if they have sent only a part of a message
- - Example: Process B sends a broadcast to processes A and C, but fails after the message has been sent to A but not to C
- - 
- - 
- - 
-*** Consensus with Process Failures
- Correctness conditions
- - Agreement: No two processes decide on different values.
- - Validity: If all processes start with the same value, then this value is the only valid one
- - Sometimes also: The initial value of each process is a valid final value
- - Termination: All nonfaulty processes eventually decide
- - Why is it necessary to restrict here to “nonfaulty” processes? 
- - 
- - Fault model
- - At most f processes will fail
-*** Consensus with Failing Processes
- FloodSet algorithm
- - Each process stores a subset W out of the valid values V 
- - Initially: W is the value that the respective process proposes 
- - After every round each process broadcasts W to all participants 
- - All received elements are added to W
- - After f +1 rounds each process decides
- - Has W only one element, this is the result
- - Otherwise a default value is chosen (e.g. the smallest possible value v0) – validity makes no requirements for the case when there is more than a single initial value!
-*** Consensus with Failing Processes
- Why f +1 rounds? 
- - At most f nodes may fail 
- - With f +1 rounds, there is at least one round in which no node fails ® in this round consensus is established
- -  f +1 rounds, O((f +1)n2) messages
- - Optimizations possible (exponential information gathering algorithms which function also for other failure models)
- - 
- - Why not decide after two rounds? 
- - See exercise sheet
- - Hint: partly sending before failure
- - 
-*** Overview 
- Leader election 
- - Mutual exclusion
- - Global snapshot
- - Distributed consensus
- - Consensus with link failures
- - Consensus with node failures 
- - Example algorithm: Basic Paxos 
- - 2PC and 3PC
- - Byzantine agreement 
- - 
- - 
-*** Example consensus protocol: Paxos 
- 55
- L. Lamport, Paxos made simple, 2001. 
- - http://research.microsoft.com/en-us/um/people/lamport/pubs/paxos-simple.pdf
-*** Paxos: Roles 
- 56
- One request can lead 
- - to several proposals 
- - with different values!
-*** Paxos: Quorums 
- 57
-*** Paxos: Some intuition 
- 58
-*** Paxos: Normal operation 
- 59
-*** Paxos Phase 1: Prepare & Promise 
- 60
-*** Paxos Phase 2: Accepting 
- 61
-*** Paxos: Normal execution MSC 
+   - Danger of blocking often considered negligible in practice
+   - But that jeopardises ACID guarantee (cp. 
+     \href{http://www.bailis.org/blog/when-is-acid-acid-rarely/}{blog},
+     \href{https://www.cs.rutgers.edu/~pxk/417/notes/content/transactions.html}{from
+     ACID to BASE})    
+ - 3PC rarely implemented
+   - Example \href{https://docs.oracle.com/cd/B19306_01/server.102/b14231/ds_txns.htm}{Oracle description} 
 
-*** Paxos: Proposer  fails MSC 
+     
 
-*** Paxos: Battling  Proposers 
- 64
-
-
-*** Consensus with Byzantine Processes
- Correctness conditions
- - Agreement: No two nonfaulty processes decide on different values
- - Validity: If all nonfaulty processes start with the same value, then this value is the only valid one
- - Termination: All nonfaulty processes eventually decide
- - Remark: 
- - Restriction of the validity conditions to only nonfaulty processes because conditions for the behavior of Byzantine processes make no sense 
- - n > 3f required (triple modular redundancy not sufficient!)
- - For failing processes such a limit does not exist!
- - An algorithm for Byzantine processes does in general not solve the consensus problem for failing processes 
- - Reason: In version for failing processes all processes that decide have to agree – even processes that fail after they have decided! 	
- - 
-*** n=3, f=1 does not Solve Byzantine Agreement
- Example algorithm (no failure)
- - Round 1: Everybody sends its own value to its neighbor
- - 
- - 
- Round 2: Everybody sends value of each neighbor to the other neighbor
 
 
 
+* Auxiliary algorithms 
 
- 1
- 1
- 0
+*** In addition to commit? 
 
+- A commit protocol clearly necessary for distributed transactions 
+- What else?
+  - How to lock? Or: how to do mutual exclusion? 
+  - How to detect deadlocks? 
 
+ 
+** Distributed mutual exclusion
 
+*** Locking and mutex 
 
+- Recall database class: Transactions need *locks*
+  - Read/write lock
+  - On tables, rows, ...
+- A simplified version of locks is *\ac{MutEx}*
+  - Once MutEx available, locks can be easily constructed on top 
 
- 1
- 0
- 1
- 0
- 1
- A
- B
- C
+*** Mutual exclusion in distributed systems
+ - Problem of mutual exclusion: when processes execute concurrently,
+   there may be crucial portions of code which may only be executed by
+   at most one process at any one time
+   - This/these piece(s) of code form a so-called *critical region*
+   - In non-distributed systems: semaphores to protect such critical
+     regions  
+   - But this does not directly carry over to distributed systems! 
+ - Options
+   - Centralized algorithm
+   - Distributed algorithm 
+   - Token-Ring-based algorithm 
 
+*** A centralized algorithm for mutual exclusion 
+ - Run a leader election algorithm, determine a coordinator for a
+   critical region  
+   - Known to everybody
+ - Coordinator holds a token for the critical region 
+ - Node who wants to enter into the region sends message to
+   coordinator 
+   - If coordinator owns token, send it
+   - Else, put request into a queue 
+ - After leaving the critical region, send back token to coordinator 
 
+*** Example: Mutual-Exclusion-Server                               :noexport:
 
+ p1
+ p2
+ p3
+ p4
+ Server
 
- 1
- 1
- 0
+ Request 
+ -           token
 
+ 2. Grant 
+ -   token
 
+ 3. Request 
+ -           token
+ 4
+ Queue of
+ - requests
 
 
+ 4. Request 
+ -     token
+ 2
 
- B said 0
- B said 0
- A said 1
- A said 1
- C said 1
- C said 1
- A
- B
- C
-*** n=3, f=1 does not Solve Byzantine Agreement
- Execution a1: C is faulty
- - Round 1:  
- Round 2: 
+ 5. Release  token
 
+ 6. Grant  token
 
+ Token
 
 
+*** Properties
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+****** Pros 
+ - Mutual exclusion is achieved
+ - Fair -– requests are served in order 
+ - Easy to implement
+ - Per access to critical region, only three messages are required  
 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
+****** Cons 
 
+ - Coordinator is single point of failure
+ - When a requester is blocked, impossible to distinguish between a
+   failed coordinator and a long queue 
+ - Coordinator becomes a performance bottleneck in large systems 
+ - In particular when serving more than one critical region 
+
+
+*** Distributed mutual exclusion
+ - How to achieve mutual exclusion without a coordinator? 
+ - All processes use multicast 
+ - All processes have a logical clock (local sequence number) and
+   process id
+   - Process id to break ties when comparing clocks 
+ - When trying to enter into the critical region
+   - Send a request to all other nodes
+   - All other nodes have to agree to such a request before a node may
+     enter critical region
+   - Delay agreement when interested yourself and has smaller clock 
 
- B said 1
- B said 0
- A said 1
- A said 1
- C said 0
- C said 0
- A
- B
- C
 
+*** Algorithm (Ricart and Agrawala, 1981) \cite{Ricart:1981:OAM:358527.358537} 
 
+\tiny
 
 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
 
- 1
- 0
- 1
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
 
+#+BEGIN_SRC python 
+class MuTex:
+    def init(self):
+        self.state = RELEASED
+        self.seqNumber = 0
+        self.id = get_process_id()
+        self.queue = []
+        
+    def enter(self):
+        self.state = WANTED
+        self.replies_received = 0
+        self.seqNumber++
+        multicast(WANT, self.seqNumber, self.id)
 
+    def leave(self):
+        self.state = RELEASED
+        for q in self.queue: send(q, CLEAR)
+        self.queue = []
+#+END_SRC
 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
- 1
- 0
- 1
- 0
- 1
- 1
- A
- B
- C
- A and B decide 1 because of validity
-*** n=3, f=1 does not Solve Byzantine Agreement
- Execution a2: A is faulty 
- - Round 1:  
- Round 2: 
 
+#+BEGIN_SRC python 
+    def receive_reply(self):
+        self.replies_received++
+        if self.replies_received == N-1:
+            state = HELD
+            # enter critical, e.g., release thread
 
+    def receive_request(self, (request_seqNr, request_id)):
+        if ( (self.state == HELD) or
+             (self.state == WANTED and
+                  (self.seqNr, self.id) < (request_seqNr, request_id))):
+            self.queue.append( (request_seqNr, request_id))
+        else:
+            send(request_seqNr, CLEAR) 
 
+            
 
- 1
- 0
- 0
+#+END_SRC
 
 
+*** Example distributed mutual exclusion 
 
 
+#+CAPTION: Example run of Ricart-Agrawala mutual exclusion
+#+ATTR_LaTeX: :height 0.75\textheight
+#+NAME: fig:distTrans:mutex
+[[./figures/mutex.pdf]]
 
- 1
- 0
- 0
- 0
- 0
- 1
- A
- B
- C
 
 
 
+*** Properties of distributed mutual exclusion 
+ In simple form, each node turns into a single point of failure 
+ - $N$ of them, instead of just one
+ - Could be overcome by using additional protocol mechanisms
+ - But considerably complicates state management 
+ - Each process is involved in decision about access to critical
+   region, even if not interested  
+ - Possible improvement: simple majority suffices (quorum) 
+ - In total: slower, more complicated, more expensive, less robust
 
+**** Distributed mutex is spinach                               :B_quotation:
+     :PROPERTIES:
+     :BEAMER_env: quotation
+     :END:
 
+Finally, like eating spinach and learning Latin in high school, some
+things are said to be good for you in some abstract way. (Tanenbaum) 
 
+*** Comparison mutual exclusion
 
 
+#+ATTR_LATEX: :align lrrp{0.3\textwidth}
+| Algorithm   | Messages   | Delay          | Problems                         |
+|-------------+------------+----------------+----------------------------------|
+| Centralized | 3          | 2              | Coordinator crash, bottleneck    |
+| Distributed | $2(n-1)$   | $2(n-1)$       | Crash of *any* process           |
+| Token ring  | at least 1 | $0 \ldots n-1$ | Lost token, crash of any process |
 
- B said 1
- B said 0
- A said 1
- A said 1
- C said 0
- C said 0
- A
- B
- C
 
- B and C decide 0 because of validity
-*** n=3, f=1 does not Solve Byzantine Agreement
- Execution  a3: B is faulty
- - Round 1: 
- Round 2: 
+- Messages per exit/entry
+- Delay in message times
 
+** Snapshot 
 
 
+*** Deadlock detection 
 
- 1
- 0
+- Recall deadlocks: A cycle in a wait-for graph 
+- With locks in databases: Possible
+  - Transaction A locks row 1 in table X, needs row 2 in table Y 
+  - Transaction B locks row 2 in table Y, needs row 1 in table X
 
 
+#+CAPTION: Deadlock with transactions and tables 
+#+ATTR_LaTeX: :width 0.65\linewidth
+#+NAME: fig:distTrans:deadlock
+[[./figures/deadlock.pdf]]
 
 
+*** Distributed deadlock detection? 
 
- 1
- 0
- 0
- 0
- 1
- 1
- A
- B
- C
+- In a distributed setting, wait-for graph is not available at any
+  single point
+- Worse: it is in flux
+  - Lock requests, grants, releases can be inside a *message in
+    transit*, not known at any particular point!
 
 
+#+BEAMER: \pause
 
+- Can we reconstruct wait-for graph, despite graph changes are in
+  transit? 
 
+*** Similar problems 
 
+- Garbage collection
+  - Are there still references to an object, somewhere?
+- Termination detection
+  - Can we terminate a process, when jobs for it might be in transit?
 
+**** State collection (snapshot) 
+  - More generally: Compute a function on process states, where state
+    changes are potentially in transit?
+  - Example:
+    - Processes are bank accounts, messages are money transfers
+    - What is the total sum of money? 
 
+*** Snapshot: Challenge 
 
+- Processes can easily record their local state at some point in time
+  - Recorded states can be shipped to a single location and processed
+- Problem: Triggering local state recording happens with messages
+  - No synchronised time available!
+- Problem 2: And even if we had synchronised time, it would not help
+  - Because we would not know what to do with messages in transit 
 
+*** Snapshot: Cuts 
 
 
- B said 1
- B said 0
- A said 1
- A said 1
- C said 0
- C said 0
- A
- B
- C
- A and C would have to decide for the same value because of agreement
-*** n=3, f=1 does not Solve Byzantine Agreement
- Thus: 
- - a1 ~1 a3
- - Process A decides 1 in a1 (because of validity condition) and therefore also in a3
- - a2 ~3 a3
- - Process C decides 0 in a2 and therefore also in a3 
- - Processes A and C violate the agreement condition in a3 
- - 
- - This algorithm cannot solve Byzantine agreement for n = 3f
- - Because no statement was made about the type of decision making this holds for all algorithms with this communication structure 
- - 
- - Argument can be extended to a proof for arbitrary algorithms with n = 3f (with arbitrary messages, rounds) 
- - 
-*** Byzantine agreement for n > 4f with 2(f+1) rounds 
+- Which states should we record, which messages? 
+- Let's think of a timeline of processes exchanging messages 
+- Each process, we record at some point in time
+  - Red dots in following  figures 
+- A so-called *cut*
+  - Think of a line connecting the red dots
 
-*** Example: n=5, f=1, 2(1+1) rounds, 2nd proc is traitor
 
-*** Powerful algorithms for Byzantine Agreement: EIG 
+*** Cut without messages 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
 
- - To achieve bound n > 3f for Byzantine Agreement, better algorithms needed (which exist)
- - 
- - Popular: Exponential Information Gathering 
- - Each node builds a tree of all the information all other nodes have achieved in all previous rounds 
- - Complex information exchange among nodes 
- - Relatively complex decisions rules
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
 
+- Simplest example: Cut does not cross any message 
+  - For all messages, both send *and* receive are *either* before or
+    after the cut
+- Simply using the recorded state $S_i$ per process $P_i$ is fine 
 
-*** Odds and ends 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
- - Life Beyond Distributed Transactions: https://queue.acm.org/detail.cfm?id=3025012 
+
+
+#+CAPTION: Simple cut not crossing messages
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=1
+#+NAME: fig:distTrans:cut:simple
+[[./figures/cuts.pdf]]
+
+
+
+
+
+*** Cut cutting a message 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+- Consider processes 1 and 3 and message $m_2$
+- Suppose we used $S_1$, $S_3$
+  - Then $m_2$'s content *no longer* included in $S_3$
+  - And *not yet* in $S_1$
+- Repair?
+  - $P_1$ has to collect messages after recording state and add to
+    record
+  - But how long? 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: Cut across a message
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+NAME: fig:distTrans:cut:forward
+[[./figures/cuts.pdf]]
+
+
+
+*** An implausible cut
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+- This cut due to incorrect synchronisation between processes
+- Now, both $S_3$ *and* $S_1$ reflect $m_2$
+  - And no easy way out -- /remove/ a message from state? inverse
+    functions? 
+- Such a cut is called *inconsistent*; avoid! 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: An inconsistent cut 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+NAME: fig:distTrans:cut:inconsistent 
+[[./figures/cuts.pdf]]
+
+
+
+
+*** Distributed snapshot algorithm 
+
+
+- Goal: Construct consistent cuts and the messages to be added to each
+  process' locally recorded state 
+- Distributed snapshot algorithm \cite{Chandy:1985:DSD:214451.214456}
+- Assumptions
+  - Neither channels nor processes fail; messages arrive intact, exactly once
+  - Channels are unidirectional, pair-wise, FIFO
+  - Graphs of processes and channels is strongly connected
+  - Any process may initiate a global snapshot at any time
+  - Processes may continue execution and send/receive normal messages
+    while the snapshot takes place  
+
+
+*** Distributed snapshot algorithm: Idea 
+
+- Each process records
+  - Its own state once it learns about snapshot 
+  - For each incoming channel, messages arrived via this channel after
+    receiver has recorded state, sent before sender has recorded its
+    state 
+  - Accounts for messages transmitted, but not yet received for
+    different points in time of process state recording 
+- Channels also have state:  messages sent but not received
+- Algorithm uses marker messages 
+  - Prompts receiver to record its own state
+  - Determines which messages are included in the channel state
+- Start of algorithm: Initiator behaves as if it had received a marker
+  (over a fictive channel)  
+
+
+*** Distributed snapshot algorithm: Pseudo code 
+
+#+BEGIN_SRC python 
+class Snapshot:
+    inchannels = [ [] ] * numInchannels
+    inchannels_Done = [ False ] * numInchannels
+    outchannel = [outCh1, ... outChm]
+    stateRecord = None
+    recordingOn = False
+
+    def on_marker (self, marker_channel):
+        if not self.stateRecord:
+            self.stateRecord = self.my_state()
+            inchannel_Done[marker_channel] = True
+            for oc in outchannels: oc.send("M") 
+        else:
+            inchannel_Done[marker_channel] = True 
+#+END_SRC
+
+*** Distributed snapshot algorithm: Pseudo code 
+
+#+BEGIN_SRC python 
+class Snapshot: 
+# class continues here 
+
+    def receive_message (self, mess, channel):
+        if mess == "M": 
+            self.inchannels_Done[channel] = True
+        else:
+            if not self.inchannels_Done[channel]:
+                self.inchannels[channel].append(mess)
+
+        if functools.reduce(lambda x, y: x and y,
+                self.inchannels_Done):
+            self.store_State_and_messages()
+#+END_SRC
+
+
+
+
+*** Example run: One node 
+
+#+CAPTION: A node for distributed snapshot example
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=1
+#+NAME: fig:distTrans:snapshot:node
+[[./figures/snapshot.pdf]]
+
+*** Example run: Three node setup  
+
+#+CAPTION: Three node setup for  distributed snapshot example
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+NAME: fig:distTrans:snapshot:setup
+[[./figures/snapshot.pdf]]
+
+*** Example run: Step 1
+
+#+CAPTION:  Distributed snapshot example run, step 1 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+NAME: fig:distTrans:snapshot:run1
+[[./figures/snapshot.pdf]]
+
+*** Example run: Step 2
+
+#+CAPTION:  Distributed snapshot example run, step 2
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=4
+#+NAME: fig:distTrans:snapshot:run2
+[[./figures/snapshot.pdf]]
+
+
+
+*** Example run: Step 3
+
+#+CAPTION:  Distributed snapshot example run, step 3
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=5
+#+NAME: fig:distTrans:snapshot:run3
+[[./figures/snapshot.pdf]]
+
+
+*** Example run: Step 4
+
+#+CAPTION:  Distributed snapshot example run, step 4
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=6
+#+NAME: fig:distTrans:snapshot:run4
+[[./figures/snapshot.pdf]]
+
+
+*** Example run: Step 5
+
+#+CAPTION:  Distributed snapshot example run, step 5
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=7
+#+NAME: fig:distTrans:snapshot:run5
+[[./figures/snapshot.pdf]]
+
+
+*** Example run: Step 6
+
+#+CAPTION:  Distributed snapshot example run, step 6
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=8
+#+NAME: fig:distTrans:snapshot:run6
+[[./figures/snapshot.pdf]]
+
+
+*** Example run: Step 7
+
+#+CAPTION:  Distributed snapshot example run, step 7
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=9
+#+NAME: fig:distTrans:snapshot:run7
+[[./figures/snapshot.pdf]]
+
+
+*** Example run: Step 8
+
+#+CAPTION:  Distributed snapshot example run, step 8
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=10
+#+NAME: fig:distTrans:snapshot:run8
+[[./figures/snapshot.pdf]]
+
+
+*** Example run: Step 9
+
+#+CAPTION:  Distributed snapshot example run, step 9
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=11
+#+NAME: fig:distTrans:snapshot:run9
+[[./figures/snapshot.pdf]]
+
+
+*** Example run: Step 10
+
+#+CAPTION:  Distributed snapshot example run, step 10
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=12
+#+NAME: fig:distTrans:snapshot:run10
+[[./figures/snapshot.pdf]]
+
+
+*** Example run: Step 11
+
+#+CAPTION:  Distributed snapshot example run, step 11
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=13
+#+NAME: fig:distTrans:snapshot:run11
+[[./figures/snapshot.pdf]]
+
+
+*** Example run: Step 12
+
+#+CAPTION:  Distributed snapshot example run, step 12
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=14
+#+NAME: fig:distTrans:snapshot:run12
+[[./figures/snapshot.pdf]]
+
+
+* Summary
+
+*** Summary 
+
+- Distributed transactions is a typical and relevant problem in
+  distributed databases
+- 2PC as a typical approach, but does not deal with all failure
+  scenarios
+  - 3PC somewhat better, but also not perfect
+  - Different tradeoffs between safety and liveness
+- In context of distributed transactions, several other algorithmic
+  problems occur
+  - Locking/mutex; distributed snapshot 
+- Up next: how to deal with failures more generally?  

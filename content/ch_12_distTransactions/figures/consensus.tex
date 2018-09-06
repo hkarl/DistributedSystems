@@ -1,0 +1,27 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+\begin{tikzpicture}
+% 
+\node [cowboy] (c1) at (-3, 2)  {}; 
+\node [cowboy, right=0.1cm of c1] (c2) {}; 
+\node [cowboy] (c3) at (3, 2)  {}; 
+\node [cowboy, right=0.1cm of c3] (c4) {}; 
+
+
+\node [guard] (g1) at (-1, 0)  {}; 
+\node [guard, right=0.1cm of g1] (g2)  {}; 
+\node [guard, right=0.1cm of g2] (g3)  {}; 
+\node [guard, right=0.1cm of g3] (g4)  {}; 
+\node [guard, right=0.1cm of g4] (g5)  {}; 
+\node [guard, right=0.1cm of g5] (g6)  {}; 
+
+\draw [rounded corners] (c1.south) -- (c2.south) -- ([shift={(0,.5)}]  g1.north) -- ([shift={(0,.3)}] g5.north) -- (c3.south) -- (c4.south);
+
+
+\node [cloud, draw, aspect=6, fill=gray!20] at (0, 2) {};
+\end{tikzpicture}
+\end{document}

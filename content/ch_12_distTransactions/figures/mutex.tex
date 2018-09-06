@@ -1,0 +1,57 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+\begin{msc}{Ricart-Agrawala example}
+% 
+\declinst{a}{}{A}
+\declinst{b}{}{B}
+\declinst{c}{}{C}
+
+\action{SN = 7}{a}
+\action{SN = 3}{b}
+\action{SN = 9}{c}
+\nextlevel[3]
+
+\condition{RELEASED}{b}
+\condition{WANTED}{a}
+
+\nextlevel[2]
+\mess[auto,below, near start]{WANT, 7}{a}{c}[3]
+\mess{}{a}{b}[6]
+
+
+\condition{WANTED}{c}
+\nextlevel[2]
+\mess[auto,below, near start]{WANT, 9}{c}{b}[2]
+\mess{}{c}{a}[3]
+
+
+\nextlevel[2]
+
+\mess[below]{CLEAR}{b}{c}[1] 
+
+\nextlevel[1]
+\msccomment[side=left]{queue}{a}
+\nextlevel[1]
+\mess[below]{CLEAR}{b}{a}[1] 
+\nextlevel[1]
+\mess{CLEAR}{c}{a}[3]
+\nextlevel[3]
+
+\condition{HELD}{a}
+\nextlevel[3]
+
+\condition{RELEASED}{a}
+\nextlevel[2]
+\msccomment[side=left]{clear queue}{a}
+\mess{CLEAR}{a}{c}[3]
+
+\nextlevel[3]
+\condition{HELD}{c}
+\nextlevel[2]
+
+\end{msc}
+\end{document}
