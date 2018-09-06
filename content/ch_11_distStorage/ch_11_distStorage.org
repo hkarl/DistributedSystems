@@ -734,6 +734,9 @@ Assumptions for graphs:
  - Consistency? depends on details! 
 
 *** Remote-write with blocking write 
+    :PROPERTIES:
+    :CUSTOM_ID: s:distStor:pb_blocking
+    :END:
 
 #+CAPTION: Primary with backup and blocking write operations
 #+ATTR_LaTeX: :width 0.9\linewidth :options page=2
