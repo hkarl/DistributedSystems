@@ -111,6 +111,10 @@
 
 #+include: "../ch_12_distTransactions/ch_12_distTransactions.org"
 
+** Dealing with failures: Consensus
+
+#+include: "../ch_14_failures/ch_14_failures.org"
+
 ** Limits of distributed data bases: NoSQL
    :PROPERTIES:
    :CUSTOM_ID: ch:nosql
@@ -118,10 +122,6 @@
 
 
 #+include: "../ch_13_nosql/ch_13_nosql.org"
-
-** Dealing with failures
-
-#+include: "../ch_14_failures/ch_14_failures.org"
 
 ** Distributed file systems
 
