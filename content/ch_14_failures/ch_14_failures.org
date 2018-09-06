@@ -1,144 +1,1003 @@
 #+BIBLIOGRAPHY: ../bib plain
 
 
+* Consensus 
+  :PROPERTIES:
+  :CUSTOM_ID: sec:distTrans:consensus
+  :END:
+
+** Modeling consensus 
+
+*** From specific protocol to general insight 
+
+- So far, we have no idea how to be *both safe and live*
+  - 2PC and 3PC made different tradeoffs, but neither achieved both
+    goals
+- Can we have both?
+  - Fiddle with protocols?
+  - Or think about the problem more systematically? 
+
+*** Consensus
+
+- What do we *really* want to achieve?
+  - An agreed-upon decision, a *consensus* 
+
+*** Intuition: Two-army problem 
+
+- Two armies, one on the valley floor; the other distributed over the
+  mountains
+- Mountain army has to agree when to attack
+- But can only use messengers, which are prone to be intercepted
+- Note: equivalent to *terminating reliable broadcast*! 
+
+
+#+CAPTION: Two-army problem
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:distTrans:two_army
+[[./figures/consensus.pdf]]
+
+
+
+
+*** Consensus formalised 
+
+- Set of processes, each process can propose 0 or 1 has desired result
+- One a process has *decided* it cannot not change that decision
+  (decision becomes visible to outside) 
+
+#+BEAMER: \pause
+
+- Requirements
+  - *Agreement*: All processes decide on the same value
+  - *Termination*: All  processes eventually decide
+  - *Validity*
+    - If all processes start with 0, both must decide for 0
+    - If all processes start with 1 *and* all messages are delivered,
+      then both must decide for 1
+    - (Validity just rules out trivial algorithms; variations exist) 
+
+
+
+** Feasible  cases 
+
+*** No failures at all 
+
+- No node failures, no messages lost, all messages arrive in bounded
+  time (*synchronous model*) 
+- Easy! 
+- E.g., every process sends its values to all other processes 
+
+
+*** Node fails, all messages arrive in bounded time 
+
+- Validity here: If all processes start with same value, all processes
+  must decide for this one 
+- Fault model: at most $f$ processes fail 
+- Idea: broadcast in $f+1$ rounds; there must be one round where
+  everybody gets every message 
+
+*** FloodSet algorithm 
+
+- Each process stores a subset W out of the valid values V 
+- Initially: W is the value that the respective process proposes 
+- After every round each process broadcasts W to all participants 
+- All received elements are added to W
+- After f +1 rounds each process decides
+  - Has W only one element, this is the result
+  - Otherwise a default value is chosen (e.g. the smallest possible
+    value v0) – validity makes no requirements for the case when there
+    is more than a single initial value! 
+
+
+*** FloodSet algorithm 
+ - Why $f +1$ rounds? 
+   - At most $f$ nodes may fail 
+   - With $f +1$ rounds, there is at least one round in which no node
+     fails
+   - Hence: in this round consensus is established 
+   - $f +1$ rounds, $O((f +1)n^2)$ messages
+ - Why not decide after two rounds? 
+   - See homework assignment 
+   - Hint: partial sending before failure
+ - Optimizations possible (exponential information gathering
+   algorithms which function also for other failure models) 
+
+
+*** Nodes are traitors, all messages arrive in bounded time 
+
+- So-called *Byzantine agreement* 
+- Solvable provided there are at least $n = 3f+1$ node available when
+  there are $f$ traitors 
+- Algorithm: see below
+  \slideref{sec:distTrans:byzt_alg}[s:distTrans:byzt_alg] 
+
+
+*** Consensus with Byzantine Processes
+
+ Correctness conditions
+ - Agreement: No two nonfaulty processes decide on different values
+ - Validity: If all nonfaulty processes start with the same value, then this value is the only valid one
+ - Termination: All nonfaulty processes eventually decide
+ - Remark: 
+ - Restriction of the validity conditions to only nonfaulty processes because conditions for the behavior of Byzantine processes make no sense 
+ - n > 3f required (triple modular redundancy not sufficient!)
+ - For failing processes such a limit does not exist!
+ - An algorithm for Byzantine processes does in general not solve the consensus problem for failing processes 
+ - Reason: In version for failing processes all processes that decide have to agree – even processes that fail after they have decided! 	
+ - 
+
+
+** Impossibility 
+
+
+*** \ac{FLP} result 
+
+**** Impossibility of consensus in asynchronous systems with node failure :B_theorem:
+     :PROPERTIES:
+     :BEAMER_env: theorem
+     :END:
+
+In an *asynchronous* system, there is *provably no deterministic* algorithm that
+allows a set of processes to find consensus on even a binary
+variable, if there could be even a *single* failing
+process. \cite{Fischer:1985:IDC:3149.214121} 
+
+
+**** Essence  
+
+- Combination of asynchrony and failure prevents consensus
+- In synchronous system, consensus is easy -- upper bound on message
+  times allows to detect failing node with certainty 
+
+
+*** FLP proof 
+
+Omitted. Too complicated. \Smiley 
+
+
+*** FLP interpretation 
+
+- Deterministic algorithms cannot *guarantee* both liveness and
+  safety in *asynchronous*, possibly *faulty* systems
+- FLP does *not* say that a practical algorithm cannot come reasonably
+  close, reasonably often
+  - Theoretically: Randomized consensus, probability of missing
+    consensus can be made arbitrarily small
+    - I.e: $P (\text{some nodes decide 0, others 1}) < \epsilon$
+    - $\epsilon$ determines round number 
+  - Practically algorithms -- PAXOS and RAFT -- up next 
+
+
+*** Further consequences 
+
+- Far reaching implication
+- E.g., reliable terminating multicast is equivalent to consensus
+  under wide set of assumptions 
+  - Needs agreement on which messages have been received by which
+    nodes
+- Hence: reliable terminating multicast is impossible to achieve
+  deterministically! 
+
+** PAXOS
+
+*** Example consensus protocol: Paxos 
+
+- Paxos is perhaps the most widely used consensus protocol in
+  practical use
+  - E.g., used in Zookeeper, Kafka, Google's Chubby,  ...
+- Sources 
+  - Original publication considered difficult to read
+    \cite{Lamport:1998:PP:279227.279229} 
+  - Followup paper tried to simplify exposition
+    \cite{paxos-made-simple}
+  - Explanation here partially follows a tutorial on Paxos
+    \cite{Meling2013}; probably most easy to read 
+
+*** Paxos 
+
+- Paxos: A *family* of consensus protocols 
+- From basic to multi to fast to Byzantine to \ldots
+  - With different trade-offs possible  (number, types of failures,
+    latency,   \ldots ) 
+  - We will only cover the basic version here 
+
+*** Assumptions  for basic Paxos 
+- Assumptions 
+  - Processors: fail-stop model, arbitrary speed; may *propose* values  
+  - Network: asynchronous, connected, loss/reordering/duplication
+    failures (but no corruption); partition are hence possible!   
+  - $2f+1$ processors for at most $f$  simultaneous failures 
+
+
+*** Basic Paxos properties 
+
+- Safety  (make no inconsistent decisions): 
+  - Only a *single* value is chosen as result 
+  - Only a *proposed* value is chosen 
+  - Only a chosen value is made public
+- Lifeness   (make progress) :
+  - FLP result still holds
+  - So Paxos sacrifices liveness (blocks on decisions) if necessary 
+
+
+*** Some initial thoughts 
+
+- We saw how safety and lifeness have to be balanced
+  - Timeouts vs. network partition problem
+- We saw how a primary/backup approach tackles some of these issues
+- Let's start from that as a strawman and see what we have to change
+  to come up with a working protocol \cite{Meling2013}
+
+*** Strawman: Primary/backup 
+
+- Strawman protocol (cp. \slideref{sec:distStor:consistency_protocols}[s:distStor:pb_blocking]) 
+  - Client talks to a primary server
+  - Primary distributes data to backup(s)
+  - Backup(s) acknowledge to primary
+  - Primary acknowledges to client 
+
+*** Strawman: Primary/backup 
+
+
+Recall figure: 
+
+#+CAPTION: Primary with backup and blocking write operations
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=2
+#+NAME: fig:distTrans:primary_blocking_write
+[[./../ch_11_distStorage/figures/updateProtocols.pdf]]
+
+*** Strawman: Use multicast to all servers 
+
+Slight modification: Clients multicast to all servers, spreading
+information 
+
+
+#+CAPTION: Primary/backup strawman with multicast
+#+ATTR_LaTeX: :width 0.65\linewidth :options page=1
+#+NAME: fig:distTrans:pb:mutlicast
+[[./figures/paxos.pdf]]
+
+
+
+
+*** Server crash in strawman? 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+- What if the primary crashes?
+- Use a leader elect protocol to a elect a new primary
+- Have new primary send replies to clients 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Primary/backup strawman: server crash 
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=2
+#+NAME: fig:distTrans:pb:server_crash 
+[[./figures/paxos.pdf]]
+
+
+*** Network partition in strawman? 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+- What if network partitions between the two leaders?
+  - Not distinguishable from crash! 
+- Leader elect protocol would elect a new leader 
+- Both leaders send back replies to clients
+  - Could be different replies!
+  - Clients see different replies in different order \Sadey 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Primary/backup strawman with network partition 
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=3
+#+NAME: fig:distTrans:pb:partition
+[[./figures/paxos.pdf]]
+
+*** Strawman: Deal with  network partition 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- Network partitions are unavoidable
+- But replies should stay consistent
+- Idea: uneven number of servers
+  - Only leader in majority partition would actually answer 
+
+****** Liveness jeopardy? 
+
+- This jeopardises liveness if minority partition are the actual
+  survivors! 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Server group to deal with network partition 
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=4
+#+NAME: fig:distTrans:pb:group_partition 
+[[./figures/paxos.pdf]]
+
+
+*** Partially healing partitions confuses 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- A partially healed partition can create additional confusion
+- Example: Server S1 -- deemed failed -- resends message to S3 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Server group with partially healed partition 
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=5
+#+NAME: fig:distTrans:pb:group_partial_parition 
+[[./figures/paxos.pdf]]
+
+
+
+*** Avoid confusion by sequence numbers 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- Server following a new leader should *promise* allegiance to the new
+  one, ignore commands from an old one
+- But old one might indeed be resurrected, and new one might fail:
+  cannot make that switch for even
+- We need a notion of sequence or /round numbers/, indicating which
+  leader is currently trusted
+  - Commands from older rounds are ignored 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Server group with round numbers 
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=6
+#+NAME: fig:distTrans:pb:mutlicast
+[[./figures/paxos.pdf]]
+
+*** From strawman to protocol 
+
+- The strawman discussion should have reminded you of essential
+  protocol mechanisms we need
+  - Timeouts and retransmissions of messages
+  - Heartbeating to help in failure detection 
+  - Uneven number of servers, to decide on a majority in case of
+    partitions
+  - Leader election
+  - Round numbers for elected leaders, to deal with switching leader
+    role back and forth 
+- We still skimmed  over a couple of details
+  - E.g., how to behave when recovering after failure
+
+#+BEAMER: \pause
+Let's see how PAXOS works in more detail! 
+
+
+*** Roles 
+- *Client*: 
+  - Makes requests to one or several proposers 
+  - One request can lead to several proposals with different values!
+  - Waits for response 
+- *Proposer*:
+  - Shepherds a client request 
+  - *Proposes* a decision value, gives it a unique, monotonically
+    increasing number  
+  - Tries to convince acceptors to agree to request  
+- *Leader*: 
+  - A special role for one proposer 
+
+*** Roles  (1) 
+
+- *Acceptor* (voter): 
+  - Keep the fault-tolerant, consistent state 
+  - Grouped into Quorums
+  - Can be part of multiple quorums for the same request 
+- *Learner*: 
+  - Carry out decisions taken by acceptors (e.g., send response to
+    client) 
+  - Multiple learners possible and typical 
+
+*** Roles vs. processes 
+
+- Typically, a physical process assumes multiple roles 
+  - Usually, proposer, acceptor, and learner combined into one process 
+- But an implementation matter
+  - Compare \cite{Chandra:2007:PML:1281100.1281103} for implementation
+    aspects 
+
+*** Action: Propose, accept, choose 
+
+- Values can be *proposed*
+  - Based on client input, typically 
+- Proposals can be *accepted*
+- Proposals accepted by a quorum are *chosen* 
+  - Cannot be undone!
+  - Multiple proposals can only be chosen if they all have the same
+    value 
+- Chosen proposals can be sent back to clients
+  - Made public
+
+
+*** Paxos: Quorums 
+
+
+- To make sure that enough information exists even in presence of
+  failures, acceptors are grouped into quorums  
+  - A quorum: A subset of acceptors 
+  - A quorum must have more than half of all acceptors (a majority)
+  - (Variations and generalizations exist) 
+- Decisions are taken by a quorum of acceptors, not by all of them 
+
+
+*** Paxos: Some intuition 
+
+See \cite{paxos-made-simple}: 
+
+- What happens if multiple proposals for a given request are made?
+  (from different proposers)  
+  - We require that at least one is accepted
+  - Simple rule: An acceptor *accepts* the *first proposal* that it
+    receives (P1) 
+  - If more than one proposal is accepted, they all must decide for
+    the same number (uniqueness)  
+
+*** Paxos accepts multiple proposals? 
+
+
+- Why not just accept one proposal and be done with it?
+
+#+BEAMER: \pause
+
+- Could stall:
+  - Five acceptors, three proposals (red, green, blue) 
+  - Red, blue proposal get to two servers each, first; green gets
+    first to remaining server
+  - No majority possible unless we allow change of mind! 
+
+*** Paxos: Some intuition 
+
+- Let’s give unique, ordered sequence numbers to proposals
+  - Proposal is hence (value, sequence number) 
+  - Uniqueness follows if, once a value $v$ for a a proposal with number
+    $N$ has been chosen, all proposals with $N^\prime > N$ choose the
+    same value $v$ (P2)  
+
+*** Paxos: Some intuition 
+
+- But P1 & P2 would fail if 
+  - some acceptor A has not received a proposal when some value $v$ is
+    chosen  
+  - A receives a slow communication with a low $N$ and another value
+    $v’$  
+- We need a stronger promise: 
+  - If a proposal with value $v$ is chosen, then every higher-numbered
+    proposal issued by any proposer has value $v$  
+  - How does a proposer ensure this? Needs to talk to acceptors, and
+    extract a promise out of them not to accept any other proposals in
+    the future!  
+
+
+*** Paxos: Normal operation 
+
+- Client sends request to proposer
+- Proposer
+  - assigns new number to request (say, $N$) 
+  - runs the $N$th instance of the algorithm by sending messages to a
+    quorum 
+  - (separate algorithm instance per request; can be optimised) 
+- Operation in rounds, each with two phases 
+  - Phase 1a: Prepare
+  - Phase 1b: Promise 
+  - Phase 2a: Accept Request 
+  - Phase 2b: Accepted 
+
+
+
+*** Paxos Phase 1: Prepare & Promise 
+
+Phase 1a: Prepare 
+  - Proposer creates proposed value $v$ with number $N$
+    - Numbers must be unique, monotonically increasing per proposer 
+  - Send ~Prepare(v,N)~ to chosen quorum 
+    - Different quorums for each request possible (and typical) 
+
+*** Paxos Phase 1: Prepare & Promise 
+
+Phase 1b: Promise 
+  - Acceptor compares received proposal number $N$ to the number of
+    any other prepare requests to which it has already responded
+  - $N$ larger than all others: Send back 
+    - a ~Promise~ not to accept any more proposals less than $N$ 
+    - the highest-numbered proposal (if any) that it already has
+      accepted
+    - Write $N$ to stable storage! 
+  - $N$ smaller than some: Do nothing 
+    - (Or send back a NACK, telling proposer that this proposal will
+      not work) 
+
+
+*** Paxos Phase 2: Accepting 
+
+Phase 2a: Proposer sends ~Accept~ request
+  - Once proposer has received promises from a quorum of
+    acceptors: send out an ~Accept~ request with  
+    - the value $v$ corresponding to highest-numbered request obtained 
+      from the promises   
+    - or with an arbitrary value, if no values were included in any
+      promise  
+
+*** Paxos Phase 2: Accepting 
+
+Phase 2b: Acceptors receive Accept request 
+  - Upon receiving an ~Accept~ request: accept value $v$ of the
+    request
+    - And write to stable storage 
+    - Unless it has sent a promise to a prepare message with a higher
+      value $N$
+  - Send  ~Learn~ message to all learners, informing about $v$
+    - To all or one, depending on fault assumptions
+    - *Distinguished learner*, to inform all other learners 
+
+
+Learning: 
+  - Upon acceptance, an acceptor can inform all learners 
+  - Learner actually accepts when it has received accept messages from
+    a quorum (with the same value, of course)  
+
+
+
+*** Paxos: Normal execution MSC 
+
+
+#+CAPTION: Paxos regular run 
+#+ATTR_LaTeX: :height 0.75\textheight :options page=7
+#+NAME: fig:distTrans:paxos:normal
+[[./figures/paxos.pdf]]
+
+
+
+*** Paxos: Proposer  fails MSC 
+
+#+CAPTION: Paxos proposer fails  
+#+ATTR_LaTeX: :height 0.75\textheight :options page=8
+#+NAME: fig:distTrans:paxos:proposer_fails 
+[[./figures/paxos.pdf]]
+
+
+*** Paxos: Battling  Proposers 
+
+#+CAPTION: Paxos proposer fails  
+#+ATTR_LaTeX: :height 0.75\textheight :options page=9
+#+NAME: fig:distTrans:paxos:battling_proposer
+[[./figures/paxos.pdf]]
+
+
+*** Solving battling proposers 
+
+- Break symmetry between multiple proposers, each trying to out-bid
+  the other 
+- A *dedicated proposer* gets preference
+  - Basically, different timer values
+  - Similar to dedicated learner 
+
+
+
+*** Things to build with Paxos 
+
+- Consensus in the strict sense
+- Replicated state machine
+  - Reliable (as far as possible), total order delivery of messages to
+    components of the replicated state machine 
+  - Building block: Log replication 
+
+
+
+*** Paxos follow-up 
+
+- Paxos paper triggered a lot of followup work (\href{http://paxos.systems/variants.html}{overview})
+- Notable:
+  - Vertical Paxos \cite{Lamport:2009:VPP:1582716.1582783}
+    - Can deal with changing configuration while consensus in progress
+  - Egalitarian Paxos \cite{Moraru:2013:MCE:2517349.2517350}
+    - Relieve leader bottleneck
+
+*** Paxos follow-up: RAFT 
+
+RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
+\href{https://raft.github.io/raft.pdf}{extended version}) 
+
+    - More restricted than Paxos, more specified in detail,
+      practically oriented, 
+      \href{https://raft.github.io}{plenty of implementations} 
+      available   
+    - Eg., proscribes that only most up-to-date server can become new
+      leader
+    - But does not address leader bottleneck issue
+    - Material 
+      - \href{http://thesecretlivesofdata.com/raft/}{Excellent 	animation} to explain RAFT
+      - \href{https://raft.github.io}{Interactive animation}
+
+
+** Log replication 
+
+
+*** How to use Paxos to build Kafka 
+
+- Recall Kafka and log aggregation in general
+  - Multiple queues, all replicated
+  - Multiple writers append to each queue
+  - We want /total order/ for each queue (everybody sees same sequence
+    of entires)
+- Adding one entry to replicate queue is a single run of Paxos
+  - I.e., agree on index where new value should sit in queue 
+
+
+
+*** Efficient log aggregation 
+
+- Running a separate Paxos per log addition is feasible, but
+  inefficient 
+- Do we really need promises for *every* new entry? Assuming proposer
+  is relatively stable?
+  - Not really: Pick a single proposer as *leader* 
+  - Can aggregate effort; better with stable leader,  worse with
+    frequently failing leader 
+- *Multi-Paxos* (already in \cite{Lamport:1998:PP:279227.279229}) 
+  - Compare \href{https://www.youtube.com/watch?v=JEpsBg0AO6o&feature=youtu.be}{Ousterhout lecture video }
+
+
+
+*** Log aggregation setup 
+
+- Each aggregator stores a replica of a queue
+- A single proposer
+- Multiple clients issue multiple append commands
+- Goals:
+  - No append is lost
+  - All replicas store appends in same order 
+
+*** Log aggregation protocol -- \href{https://ramcloud.stanford.edu/~ongaro/userstudy/paxos.pdf}{rough idea}  
+
+- Client: send append command to leader, with unique IDs 
+  - Clients can re-issue requests in case leader crashes 
+- Leader proposes order
+  - In normal operation, it just determines order -- proposals needed
+    for fault tolerance
+- Keep track of which appends-IDs go into which position 
+
+
+*** Data flow? 
+
+- Does data flow from client via proposer to all acceptors?
+  - No, bottleneck
+- Client can directly talk to all acceptors and ensure data is
+  stored there
+  - Possibly only afterwards talk to leader to get a number
+
+
+#+BEAMER: \pause
+
+- We have almost invented \ac{GFS} now -- see later for more details 
+
+
+*** Example log aggregation 
+
+- Kafka uses Zookeeper, which uses RAFT, for replication
+- 
+   \href{http://mesos.apache.org/documentation/latest/replicated-log-internals/}{Apache
+   Mesos'} replicated log component, based on Paxos
+- Corfu, intended for FLASH drives and their idiosyncrasies 
+  \cite{Balakrishnan:2013:CDS:2542150.2535930},
+  \cite{Malkhi:2012:PCF:2146382.2146391} 
+
+
+** Byzantine agreement 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:distTrans:byzt_alg
+   :END:
+
+*** An algorithm for Byzantine agreement 
+   :PROPERTIES:
+   :CUSTOM_ID: s:distTrans:byzt_alg
+   :END:
+
+
+*** n=3, f=1 does not Solve Byzantine Agreement
+ Example algorithm (no failure)
+ - Round 1: Everybody sends its own value to its neighbor
+ - 
+ - 
+ Round 2: Everybody sends value of each neighbor to the other neighbor
+
+
+
+
+ 1
+ 1
+ 0
+
+
+
+
+
+ 1
+ 0
+ 1
+ 0
+ 1
+ A
+ B
+ C
+
+
+
+
+ 1
+ 1
+ 0
+
+
+
+
+
+ B said 0
+ B said 0
+ A said 1
+ A said 1
+ C said 1
+ C said 1
+ A
+ B
+ C
+*** n=3, f=1 does not Solve Byzantine Agreement
+ Execution a1: C is faulty
+ - Round 1:  
+ Round 2: 
+
+
+
+
+
+
+
+
+
+ B said 1
+ B said 0
+ A said 1
+ A said 1
+ C said 0
+ C said 0
+ A
+ B
+ C
+
+
+
+
+
+ 1
+ 0
+ 1
+
+
+
+
+
+ 1
+ 0
+ 1
+ 0
+ 1
+ 1
+ A
+ B
+ C
+ A and B decide 1 because of validity
+*** n=3, f=1 does not Solve Byzantine Agreement
+ Execution a2: A is faulty 
+ - Round 1:  
+ Round 2: 
+
+
+
+
+ 1
+ 0
+ 0
+
+
+
+
+
+ 1
+ 0
+ 0
+ 0
+ 0
+ 1
+ A
+ B
+ C
+
+
+
+
+
+
+
+
+
+ B said 1
+ B said 0
+ A said 1
+ A said 1
+ C said 0
+ C said 0
+ A
+ B
+ C
+
+ B and C decide 0 because of validity
+*** n=3, f=1 does not Solve Byzantine Agreement
+ Execution  a3: B is faulty
+ - Round 1: 
+ Round 2: 
+
+
+
+
+ 1
+ 0
+
+
+
+
+
+ 1
+ 0
+ 0
+ 0
+ 1
+ 1
+ A
+ B
+ C
+
+
+
+
+
+
+
+
+
+
+
+ B said 1
+ B said 0
+ A said 1
+ A said 1
+ C said 0
+ C said 0
+ A
+ B
+ C
+ A and C would have to decide for the same value because of agreement
+*** n=3, f=1 does not Solve Byzantine Agreement
+ Thus: 
+ - a1 ~1 a3
+ - Process A decides 1 in a1 (because of validity condition) and therefore also in a3
+ - a2 ~3 a3
+ - Process C decides 0 in a2 and therefore also in a3 
+ - Processes A and C violate the agreement condition in a3 
+ - 
+ - This algorithm cannot solve Byzantine agreement for n = 3f
+ - Because no statement was made about the type of decision making this holds for all algorithms with this communication structure 
+ - 
+ - Argument can be extended to a proof for arbitrary algorithms with n = 3f (with arbitrary messages, rounds) 
+ - 
+*** Byzantine agreement for n > 4f with 2(f+1) rounds 
+
+*** Example: n=5, f=1, 2(1+1) rounds, 2nd proc is traitor
+
+*** Powerful algorithms for Byzantine Agreement: EIG 
+
+ - To achieve bound n > 3f for Byzantine Agreement, better algorithms needed (which exist)
+ - 
+ - Popular: Exponential Information Gathering 
+ - Each node builds a tree of all the information all other nodes have achieved in all previous rounds 
+ - Complex information exchange among nodes 
+ - Relatively complex decisions rules
+
+
+
+*** Odds and ends 
+
+ - Life Beyond Distributed Transactions: https://queue.acm.org/detail.cfm?id=3025012 
+
+
+
+* Case studies 
+
+- ZK/ZAB
+- Chubby 
+- etcd 
+
+
+
+
+* Summary 
+  
+*** Summary 
+
+
+* OLD 
+
 Issue: Leader election under Dealing with failues? Maybe move up to a
 better place? 
-
-** Distributed mutual exclusion 
-
-*** Mutual exclusion in distributed systems
- Problem of mutual exclusion: when processes execute concurrently, there may be crucial portions of code which may only be executed by at most one process at any one time 
- - This/these piece(s) of code form a so-called critical region
- - In non-distributed systems: semaphores to protect such critical regions 
- - But this does not directly carry over to distributed systems! 
- - 
- - Options
- - Centralized algorithm
- - Distributed algorithm 
- - Token-Ring-based algorithm 
-*** A centralized algorithm for mutual exclusion 
- Run a leader election algorithm, determine a coordinator for a critical region 
- - Known to everybody
- - Coordinator holds a token for the critical region 
- - Node who wants to enter into the region sends message to coordinator
- - If coordinator owns token, send it
- - Else, put request into a queue 
- - After leaving the critical region, send back token to coordinator 
- - 
-*** Example: Mutual-Exclusion-Server
-
- p1
- p2
- p3
- p4
- Server
-
- Request 
- -           token
-
- 2. Grant 
- -   token
-
- 3. Request 
- -           token
- 4
- Queue of
- - requests
-
-
- 4. Request 
- -     token
- 2
-
- 5. Release  token
-
- 6. Grant  token
-
- Token
-
-*** Properties
- Mutual exclusion is achieved
- - Fair – requests are served in order 
- - Easy to implement
- - Per access to critical region, only three messages are required  
- Coordinator is single point of failure
- - When a requester is blocked, impossible to distinguish between a failed coordinator and a long queue
- - Coordinator becomes a performance bottleneck in large systems 
- - In particular when serving more than one critical region 
-*** Distributed mutual exclusion
- How to achieve mutual exclusion without a coordinator? 
- - 
- - All processes use multicast 
- - All processes have a logical clock 
- - When trying to enter into the critical region
- - Send a request to all other nodes
- - All other nodes have to agree to such a request before a node may enter critical region 
-*** Example distributed mutual exclusion (1)
- p1
- p2
- p3
-
-
-
- Timestamp = 8
- 8
- 8
- Timestamp = 12
- 12
- 12
- Prozesses p1 and p3 want to enter critical region
- Prozess p1 has smallest timestamp and wins
-*** Example distributed mutual exclusion(2)
- p1
- p2
- p3
- OK
- OK
- OK
- Prozess p1 has smallest timestamp and wins
- p1 enters critical region
-*** Example distributed mutual exclusion (3)
- p1
- p2
- p3
- OK
- Once prozess p1 is done, it leaves critical region and sends OK to p3.
- p1 leaves critical region
-   p3 enters critical region
- Any problems if these messages are not delivered in atomic order???
-*** Algorithm (Ricart and Agrawala, 1981)
- On initialization
- - 	state := RELEASED; 
- - To enter the section
- - 	state := WANTED;
- - 	Multicast request to all processes;		
- - 	T := request’s timestamp;
- - 	Wait until (number of replies received = (N – 1));
- - 	state := HELD;
- - 
- - On receipt of a request <Ti , pi> at pj (i $\not =$ j)
- - 	if  (state = HELD or (state = WANTED and (T, pj) < (Ti, pi)))
- - 	then 
- - 		queue request from pi without replying; 
- - 	else 
- - 		reply immediately to pi;
- - 	end if
- - To exit the critical section
- - 	state := RELEASED;
- - 	reply to all queued requests;
-*** Properties of distributed mutual exclusion 
- In simple form, each node turns into a single point of failure 
- - N of them, instead of just one
- - Can be overcome by using additional protocol mechanisms
- - E.g., a more powerful group communication protocol! With terminating reliable multicast 
- - Each process is involved in decision about access to critical region, even if not interested 
- - Possible improvement: simple majority suffices 
- - In total: slower, more complicated, more expensive, less robust
- - 
- - 
- - “Finally, like eating spinach and learning Latin in high school, some things are said to be good for you in some abstract way.” (Tanenbaum) 
- - 
-*** Comparison mutual exclusion
 
 
 ** Chubby  lock service 
