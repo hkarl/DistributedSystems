@@ -108,10 +108,16 @@
 #+include: "../ch_11_distStorage/ch_11_distStorage.org"
 
 ** Distributed transactions
+   :PROPERTIES:
+   :CUSTOM_ID: ch:distTrans
+   :END:
 
 #+include: "../ch_12_distTransactions/ch_12_distTransactions.org"
 
 ** Dealing with failures: Consensus
+   :PROPERTIES:
+   :CUSTOM_ID: ch:consensus
+   :END:
 
 #+include: "../ch_14_failures/ch_14_failures.org"
 
