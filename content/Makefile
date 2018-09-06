@@ -59,7 +59,7 @@ book.pdf: book.tex
 
 #########################
 
-chapter: slides # slides169 handout 
+chapter: slides handout  # slides169 
 
 quick:
 	quick=True make slides
