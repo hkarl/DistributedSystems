@@ -1269,6 +1269,21 @@ Nodes are replicated, access is:
 
 
 
+
+** Chubby  lock service 
+
+*** Auxiliary service: Chubby lock service  
+- Chubby \cite{Burrows:2006:CLS:1298455.1298487}
+- Precursor to Zookeeper, Google-internal project
+- Based on Paxos consensus (cp.  Section
+  \slideref{sec:consensus:paxos})  
+- Goals: Provide distributed locking for
+  - Moderately large number of clients (around 10.000)
+  - High dependability
+  - File-system like interface
+  - Advisory locks, event notification 
+- Architecture: similar to Zookeeper (which evolved out of Chubby) 
+
 *  Summary 
 
 *** Summary 
