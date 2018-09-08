@@ -1,0 +1,40 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{adjustbox}
+\usepackage{marvosym}
+\begin{document}
+
+% tikzpicture is just necessary to get the bounding box width righ 
+\begin{tikzpicture}
+  \node {\begin{tabular}{llccccrr}
+\toprule
+\multicolumn{2}{}{} & 
+\multicolumn{4}{c}{Message ordering}  & 
+\multicolumn{2}{}{} 
+\\
+\multicolumn{2}{}{} & 
+\multicolumn{2}{c}{Unordered} &
+\multicolumn{2}{c}{Ordered} & 
+\multicolumn{2}{}{}  \\
+\midrule 
+ \multirow{4}{*}{\rotatebox{90}{Process}} & \multirow{2}{*}{Synchronous} & ok& ok & ok & ok & \multirow{2}{*}{Bounded} & \multirow{4}{*}{\rotatebox{90}{Delay}} \\
+  && \Lightning & \Lightning  &  ok & ok && \\
+%--------
+  & \multirow{2}{*}{Asynchronous} & \Lightning &\Lightning  & \Lightning & ok &\multirow{2}{*}{Unbounded}& \\
+  &&  \Lightning  & \Lightning  & \Lightning  & ok  && \\
+\midrule 
+  && Unicast & Multicast & Unicast & Multicast && \\
+\multicolumn{2}{}{} & 
+\multicolumn{4}{c}{Message transmission}  & 
+\multicolumn{2}{}{} 
+\\
+\bottomrule
+\end{tabular}};
+\end{tikzpicture}
+
+
+\end{document}

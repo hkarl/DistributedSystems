@@ -3,10 +3,10 @@
 
 * Consensus 
   :PROPERTIES:
-  :CUSTOM_ID: sec:distTrans:consensus
+  :CUSTOM_ID: sec:consensus:consensus
   :END:
 
-** Modeling consensus 
+* Modeling consensus 
 
 *** From specific protocol to general insight 
 
@@ -33,7 +33,7 @@
 
 #+CAPTION: Two-army problem
 #+ATTR_LaTeX: :width 0.75\linewidth
-#+NAME: fig:distTrans:two_army
+#+NAME: fig:consensus:two_army
 [[./figures/consensus.pdf]]
 
 
@@ -58,7 +58,7 @@
 
 
 
-** Feasible  cases 
+* Feasible  cases                                                  :noexport:
 
 *** No failures at all 
 
@@ -105,11 +105,11 @@
 
 *** Nodes are traitors, all messages arrive in bounded time 
 
-- So-called *Byzantine agreement* 
+- So-called *Byzantine agreement*  \cite{Lamport:1982:BGP:357172.357176}
 - Solvable provided there are at least $n = 3f+1$ node available when
   there are $f$ traitors 
 - Algorithm: see below
-  \slideref{sec:distTrans:byzt_alg}[s:distTrans:byzt_alg] 
+  \slideref{sec:consensus:byzt_alg}[s:consensus:byzt_alg] 
 
 
 *** Consensus with Byzantine Processes
@@ -127,7 +127,7 @@
  - 
 
 
-** Impossibility 
+* Impossibility 
 
 
 *** \ac{FLP} result 
@@ -178,7 +178,22 @@ Omitted. Too complicated. \Smiley
 - Hence: reliable terminating multicast is impossible to achieve
   deterministically! 
 
-** PAXOS
+
+*** Summary impossible cases 
+
+#+CAPTION: A summary of possible and impossible cases for consensus (following \cite[Fig. 8.17]{Tanenbaum:2006:DSP:1202502}) 
+#+ATTR_LaTeX: :width 0.9\linewidth 
+#+NAME: fig:consensus:imposible_summary
+[[./figures/impossible.pdf]]
+
+
+* PAXOS                                                            :noexport:
+  :PROPERTIES:
+  :CUSTOM_ID: sec:consensus:paxos
+  :END:
+
+
+** Reference algorithm 
 
 *** Example consensus protocol: Paxos 
 
@@ -220,6 +235,9 @@ Omitted. Too complicated. \Smiley
   - So Paxos sacrifices liveness (blocks on decisions) if necessary 
 
 
+
+** Strawman 
+
 *** Some initial thoughts 
 
 - We saw how safety and lifeness have to be balanced
@@ -243,7 +261,7 @@ Recall figure:
 
 #+CAPTION: Primary with backup and blocking write operations
 #+ATTR_LaTeX: :width 0.9\linewidth :options page=2
-#+NAME: fig:distTrans:primary_blocking_write
+#+NAME: fig:consensus:primary_blocking_write
 [[./../ch_11_distStorage/figures/updateProtocols.pdf]]
 
 *** Strawman: Use multicast to all servers 
@@ -254,7 +272,7 @@ information
 
 #+CAPTION: Primary/backup strawman with multicast
 #+ATTR_LaTeX: :width 0.65\linewidth :options page=1
-#+NAME: fig:distTrans:pb:mutlicast
+#+NAME: fig:consensus:pb:mutlicast
 [[./figures/paxos.pdf]]
 
 
@@ -288,7 +306,7 @@ information
 
 #+CAPTION: Primary/backup strawman: server crash 
 #+ATTR_LaTeX: :width 0.85\linewidth :options page=2
-#+NAME: fig:distTrans:pb:server_crash 
+#+NAME: fig:consensus:pb:server_crash 
 [[./figures/paxos.pdf]]
 
 
@@ -320,7 +338,7 @@ information
 
 #+CAPTION: Primary/backup strawman with network partition 
 #+ATTR_LaTeX: :width 0.85\linewidth :options page=3
-#+NAME: fig:distTrans:pb:partition
+#+NAME: fig:consensus:pb:partition
 [[./figures/paxos.pdf]]
 
 *** Strawman: Deal with  network partition 
@@ -353,7 +371,7 @@ information
 
 #+CAPTION: Server group to deal with network partition 
 #+ATTR_LaTeX: :width 0.85\linewidth :options page=4
-#+NAME: fig:distTrans:pb:group_partition 
+#+NAME: fig:consensus:pb:group_partition 
 [[./figures/paxos.pdf]]
 
 
@@ -381,7 +399,7 @@ information
 
 #+CAPTION: Server group with partially healed partition 
 #+ATTR_LaTeX: :width 0.85\linewidth :options page=5
-#+NAME: fig:distTrans:pb:group_partial_parition 
+#+NAME: fig:consensus:pb:group_partial_parition 
 [[./figures/paxos.pdf]]
 
 
@@ -414,9 +432,11 @@ information
 
 #+CAPTION: Server group with round numbers 
 #+ATTR_LaTeX: :width 0.85\linewidth :options page=6
-#+NAME: fig:distTrans:pb:mutlicast
+#+NAME: fig:consensus:pb:mutlicast
 [[./figures/paxos.pdf]]
 
+
+** Protocol 
 *** From strawman to protocol 
 
 - The strawman discussion should have reminded you of essential
@@ -539,6 +559,8 @@ See \cite{paxos-made-simple}:
     the future!  
 
 
+
+** Normal operation 
 *** Paxos: Normal operation 
 
 - Client sends request to proposer
@@ -613,16 +635,18 @@ Learning:
 
 #+CAPTION: Paxos regular run 
 #+ATTR_LaTeX: :height 0.75\textheight :options page=7
-#+NAME: fig:distTrans:paxos:normal
+#+NAME: fig:consensus:paxos:normal
 [[./figures/paxos.pdf]]
 
 
+
+** Operation with failures 
 
 *** Paxos: Proposer  fails MSC 
 
 #+CAPTION: Paxos proposer fails  
 #+ATTR_LaTeX: :height 0.75\textheight :options page=8
-#+NAME: fig:distTrans:paxos:proposer_fails 
+#+NAME: fig:consensus:paxos:proposer_fails 
 [[./figures/paxos.pdf]]
 
 
@@ -630,7 +654,7 @@ Learning:
 
 #+CAPTION: Paxos proposer fails  
 #+ATTR_LaTeX: :height 0.75\textheight :options page=9
-#+NAME: fig:distTrans:paxos:battling_proposer
+#+NAME: fig:consensus:paxos:battling_proposer
 [[./figures/paxos.pdf]]
 
 
@@ -653,6 +677,8 @@ Learning:
   - Building block: Log replication 
 
 
+
+** Follow-up 
 
 *** Paxos follow-up 
 
@@ -680,7 +706,7 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
       - \href{https://raft.github.io}{Interactive animation}
 
 
-** Log replication 
+* Log replication                                                  :noexport:
 
 
 *** How to use Paxos to build Kafka 
@@ -753,265 +779,413 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
   \cite{Malkhi:2012:PCF:2146382.2146391} 
 
 
-** Byzantine agreement 
+* Byzantine agreement 
    :PROPERTIES:
-   :CUSTOM_ID: sec:distTrans:byzt_alg
-   :END:
-
-*** An algorithm for Byzantine agreement 
-   :PROPERTIES:
-   :CUSTOM_ID: s:distTrans:byzt_alg
+   :CUSTOM_ID: sec:consensus:byzt_alg
    :END:
 
 
-*** n=3, f=1 does not Solve Byzantine Agreement
- Example algorithm (no failure)
- - Round 1: Everybody sends its own value to its neighbor
- - 
- - 
+*** Byzantine agreement 
+   :PROPERTIES:
+   :CUSTOM_ID: s:consensus:byzt_alg
+   :END:
+
+
+- So far: benign failure model (fail stop) 
+- What if failures are due to attacks, corruption, strange
+  malfunction, ...?
+- Consensus still possible?
+
+#+BEAMER: \pause
+
+- Plausible expectations?
+  - Surely no consensus with arbitrary number of compromised nodes
+  - No expectations towards compromised nodes plausible 
+
+*** Formally 
+
+- *Agreement*: No two *nonfaulty* processes decide on different values  
+- *Validity*: If all *nonfaulty* processes start with the same value,
+  then this value is the only valid one 
+- *Termination*: All *nonfaulty* processes eventually decide
+
+*** Remarks 
+
+- Faulty nodes can behave as they like
+  - Hence, validity restricted to nonfaulty nodes 
+- Algorithm for Byzantine agreement not necessarily good for
+  consensus with failing processes 
+
+*** Triple modular redundancy 
+
+- Possibly natural expectation: each faulty node has to outvoted by
+  two correct nodes
+  - Hence: for $f$ faulty nodes, $3f$ nodes in total suffices
+  - So-called *\ac{TMR}*
+
+#+BEAMER: \pause
+- Actually: not true!
+  - Following slides give an idea why not 
+
+*** TMR example 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- Let us consider a simple three-node scenario
+- Every node talks to every other node 
+- One node might be faulty 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: TMR counterexample setup
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=1
+#+NAME: fig:consensus:tmr:setup
+[[./figures/byzantine.pdf]]
+
+
+
+
+*** Normal run 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+Round 1: Everybody sends its own value to its neighbor
+
+
+#+CAPTION: TMR counterexample: normal run, step 1
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+NAME: fig:consensus:tmr:normal1
+[[./figures/byzantine.pdf]]
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
  Round 2: Everybody sends value of each neighbor to the other neighbor
 
+#+CAPTION: TMR counterexample: normal run, step 2
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+NAME: fig:consensus:tmr:normal2
+[[./figures/byzantine.pdf]]
 
 
 
- 1
- 1
- 0
+*** C is faulty  
 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
+Round 1
 
 
- 1
- 0
- 1
- 0
- 1
- A
- B
- C
+#+CAPTION: TMR counterexample: C faulty , step 1
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=4
+#+NAME: fig:consensus:tmr:Cfaulty1
+[[./figures/byzantine.pdf]]
 
 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
 
- 1
- 1
- 0
+Round 2
 
+#+CAPTION: TMR counterexample: C faulty , step 2
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=5
+#+NAME: fig:consensus:tmr:Cfaulty2
+[[./figures/byzantine.pdf]]
 
 
+*** Additional rounds? 
 
+- Note: Additional rounds would not help
+- Correct nodes cannot send more information
+- Faulty nodes just could spread more confusion 
 
- B said 0
- B said 0
- A said 1
- A said 1
- C said 1
- C said 1
- A
- B
- C
-*** n=3, f=1 does not Solve Byzantine Agreement
- Execution a1: C is faulty
- - Round 1:  
- Round 2: 
+*** A is faulty  
 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
+Round 1
 
 
+#+CAPTION: TMR counterexample: A faulty , step 1
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=6
+#+NAME: fig:consensus:tmr:Afaulty1
+[[./figures/byzantine.pdf]]
 
 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
 
- B said 1
- B said 0
- A said 1
- A said 1
- C said 0
- C said 0
- A
- B
- C
+Round 2
 
+#+CAPTION: TMR counterexample: A faulty , step 2
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=7
+#+NAME: fig:consensus:tmr:Afaulty2
+[[./figures/byzantine.pdf]]
 
 
 
 
- 1
- 0
- 1
 
+*** B is faulty  
 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
+Round 1
 
- 1
- 0
- 1
- 0
- 1
- 1
- A
- B
- C
- A and B decide 1 because of validity
-*** n=3, f=1 does not Solve Byzantine Agreement
- Execution a2: A is faulty 
- - Round 1:  
- Round 2: 
 
+#+CAPTION: TMR counterexample: B faulty , step 1
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=8
+#+NAME: fig:consensus:tmr:Bfaulty1
+[[./figures/byzantine.pdf]]
 
 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
- 1
- 0
- 0
 
+Round 2
 
+#+CAPTION: TMR counterexample: B faulty , step 2
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=8
+#+NAME: fig:consensus:tmr:Bfaulty2
+[[./figures/byzantine.pdf]]
 
 
 
- 1
- 0
- 0
- 0
- 0
- 1
- A
- B
- C
 
 
 
+*** Taking stock: Decisions  
 
+\small 
+#+CAPTION: Taking stock of TMR -- decisions 
+#+ATTR_LATEX: :align lllp{0.2\linewidth}
+| Case     | Round 1                                                              | Round 2                                                              | Observation             |
+|----------+----------------------------------------------------------------------+----------------------------------------------------------------------+-------------------------|
+| Normal   | \includegraphics[valign=c,width=0.2\linewidth,page=2]{figures/byzantine.pdf}  | \includegraphics[valign=c,width=0.2\linewidth,page=3]{figures/byzantine.pdf} | All decide 0 or 1       |
+| C faulty | \includegraphics[valign=c,width=0.2\linewidth,page=4]{figures/byzantine.pdf} | \includegraphics[valign=c,width=0.2\linewidth,page=5]{figures/byzantine.pdf} | A, B decide 1, validity |
+| A faulty | \includegraphics[valign=c,width=0.2\linewidth,page=6]{figures/byzantine.pdf} | \includegraphics[valign=c,width=0.2\linewidth,page=7]{figures/byzantine.pdf} | B, C decide 0, validity |
+| B faulty | \includegraphics[valign=c,width=0.2\linewidth,page=8]{figures/byzantine.pdf} | \includegraphics[valign=c,width=0.2\linewidth,page=9]{figures/byzantine.pdf} | A, C same (0 or 1)      |
 
+*** Taking stock: Distinguishable 
 
+Right columns show which cases are indistinguishable for each node 
 
+\small 
+#+CAPTION: Taking stock of TMR -- indistinguishable cases 
+#+ATTR_LATEX: :align lllccc
+| Case     | Round 1                                                              | Round 2                                                              | A | B | C |
+|----------+----------------------------------------------------------------------+----------------------------------------------------------------------+---+---+---|
+| Normal   | \includegraphics[valign=c, width=0.2\linewidth,page=2]{figures/byzantine.pdf} | \includegraphics[valign=c, width=0.2\linewidth,page=3]{figures/byzantine.pdf} |   |   |   |
+| C faulty | \includegraphics[valign=c, width=0.2\linewidth,page=4]{figures/byzantine.pdf} | \includegraphics[valign=c, width=0.2\linewidth,page=5]{figures/byzantine.pdf} | x |   |   |
+| A faulty | \includegraphics[valign=c, width=0.2\linewidth,page=6]{figures/byzantine.pdf} | \includegraphics[valign=c, width=0.2\linewidth,page=7]{figures/byzantine.pdf} |   |   | x |
+| B faulty | \includegraphics[valign=c, width=0.2\linewidth,page=8]{figures/byzantine.pdf} | \includegraphics[valign=c, width=0.2\linewidth,page=9]{figures/byzantine.pdf} | x |   | x |
 
 
- B said 1
- B said 0
- A said 1
- A said 1
- C said 0
- C said 0
- A
- B
- C
 
- B and C decide 0 because of validity
-*** n=3, f=1 does not Solve Byzantine Agreement
- Execution  a3: B is faulty
- - Round 1: 
- Round 2: 
 
 
+*** n=3, f=1 does not solve Byzantine Agreement
 
+- Process A  
+  - Decides 1 in case "C faulty"  (because of validity)
+  - Cannot distinguish case "C faulty" and "B faulty"
+  - Hence decides 1 in case "B faulty"
+- Process C
+  - Decides 0 in case "A faulty" (because of validity)
+  - Cannot distinguish case "A faulty" and "B faulty"
+  - Hence decides 0 in case "B faulty"
+- But: Agreement forces A, C to decide the same in case "B faulty"
 
- 1
- 0
+*** n=3, f=1 does not solve Byzantine Agreement
 
+- So: A decides 1 if and only if decides 0 
+- *Contradiction* 
+  - Not a formal proof, but the core idea
+  - We made no assumptions about communication structure, algorithm,
+    etc. 
 
+*** Synchronous Byzantine agreement algorithm 
 
+- As one example: Byzantine agreement in a *synchronous* setting \cite{Berman1989}
+  - With $n> 4f$ nodes, in $2(f+1)$ rounds, constant message size
+- Idea: Do rounds of two phases
+  - In each round, one node becomes /king/ for that round
+  - Collects and redistributes data
+  - Enough information exchanged to overrule traitors 
 
 
- 1
- 0
- 0
- 0
- 1
- 1
- A
- B
- C
+*** Algorithm pseudocode 
 
+#+BEGIN_SRC python
+def vote(id, initial_vote, num_proc, f):
+    preference = [None] * num_proc
+    preference[id] = initial_vote
 
+    for k in range(f+1):
+        # odd phase:
+        broadcast (preference[id])
+        preference[j] = receive_from(j) for j <> id
+        majority_pref = most often value in perference
+        multiplicity = number of occurences of majority_preference
 
+	# even phase - next slide
+#+END_SRC
 
 
+*** Algorithm pseudocode 
+        
+#+BEGIN_SRC python
+    for k in range(f+1): 
+        # odd phase: 
+        # ... 
 
+        # even phase: 
+        if id == k:
+            broadcast majority_preference
+        king_majority = receive from process k
+            # possibly from yourself
 
+        if mulitplicity > num_proc/2 + f:
+            preference[id] = majority_pref
+        else:
+            preference[id] = king_majority
 
+    decide for preference[id]
+#+END_SRC
 
+*** Example: n=5, f=1, 2(1+1) rounds (odd and even), 2nd node is traitor
 
 
- B said 1
- B said 0
- A said 1
- A said 1
- C said 0
- C said 0
- A
- B
- C
- A and C would have to decide for the same value because of agreement
-*** n=3, f=1 does not Solve Byzantine Agreement
- Thus: 
- - a1 ~1 a3
- - Process A decides 1 in a1 (because of validity condition) and therefore also in a3
- - a2 ~3 a3
- - Process C decides 0 in a2 and therefore also in a3 
- - Processes A and C violate the agreement condition in a3 
- - 
- - This algorithm cannot solve Byzantine agreement for n = 3f
- - Because no statement was made about the type of decision making this holds for all algorithms with this communication structure 
- - 
- - Argument can be extended to a proof for arbitrary algorithms with n = 3f (with arbitrary messages, rounds) 
- - 
-*** Byzantine agreement for n > 4f with 2(f+1) rounds 
-
-*** Example: n=5, f=1, 2(1+1) rounds, 2nd proc is traitor
+|          | Node          |     1 | 2       |     3 |     4 |     5 |
+|          | Vote          |     7 | #       |     3 |     3 |     2 |
+| Round    | Preferences   | 7---- | #       | --3-- | ---3- | ----2 |
+|----------+---------------+-------+---------+-------+-------+-------|
+| 1a       | Preferences   | 77332 | #       | 72332 |  7332 | 72332 |
+|          | Majority      |     7 | #       |     2 |     3 |     2 |
+|          | Multiplicity  |     2 | #       |     2 |     3 |     2 |
+|----------+---------------+-------+---------+-------+-------+-------|
+| 1b       | King majority |     7 |         |       |       |       |
+|          | Preference    | 77332 |         | 72732 | 73372 | 72337 |
+|----------+---------------+-------+---------+-------+-------+-------|
+| 2a       | Preferences   | 72777 |         | 75777 | 73777 | 73777 |
+|          | Majority      |     7 |         |     7 |     7 |     7 |
+|          | Multiplicity  |     4 |         |     4 |     4 |     4 |
+|----------+---------------+-------+---------+-------+-------+-------|
+| 2b       | King majority |       | 1,2,3,4 |       |       |       |
+|          | Preference    | 72777 |         | 75777 | 73777 | 73777 |
+|----------+---------------+-------+---------+-------+-------+-------|
+| Decision |               |     7 |         |     7 |     7 |     7 |
 
 *** Powerful algorithms for Byzantine Agreement: EIG 
 
- - To achieve bound n > 3f for Byzantine Agreement, better algorithms needed (which exist)
- - 
+ - To achieve bound $n > 3f$ for Byzantine Agreement, better
+   algorithms needed (which exist) 
  - Popular: Exponential Information Gathering 
- - Each node builds a tree of all the information all other nodes have achieved in all previous rounds 
+ - Each node builds a tree of all the information all other nodes have
+   achieved in all previous rounds  
  - Complex information exchange among nodes 
  - Relatively complex decisions rules
+ - Overall, complicated problem with many variants (cp. e.g. \cite{7780366}) 
 
 
 
-*** Odds and ends 
+*** Practical Byzantine Agreement 
 
- - Life Beyond Distributed Transactions: https://queue.acm.org/detail.cfm?id=3025012 
+- View-change based approach to Byzantine Agreement
+  \cite{Castro:2002:PBF:571637.571640}
+- Assumes all messages are authenticated (source of a message is
+  always clear, even for messages from traitor)
+  - Simplifies problem 
+- Also works for $n> 3f$, weak synchrony needed for liveness
+  - I.e., with arbitrary message delays, algorithm can get stuck
+  - But it is safe, will never make a wrong decision 
 
+   
 
-
+ 
 * Case studies 
 
-- ZK/ZAB
-- Chubby 
-- etcd 
+*** System so far 
 
-
-
+- Zookeeper, Chubby: Use Paxos to ensure consistent states
+- Filesystems (Ceph, XtreemFS) use Paxos-based approach 
+- \href{https://github.com/etcd-io/etcd}{etcd} (distributed, reliable
+  key/value-store) uses RAFT   
+- Raft: Plenty of implementations available 
 
 * Summary 
   
 *** Summary 
 
 
-* OLD 
-
-Issue: Leader election under Dealing with failues? Maybe move up to a
-better place? 
-
-
-** Chubby  lock service 
-
-*** Auxiliary service: Chubby lock service  
- 25
- M. Burrows, The Chubby lock service for loosely-coupled distributed systems, proc. of OSDI 2006
-*** Chubby design rationale 
- 26
-*** Chubby system structure 
- 27
+- Achieving  consensus is perhaps *the* core problem of distributed
+  systems
+  - Essential building block for many design approaches, like state
+    machine replication, atomic multicast, ... 
+- Its impossibility in general settings in unavoidable
+  - Intricacies: node failures, delayed messages, network partition 
+- Even in restricted settings, it is a complicated algorithmic problem
+  - Leading to algorithms like Paxos and RAFT
+- The complexity of solving it is the reason for the existence of
+  systems like Chubby, Zookeeper, and others 
 
 
-** Alternative: Zookeeper as support system 
-
--
-  https://www.igvita.com/2010/04/30/distributed-coordination-with-zookeeper/ 

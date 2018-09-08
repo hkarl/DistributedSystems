@@ -1,0 +1,123 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary[intersections]
+\usepackage{skull}
+\begin{document}
+
+\newcommand{\byzgraph}{
+\node [circle, draw] (a)  {A}; 
+\node [circle, draw] (b) at (2, 2*1.73/2) {B}; 
+\node [circle, draw] (c) at (4, 0) {C}; 
+
+\coordinate (al) at ([xshift=-0.5cm, yshift=-0.5cm]a.south west); 
+\coordinate (bl) at ([xshift=+0.5cm, yshift=+0.5cm]b.north east); 
+\coordinate (cl) at ([xshift=+0.5cm, yshift=-0.5cm]c.south east); 
+
+\draw [-> ] (a) to [bend left] node [midway, auto, outer sep = 5pt] (ab)  {} (b); 
+\draw [->] (b)  to [bend left] node [midway, auto, outer sep = 5pt] (bc)  {}  (c); 
+\draw [->] (c)  to [bend left]  node [midway, auto, outer sep = 5pt] (ca)  {}  (a); 
+
+\draw [-> ] (a)  to node [midway, auto, outer sep = 5pt] (ac)  {}  (c); 
+\draw [->] (c)   to node [midway, auto, outer sep = 5pt] (cb)  {}  (b); 
+\draw [->] (b) to node [midway, auto, outer sep = 5pt] (ba)  {}  (a); 
+
+% test nodes:  
+% \node at (ac) {XY}; 
+% \node at (ab) {XY}; 
+% \node at (bc) {XY}; 
+% \node at (ba) {XY}; 
+% \node at (ca) {XY}; 
+% \node at (cb) {XY}; 
+% \node at (al) {XY}; 
+% \node at (bl) {XY}; 
+% \node at (cl) {XY}; 
+}
+
+\newcommand{\nodelabels}[3]{
+\node [draw] at (al) {#1}; 
+\node [draw] at (bl) {#2}; 
+\node [draw] at (cl) {#3}; 
+}
+
+\newcommand{\edgelabels}[6]{
+\node at (ab) {#1}; 
+\node at (ac) {#2}; 
+\node at (ba) {#3}; 
+\node at (bc) {#4}; 
+\node at (ca) {#5}; 
+\node at (cb) {#6}; 
+}
+
+\begin{tikzpicture}
+\byzgraph
+\nodelabels{1}{0}{1}
+\end{tikzpicture}
+
+%------- regular case: 
+
+\begin{tikzpicture}
+\byzgraph
+\nodelabels{1}{0}{1}
+\edgelabels{1}{1}{0}{0}{1}{1}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\byzgraph
+\nodelabels{1}{0}{1}
+\edgelabels{C: 1}{B: 1}{C: 0}{A: 0}{B: 1}{A: 1}
+\end{tikzpicture}
+
+% -----   C faulty 
+
+\begin{tikzpicture}
+\byzgraph
+\nodelabels{1}{1}{0}
+\edgelabels{1}{1}{1}{1}{0}{0}
+\node [red, fill=white, draw] at (cl) {$\skull$}; 
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\byzgraph
+\nodelabels{1}{1}{0}
+\edgelabels{C: 0}{B: 1}{C: 1}{A: 1}{\textcolor{red}{B: 0}}{A: 1}
+\node [red, fill=white, draw] at (cl) {$\skull$}; 
+\end{tikzpicture}
+
+% ----- A is faulty 
+
+\begin{tikzpicture}
+\byzgraph
+\nodelabels{x}{0}{0}
+\edgelabels{1}{1}{0}{0}{0}{0}
+\node [red, fill=white, draw] at (al) {$\skull$}; 
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\byzgraph
+\nodelabels{x}{0}{0}
+\edgelabels{C: 0}{\textcolor{red}{B: 1}}{C: 0}{A: 1}{B: 0}{A: 1}
+\node [red, fill=white, draw] at (al) {$\skull$}; 
+\end{tikzpicture}
+
+
+% ----- B is faulty 
+
+\begin{tikzpicture}
+\byzgraph
+\nodelabels{1}{x}{0}
+\edgelabels{1}{1}{\textcolor{red}{C: 1}}{\textcolor{red}{A: 0}}{0}{0}
+\node [red, fill=white, draw] at (bl) {$\skull$}; 
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\byzgraph
+\nodelabels{1}{x}{0}
+\edgelabels{C: 0}{B: 1}{C: 0}{A: 1}{B: 0}{A: 1}
+\node [red, fill=white, draw] at (bl) {$\skull$}; 
+\end{tikzpicture}
+
+
+
+\end{document}
