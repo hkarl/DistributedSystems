@@ -37,6 +37,8 @@ content/ch*/ch*-handout.pdf
 content/ch*/figures/*.pdf
 content/ch*/figures/*/*.pdf
 content/ch*/ch*.tex
+content/*.rel
+content/figures/*.rel
 
 
 # Intermediate files, perhaps useful later
