@@ -1114,6 +1114,7 @@ def vote(id, initial_vote, num_proc, f):
 
 *** Example: n=5, f=1, 2(1+1) rounds (odd and even), 2nd node is traitor
 
+\tiny
 
 |          | Node          |     1 | 2       |     3 |     4 |     5 |
 |          | Vote          |     7 | #       |     3 |     3 |     2 |
