@@ -243,3 +243,4 @@ TSWLatexianTemp*
 
 # expex forward references with \gathertags
 *-tags.tex
+/content/templates/msc.pdf
