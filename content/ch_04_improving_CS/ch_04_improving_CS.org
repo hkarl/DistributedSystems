@@ -880,6 +880,20 @@ Idea: inform DNS about multiple IP addresses  for the same name
 [[./figures/LB.pdf]]
 
 
+*** TODO Direct Server Return                                      :noexport:
+
+D. E. Eisenbud, C. Yi, C. Contavalli, C. Smith, R. Kononov, E. Mann-
+Hielscher, A. Cilingiroglu, B. Cheyney, W. Shang, and
+J. D. Hosein. Maglev: A fast and reliable software network load
+balancer. In 13th USENIX Symposium on Networked Systems Design and
+Implementation (NSDI 16), 2016.
+
+P. Patel, D. Bansal, L. Yuan, A. Murthy, A. Greenberg, D. A. Maltz,
+R. Kern, H. Kumar, M. Zikos, H. Wu, C. Kim, and N. Karri. Ananta:
+Cloud scale load balancing. In SIGCOMM’13.
+
+
+
 ** DNS: a little detour 
 
 *** DNS: A records  
@@ -1385,6 +1399,13 @@ When adding a server, most values keys stay with the same server
   - Common rule of thumb: 100 to 200 points per server 
 
 
+
+** Memcached 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:memcached
+   :END:
+
+
 *** Memcached
 
 - Implementation of a distributed, consistent hashing scheme to be
@@ -1445,7 +1466,8 @@ Compare \url{https://linuxtechme.wordpress.com/2012/03/29/470/}
 *** Foreshadowing: Consistency 
 
 - What happens if the caches coordinate? 
-- See Redis, see consistency chapter later on 
+- See Redis (Section~\sectionref{sec:redis}), see consistency chapter
+  (Section~\sectionref{ch:distributed-storage}) later on  
 
 *** An aside: \acf{CDN}
 
