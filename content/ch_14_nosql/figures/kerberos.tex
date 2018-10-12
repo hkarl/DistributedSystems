@@ -1,0 +1,52 @@
+
+\documentclass[tikz]{standalone}
+
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+  \begin{msc}[instance distance=1.5cm]{Kerberos}
+    \declinst{a}{}{Alice}
+    \declinst{c}{}{Alice's machine}
+    \declinst{as}{}{AS}
+    \declinst{tgs}{}{TGS}
+    \declinst{s}{}{Server S}
+    
+    \mess{login}{a}{c}
+    \nextlevel 
+    \mess{Alice ID: A}{c}{as}
+    \nextlevel[2] 
+
+    \mess{$K_{A, \mathrm{AS}} ( K_{A, \mathrm{TGS}},  K_{\mathrm{AS}, \mathrm{TGS}} (A,  K_{A, \mathrm{TGS}})  ) $  }{as}{c}
+    \nextlevel[2] 
+
+    \mess{Password?}{c}{a}
+    \nextlevel[1] 
+    
+    \mess{PWD}{a}{c}
+    \nextlevel[2] 
+
+    \mess{$K_{\mathrm{AS}, \mathrm{TGS}} ( A, K_{A, \mathrm{TGS}}), S,  K_{A, \mathrm{TGS}}(t) $  }{c}{tgs}
+    \nextlevel[2] 
+    
+    \mess{$K_{\mathrm{A}, \mathrm{TGS}} ( S, K_{A,S}), K_{\mathrm{A}, \mathrm{TGS}} (S,   K_{A,S}) $  }{tgs}{c}
+    \nextlevel[2] 
+    
+    \mess{Use $K_{A, S}$}{c}{s}
+
+  % example: +
+    % \declinst{c}{}{Client} 
+    % \declinst{cc}{}{Channel API}
+    % \declinst{sc}{}{Channel API} 
+    % \declinst{s}{}{Server} 
+    % % 
+    % \regionstart{suspension}{s}
+    % \nextlevel
+    % \mess{Pass request   to channel}{c}{cc}
+    % \regionstart{activation}{c}
+    % \msccomment[side=left]{Do something}{c}
+    % \nextlevel
+    % \msccomment[side=left]{Block for reply}{c}
+
+  \end{msc}
+\end{document}
