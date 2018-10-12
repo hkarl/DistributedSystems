@@ -420,6 +420,9 @@ print("Average temperature for zipcode '%s' was %dF" % (
     how to scale up  and build advanced pub/sub patterns in 0mq 
 
 ** Redis 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:redis
+   :END:
 
 *** Redis 
 
@@ -573,6 +576,9 @@ C : channel b'test.', received: b'for neither'
 C : unsubscribed and finished
 $ 
 #+END_SRC
+
+
+
 
 ** Hedwig 
 
