@@ -801,53 +801,108 @@ distributed system   https://github.com/etcd-io/etcd
 
 ** LDAP                                                            :noexport:
 
+*** More general: directory service 
+
+- DNS can only store relative simple mappings <name,attribute> 
+  - Name: fully qualified domain name; attribute: IP address
+  - Lookup: provide name, get attribute
+- Generalize to *directory service* 
+  - Store collections of arbitrary names and attributes and their bindings
+  - Provide flexible ways of lookup – in particular, lookup via
+    attributes, not only names!  
+    - “Where can I print?”, “Who has phone number 1234567?”
+  - Analogy: 
+    - Directory service = “yellow pages”
+    - Standard services like DNS = “white pages” 
+    - Sometimes, both functionalities present in one service 
+
 *** Example directory service: X.500 
  Data stored in a tree structure – Directory Information Tree 
  - Each node in tree can store wide range of attributes 
  - Tree + data in nodes: Directory Information Base (DIB)
- - Conceptually: one single DIB worldwide, stored distributedly at many X.500 servers 
- - Servers: Directory 
- - Service Agents (DSA)
- - Clients: Directory 
- - User Agents (DUA) 
- - 
-*** X.500 Directory Information Tree 
-
-*** X.500 Directory Information Base entries 
+   - Conceptually: one single DIB worldwide, stored distributedly at many X.500 servers - Servers: Directory Service Agents (DSA)
+   - Clients: Directory User Agents (DUA) 
 
 *** DIB access & updating
- Access to DIB
- - Read: provide absolute or relative path name in tree, returns attributes
- - Search: Provide filter expression and base node; return all node names for nodes below base node where filter is true 
+ - Access to DIB
+   - Read: provide absolute or relative path name in tree, returns attributes
+   - Search: Provide filter expression and base node; return all node
+     names for nodes below base node where filter is true  
  - Updating DIB: Add, delete, modify
- - Replication and caching of data between multiple servers necessary
- - But: no details specified in standard how consistency is to be maintained (if at all)
- - E.g., disseminate updates based on time triggers
- - Results in only eventually consistent database
- - Often regarded as acceptable 
- - 
+   - Replication and caching of data between multiple servers
+     necessary 
+   - But: no details specified in standard how consistency is to be
+     maintained (if at all) 
+   - E.g., disseminate updates based on time triggers
+     - Results in only eventually consistent database
+     - Often regarded as acceptable 
+
 *** LDAP
- Accessing to X.500 needs an API and a protocol
- - One possible (and common) option: 
- - Lightweight directory access protocol (LDAP)
- - RFC 2251
+ - Accessing to X.500 needs an API and a protocol
+ - One possible (and common) option:  \ac{LDAP}
+   - RFC 2251
  - TCP/IP-based interaction with X.500 servers
- - But can also access other servers which understand the protocol and are not X.500 servers themselves – e.g., Microsoft Active Directory 
+ - But can also access other servers which understand the protocol and
+   are not X.500 servers themselves – e.g., Microsoft Active Directory  
  - Provides secure access, authentication 
- - 
- - In practice: Have a look at ldapsearch and related tools 
- - Try (access to IRB LDAP server): 
- - ldapsearch -LLL -h irb-ldap2 -b dc=cs,dc=upb,dc=de -x sn=karl
+ - In practice: Have a look at ~ldapsearch~ and related tools 
+   - TODO: Try (access to IRB LDAP server): ~ldapsearch -LLL -h irb-ldap2 -b
+     dc=cs,dc=upb,dc=de -x sn=karl~ 
  - To run your own server: look at www.openldap.org 
+
+
 *** LDAP replication
  LDAP can support replication of database 
- - 
- - One example implementation (based on openldap.org): slapd as LDAP server, slurpd as replication daemon 
- - slapd as server can run as master or slave 
+ - One example implementation (based on openldap.org): ~slapd~ as LDAP
+   server, ~slurpd~ as replication daemon  
+ - ~slapd~ as server can run as master or slave 
  - Master server writes replication log file
- - slurpd periodically checks whether replication log file has changed
+ - ~slurpd~ periodically checks whether replication log file has changed
  - If so: lock log file, make private copy, spawn child process for each slave server to update, child process sends private copy to its slave 
- - 
+
+
+** Kerberos 
+
+*** Kerberos in one slide 
+
+- Goal: Allow to set up secure, authenticated  channels between client
+  and arbitrary   server
+  - Share secret keys to do so
+- Participants
+  - \ac{AS}: Authentication, provides key for client to talk to TGS 
+  - \ac{TGS}: Ticket, contains actual key to talk to server 
+  - Ticket: to convince server of client's identity 
+
+*** Kerberos MSC 
+
+
+#+CAPTION: Kerberos key steps
+#+ATTR_LaTeX: :width 0.85\linewidth
+#+NAME: fig:kerberos
+[[./figures/kerberos.pdf]]
+
+
+
+
+** Active Directory 
+
+*** Active Directory in one slide 
+
+- Microsoft-developed directory service for Windows Domains
+  - Servers: ~Domain Controller~
+  - Can be used for authentication and authorization of users and
+    machines
+    - Check passwords, provide permissions, ... 
+- Uses LDAP versions 2, 3 
+- Particular feature: LDAP forests = multiple independent trees 
+
+
+* Conclusions 
+
+** Conclusions 
+
+
+
 
 * Graveyard                                                        :noexport:
 *** Horizontal scalability 
