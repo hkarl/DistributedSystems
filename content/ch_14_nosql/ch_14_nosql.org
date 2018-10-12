@@ -1,49 +1,535 @@
 #+BIBLIOGRAPHY: ../bib plain
 
-* CAP and friends 
+* CAP and friends                                                  :noexport:
 
+** Distribute store
+
+*** The story so far 
+
+- Replicated storage is necessary for dependability and performance 
+- Keeping replicated storage consistent is
+  - Tricky in fault-free environments, if you want performance
+  - Impossible in faulty environments, if you want realistic faul
+    assumptions (FLP theorem) 
+- We have seen tradeoffs between safety and liveness
+  - Can we make such tradeoffs more explicit?
+  - What does that entail about options for distributed data stores? 
+
+*** Distributed data store 
+
+- What should a (distributed, replicated) data store do?
+  - When you make a request, it should *answer*
+    - ... and not just with an error message
+    - it should be *available*
+  - When you ask the same question at different places, it should give
+    the *same answer*
+    - Slightly looser requirement then *all copies should be
+      identical*
+    - It should be *consistent* 
+
+*** Distributed data store -- example 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+Simple example: 
+- Both readers should eventually be able to answer 42
+- This will take some time (latency to answer request), but is
+  possible  
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: Simple distributed data store example, no faults
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=1
+#+NAME: fig:nosql:store:simple
+[[./figures/cap.pdf]]
+
+
+
+
+*** Distributed data store and network partitions? 
+
+- But what happens when the network between replicas does not work?
+  - The distribute storage is *partitioned*
+- What to do in partitioned case? 
+
+*** Partitioned example
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- Should S3 answer with error message?
+  - Because it cannot know up-to-date value? 
+  - Then it *violates availability*
+- Should S3 answer with last known value?
+  - Then it *violates consistency* 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Partitioned  data store example
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+NAME: fig:nosql:store:partitioned
+[[./figures/cap.pdf]]
+
+
+
+
+
+** Consequence 
 *** CAP theorem 
+
+**** \ac{CAP}                                                     :B_theorem:
+     :PROPERTIES:
+     :BEAMER_env: theorem
+     :END:
+
  - https://people.eecs.berkeley.edu/~brewer/cs262b-2004/PODC-keynote.pdf
- - http://blog.nahurst.com/visual-guide-to-nosql-systems (find better
-   source for picture) 
-
-****  Sharding
-
- - https://bravenewgeek.com/tag/vector-clocks/
- - Shapiro,
- Consistency without concurrency control in large, dynamic systems  https://dl.acm.org/citation.cfm?id=1773921 
 
 
- - http://www.julianbrowne.com/article/brewers-cap-theorem 
+A distributed data store cannot at most two of the following three
+properties: 
+- Availability
+- Consistency
+- Partition-tolerance 
 
-*** What can we hope for? CAP theorem 
- 7
- http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6133253
-*** BASE: Give up CAP 
 
-bla 
+*** Pacelec 
 
-*** Structured approach: STate-machine replication 
+A more detailed interpretation: 
 
- - https://en.wikipedia.org/wiki/State_machine_replication
+**** Pacelec                                                      :B_theorem:
+     :PROPERTIES:
+     :BEAMER_env: theorem
+     :END:
+
+- When there is a partition (P), there is a tradeoff between
+  availability (A) and consistency (C)
+- Else, there is a tradeoff between latency (L) and consistency (C)
+  - Non-consistent answers can be given faster 
+
+*** SQL/ACID  data bases? 
+
+- Conventional data bases: SQL as query language, ACID as transaction
+  semantics
+- Are subject to these same fundamentals!
+- Typically: partitions /never happen/ \Smiley 
+
+*** Tradeoffs
+
+- Let's admit that partitions to happen
+  - Inside and between data centers
+- We then see different tradoffs:
+  - Available and consistent (but ignore partitions): conventional
+    SQL/ACID databases 
+  - Available, tolerate partitions: gives occasional inconsistent
+    answers
+  - Consistent, tolerate partitions: occasionally stalls 
+
+
+*** CAP landscape 
+
+
+#+CAPTION: The CAP landscape
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=3
+#+NAME: fig:nosql:cap_landscape
+[[./figures/cap.pdf]]
+
+
+*** BASE 
+
+One design choice: give up consistency! 
+
+- Basically Available 
+- But only Soft state -- content might change at unpredictable times
+- Because of Eventual consistency
+  - In absence of updates, state will converge and system become
+    consistent 
+
+** Eventual consistency 
+
+*** Eventual consistency 
+
+In absence of updates, state will converge and system become
+consistent 
+
+- System will eventually become consistent
+  - Careful, false friend: schliesslich, not eventuell 
+
+*** Rumour spreading  
+
+- One option to implement: treat an update as a rumour
+- Spread it like a rumour (or an epidemic)  to peer storage sites  
+- Nicely treatable by differential equations
+  - Possible bonus material 
+
+
+* NoSql                                                            :noexport:
+
+** Overview 
+*** From SQL to NoSql 
+
+- CAP: Limits on traditional data base model, typical promises
+- Development: Not only SQL
+  - Database with different, explicit CAP tradeoffs
+  - Different data models (instead of tables?)
+  - Different query approaches
+  - Different update semantics
+    - Not uncommon: ACID locally, eventually consistent across cluster
+- But *very* hard to generalise; lot's of variability across products 
+*** Why? 
+
+- Making CAP tradeoffs explicit is a *very* good thing for developers
+  to be aware of
+- Not trying to achieve CAP opens road to better scalability
+- ... and simplified design
+- Sometimes, tables just are not the right model
+- Sometimes, ACID guarantees just not necessary (think: shopping cart) 
+
+
+*** NoSql data models: Diverse 
+
+- Key-value 
+  - Redis, MemcacheD, Dynamo, Riak   
+- Document-based 
+  - MongoDB, CouchDB
+- Column-oriented
+  - Google BigTable, Cassandra (with multiple masters) 
+- Graph-based 
+  - Redis 
+- Compare
+  \href{https://www.thoughtworks.com/de/insights/blog/nosql-no-problem-intro-nosql-databases}{blog  post} for nice application examples  
+
+
+*** Query language? 
+
+- SQL is great, mature, familiar
+- Counterpart?
+  - Not much -- lot's of diversity
+- SparQL: query RDF / tuple data
+  - But not generalised to other types
+
+#+BEAMER: \pause
+
+- Actually, sometimes SQL is the query language used for an NoSQL
+  database \Smiley 
+
+
+*** Distributing data 
+
+- So far: *replication* of data onto several servers
+  - Mostly for fault tolerance, some performance
+- Alternative: Distribute data
+  - *Sharding*: different data on different servers
+  - Different strategies 
+- Combination possible 
+
+*** Replication vs. sharding 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: Full replication 
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=1
+#+NAME: fig:nosql:fullrep
+[[./figures/nosql.pdf]]
+
+
+#+CAPTION: Balanced sharding
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=2
+#+NAME: fig:nosql:balanced_sharding 
+[[./figures/nosql.pdf]]
+
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Unbalanced sharding
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=3
+#+NAME: fig:nosql:unbalanced_sharding 
+[[./figures/nosql.pdf]]
+
+
+#+CAPTION: Combined replication and  sharding
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=4
+#+NAME: fig:nosql:repl_shard
+[[./figures/nosql.pdf]]
+
+
+*** Sharding strategies 
+
+- Key ranges
+  - Identify key field, use it to compute target server
+  - Compare consistent hashing
+- Locality
+  - For geographically distributed servers, keep data local to origin 
+
+
+** Types 
+*** Key-value databases 
+
+- We already saw Redis, MemcacheD as examples
+- Simple(st) NoSql semantics
+  - No schema for data
+  - Think big hash table 
+- Intended for huge volumes, high access rates 
+- Possible first example: Amazon Dynamo
+- CAP: Typically, available and partition-tolerant
+  - But you might get inconsistent answers 
+
+*** Column-oriented databases 
+
+- Still notion of table, but works on columns rather than rows
+  - Often: one column stored contiguously in a specific file
+- Highly optimized for operation on entire columns
+  - E.g., aggregate all values in a column
+  - Column values typically of same type, highly compressable
+
+*** Document-oriented databases 
+
+- Documents
+  - Collection of key/value pairs 
+  - Often support for
+    arbitrary nesting of documents
+  - Often represented as JSON or similar
+  - Can be grouped into document collections 
+- No scheme imposed
+  - E.g., not all documents in a collection must have the same keys or
+    types of values
+- Often, versioning support  
+- Complex model can make queries slow 
+
+
+*** Graph databases 
+
+- Store graphs \Smiley
+  - Set of ordered pairs of entities
+  - Nodes and edges have unique identifiers
+  - Constant cost for local operations (only involving a node and its
+    neighbors) irrespective of size of graph
+
+
+
+
+
 
 
   
-* Case study: Key-value stores 
+* Key-value database                                               :noexport:
   :PROPERTIES:
   :CUSTOM_ID:       sec:keyvalue_stores
   :END:
 
-** Bla 
-   :PROPERTIES:
-   :CUSTOM_ID: sec:bla
-   :END:
+*** Already covered 
+
+- We have already covered from a usage perspective 
+  - Memcached (Section~\sectionref{sec:memcached})
+  - Redis (Section~\sectionref{sec:redis})
+- We briefly look at some more examples
+- And at architectural choices 
 
 
-***  Case study: Key-Value stores, distributed  
- - Key-Value-Stores, take up Memcache discussion from client/server
-   chapter 
- - REdis
+** Dynamo 
+
+*** Dynamo 
+- Dynamo \cite{DeCandia:2007:DAH:1323293.1294281}, probably one of the
+  first large-scale, high-performance key-value stores 
+- \href{https://aws.amazon.com/dynamodb/}{Product at Amazon}
+- Highlights
+  - Highly available, but sacrifices consistent (AP in the CAP
+    triangle)
+  - Geared towards tens of thousands of servers -- at that scale,
+    things fail constantly 
+  - Object versioning, application-assisted conflict resolution 
+
+*** Use cases 
+
+- Quote: /best seller lists, shopping carts, customer preferences,
+  session management, sales rank, and product catalog/
+  \cite{DeCandia:2007:DAH:1323293.1294281}
+  - Tens of millions of requests per day (thousands per second) 
+- Key/value store is natural pattern
+
+*** Architecture 
+
+- Consistent hashing for partitioning, replication
+- Object versioning
+- Consistency during update: Quorum
+  - Eventually consistent storage 
+- Membership protocol based on gossiping 
+- Operations only on individual keys, no isolation (in ACID sense)
+
+
+*** \ac{SLA}
+
+- What to optimise, what to promise?
+  - Service and Dynamo enter in an SLA   
+- Multiple quntifications
+  - E.g., mean and variance of response time
+    - Considered too lenient 
+  - E.g., 99.9% percentile response time at given load
+    - Typical goal! 
+
+
+#+BEAMER: \pause
+
+**** SLA vs. SLO 
+
+- Strictly speaking, this is an \ac{SLO}
+- But terminology often sloppy her 
+
+
+
+
+*** Principles 
+
+- Incremental scalability: Add single hosts at a time
+- Symmetry among nodes
+  - Decentralization, trusted,  but heterogeneity
+- Always writable: no update rejected because of partition
+- Zero-hop approach: Every node knows about every other
+  - No P2P-style routing
+
+*** Partition and replication 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- Partition and replication: consistent hashing, storing a data item
+  on next three nodes 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Dynamo: Store data at multiple servers 
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=5
+#+NAME: fig:nosql:dynamo
+[[./figures/nosql.pdf]]
+
+
+*** Versioning  
+
+- With network partitions and unavailability, inconsistencies can
+  happen
+- *Eventual consistency*: over time, replicas converge
+- Handled by *versions* of data, which can only be appended to
+  - Think shopping cart, with *add* or *delete* operations appended to
+    best known state
+- Version expressed as vector clock 
+  - Updates must present vector clock of version they want to update 
+
+*** Versioning and reconciliation 
+
+Reconciliation: What happens when different versions reconnect? 
+  - Syntax reconciliation: Sometimes, authoritative version can be
+    automatically determined (changes in one subsume changes in other)
+  - Semantic reconciliation: Sometimes, application has to decide
+    - Multiple versions with concurrent vector clocks!
+    - Dynamo will return all versions to application
+    - Update should reconcile, collapses versions 
+    - Example shopping cart: keep the adds, may drop some of the deletes
+
+*** Consistency 
+
+- Where does an update happen?
+- Use a quorum! (typical $N$, $W$ relations)
+  - A coordinator for an operation locally generates new vector clock
+  - Talks to $N$ or $W$ other nodes
+  - If confirmed, proceed; else, reconcile versions
+
+*** Consistency with unavailable nodes? 
+
+- But: availability is paramount -- must not stall 
+- Hence: *sloppy quorum*
+  - Preference list of servers, only some of which must participate in
+    quorum
+- Means replicas need to get synchronized after failure recovery
+  - Uses Merkle trees to speed up detection of unsynchronized branches 
+
+
+
+
+
+** Smaller examples 
+
+
+
+*** Voldemort 
+
+Linkedin dyanmo clone http://www.project-voldemort.com/voldemort/ ,
+https://github.com/voldemort/voldemort 
+
+**** From the commercial                                        :B_quotation:
+     :PROPERTIES:
+     :BEAMER_env: quotation
+     :END:
+
+
+\small 
+
+- Data is automatically replicated over multiple servers.
+- Data is automatically partitioned so each server contains only a subset of the total data
+- Provides tunable consistency (strict quorum or eventual consistency)
+- Server failure is handled transparently
+- Pluggable Storage Engines -- BDB-JE, MySQL, Read-Only
+- Pluggable serialization -- Protocol Buffers, Thrift, Avro and Java Serialization
+- Data items are versioned to maximize data integrity in failure scenarios without compromising availability of the system
+- Each node is independent of other nodes with no central point of failure or coordination
+- Good single node performance: you can expect 10-20k operations per second depending on the machines, the network, the disk system, and the data replication factor
+- Support for pluggable data placement strategies to support things like distribution across data centers that are geographically far apart.
+
+*** Redis architecture 
+
+Not much concrete information available \Sadey 
+
    - REdis vs. Memcached
      - persistent by default
      - cluster support: https://redis.io/topics/cluster-tutorial
@@ -51,87 +537,270 @@ bla
    - REDIS vs. CAP: CP?
      - Compare: https://aphyr.com/posts/283-jepsen-redis
      - http://blog.nahurst.com/visual-guide-to-nosql-systems
-   - Issue: logical time, happened before, vector clocks, ... here? or in
-     distributed event log? (almost the same thing, in any case...)  
- - Some other examples:
+
+*** Riak 
    - RiakKV http://basho.com/products/riak-kv/ 
      - http://basho.com/posts/technical/vector-clocks-revisited/
+   - Features: Everything that is great under the sun 
 
-*** Redis -- Some more details 
-    :PROPERTIES:
-    :CUSTOM_ID:       s:redis
-    :END:
-
-bla bla 
-
-
-*** Case study: Distributed event log 
-
- - Kafka
-   - https://kafka-python.readthedocs.io/en/latest/
- - Sources:
-   - 
-      http://krasserm.github.io/2015/01/13/event-sourcing-at-global-scale/
-
-*** Other No-Sql data bases 
- - Long list of possible examples 
-   - Column-style databases
-   - Apache couchDB
- - E.g., Cassandra
-   - what are 3 fundamental diffs between Cassandra and Riak?
-
-*** Case study: Spanner 
+*** Spanner 
 
  - Google scalable, multi-version, globally-distributed, and synchronously-replicated database
  - https://research.google.com/archive/spanner.html 
 
 
-* Case study: Distributed message log (kafka) 
+
+**** Paper abstract                                             :B_quotation:
+     :PROPERTIES:
+     :BEAMER_env: quotation
+     :END:
+
+\small 
+
+Spanner is Google’s scalable, multi-version, globally- distributed,
+and synchronously-replicated database. It is the first system to
+distribute data at global scale and sup- port externally-consistent
+distributed transactions. This paper describes how Spanner is
+structured, its feature set, the rationale underlying various design
+decisions, and a novel time API that exposes clock uncertainty. This
+API and its implementation are critical to supporting exter- nal
+consistency and a variety of powerful features: non- blocking reads in
+the past, lock-free read-only transac- tions, and atomic schema
+changes, across all of Spanner. 
+
+*** etcd 
+
+Distributed reliable key-value store for the most critical data of a
+distributed system   https://github.com/etcd-io/etcd 
+
+- Simple, secure, fast, reliable 
+- Uses Raft consensus 
+
+
+* TODO Column-oriented databases                                   :noexport:
+
+** Google BigTable 
+
+** Hypertable, Hbase 
+
+** Cassandra 
 
 
 
-*** Case study: Apache Kafka 
- 61
- http://kafka.apache.org/documentation.html#introduction
-*** Kafka: Topics 
- 62
-*** Kafka: Partitions 
- 63
-*** Kafka: Consumer groups 
- 64
-*** Kafka: Guarantees 
- 65
-*** Kafka: Design 
- 66
-*** Message queuing: Conclusion 
- 67
+* TODO Document-oriented databases                                 :noexport:
+
+** CouchDB 
+
+** MongoDB 
 
 
-* Directory services: LDAP 
 
-*** Directory services 
- Name services 
+* TODO Graph databases                                             :noexport:
+
+* TODO Hybrids                                                     :noexport:
+
+** Cassandra 
+
+- Both key/value aspects like Dynamo 
+- and bigtable aspects 
+
+
+
+
+* Directory services 
+
+*** Special case: Directories 
+
+- Let's look at very specific data bases: directory services 
+- Mapping names to names
+  - Typically, based on (many) attributes 
+
+*** More general: directory service
+ - Mapping what? 
+   - Name: fully qualified domain name; attribute: IP address
+   - Lookup: provide name, get attribute
+ - Generalize to directory service
+   - Store collections of arbitrary names and attributes and their
+     bindings 
+   - Provide flexible ways of lookup – in particular, lookup via
+     attributes, not only names!  
+     - “Where can I print?”, “Who has phone number 1234567?”
+   - Analogy: 
+     - Directory service = “yellow pages”
+     - Standard services like DNS = “white pages” 
+     - Sometimes, both functionalities present in one service 
+
+
+*** Directory services: Examples
  - DNS
  - X.500, LDAP
- - eMail 
- - Distributed file systems
- - Web search & Map/Reduce – Google, Hadoop
- - Voice over IP / Internet Telephony 
- - Messaging & presence – XMPP 
- - Cloud computing
- - Some odds and ends 
-*** More general: directory service
- DNS can only store relative simple mappings <name,attribute> 
- - Name: fully qualified domain name; attribute: IP address
- - Lookup: provide name, get attribute
- - Generalize to directory service
- - Store collections of arbitrary names and attributes and their bindings
- - Provide flexible ways of lookup – in particular, lookup via attributes, not only names! 
- - “Where can I print?”, “Who has phone number 1234567?”
- - Analogy: 
- - Directory service = “yellow pages”
- - Standard services like DNS = “white pages” 
- - Sometimes, both functionalities present in one service 
+
+** DNS 
+
+
+*** Domain Name System (DNS) – Motivation 
+ - Addressing in the Internet uses 4 bytes (IPv4), commonly
+   represented in dotted decimal notation 
+   - Nice for machines, impractical for human beings
+   - Do you recognize (or could remember) 131.234.25.30 ? 
+ - More convenient: Mnemonic names for communication peers
+   - E.g., www.uni-paderborn.de 
+ - \acf{DNS} solves this need \cite{Mockapetris:1988:DDN:52325.52338}
+   (plus lots of \ac{IETF} \acp{RFC}) 
+
+*** DNS --  Architecture 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+\small 
+
+ DNS maps names to names (common: IP “addresses”) 
+ - Actually: maps to resource records
+ - Names are structured hierarchically into a name space
+ - Max. 63 characters per component, max. 255 characters total
+ - Domains partition name space, can have subdomains 
+ - Mapping done by name servers (well known, hierarchical) 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: DNS namespace structure
+#+ATTR_LaTeX: :height 0.7\textheight :options page=1
+#+NAME: fig:dns_namespace
+[[./figures/dns.pdf]]
+
+
+
+*** DNS resource records	 
+ Resource records: Information about domains, single hosts, … 
+ - Structure: 5-tuple
+ - Domain_name: Domain which is described by record (can have multiple) 
+ - Time_to_live: Validity, in seconds
+ - Class: For Internet, always “IN” (anything else rarely seen)
+ - Type: See next page 
+ - Value: Actual value 
+ Check: http://www.dnsstuff.com/
+*** DNS types of resource records 
+
+#+CAPTION: Types of DNS resource records
+#+ATTR_LaTeX: :width \linewidth :options page=4
+#+NAME: fig:dns_namespace
+[[./figures/dns.pdf]]
+
+
+
+*** DNS name servers 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+ - Name space divided into zones, bounded by delegation 
+ - Each zone has a *primary name server* with authoritative information
+   - Also *secondary name server* for dependability
+   - Secondaries periodically check whether their copies are up-to-date
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Name servers for different zones
+#+ATTR_LaTeX: :width 0.89\linewidth :options page=5
+#+NAME: fig:dns:nameservers
+[[./figures/dns.pdf]]
+
+
+
+
+*** DNS name servers (2) 
+
+
+ - Each name server knows about
+   - Its own zone (among others, all the domains not in a children zone) 
+   - Name servers of all its children zones
+   - Its siblings or about some server that knows about the siblings
+ - Practically: Have a look at ~dig~ 
+
+*** DNS query resolution
+ Queries by an end system are sent to their pre-configured name server (obtained from configuration, DHCP,…) 
+ - If possible, that name server answers query
+ - If not, it will forward query to the “most suitable” name server in the zone hierarchy it is aware of
+ - Continues recursively
+ - Answer sent back through intermediate servers
+ - Servers may cache replies (with limited time to live)
+ - Practically: Have a look at ~nslookup~
+
+*** Iterative vs. recursive name resolution 
+****  Iterative resolution
+
+#+CAPTION: Iterative DNS resolution 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+NAME: fig:dns:iterative
+[[./figures/dns.pdf]]
+
+
+*** Iterative vs. recursive name resolution 
+
+****  Recursive resolution
+
+#+CAPTION: Recursive DNS resolution 
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+NAME: fig:dns:iterative
+[[./figures/dns.pdf]]
+
+
+*** DNS as a distributed system – Some issues 
+ - DNS can be regarded as a distributed data store with local replicas (caches) 
+   - Has to serve vast number of lookups; distribution essential for
+     performance and fault tolerance  
+ - Updates 
+   - Originally, assumed to be quite rare 
+   - Essentially: Enter new data into configuration file of
+     authoritative primary name server  
+
+*** DNS as a distributed system – Some issues 
+ - Consistency? 
+   - Inconsistency accepted; stale copies on the order of days ok – eventual consistency, depending on time-to-live value of cache entry  
+   - Cached data is flagged as non-authoritative when replying to client 
+   - No detection scheme for stale data! 
+ - Usually complemented by local naming-like services 
+   - E.g., to store user passwords (NIS, yellow pages, …) – see later 
+
+*** Dynamic DNS
+ - Problem: More hosts than IP addresses; only temporarily assigned IP addresses 
+   - How to find such hosts in DNS? Not possible to put a permanent
+     entry into DNS since IP address might change 
+ - Solution: Dynamic DNS
+   - Idea: Once a node, which has a given name reserved, is assigned
+     an IP address, it registers this address with the DNS server in
+     charge of the reserved name 
+   - Relatively low time-to-live entries, since values change 
+ - Practically: Most “home office” switches support registration of
+   devices at one/several dynamic DNS providers 
+   - E.g., www.dyndns.com 
+
+** LDAP                                                            :noexport:
+
 *** Example directory service: X.500 
  Data stored in a tree structure – Directory Information Tree 
  - Each node in tree can store wide range of attributes 
@@ -180,88 +849,46 @@ bla bla
  - If so: lock log file, make private copy, spawn child process for each slave server to update, child process sends private copy to its slave 
  - 
 
+* Graveyard                                                        :noexport:
+*** Horizontal scalability 
+
+- Replication
+- Partitioning
+  - Hash-based
+  - Range-based 
+
+
+****  Sharding
 
 
 
+ - http://blog.nahurst.com/visual-guide-to-nosql-systems (find better
+   source for picture) 
 
-* Directory services: DNS 
+ - https://bravenewgeek.com/tag/vector-clocks/
+ - Shapiro,
+ Consistency without concurrency control in large, dynamic systems  https://dl.acm.org/citation.cfm?id=1773921 
 
 
-*** Domain Name System (DNS) – Motivation 
- Addressing in the Internet uses 4 bytes (IPv4), commonly represented in dotted decimal notation
- - Nice for machines, impractical for human beings
- - Do you recognize (or could remember) 131.234.25.30 ? 
- - 
- - More convenient: Mnemonic names for communication peers
- - E.g., www.uni-paderborn.de 
- - 
- - Domain Name System (DNS) solves this need
-*** DNS – Architecture 
- DNS maps names to names (common: IP “addresses”) 
- - Actually: maps to resource records
- - Names are structured hierarchically into a name space
- - Max. 63 characters per component, max. 255 characters total
- - Domains partition name space, can have subdomains 
- - 
- - 
- - 
- - 
- - 
- - 
- - 
- - Mapping done by name servers (well known, hierarchical) 
-*** DNS resource records	 
- Resource records: Information about domains, single hosts, … 
- - Structure: 5-tuple
- - Domain_name: Domain which is described by record (can have multiple) 
- - Time_to_live: Validity, in seconds
- - Class: For Internet, always “IN” (anything else rarely seen)
- - Type: See next page 
- - Value: Actual value 
- Check: http://www.dnsstuff.com/
-*** DNS types of resource records 
+ - http://www.julianbrowne.com/article/brewers-cap-theorem 
 
-*** DNS name servers
- Name space divided into zones, bounded by delegation 
- - Each zone has a primary name server with authoritative information
- - Also secondary name server for dependability
- - Secondaries periodically check whether their copies are up-to-date
- - Each name server knows about
- - Its own zone (among others, all the domains not in a children zone) 
- - Name servers of all its children zones
- - Its siblings or about some server that knows about the siblings
- - Practically: Have a look at dig 
- - 
-*** DNS query resolution
- Queries by an end system are sent to their pre-configured name server (obtained from configuration, DHCP,…) 
- - If possible, that name server answers query
- - If not, it will forward query to the “most suitable” name server in the zone hierarchy it is aware of
- - Continues recursively
- - Answer sent back through intermediate servers
- - Servers may cache replies (with limited time to live)
- - Practically: Have a look at nslookup
-*** Iterative vs. recursive name resolution 
- Iterative resolution
- Recursive resolution
-*** DNS as a distributed system – Some issues 
- DNS can be regarded as a distributed data store with local replicas (caches) 
- - Has to serve vast number of lookups; distribution essential for performance and fault tolerance 
- - Updates 
- - Originally, assumed to be quite rare 
- - Essentially: Enter new data into configuration file of authoritative primary name server 
- - Consistency? 
- - Inconsistency accepted; stale copies on the order of days ok – eventual consistency, depending on time-to-live value of cache entry  
- - Cached data is flagged as non-authoritative when replying to client 
- - No detection scheme for stale data! 
- - Usually complemented by local naming-like services 
- - E.g., to store user passwords (NIS, yellow pages, …) – see later 
-*** Dynamic DNS
- Problem: More hosts than IP addresses; only temporarily assigned IP addresses 
- - How to find such hosts in DNS? Not possible to put a permanent entry into DNS since IP address might change
- - Solution: Dynamic DNS
- - Idea: Once a node, which has a given name reserved, is assigned an IP address, it registers this address with the DNS server in charge of the reserved name
- - Relatively low time-to-live entries, since values change
- - 
- - Practically: Most “home office” switches support registration of devices at one/several dynamic DNS providers
- - E.g., www.dyndns.com 
-*** Example DNS database (zone: cs.vu.nl) 
+*** What can we hope for? CAP theorem 
+ 7
+ http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6133253
+
+
+*** Examples 
+
+- Yahoo Pnuts/Sherpa
+  - still relevant? 
+
+
+
+*** Case study: Distributed event log 
+
+ - Kafka
+   - https://kafka-python.readthedocs.io/en/latest/
+ - Sources:
+   - 
+      http://krasserm.github.io/2015/01/13/event-sourcing-at-global-scale/
+
