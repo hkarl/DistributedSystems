@@ -171,7 +171,7 @@ block/.style = {rectangle, draw=black, thick, align=center}]
 #+CAPTION: FAD stakeholders
 #+ATTR_LaTeX: :width 0.9\linewidth
 #+NAME: fig:FAD
-[[./figures/FAD.pdf]]
+[[../ch_03_RPC_CS/figures/FAD.pdf]]
 
 *** Quantitative Requirements 
 
@@ -227,9 +227,17 @@ Some numbers
  - (We used to do VMWare-based actual installations, but nobody was interested ) 
  - Assignments will be discussed in “Tafelübung”; they will not be graded or used for bonus points, … 
 
-*** TODO Project!
+*** Project!
 
-Consider whether we do a project 
+For the 6 ECTS version: We will do mini-projects! 
+- Groups of 3-4 students
+- Pick an interesting topic
+- Work on it, present it to the class 
+- Example topics:
+  - WebChat, Three-tier Web app, RabbitMQ, Kafka, RabbitMQ,
+    Microservice-Chain based on Message queuing, Zookeeper recipes,
+    grab data from doodle, fix existing WebApp, lambda functions,
+    ElasticSearch, ...        
 
 
 *** Exam
@@ -259,3 +267,11 @@ Consider whether we do a project
 
 
  
+
+
+*** Cancelled classes 
+
+- Oct 8, Oct 25 (1.5), Nov 1 (1.5), Nov 29 (1.5)
+- We miss 5.5 classes! 
+- How to compensate for this? 
+
