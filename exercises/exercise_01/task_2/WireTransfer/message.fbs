@@ -1,0 +1,18 @@
+namespace VS.wire_transfer;
+
+enum Type : byte {CONTROL, PUSH, PULL}
+
+struct MessageHeader {
+  request:Type;
+  seq_num:int;
+}
+
+table Message {
+  header:MessageHeader;
+  from:string;
+  hasContent:bool;
+  content:[byte];
+}
+
+root_type Message;
+
