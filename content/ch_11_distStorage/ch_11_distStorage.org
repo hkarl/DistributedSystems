@@ -428,7 +428,7 @@ Necessary condition:
 *** Causal consistency: Example
 
 #+CAPTION: Causally consistent example
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=6
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=6
 #+NAME: fig:distStor:causally_consistent
 [[./figures/consistency_mscs.pdf]]
 
@@ -443,7 +443,7 @@ Necessary condition:
 *** Causal consistency: Example 2
 
 #+CAPTION: Not causally consistent example
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=7
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=7
 #+NAME: fig:distStor:not_causally_consistent
 [[./figures/consistency_mscs.pdf]]
 
@@ -714,7 +714,7 @@ Assumption: one server, several clients with their own cache each
 
 
 #+CAPTION: Primary without backup 
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=1 
+#+ATTR_LaTeX: :height 0.5\textheight :options page=1 
 #+NAME: fig:distStor:primary_no_backup
 [[./figures/updateProtocols.pdf]]
 
@@ -739,7 +739,7 @@ Assumptions for graphs:
     :END:
 
 #+CAPTION: Primary with backup and blocking write operations
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=2
+#+ATTR_LaTeX: :height 0.6\textheight :options page=2
 #+NAME: fig:distStor:primary_blocking_write
 [[./figures/updateProtocols.pdf]]
 
@@ -751,7 +751,7 @@ Assumptions for graphs:
 Writer may proceed even if data not written yet 
 
 #+CAPTION: Primary with backup and blocking write operations
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=3
+#+ATTR_LaTeX: :height 0.5\textheight :options page=3
 #+NAME: fig:distStor:primary_non_blocking_write
 [[./figures/updateProtocols.pdf]]
 
@@ -783,7 +783,7 @@ process that wants to write
 *** Local-write protocol without backup, example  
 
 #+CAPTION: Local write: migrate single server 
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=4
+#+ATTR_LaTeX: :height 0.65\textheight :options page=4
 #+NAME: fig:distStor:migrate_no_backup
 [[./figures/updateProtocols.pdf]]
 
@@ -799,7 +799,7 @@ Role of primary is transferred from S2 to S4
 *** Local-write protocol with backup, example  
 
 #+CAPTION: Local write: migrate server plus backup 
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=5
+#+ATTR_LaTeX: :height 0.75\textheight :options page=5
 #+NAME: fig:distStor:migrate_with_backup
 [[./figures/updateProtocols.pdf]]
 
@@ -871,10 +871,10 @@ Possible approach:
 
 *** Replicated objects with coordinator example  
 
-Objects o no replicated;  p at S1, *S2*, S3; q at S3, *S4*
+Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 
 #+CAPTION: Replicated objects invoke methods, answer via their coordinators (shown in red)  
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=8
+#+ATTR_LaTeX: :height 0.7\textheight :options page=8
 #+NAME: fig:distStor:replicated_object_coordinator
 [[./figures/updateProtocols.pdf]]
 
@@ -938,7 +938,7 @@ Objects o no replicated;  p at S1, *S2*, S3; q at S3, *S4*
 
 
 #+CAPTION: Check version before writing
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=1
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=1
 #+NAME: fig:distStor:check_before_update
 [[./figures/quorum.pdf]]
 
@@ -986,7 +986,7 @@ Objects o no replicated;  p at S1, *S2*, S3; q at S3, *S4*
 *** Write at more than  half replicas? 
 
 #+CAPTION: Writing at more than half of all replicas ensures up-to-date values 
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+ATTR_LaTeX: :height 0.75\textheight :options page=3
 #+NAME: fig:distStor:write_at_least_half 
 [[./figures/quorum.pdf]]
 
