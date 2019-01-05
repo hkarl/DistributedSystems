@@ -100,11 +100,13 @@ endif
 
 %-slides169.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib  ../book/book.aux 
 	-${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
-	${BIBCOMMAND} $(basename $<)
-	cp $(basename $<).bbl  $(basename $<)169.bbl
+ifndef quick
+	${BIBCOMMAND} $(basename $<)169
+	#cp $(basename $<).bbl  $(basename $<)169.bbl
 	-${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
 	-${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
 	cp $@ ../../output/slides169/
+endif
 
 
 
