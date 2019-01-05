@@ -300,7 +300,7 @@ monitor*) or in a distributed fashion
 *** 2PC regular run: Commit
 
 #+CAPTION: 2PC regular commit
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=3
+#+ATTR_LaTeX: :width 0.7\linewidth :options page=3
 #+NAME: fig:dT:2pc:commit
 [[./figures/2pc.pdf]]
 
@@ -310,7 +310,7 @@ monitor*) or in a distributed fashion
 *** 2PC regular run: Abort 
 
 #+CAPTION: 2PC regular abort
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=4
+#+ATTR_LaTeX: :width 0.7\linewidth :options page=4
 #+NAME: fig:dT:2pc:commit
 [[./figures/2pc.pdf]]
 
@@ -464,7 +464,7 @@ A commit protocol is called *blocking* when
 
 
 #+CAPTION: 3PC coordinator finite state machine
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=1
+#+ATTR_LaTeX: :width 0.7\linewidth :options page=1
 #+NAME: fig:dT:3pc:fsm:coordinator
 [[./figures/3pc.pdf]]
 
@@ -478,7 +478,7 @@ A commit protocol is called *blocking* when
 ****** Participant 
 
 #+CAPTION: 3PC participant finite state machine
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=2
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=2
 #+NAME: fig:dT:3pc:fsm:participant
 [[./figures/3pc.pdf]]
 
@@ -540,13 +540,13 @@ A commit protocol is called *blocking* when
     comment.
     - *But they might have committed! A does not know!*
 
-*****                                                                 :BMCOL:
+***** 								      :BMCOL:
       :PROPERTIES:
       :BEAMER_col: 0.5
       :END:
 
 #+CAPTION: 3PC coordinator fails; node A is partitioned 
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=4
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=4
 #+NAME: fig:dT:3pc:partition
 [[./figures/3pc.pdf]]
 
@@ -556,10 +556,7 @@ A commit protocol is called *blocking* when
 - These two cases are indistinguishable for A
 - But A should behave differently! 
 
-
-
-
-****                                                              :B_columns:
+**** 								  :B_columns:
      :PROPERTIES:
      :BEAMER_env: columns
      :END:
@@ -570,7 +567,7 @@ A commit protocol is called *blocking* when
       :END:
 
 #+CAPTION: 3PC coordinator fails; node A is partitioned, A should abort  
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=5
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=5
 #+NAME: fig:dT:3pc:partition_Aabort
 [[./figures/3pc.pdf]]
 
@@ -582,7 +579,7 @@ A commit protocol is called *blocking* when
       :END:
 
 #+CAPTION: 3PC coordinator works; node A is partitioned, A should commit
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=6
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=6
 #+NAME: fig:dT:3pc:partition_Aabort
 [[./figures/3pc.pdf]]
 
@@ -1094,21 +1091,21 @@ class Snapshot:
 *** Example run: Three node setup  
 
 #+CAPTION: Three node setup for  distributed snapshot example
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+ATTR_LaTeX: :height 0.8\textheight :options page=2
 #+NAME: fig:distTrans:snapshot:setup
 [[./figures/snapshot.pdf]]
 
 *** Example run: Step 1
 
 #+CAPTION:  Distributed snapshot example run, step 1 
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+ATTR_LaTeX: :height 0.8\textheight :options page=3
 #+NAME: fig:distTrans:snapshot:run1
 [[./figures/snapshot.pdf]]
 
 *** Example run: Step 2
 
 #+CAPTION:  Distributed snapshot example run, step 2
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=4
+#+ATTR_LaTeX: :height 0.8\textheight :options page=4
 #+NAME: fig:distTrans:snapshot:run2
 [[./figures/snapshot.pdf]]
 
@@ -1117,7 +1114,7 @@ class Snapshot:
 *** Example run: Step 3
 
 #+CAPTION:  Distributed snapshot example run, step 3
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=5
+#+ATTR_LaTeX: :height 0.8\textheight :options page=5
 #+NAME: fig:distTrans:snapshot:run3
 [[./figures/snapshot.pdf]]
 
@@ -1125,7 +1122,7 @@ class Snapshot:
 *** Example run: Step 4
 
 #+CAPTION:  Distributed snapshot example run, step 4
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=6
+#+ATTR_LaTeX: :height 0.8\textheight :options page=6
 #+NAME: fig:distTrans:snapshot:run4
 [[./figures/snapshot.pdf]]
 
@@ -1133,7 +1130,7 @@ class Snapshot:
 *** Example run: Step 5
 
 #+CAPTION:  Distributed snapshot example run, step 5
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=7
+#+ATTR_LaTeX: :height 0.8\textheight :options page=7
 #+NAME: fig:distTrans:snapshot:run5
 [[./figures/snapshot.pdf]]
 
@@ -1141,7 +1138,7 @@ class Snapshot:
 *** Example run: Step 6
 
 #+CAPTION:  Distributed snapshot example run, step 6
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=8
+#+ATTR_LaTeX: :height 0.8\textheight :options page=8
 #+NAME: fig:distTrans:snapshot:run6
 [[./figures/snapshot.pdf]]
 
@@ -1149,7 +1146,7 @@ class Snapshot:
 *** Example run: Step 7
 
 #+CAPTION:  Distributed snapshot example run, step 7
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=9
+#+ATTR_LaTeX: :height 0.8\textheight :options page=9
 #+NAME: fig:distTrans:snapshot:run7
 [[./figures/snapshot.pdf]]
 
@@ -1157,7 +1154,7 @@ class Snapshot:
 *** Example run: Step 8
 
 #+CAPTION:  Distributed snapshot example run, step 8
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=10
+#+ATTR_LaTeX: :height 0.8\textheight :options page=10
 #+NAME: fig:distTrans:snapshot:run8
 [[./figures/snapshot.pdf]]
 
@@ -1165,7 +1162,7 @@ class Snapshot:
 *** Example run: Step 9
 
 #+CAPTION:  Distributed snapshot example run, step 9
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=11
+#+ATTR_LaTeX: :height 0.8\textheight :options page=11
 #+NAME: fig:distTrans:snapshot:run9
 [[./figures/snapshot.pdf]]
 
@@ -1173,7 +1170,7 @@ class Snapshot:
 *** Example run: Step 10
 
 #+CAPTION:  Distributed snapshot example run, step 10
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=12
+#+ATTR_LaTeX: :height 0.8\textheight :options page=12
 #+NAME: fig:distTrans:snapshot:run10
 [[./figures/snapshot.pdf]]
 
@@ -1181,7 +1178,7 @@ class Snapshot:
 *** Example run: Step 11
 
 #+CAPTION:  Distributed snapshot example run, step 11
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=13
+#+ATTR_LaTeX: :height 0.8\textheight :options page=13
 #+NAME: fig:distTrans:snapshot:run11
 [[./figures/snapshot.pdf]]
 
@@ -1189,7 +1186,7 @@ class Snapshot:
 *** Example run: Step 12
 
 #+CAPTION:  Distributed snapshot example run, step 12
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=14
+#+ATTR_LaTeX: :height 0.8\textheight :options page=14
 #+NAME: fig:distTrans:snapshot:run12
 [[./figures/snapshot.pdf]]
 
