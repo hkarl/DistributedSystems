@@ -1,4 +1,4 @@
-#+TITLE: Dealing with failures
+#+TITLE: Dealing with failures: Consensus
 #+include: "../slidehead.org"
 
 \begin{frame}

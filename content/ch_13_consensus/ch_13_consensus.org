@@ -1,12 +1,10 @@
 #+BIBLIOGRAPHY: ../bib plain
 
 
-* Consensus 
+* Modeling consensus 
   :PROPERTIES:
   :CUSTOM_ID: sec:consensus:consensus
   :END:
-
-* Modeling consensus 
 
 *** From specific protocol to general insight 
 
@@ -41,9 +39,9 @@
 
 *** Consensus formalised 
 
-- Set of processes, each process can propose 0 or 1 has desired result
-- One a process has *decided* it cannot not change that decision
-  (decision becomes visible to outside) 
+- Set of processes, each process can propose 0 or 1 as desired result
+- Once a process has *decided*, it cannot change that decision
+  (decision becomes visible to outside world) 
 
 #+BEAMER: \pause
 
@@ -58,14 +56,15 @@
 
 
 
-* Feasible  cases                                                  :noexport:
+* Feasible  cases
 
 *** No failures at all 
 
 - No node failures, no messages lost, all messages arrive in bounded
   time (*synchronous model*) 
 - Easy! 
-- E.g., every process sends its values to all other processes 
+- E.g., every process sends its values to all other processes
+- Then, deterministic decision rule 
 
 
 *** Node fails, all messages arrive in bounded time 
@@ -114,17 +113,16 @@
 
 *** Consensus with Byzantine Processes
 
- Correctness conditions
- - Agreement: No two nonfaulty processes decide on different values
- - Validity: If all nonfaulty processes start with the same value, then this value is the only valid one
- - Termination: All nonfaulty processes eventually decide
- - Remark: 
- - Restriction of the validity conditions to only nonfaulty processes because conditions for the behavior of Byzantine processes make no sense 
- - n > 3f required (triple modular redundancy not sufficient!)
- - For failing processes such a limit does not exist!
- - An algorithm for Byzantine processes does in general not solve the consensus problem for failing processes 
- - Reason: In version for failing processes all processes that decide have to agree – even processes that fail after they have decided! 	
- - 
+ - Correctness conditions
+   - *Agreement*: No two nonfaulty processes decide on different values
+   - *Validity*: If all nonfaulty processes start with the same value, then this value is the only valid one
+   - *Termination*: All nonfaulty processes eventually decide
+ - Remarks: 
+   - Restriction of the validity conditions to only nonfaulty processes because conditions for the behavior of Byzantine processes make no sense 
+   - n > 3f required (triple modular redundancy not sufficient!)
+   - For failing processes such a limit does not exist!
+   - An algorithm for Byzantine processes does in general not solve the consensus problem for failing processes 
+   - Reason: In version for failing processes all processes that decide have to agree – even processes that fail after they have decided! 	
 
 
 * Impossibility 
@@ -152,8 +150,9 @@ process. \cite{Fischer:1985:IDC:3149.214121}
 
 *** FLP proof 
 
-Omitted. Too complicated. \Smiley 
+- Omitted. Too complicated. \Smiley 
 
+- Good explanation in, e.g., \cite{Lynch:1996:DA:525656}
 
 *** FLP interpretation 
 
@@ -170,7 +169,7 @@ Omitted. Too complicated. \Smiley
 
 *** Further consequences 
 
-- Far reaching implication
+- Far-reaching implication
 - E.g., reliable terminating multicast is equivalent to consensus
   under wide set of assumptions 
   - Needs agreement on which messages have been received by which
@@ -187,7 +186,7 @@ Omitted. Too complicated. \Smiley
 [[./figures/impossible.pdf]]
 
 
-* PAXOS                                                            :noexport:
+* PAXOS
   :PROPERTIES:
   :CUSTOM_ID: sec:consensus:paxos
   :END:
@@ -220,7 +219,7 @@ Omitted. Too complicated. \Smiley
 - Assumptions 
   - Processors: fail-stop model, arbitrary speed; may *propose* values  
   - Network: asynchronous, connected, loss/reordering/duplication
-    failures (but no corruption); partition are hence possible!   
+    failures (but no corruption); partitions are hence possible!   
   - $2f+1$ processors for at most $f$  simultaneous failures 
 
 
@@ -271,7 +270,7 @@ information
 
 
 #+CAPTION: Primary/backup strawman with multicast
-#+ATTR_LaTeX: :width 0.65\linewidth :options page=1
+#+ATTR_LaTeX: :width 0.5\linewidth :options page=1
 #+NAME: fig:consensus:pb:mutlicast
 [[./figures/paxos.pdf]]
 
@@ -431,7 +430,7 @@ information
 
 
 #+CAPTION: Server group with round numbers 
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=6
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=6
 #+NAME: fig:consensus:pb:mutlicast
 [[./figures/paxos.pdf]]
 
@@ -566,7 +565,7 @@ See \cite{paxos-made-simple}:
 - Client sends request to proposer
 - Proposer
   - assigns new number to request (say, $N$) 
-  - runs the $N$th instance of the algorithm by sending messages to a
+  - runs the $N$ th instance of the algorithm by sending messages to a
     quorum 
   - (separate algorithm instance per request; can be optimised) 
 - Operation in rounds, each with two phases 
@@ -706,7 +705,7 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
       - \href{https://raft.github.io}{Interactive animation}
 
 
-* Log replication                                                  :noexport:
+* Log replication
 
 
 *** How to use Paxos to build Kafka 
@@ -715,7 +714,7 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
   - Multiple queues, all replicated
   - Multiple writers append to each queue
   - We want /total order/ for each queue (everybody sees same sequence
-    of entires)
+    of entries)
 - Adding one entry to replicate queue is a single run of Paxos
   - I.e., agree on index where new value should sit in queue 
 
@@ -772,8 +771,7 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
 
 - Kafka uses Zookeeper, which uses RAFT, for replication
 - 
-   \href{http://mesos.apache.org/documentation/latest/replicated-log-internals/}{Apache
-   Mesos'} replicated log component, based on Paxos
+   \href{http://mesos.apache.org/documentation/latest/replicated-log-internals/}{Apache Mesos'} replicated log component, based on Paxos
 - Corfu, intended for FLASH drives and their idiosyncrasies 
   \cite{Balakrishnan:2013:CDS:2542150.2535930},
   \cite{Malkhi:2012:PCF:2146382.2146391} 
@@ -1020,10 +1018,10 @@ Round 2
 #+ATTR_LATEX: :align lllp{0.2\linewidth}
 | Case     | Round 1                                                              | Round 2                                                              | Observation             |
 |----------+----------------------------------------------------------------------+----------------------------------------------------------------------+-------------------------|
-| Normal   | \includegraphics[valign=c,width=0.2\linewidth,page=2]{figures/byzantine.pdf}  | \includegraphics[valign=c,width=0.2\linewidth,page=3]{figures/byzantine.pdf} | All decide 0 or 1       |
-| C faulty | \includegraphics[valign=c,width=0.2\linewidth,page=4]{figures/byzantine.pdf} | \includegraphics[valign=c,width=0.2\linewidth,page=5]{figures/byzantine.pdf} | A, B decide 1, validity |
-| A faulty | \includegraphics[valign=c,width=0.2\linewidth,page=6]{figures/byzantine.pdf} | \includegraphics[valign=c,width=0.2\linewidth,page=7]{figures/byzantine.pdf} | B, C decide 0, validity |
-| B faulty | \includegraphics[valign=c,width=0.2\linewidth,page=8]{figures/byzantine.pdf} | \includegraphics[valign=c,width=0.2\linewidth,page=9]{figures/byzantine.pdf} | A, C same (0 or 1)      |
+| Normal   | \includegraphics[valign=c,width=0.15\linewidth,page=2]{figures/byzantine.pdf}  | \includegraphics[valign=c,width=0.15\linewidth,page=3]{figures/byzantine.pdf} | All decide 0 or 1       |
+| C faulty | \includegraphics[valign=c,width=0.15\linewidth,page=4]{figures/byzantine.pdf} | \includegraphics[valign=c,width=0.15\linewidth,page=5]{figures/byzantine.pdf} | A, B decide 1, validity |
+| A faulty | \includegraphics[valign=c,width=0.15\linewidth,page=6]{figures/byzantine.pdf} | \includegraphics[valign=c,width=0.15\linewidth,page=7]{figures/byzantine.pdf} | B, C decide 0, validity |
+| B faulty | \includegraphics[valign=c,width=0.15\linewidth,page=8]{figures/byzantine.pdf} | \includegraphics[valign=c,width=0.15\linewidth,page=9]{figures/byzantine.pdf} | A, C same (0 or 1)      |
 
 *** Taking stock: Distinguishable 
 
@@ -1034,10 +1032,10 @@ Right columns show which cases are indistinguishable for each node
 #+ATTR_LATEX: :align lllccc
 | Case     | Round 1                                                              | Round 2                                                              | A | B | C |
 |----------+----------------------------------------------------------------------+----------------------------------------------------------------------+---+---+---|
-| Normal   | \includegraphics[valign=c, width=0.2\linewidth,page=2]{figures/byzantine.pdf} | \includegraphics[valign=c, width=0.2\linewidth,page=3]{figures/byzantine.pdf} |   |   |   |
-| C faulty | \includegraphics[valign=c, width=0.2\linewidth,page=4]{figures/byzantine.pdf} | \includegraphics[valign=c, width=0.2\linewidth,page=5]{figures/byzantine.pdf} | x |   |   |
-| A faulty | \includegraphics[valign=c, width=0.2\linewidth,page=6]{figures/byzantine.pdf} | \includegraphics[valign=c, width=0.2\linewidth,page=7]{figures/byzantine.pdf} |   |   | x |
-| B faulty | \includegraphics[valign=c, width=0.2\linewidth,page=8]{figures/byzantine.pdf} | \includegraphics[valign=c, width=0.2\linewidth,page=9]{figures/byzantine.pdf} | x |   | x |
+| Normal   | \includegraphics[valign=c, width=0.15\linewidth,page=2]{figures/byzantine.pdf} | \includegraphics[valign=c, width=0.15\linewidth,page=3]{figures/byzantine.pdf} |   |   |   |
+| C faulty | \includegraphics[valign=c, width=0.15\linewidth,page=4]{figures/byzantine.pdf} | \includegraphics[valign=c, width=0.15\linewidth,page=5]{figures/byzantine.pdf} | x |   |   |
+| A faulty | \includegraphics[valign=c, width=0.15\linewidth,page=6]{figures/byzantine.pdf} | \includegraphics[valign=c, width=0.15\linewidth,page=7]{figures/byzantine.pdf} |   |   | x |
+| B faulty | \includegraphics[valign=c, width=0.15\linewidth,page=8]{figures/byzantine.pdf} | \includegraphics[valign=c, width=0.15\linewidth,page=9]{figures/byzantine.pdf} | x |   | x |
 
 
 
@@ -1095,9 +1093,7 @@ def vote(id, initial_vote, num_proc, f):
         
 #+BEGIN_SRC python
     for k in range(f+1): 
-        # odd phase: 
-        # ... 
-
+        # odd phase: see previous slie
         # even phase: 
         if id == k:
             broadcast majority_preference
@@ -1114,7 +1110,7 @@ def vote(id, initial_vote, num_proc, f):
 
 *** Example: n=5, f=1, 2(1+1) rounds (odd and even), 2nd node is traitor
 
-\tiny
+\small
 
 |          | Node          |     1 | 2       |     3 |     4 |     5 |
 |          | Vote          |     7 | #       |     3 |     3 |     2 |
@@ -1165,13 +1161,39 @@ def vote(id, initial_vote, num_proc, f):
  
 * Case studies 
 
-*** System so far 
+*** Systems so far 
 
 - Zookeeper, Chubby: Use Paxos to ensure consistent states
 - Filesystems (Ceph, XtreemFS) use Paxos-based approach 
 - \href{https://github.com/etcd-io/etcd}{etcd} (distributed, reliable
   key/value-store) uses RAFT   
-- Raft: Plenty of implementations available 
+  - Raft: Plenty of implementations available (\href{https://raft.github.io}{List})
+
+*** etcd 
+
+From the \href{https://github.com/etcd-io/etcd}{marketing brochure}: 
+
+#+BEGIN_QUOTE
+etcd is a distributed reliable key-value store for the most critical data of a distributed system, with a focus on being:
+
+- *Simple*: well-defined, user-facing API (gRPC)
+- *Secure*: automatic TLS with optional client cert authentication
+- *Fast*: benchmarked 10,000 writes/sec
+- *Reliable*: properly distributed using Raft
+
+etcd is written in Go and uses the Raft consensus algorithm to manage a highly-available replicated log.
+#+END_QUOTE
+
+- Usage: e.g., in Kubernetes 
+
+*** etcd Architecture 
+
+- Designed for small amounts of key/value data, able to fit in memory 
+- With
+\href{https://github.com/etcd-io/etcd/tree/master/etcdctl}{command-line
+client} (in particular, ~put~, ~get~, ~del~ operations) 
+
+
 
 * Summary 
   
