@@ -93,7 +93,8 @@ GET requests can refer to a static web page (simply delivered by the server) or 
 
 #+BEAMER: \pause
 - Example simple servers
-  - Python's \href {https://docs.python.org/3.5/library/http.server.html#module-http.server}{http.server}
+  - Python's 
+\href{https://docs.python.org/3.5/library/http.server.html#module-http.server}{http.server}
   - npm's \href{https://www.npmjs.com/package/http-server}{http-server}
 
 
@@ -170,7 +171,7 @@ unresolvable request, ...
     :CUSTOM_ID: nginx_config
     :END:
   
-- Idea: depending on URL, server files from directories or forward to
+- Idea: depending on URL, serve files from directories or forward to
   other "locations" 
 - Order in configuration file matters 
 
@@ -436,8 +437,7 @@ Idea: Model/view/controller approach, tightly integrated with an SQL database
 - \ac{ORM} abstraction layer to hide SQL access behind Python classes
   and objects
 - Examples follow
-  \href{https://docs.djangoproject.com/en/2.0/topics/db/models/}{Django
-  tutorial, v2}
+  \href{https://docs.djangoproject.com/en/2.0/topics/db/models/}{Django tutorial, v2}
 
 #+BEGIN_SRC python 
 from django.db import models
@@ -468,14 +468,14 @@ class Album(models.Model):
 
 - Plenty of field types, e.g., BigInteger, Boolean, Date, DateTime,
   Duration, Email, file, Float, Image, Slug, Text, Time, URL, ... 
-- With plenty of options: null, blank, choices, primary_key, unique,
+- With plenty of options: null, blank, choices, primary\_key, unique,
   ... 
 - \href{https://docs.djangoproject.com/en/2.0/ref/models/fields/}{Django field types}
 
 *** SQL storage 
 
-- Tables are storage in selectable SQL engine
-- Transparent; details hidden by ORM
+- Tables are stored in selectable SQL engine
+- Transparent; details hidden by \ac{ORM}
 - Direct access possible if necessary
 - Actual database
   - Great for development: \href{https://www.sqlite.org/index.html}{sqlite3}
@@ -486,7 +486,7 @@ class Album(models.Model):
 
 - Developer specifies pairs of
   - regular expression for URLs to be matched against
-  - *class* to be called as when URL is matched 
+  - *class* to be called when URL is matched 
 
 *** Example URL dispatching  
 
@@ -508,8 +508,8 @@ urlpatterns = [
 *** Views 
 
 - Views are Python classes, with predefined methods
-  - in particular,  ~get()~ and ~post()~ invoked for corresponding
-    HTTP messages)
+  - In particular,  ~get()~ and ~post()~ invoked for corresponding
+    HTTP messages
 - Subclassed from default classes with typical combinations of
   functionality
   - Render a template (~TemplateView~)
@@ -724,7 +724,6 @@ By design, HTTP is stateless
  - Useful to identify users, store application state AT CLIENT, ... 
  - Can encode many different types of information 
  - Alternatives to store state: complex URLs, dynamically updated and returned 
- - 
  - Simple, sometimes useful, yet problematic 
  - Malicious cookie theft, inconsistencies between server/browser,
    ... 
@@ -809,7 +808,7 @@ actions on the client side
 
 - Issue: Asynchronous requests! Asynchronous answers! 
 - Suitable model: Event-based programming 
-  - An *event loop* wait for events
+  - An *event loop* waits for events
   - For an event, a callback function (plus parameters) is specified
     to be invoked when event happens
 - Concrete expression of this model depends on programming
@@ -841,13 +840,13 @@ structure
 *** AJAX Pros and Cons 
 - Advantage: Only script and data has to be loaded from server, translation to HTML done locally
 - Disadvantage:
-- Interaction with browser’s “Back” button/bookmarking often “surprising”  (improved by an explicit API in HTML5)
-- Interface design not trivial for good usability
-- Difficulties for search engines, deep link hard to do
-- \href{http://code.google.com/web/ajaxcrawling/}{Some approaches}
-  officially 
-  \href{https://webmasters.googleblog.com/2015/10/deprecating-our-ajax-crawling-scheme.html}{deprecated}
-- Google’s crawler does execute Javascript/CSS!
+  - Interaction with browser’s “Back” button/bookmarking often “surprising”  (improved by an explicit API in HTML5)
+  - Interface design not trivial for good usability
+  - Difficulties for search engines, deep link hard to do
+  - \href{http://code.google.com/web/ajaxcrawling/}{Some approaches}
+    officially 
+    \href{https://webmasters.googleblog.com/2015/10/deprecating-our-ajax-crawling-scheme.html}{deprecated}
+  - Google’s crawler does execute Javascript/CSS!
 
 
 *** AJAX example
@@ -955,186 +954,192 @@ while (True) {
 }
 #+END_SRC
 
-*** Simple callback example 
 
-Javascript examples mostly from \cite{Eloquent5:online}
+*** Promises and callbacks                                         :noexport:
 
-#+BEGIN_SRC javascript 
-function first(){
-  // Simulate a code delay
-  setTimeout( 
-  ?\tikzmark{callbackStart}?function(){
-    console.log(1);  }?\tikzmark{callbackEnd}?,
-    500 );
-}
-#+END_SRC
+**** Simple callback example 
 
- #+BEGIN_LaTeX
- \begin{tikzpicture}[remember picture]
-   \draw[overlay, line width=1pt, red] ($(pic cs:callbackStart) + (-0.1, +0.4)$) rectangle ($ (pic cs:callbackEnd) + (0, -0.1)$);
- \end{tikzpicture}
- #+END_LaTeX
+ Javascript examples mostly from \cite{Eloquent5:online}
 
+ #+BEGIN_SRC javascript 
+ function first(){
+   // Simulate a code delay
+   setTimeout( 
+   ?\tikzmark{callbackStart}?function(){
+     console.log(1);  }?\tikzmark{callbackEnd}?,
+     500 );
+ }
+ #+END_SRC
 
-*** Callback in jQuery 
+  #+BEGIN_LaTeX
+  \begin{tikzpicture}[remember picture]
+    \draw[overlay, line width=1pt, red] ($(pic cs:callbackStart) + (-0.1, +0.4)$) rectangle ($ (pic cs:callbackEnd) + (0, -0.1)$);
+  \end{tikzpicture}
+  #+END_LaTeX
 
+ Note: ~setTimeout~ calls first parameter after second parameter times
+ in milliseconds has passed. 
 
-**** Just one callback 
-
-(\href{https://www.w3schools.com/Jquery/jquery_callback.asp}{Example})) 
-
-#+BEGIN_SRC javascript 
-$("button").click(function(){
-    $("p").hide(1000);
-    alert("The paragraph is now hidden");
-});
-#+END_SRC
-
-**** Nested callbacks 
-Associate the clicking of a button with a particular callback
-function, which in turn has a callback associated
+**** Callback in jQuery 
 
 
-#+BEGIN_SRC javascript
-$("button").click(function(){
-    $("p").hide("slow", function(){
-        alert("The paragraph is now hidden");
+***** Just one callback 
+
+ (\href{https://www.w3schools.com/Jquery/jquery_callback.asp}{Example})) 
+
+ #+BEGIN_SRC javascript 
+ $("button").click(function(){
+     $("p").hide(1000);
+     alert("The paragraph is now hidden");
+ });
+ #+END_SRC
+
+***** Nested callbacks 
+ Associate the clicking of a button with a particular callback
+ function, which in turn has a callback associated
+
+
+ #+BEGIN_SRC javascript
+ $("button").click(function(){
+     $("p").hide("slow", function(){
+         alert("The paragraph is now hidden");
+     });
+ });
+ #+END_SRC
+
+
+
+**** Callback hell 
+
+ \href{http://callbackhell.com}{Nice?}
+
+ \tiny
+ #+BEGIN_SRC javascript
+ fs.readdir(source, function (err, files) {
+   if (err) {
+     console.log('Error finding files: ' + err)
+   } else {
+     files.forEach(function (filename, fileIndex) {
+       console.log(filename)
+       gm(source + filename).size(function (err, values) {
+         if (err) {
+           console.log('Error identifying file size: ' + err)
+         } else {
+           console.log(filename + ' : ' + values)
+           aspect = (values.width / values.height)
+           widths.forEach(function (width, widthIndex) {
+             height = Math.round(width / aspect)
+             console.log('resizing ' + filename + 'to ' + height + 'x' + height)
+             this.resize(width, height).write(dest + 'w' + width + '_' + filename, function(err) {
+               if (err) console.log('Error writing file: ' + err)
+             })
+           }.bind(this))
+         }
+       })
+     })
+   }
+ })
+ #+END_SRC
+
+
+**** JS Syntactic help: Arrow functions 
+
+
+ Define functions more compactly: use ~=>~ 
+ - ~(List of parameters) => {body}~ 
+ - Anonymous function, compare \lambda-expressions in other languages 
+
+***** Examples 
+
+ #+BEGIN_SRC javascript 
+ const squareA = (y) => { return y*y;}
+ const squareB = y  => y*y;
+ #+END_SRC
+
+
+**** Callbacks as arrow functions 
+
+***** Simple 
+
+ #+BEGIN_SRC javascript
+ setTimeout( () => console.log("Hi!"), 500);
+ #+END_SRC
+
+
+***** Look up storage                                              :noexport:
+
+ \cite[p.\ 182]{Eloquent5:online}
+ #+BEGIN_SRC javascript 
+ bigOak.readStorage("food caches",
+		    caches => {
+			let firstCache = caches[0];
+			bigOak.readStorage(firstCache,
+					   info => {
+					       console.log(info);
     });
-});
-#+END_SRC
+ });
+ #+END_SRC
+
+**** From callbacks to promises 
+
+ - So far: setting up a callback, to be called at an unspecified later
+   time when event occurs 
+ - How about: explicitly represent this *future* event, and the result
+   the handling of this event could lead to 
+ - Supported by notion of a *promise* 
+   - Value might already be there, or only be there in the future
+   - Value is called a *future* value 
 
 
+**** JS Promise example 
 
-*** Callback hell 
+ #+BEGIN_SRC javascript 
+ let fifteen = Promise.resolve(15); 
+ // register the actual callback 
+ fifteen.then(value => console.log(`Got ${value}`)); 
+ // → Got 15
+ #+END_SRC
 
-\href{http://callbackhell.com}{Nice?}
+**** JS Promise example 2 
 
-\tiny
-#+BEGIN_SRC javascript
-fs.readdir(source, function (err, files) {
-  if (err) {
-    console.log('Error finding files: ' + err)
-  } else {
-    files.forEach(function (filename, fileIndex) {
-      console.log(filename)
-      gm(source + filename).size(function (err, values) {
-        if (err) {
-          console.log('Error identifying file size: ' + err)
-        } else {
-          console.log(filename + ' : ' + values)
-          aspect = (values.width / values.height)
-          widths.forEach(function (width, widthIndex) {
-            height = Math.round(width / aspect)
-            console.log('resizing ' + filename + 'to ' + height + 'x' + height)
-            this.resize(width, height).write(dest + 'w' + width + '_' + filename, function(err) {
-              if (err) console.log('Error writing file: ' + err)
-            })
-          }.bind(this))
-        }
-      })
-    })
-  }
-})
-#+END_SRC
-
-
-*** JS Syntactic help: Arrow functions 
-
-
-Define functions more compactly: use ~=>~ 
-- ~(List of parameters) => {body}~ 
-- Anonymous function, compare $\lambda$-expressions in other languages 
-
-**** Examples 
-
-#+BEGIN_SRC javascript 
-const squareA = (y) => { return y*y;}
-const squareB = y  => y*y;
-#+END_SRC
-
-
-*** Callbacks as arrow functions 
-
-**** Simple 
-
-#+BEGIN_SRC javascript
-setTimeout( () => console.log("Hi!"), 500);
-#+END_SRC
-
-
-**** Look up storage                                               :noexport:
-
-\cite[p.\ 182]{Eloquent5:online}
-#+BEGIN_SRC javascript 
-bigOak.readStorage("food caches",
-		   caches => {
-		       let firstCache = caches[0];
-		       bigOak.readStorage(firstCache,
-					  info => {
-					      console.log(info);
-   });
-});
-#+END_SRC
-
-*** From callbacks to promises 
-
-- So far: setting up a callback, to be called at an unspecified later
-  time when event occurs 
-- How about: explicitly represent this *future* event, and the result
-  the handling of this event could lead to 
-- Supported by notion of a *promise* 
-  - Value might already be there, or only be there in the future
-  - Value is called a *future* value 
-
-
-*** JS Promise example 
-
-#+BEGIN_SRC javascript 
-let fifteen = Promise.resolve(15); 
-// register the actual callback 
-fifteen.then(value => console.log(`Got ${value}`)); 
-// → Got 15
-#+END_SRC
-
-*** JS Promise example 2 
-
-#+BEGIN_SRC javascript 
-function storage(nest, name) {
-   return new Promise(resolve => {
-     nest.readStorage(name, result => resolve(result));
-   });
-}
-storage(bigOak, "enemies")
-.then(value => console.log("Got", value));
-#+END_SRC
-
-
-*** Promises for the callback hell 
-
-\href{http://davidshariff.com/blog/futures-and-promises-in-javascript/}{Example}
-
-**** Hell 
-
-#+BEGIN_SRC javascript
-doA(function(aResult) {
-    // do some stuff inside b then fire callback
-    doB(aResult, function(bResult) {
-        // ok b is done, now do some stuff in c and fire callback
-        doC(bResult, function(cResult) {
-            // finished, do something here with the result from doC()
-        });
+ #+BEGIN_SRC javascript 
+ function storage(nest, name) {
+    return new Promise(resolve => {
+      nest.readStorage(name, result => resolve(result));
     });
-});
-#+END_SRC
+ }
+ storage(bigOak, "enemies")
+ .then(value => console.log("Got", value));
+ #+END_SRC
 
-**** with promises 
 
-#+BEGIN_SRC javascript
-doA()
-    .then(function() { return doB(); })
-    .then(function() { return doC(); })
-    .done(function() { /* do finished stuff here */ });
-#+END_SRC
+**** Promises for the callback hell 
+
+ \href{http://davidshariff.com/blog/futures-and-promises-in-javascript/}{Example}
+
+***** Hell 
+
+ #+BEGIN_SRC javascript
+ doA(function(aResult) {
+     // do some stuff inside b then fire callback
+     doB(aResult, function(bResult) {
+         // ok b is done, now do some stuff in c and fire callback
+         doC(bResult, function(cResult) {
+             // finished, do something here with the result from doC()
+         });
+     });
+ });
+ #+END_SRC
+
+***** with promises 
+
+ #+BEGIN_SRC javascript
+ doA()
+     .then(function() { return doB(); })
+     .then(function() { return doC(); })
+     .done(function() { /* do finished stuff here */ });
+ #+END_SRC
+
 
 *** Example Angular
 
@@ -1168,10 +1173,32 @@ processed, instantiated, and used at runtime.
 
 
 
-  
+
+*** Other frontend frameworks
+
+- \href{https://reactjs.org/}{React}: Declarative, component-based 
+
+#+BEGIN_QUOTE
+Design simple views for each state in your application, and React will
+efficiently update and render just the right components when your data
+changes. ... Build encapsulated components that manage their own
+state, then compose them to make complex UIs. 
+#+END_QUOTE
+
+- \href{https://vuejs.org/v2/guide/}{Vue.js}: 
+#+BEGIN_QUOTE
+a progressive framework for building user interfaces. Unlike other
+monolithic frameworks, Vue is designed from the ground up to be
+incrementally adoptable. The core library is focused on the view layer
+only 
+#+END_QUOTE
+
+
+- Plus: Ember.JS, Mithril.JS, Meteor.JS, ...   
+
 * Current developments
 
-** SPDY/HTTP2                                                      :noexport:
+** SPDY, HTTP2                                                     :noexport:
 
 *** Perceived HTTP 1.1 shortcomings 
 
@@ -1239,8 +1266,6 @@ Rules how to make sure both server and client are HTTP2-capable
 
 
 
-
-
 *** HTTP 2.0 
 
 HTTP streams
@@ -1271,7 +1296,7 @@ Compare \url{http://caniuse.com/\#feat=http2}
 
 ** WebSockets 
 
-*** WebSockets 
+
 
 
 *** The story so far: Browsers have initiative 

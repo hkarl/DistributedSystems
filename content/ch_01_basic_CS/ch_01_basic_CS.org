@@ -122,7 +122,7 @@ We usually have some operations like:
       length, \ldots
     - Often, no guarantee on minimum length!
   - Nonblocking (~man fcntl~, ~O_NONBLOCK~): Check whether message is available
-    - Copy into process buffer if yes
+    - Copy into process' buffer if yes
     - Corresponding return value if no
     - Does never block process for longer time 
 
@@ -170,82 +170,83 @@ Common model: *Parallel* Random Access Machine \cite{Karp:1988:SPA:894803}
 - In strict synchrony: *lock-step model*  
 - Compare: \url{http://pages.cs.wisc.edu/~tvrdik/2/html/Section2.html}
   (and many other online resources) 
+ 
+*** PRAM details                                                   :noexport:
+**** PRAM: Multiple concurrent reads 
 
-*** PRAM: Multiple concurrent reads 
-
-Situation: Multiple processors want to *read* the same address at the 
-same time 
-
-
-#+BEAMER: \pause
+ Situation: Multiple processors want to *read* the same address at the 
+ same time 
 
 
-- Option 1: That's fine; allow to proceed; all get same value
-  - Allow *concurrent reads* (CR) 
-- Option 2: Forbid even that; terminate program with error
-  - Insist on *exclusive reads* (ER) 
-
-*** PRAM: Multiple concurrent writes 
-
-Situation: Multiple processors want to *write*  the same address at the 
-same time 
+ #+BEAMER: \pause
 
 
-#+BEAMER: \pause
+ - Option 1: That's fine; allow to proceed; all get same value
+   - Allow *concurrent reads* (CR) 
+ - Option 2: Forbid even that; terminate program with error
+   - Insist on *exclusive reads* (ER) 
+
+**** PRAM: Multiple concurrent writes 
+
+ Situation: Multiple processors want to *write*  the same address at the 
+ same time 
 
 
-- Option 1: That's dangerous; terminate program with error
-  - Insist on *exclusive writes* (EW)
-- Option 2: That's ok if they all write the same value; otherwise,
-  error
-  - *COMMON concurrent write (CW)*
-- Option 3: That's ok as long as we have some priority among the
-  processors; highest priority wins
-  - *PRIORITY concurrent write*
-- Option 4: I don't care, just write any one of the intended values
-  - *ARBITRARY concurrent write* 
+ #+BEAMER: \pause
 
 
-*** PRAM: Combinations 
-
-- All combinations of ER/CR with EW/variants of CW are possible
-- /Weaker/ models like EREW closer to reality, but more difficult to
-  program
-- /Stronger/ models like CRCW: vice versa
-
-
-#+BEAMER: \pause
-
-- But: On $p$ processors, weakest model can simulate strongest model
-  with $O(\log p)$ slowdown and $p$ times memory 
+ - Option 1: That's dangerous; terminate program with error
+   - Insist on *exclusive writes* (EW)
+ - Option 2: That's ok if they all write the same value; otherwise,
+   error
+   - *COMMON concurrent write (CW)*
+ - Option 3: That's ok as long as we have some priority among the
+   processors; highest priority wins
+   - *PRIORITY concurrent write*
+ - Option 4: I don't care, just write any one of the intended values
+   - *ARBITRARY concurrent write* 
 
 
-*** PRAM algorithm: Check if value is present in memory 
+**** PRAM: Combinations 
 
-- $p$ processors, $n$ memory cells, processor $P_0$ has value $x$
-- $P_0$ wants to know whether $x$ occurs in at least one of the $n$
-  cells 
-
-
-*** EREW-PRAM: Check if value is present in memory 
-
-- $P_0$ broadcasts $x$ to other processors: *binary broadcast*
-  - Cost: $O(\log p)$
-- All processors perform local search on $n/p$ items
-  - Cost: $n/p$
-- All processors perform *parallel reduction*
-  - Cost: $n/p$
-- Total cost: $O(\log p) + n/p$
+ - All combinations of ER/CR with EW/variants of CW are possible
+ - /Weaker/ models like EREW closer to reality, but more difficult to
+   program
+ - /Stronger/ models like CRCW: vice versa
 
 
-*** Other PRAMs: Check if value is present in memory 
+ #+BEAMER: \pause
 
-- What can be simplified on a CREW PRAM, a COMMON-CRCW PRAM? 
+ - But: On $p$ processors, weakest model can simulate strongest model
+   with $O(\log p)$ slowdown and $p$ times memory 
 
-#+BEAMER: \pause
-- CREW: No binary broadcast needed; $O(1)$
-- COMMON-CRCW: No parallel reduction needed as well: processors that
-  found $x$ just write ~True~ into $P_0$ 
+
+**** PRAM algorithm: Check if value is present in memory 
+
+ - $p$ processors, $n$ memory cells, processor $P_0$ has value $x$
+ - $P_0$ wants to know whether $x$ occurs in at least one of the $n$
+   cells 
+
+
+**** EREW-PRAM: Check if value is present in memory 
+
+ - $P_0$ broadcasts $x$ to other processors: *binary broadcast*
+   - Cost: $O(\log p)$
+ - All processors perform local search on $n/p$ items
+   - Cost: $n/p$
+ - All processors perform *parallel reduction*
+   - Cost: $n/p$
+ - Total cost: $O(\log p) + n/p$
+
+
+**** Other PRAMs: Check if value is present in memory 
+
+ - What can be simplified on a CREW PRAM, a COMMON-CRCW PRAM? 
+
+ #+BEAMER: \pause
+ - CREW: No binary broadcast needed; $O(1)$
+ - COMMON-CRCW: No parallel reduction needed as well: processors that
+   found $x$ just write ~True~ into $P_0$ 
 
 ** Timing models 
 
@@ -301,9 +302,6 @@ are allowed to occur
     - If it did not arrive with $T$ time, consider it lost
       $\rightarrow$ Timeout! 
     
-  
-
-
 ** Faults models 
 
 *** Fault models 
@@ -429,7 +427,9 @@ int main(int argc, char **argv)
 - Simple usage 
 - Be *fast* and efficient 
 
-- (BTW: nanomsg http://nanomsg.org can be regarded successor to 0mq) 
+- (BTW: nanomsg-next-gen https://nng.nanomsg.org,
+  https://github.com/nanomsg/nng can be regarded successor, competitor
+  to 0mq; compare https://nng.nanomsg.org/RATIONALE.html )
 
 *** 0mq: Send and receive data, in C 
 
@@ -1347,13 +1347,15 @@ A series of requests might be related to each other
 - Maps from one name space to another 
 - Typical operations
   - Make an entry: *bind*, *register*, ...
-  - Look up and entry 
+  - Look up an entry 
 - Many examples
-  - DNS, Peer-to-peer systems,
+  - DNS, Peer-to-peer systems, service discovery, ... 
 
 #+BEAMER: \pause
 
-  - Broadcasting (like ARP), without explicit registration step 
+- Mechanisms 
+  - Broadcasting (like ARP), without explicit registration step
+  - Explicit directories 
 
 *** Client/Server Evaluation
   Advantages
