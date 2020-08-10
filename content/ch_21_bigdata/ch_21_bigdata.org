@@ -1,72 +1,445 @@
 #+BIBLIOGRAPHY: ../bib plain
 
-** Big Data 
+* Big Data 
 
-*** BigData – From scarcity to deluge?  
- Distributed Systems, Ch 7: Some case studies
- 29
+
+*** BigData – LHC						:B_quotation:
+    :PROPERTIES:
+    :BEAMER_env: quotation
+    :END:
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+Example: \ac{LHC} at \ac{CERN}, ca. late 2018 
+- About 225k cores, 60k disks, 35.000 km of optical fibre   
+- Up to 24 Gigabytes/s to be recorded (after filtering) 
+- After data reduction, store about 50+25  petabytes per year
+- Current total over 100 petabytes  (outdated?) 
+- Check \href{http://cern.ch/go/datacentrebynumbers}{CERN Data centre  by numbers} for up-to-date information
+
+
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: CERN data centre
+#+ATTR_LATEX: :width 0.9\linewidth
+#+NAME: fig:cern
+[[./figures/CERN.png]]
+
+
+*** Data volume in general 
+
+- \href{https://blog.microfocus.com/how-much-data-is-created-on-the-internet-each-day/}{Overview}
+- Fujitsu: Total amount of data stored up to 2013: 3 Zettabytes= $3
+  \cdot   10^\{21$} = 3 million Petabytes = 3 billion Terabytes  
+- IDC: 2,8 Zettabytes produced 2012; 2020 predicted 40 Zettabytes per
+  year
+  - 2025: 463 \cdot 10^9 GB/day, about 150  Zettabytes per year  
+- IBM: 90% of all data was created in the last two years
+- \href{https://www.cisco.com/c/en/us/solutions/collateral/service-provider/visual-networking-index-vni/mobile-white-paper-c11-520862.html}{Cisco traffic forecast}: 2021, 49 Exabytes per month *mobile* data
+  traffic; 47% CAGR 2016-2021
+
+
+
+
+
 *** The Three (or Five?) Vs
- 30
+
+- Common lore: The Three Vs
+  - *Volume*: amount of data 
+  - *Variety*: many different formates and sources of data ("polystructured data") 
+  - *Velocity*: speed at which data is generated, transmitted, processed, analyzed  
+- The Five Vs (Fujitsu) 
+  - Volume, Variety, Velocity as above  
+  - Versatility: use the same data for many purposes 
+  - Value: build things that people want...  
+- Compared to SQL: Speed, flexibility, scalability given larger weight than formal strictness of SQL 
 
 
-** Basic programming mode: MR
-   
-- BigData / MapReduce
-- Hadoop, Yarn
+
+* Analytics 
+
+** Structure 
+
+*** Big data analytic 
+
+****  Data as such is meaningless 
+
+***** 								:B_quotation:
+     :PROPERTIES:
+     :BEAMER_env: quotation
+     :END:
+
+
+Big data is a step forward. But our problems are not lack of access to
+data, but understanding them. (Noam Chomsyk, 2013) 
+
+***** 								:B_quotation:
+     :PROPERTIES:
+     :BEAMER_env: quotation
+     :END:
+
+We are drowning in information but starved for knowledge. (John
+Naisbitt, 1982) 
 
 
 
-*** Programming model: MapReduce
- Based on GFS and BigTable, programming actual applications remains difficult 
- - Need to parallelize, consistency, … 
- - Provide a simple programming model, applicable to wide range of applications
- - Take a set of input key/value pairs <k1, v1>
- - Example: List of <URL, PageContent> for all stored Webpages
- - For each such pair, produce an intermediate set of key/value pairs <k2, v2> - the map operation 
- - Example: For each URL, produce <word, “1”> for each word appearing in the web page
- - Map: <k1,v1> ! list( <k2,v2> )
- - Take these many lists, sort them according to produced key (sort/shuffle) 
- - List (list (<k2, v2>)) ! list (<k2, list <v2>)
- - Reduce operation: turn these lists of v2s into individual elements
- - Done separately for each <k2, list <v2> >
- - Example: Sum up the word counts for each word appearing in any webpage 
- - Application programmer has to write map and reduce functions; rest is done by the MapReduce library
- - Distribution of list to many worker machines, … 
- J. Dean, S. Ghemawat, MapReduce: Simplified Data Processing on Large Clusters, Proc. OSDI 2004 & 
- - ComMag article 2008 
-*** MapReduce application code
- 41
+
+#+BEAMER: \pause
+
+**** Process 
+
+
+#+CAPTION: From data to decisions
+#+ATTR_LATEX: :width 0.9\linewidth
+#+NAME: fig:bd:decisions
+[[./figures/bigDataProcess.pdf]]
+
+*** Data analytics -- high-level view 
+
+
+#+CAPTION: High-level big data analysis pipeline
+#+ATTR_LATEX: :height 0.8\textheight
+#+NAME: fig:bd:analysis:pipeline
+[[./figures/bdAnalyticsFlowChart.pdf]]
+
+(c) E. Hüllermeier, Gold for Exports Big Data Session. 
+
+*** Types of data analysis 
+
+- Descriptive analytics
+  - Finding local patterns that summarize and describe parts of data 
+- Predictive analytics
+  - Deduce (global) models that generalize beyond available data 
+- Unsupervised learning
+  - Input is unlabelled data 
+- Supervised learning
+  - Input is data labeled with examples that are to be predicted 
+
+
+(c) E. Hüllermeier, Gold for Exports Big Data Session. 
+
+
+** Clustering 
+
+
+*** Example for unsupervised learning: Clustering 
+
+- Given: a set of data points
+  - Describe as $n$ -dimensional vectors
+  - Intuition/expectation: Data falls into $k$ similar groups
+    (*clusters*)
+- Desired: map each data point to one of $k$ clusters
+  - With a measure of *closeness*
+
+*** Clustering example 1: Straightforward 
+
+- Simple case, two clearly separated clusters
+
+
+#+CAPTION: Straightforward clustering example
+#+ATTR_LATEX: :width 0.7\linewidth :options page=1
+#+NAME: fig:bd:clustering:straightforward
+[[./figures/kmeans.pdf]]
+
+
+*** Clustering example 2: Outliers 
+
+- Some values far away from expected value of their class
+  - Typically: $> 3 \sigma$ 
+
+
+#+CAPTION: Straightforward clustering with outlier
+#+ATTR_LATEX: :width 0.7\linewidth :options page=2
+#+NAME: fig:bd:clustering:outlier
+[[./figures/kmeans.pdf]]
+
+*** Clustering example 3: Some overlap  
+
+- Clusters overlap, answer not obvious based on parameters 
+
+#+CAPTION: Clustering with overlap
+#+ATTR_LATEX: :width 0.7\linewidth :options page=3
+#+NAME: fig:bd:clustering:outlier
+[[./figures/kmeans.pdf]]
+
+
+*** Clustering example 4: No linear separation    
+
+- Classes not linearly separated 
+
+#+CAPTION: Clustering for non-linear separable clusters 
+#+ATTR_LATEX: :width 0.7\linewidth :options page=4
+#+NAME: fig:bd:clustering:outlier
+[[./figures/kmeans.pdf]]
+
+
+** Clustering: kMeans 
+
+*** One clustering approach: kMeans 
+
+- Assume clusters are reasonably separable 
+- Represent cluster by a single representative, in the middle of cluster
+  - Jointly, the $k$ means, hence the name 
+- Clustering: Data point belongs to the cluster to whose
+  representative it is closest 
+
+
+#+BEAMER: \pause
+
+
+**** Formally: Minimize sum distance 
+
+- Chose representatives that minimizes sum of squared distances of all data to
+  their assigned cluster representative 
+
+#+BEAMER: \pause
+
+- Question: How to find representatives? (Actually: NP hard!) 
+
+*** Heuristic: Lloyd's algorithm 
+
+Two phases: *assignment* and *update*, iterated 
+
+**** Initial
+
+For each cluster, guess a representative
+
+
+
+#+BEAMER: \pause
+
+**** Assignment 
+
+Assign each data point to cluster to whose  representative it is closest
+
+
+#+BEAMER: \pause
+
+**** Update 
+
+For each cluster, compute a new representative as the gravity center
+of the assigned data points 
+
+
+*** kMeans Python sketch (1) 
+
+#+BEGIN_SRC python 
+# some helper functions 
+def distance (x,y):
+    return  (x[0]-y[0])**2 + (x[1]-y[1])**2
+
+def findClosest (p, c):
+    d = ((distance(p, c[i]),i) for i in range(len(c)))
+    return min(d)[1]
+
+def center (v):
+    if len(v)>0:
+        return ( sum([x[0] for x in v])/len(v),  
+                 sum([x[1] for x in v])/len(v), )
+    else:
+        return ( (uniform(0,100), uniform(0,50), ))
+#+END_SRC
+
+*** kMeans Python sketch (2) 
+
+#+BEGIN_SRC python 
+# init some testdata 
+data [something]
+k = 5 
+centers = [ (uniform(0,1), uniform(0,1)) for i in range(k)]
+
+for i in range(numIterations):  
+    data_with_centers = [ (d, findClosest(centers, data)) for d in data ]
+    centers = [center(
+                  ( d[0]
+		    for d in data_with_centers 
+                    if d[1] == kk)
+		  ) 
+               for kk in range(k) ]
+#+END_SRC
+
+
+
+
+*** Challenge: kMeans on big data? 
+
+- Easy enough algorithm 
+- But how to distribute it when data becomes too big for a single
+  machine? 
+
+
+*** Other standard example: WordCount 
+
+- Suppose a WebCrawler has dumped the content of the WWW on our
+  harddisk
+  - Say, with URL as filename, Web page as file content 
+- We want a statistics of words: How often does each word appear? 
+
+* MapReduce
+
+*** Programming model
+ - Goal: Provide a simple programming model, applicable to wide range of applications
+ - Idea: Represent data as key/value pairs  <k1, v1>
+   - Example: List of <URL, PageContent> for all stored Webpages
+ - Define some operators on these lists that lend themselves to
+   distributed execution
+ - Produce a list of key/value pairs again 
+
+*** Mapping
+
+ - For each such key/value pair, produce an intermediate list of key/value pairs <k2, v2>
+   - The *map* operation
+   - Neither key nor values need to be unique
+   - The keys here are already the keys we will see in our final
+     result 
+
+
+**** Example 
+
+For each URL, produce <word, “1”> for each word appearing  in the web page
+   - Open file, read it in, split it into words, ... 
+
+
+#+BEAMER: \pause
+
+**** Formally 
+
+     Map: <k1,v1> $\rightarrow$  list( <k2,v2> )
+
+
+*** Shuffling
+
+- Take all these intermediate lists 
+- Regroup them by appending all values that belong to the same key
+
+
+#+BEAMER: \pause
+
+
+**** Example 
+
+All the entries ("UPB", 1) end up as a single entry ("UPB", (1, 1, 1,
+..., 1)) 
+
+**** Formally 
+
+List (list (<k2, v2>)) \rightarrow  list (<k2, list <v2>)
+
+*** Reducing 
+    
+  
+ - From list of values to single value for each key: *Reduce* with a
+   function $r$
+   - Function should be associative, commutative; repeatedly applied
+     - r(v_1, v_2, \ldots, v_n) = r(v_2, r(v_2, \ldots, v_n)) = \ldots 
+   - Done separately for each <k2, list <v2> >
+
+**** Example 
+ - Sum up the word counts for each word appearing in any webpage 
+
+**** Formally 
+
+List(<k, list<v>) \rightarrow List(<k, r(<list<v>))
+
+*** History 
+
+- Actually, very old model; very familiar to every Lisp programmer
+- As a model for distributed computing, probably popularized by Google
+  in famous paper \cite{mapreduce:2004}
+
+*** Practicality 
+
+ - Application programmer has to write map and reduce functions
+ - Rest is done by the MapReduce library
+   - In particular, shuffling 
+ - Distribution of list to many worker machines
+
+
+*** MapReduce application code					   
+
+In addition to actual map & reduce function, application needs to
+specify some more utility functions: 
+
+- *Input reader*:  turn input (e.g., text files in file system) into
+  key/value pairs  
+- *Map function* (see above) 
+- *Partition function*: For output of map function, decide to which
+  reducer it shall be sent  
+  - reducerIndex = partition (key, numberOfReducers) 
+  - Has to be deterministic – data with same key must go to same reducer
+- *Compare function*: group keys into equivalence classes for reduce
+  step (which keys shall be considered identical?)  
+- *Reduce function* (see above)  
+- *Output writer*: turn output into files in file system 
+
+
 *** MapReduce big picture 
- 42
- Raw data as list of 
- - (key, value) pairs:
- - 
- - [(k1, v1), 
- -  (k2, v2), 
- -  (k1, v3), 
- -  (k1, v4), 
- -  (k3, v1),
- -  …. 
- - ]
- Map function
- Shuffle and group
- List of (key, list of value) pairs:
- - [(k1, [v1, v3, v4]),
- -  (k2, [v2]),
- -  (k3, [v1]),
- - ...]
 
- Reduce function
- List of (key, value) pairs: 
- - [ (k1, u1)
- -   (k2, u2),
- -   (k3, u3), , …]
- Input reader
+
+#+CAPTION: Map Reduce overview picture 
+#+ATTR_LATEX: :width 0.9\linewidth
+#+NAME: fig:mapreduce:overview
+[[./figures/mapreduce.pdf]]
+
+* todo								   :noexport:
+
+
+** Distributed MR 
+
+*** What, how to store? 
 
 
 
- Raw data 
-*** CountWords – Python example 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- Typical: LARGE, unstructured text files 
+  - Break them up in chunks 
+  - Store chunks redundantly 
+  - Keep track of chunks in a master 
+- Efficient: Sequential read, atomic append 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: How to store data in a cluster?
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:mr:howtostore
+[[./figures/howtostore.pdf]]
+
+
+
+
+*** CountWords – Python example					   :noexport:
  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. …
  ['lorem',
  -  'ipsum',
@@ -126,8 +499,31 @@
 
 
 *** Preparing Map/Reduce for distributed execution 
- 44
-*** Example: distributed word count, Map/Reduce style
+
+- Input data is split over many
+  - Natural place to run map functions 
+  - Data might be in several files per machine 
+  - Distributed, redundant file system! 
+- Reducers need grouped input 
+  - To be provided by shuffle
+  - Can be run on same or other worker machines 
+- Shuffle is the same for all types of jobs 
+  - Can be implemented in both mappers and reducers 
+
+
+
+*** Distributed MR: Core idea 
+
+
+#+CAPTION: Core structure of running map/reduce in a cluster
+#+ATTR_LaTeX: :width 0.9\linewidth
+#+NAME: fig:mr:structure
+[[./figures/distrMR_structure.pdf]]
+
+
+
+
+*** Example: distributed word count, Map/Reduce style		   :noexport:
  Worker Map #1
 
  Lorem ipsum dolor 
@@ -219,127 +615,323 @@
 
 
 
-*** MapReduce: Distributed Execution 
- Distributed shuffle/sort
- - takes place 
- - automatically!
+
 *** MapReduce execution overview 
 
+
+#+CAPTION: MapReduce execution overview from a process perspective
+#+ATTR_LaTeX: :width 0.9\linewidth
+#+NAME: fig:mr:execution_overview
+[[./figures/mr_execution_overiew.pdf]]
+
+
+
 *** Questions to solve 
- 48
-*** MapReduce example – WordCount with google functions
- map (String key, String value):
- - // key: document name
- - // value: document contents
- - for each word w in value:
- - 	EmitIntermediate(w, "1");
- - 
- - reduce (String key, Iterator values):
- - // key: a word
- - // values: a list of counts
- - int result = 0;
- - for each v in values:
- - 	result += ParseInt(v);
- - 	Emit(AsString(result));
+
+- Which worker is picked to run which map job? 
+- Redundant data storage, but multiple M&R jobs overlap, compete for
+  resources 
+  - How to know? Applications announce, history, predictions, …? 
+- When to start reducing? 
+  - How much to overlap mapping, shuffling, and reducing phases? 
+- Which partition is sent to which reduce worker? 
+- Complex tuning problems! Performance not evident 
+    
 
 
 *** MapReduce code example: Count word frequencies 
 
-*** Example: k-means clustering 
+#+CAPTION: Word count -- from google code examples
+#+ATTR_LaTeX: :width 0.9\linewidth
+#+NAME: fig:mr:word_count:google
+[[./figures/mr_wordcount.pdf]]
 
 
 
 
+*** kMeans as map/reduce 
+
+- Mapper
+  - Input: subset of data vectors, current centres 
+  - Output: List of pairs (closest centre, data vector)
+- Shuffle
+  - Reorder into lists of pairs: (centre, list of corresponding data
+    vectors) 
+- Reducer 
+  - Input: (centre, list of corresponding data vectors) 
+  - Output: new centre (component-wise arithmetic mean of data vectors) 
+
+
+***  kMeans as MR job: Structure 
+
+
+#+CAPTION: Structuring kMeans as an MR job
+#+ATTR_LaTeX: :width 0.9\linewidth
+#+NAME: fig:mr:kmeans:structure
+[[./figures/mr_kMeans.pdf]]
 
 
 
+*** kMeans MR Python sketch 
+
+#+BEGIN_SRC python 
+def distance (x,y):
+    return  (x[0]-y[0])**2 + (x[1]-y[1])**2
+
+def findClosest (p, c):
+    d = ((distance(p, c[i]),i) for i in range(len(c)))
+    return min(d)[1]
+
+def center (v):
+    # print v 
+    if len(v)>0:
+        return ( sum([x[0] for x in v])/len(v),  
+                 sum([x[1] for x in v])/len(v), )
+    else:
+        return ( (uniform(0,100), uniform(0,50), ))
+
+#########################
+
+def mapper (vecs, kmeans):
+    return [ (findClosest (v, kmeans), v) for v in vecs]
+
+def reducer (k, vecs):
+    return center (vecs)
+#+END_SRC
+
+*** kMeans MR Python sketch (2) 
+
+#+BEGIN_SRC python 
+# split up the vectors in mappers many partitions
+datapartitions = list(chunks(data, numSamples/numMappers))
+
+for i in range(numIters):
+
+    # apply mapper to each one, produces a list of lists with (closest center, vector) 
+    mappedData = [mapper (d, kmeans) for d in datapartitions]
+
+    
+    # flatten the mappedData to remove the numMapper many sublists, then shuffle around according to key 
+    # produces a list of (center, list of closest vectors) 
+    flattenedData = list(itertools.chain.from_iterable (mappedData))
+    shuffledData = [(k, [m[1] for m in flattenedData if m[0] == k])
+                    for k in range(numK)]
+
+
+    # and apply reducer, updating the centers immediately: 
+    kmeans = [reducer(k, v) for (k,v) in shuffledData ]
+    pprint.pprint (kmeans) 
+#+END_SRC
 
 
 
+* Frameworks 
+
+** Old and new 
+
+*** Early vs. current MR frameworks 
+
+- Early examples: 
+  - All intermediate results written to disk (in iterative code!) 
+  - Reusing them in iterative jobs: read from disk 
+  - Perhaps even on different machine (caching!)
+  - Examples: Google MapReduce, (older) Hadoop 
+- Consequence: 
+  - Good performance for simple jobs 
+  - Terrible for iterative jobs 
+    - Example: k-Means!
+- Current frameworks: Keep data in memory!
+  - Spark 
+  - But: Dependability?  
 
 
 
+*** Google MapReduce: Some old performance figures (2004)
 
 
 
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
 
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
 
-
-
-
-
-
-
-
- x1
- x2
- WS 16/17, v 1.4
- Distributed Systems, Ch 7: Some case studies
- 51
-*** k-means as map/reduce 
- 52
-*** 
- Mapper
-
- Mapper
-
-
-
-
-
- [(c(1), v1),…
- -     (c(m), vm)]
- [(c(m+1), vm+1),…
- -        (c(2m), v2m)]
-
- Shuffle
- [(c1, [v(1,1), v(1,2), … ]),
- -   …
- -   (c1, [v(1,1), v(1,2), … ]) ]
-
-
-
- Reduce
- Reduce
-
-
- c1’
- ck’
- WS 16/17, v 1.4
- Distributed Systems, Ch 7: Some case studies
- 53
-*** Python k-means map/reduce  (NOT distributed!)  
- Distributed Systems, Ch 7: Some case studies
- 54
-*** MapReduce: Some old performance figures (2004)
  Setup: cluster with about 1800 machines
  - Dual 2GHz Xeon, 4 GB memory, two 160 GB IDE disks
- - Gigabit Ethernet, ¼ 100-200 Gbps aggregate bandwidth 
+ - Gigabit Ethernet, \aprox 100-200 Gbps aggregate bandwidth 
  - Application: Sort 
- -  Sort 1010 100 byte long records, ¼ 1 TB data
+ -  Sort 1010 100 byte long records, \approx 1 TB data
  - Write sorted output to 2-way replicated GFS file (2 TB output) 
-*** MapReduce: Some more performance figures 
- 56
-*** Sorting: CloudSort benchmark
- 57
- http://sortbenchmark.org
-*** MapReduce statistics @ Google  
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+
+#+CAPTION: Sorting by MR - ca. 2004
+#+ATTR_LaTeX: :height 0.9\textheight
+#+NAME: fig:mr:sorting
+[[./figures/mr_sorting.pdf]]
+
+
+
+*** MapReduce: Some more recent performance figures 
+
+- Terasort: 
+  - Nov 2008: 68 seconds on 1000 machines 
+  - May 2009: 62 seconds on 1460 machines 
+- Petasort: 
+  - Nov 2008: 6’2’’, 4000 machines 
+  - May 2009: 16’15’’, 3658 machines 
+  - Sept 2011: 0’33’’, 8000 machines 
+- 10Petasort:
+  - Sept 2011: 6’27’’, 8000 machines
+- 50Petasort:
+  - 23 hours, 36.2 TB/min, 50 MB/s/worker (about 10.000 machines?)
+- Sources:
+  \href{http://static.googleusercontent.com/media/research.google.com/en//archive/papers/mapreduce-sigmetrics09-tutorial.pdf}{1},
+  \href{http://googleresearch.blogspot.de/2011/09/sorting-petabytes-with-mapreduce-next.html}{2}
+  \href{https://cloud.google.com/blog/products/gcp/history-of-massive-scale-sorting-experiments-at-google}{3} \href{http://sortbenchmark.org}{4}
+
+
+
+
+** Hadoop 
 
 *** Hadoop 
- 59
+- Standard system: Hadoop/YARN as Map/Reduce engine, with HDFS as
+  user-level filesystem  
+  - Apache Foundation project 
+  - Java-based; strong emphasis on portability 
+- Hadoop
+  - Centralized JobTracker splits up input and assigns it to map and
+    reduce tasks, running on each node  
+  - Per node, TaskTracker runs the actual map and reduce jobs; polls
+    JobTracker for jobs; each job runs in own JVM instance (!)  
+- HDFS user-level file system 
+  - HDFS files chopped into 64 Mbyte chunks, stored as files in an
+    underlying (arbitrary) file system   
+  - NameNode: centralized service, maintains directory tree, maps HDFS
+    file names to list of constituting chunks   
+  - DataNode: stores chunks, abstracts away local filesystem 
+
+
 *** Hadoop 
- Shafer, Rixner, Cox, The Hadoop Distributed Filesystem: Balancing Portability and Performance
+
+
+#+CAPTION: Hadoop cluster structure (Fig. 1 from \cite{shvachko10:_hadoop_distr_file_system})
+#+ATTR_LaTeX: :width 0.9\linewidth
+#+NAME: fig:hadoop:structure
+[[./figures/hadoop_structure.pdf]]
+
+
+
 *** Hadoop Yarn – Map/Reduce task scheduler 
- Distributed Systems, Ch 7: Some case studies
- 61
- from: http://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/YARN.html
-*** Outlook: SQL-like interaction with a BD infrastructure (*) 
- 62
-*** Word Count using Pig
- Distributed Systems, Ch 7: Some case studies
- 63
-*** Kmeans Using Pig
- 64
 
-*** PigLatin – advantages over, e.g., Python, SQL?
- 68
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+- Yarn: Redesign of JobTracker 
+- Split up into separate daemons: 
+  - Resource Manager, global 
+  - Job scheduling, per-application ApplicationMaster  
+    - Can handle individual M/R jobs as well as DAGs of such jobs  
+  - Containers represent resources (memory, CPU, \ldots)
+  - Pluggable schedulers (e.g., Fair, Capacity, \ldots) 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+
+#+CAPTION: Hadoop Yarn
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:hadoop:yarn
+[[./figures/hadoop_yarn.pdf]]
+
+
+
+http://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/YARN.html
+
+
+** Spark 
+
+*** From disk-based to memory based 
+
+- Observation: Map/Reduce is terrible at iterative algorithms 
+  - Intermediate results get written to disk, read again from disk, … 
+- Idea: Make iterative structure explicit and visible to processing system
+  - Allowing it to cache intermediate results 
+  - Example: Apache Spark 
+- Spark material 
+  - Main publication: \cite{zaharia12:_resil_distr_datas},  \href{https://www.usenix.org/sites/default/files/conference/protected-files/nsdi_zaharia.pdf}{slides}, \href{https://c59951.ssl.cf2.rackcdn.com/nsdi12/zaharia.mp4}{video} 
+  - Internals: \href{https://spark-summit.org/2014/a-deeper-understanding-of-spark-internals/}{presentation},
+    \href{https://www.youtube.com/watch?v=dmL0N3qfSc8}{video}  
+
+
+*** Dependable in memory M/R?
+
+- Idea to keep data in memory during M/R jobs is fairly obvious 
+- Not obvious: How to ensure dependability?
+  - What happens to intermediate results when one machine goes down
+    during a job?  
+- What if intermediate results can be recomputed? 
+  - Re-execute the job? 
+  - Semantics? Depends on model details  
+  - Performance? Trade-off analysis 
+
+*** Spark 
+
+- A dependable, in-memory MR framework \cite{zaharia12:_resil_distr_datas}
+- Core idea: During a job, keep track how intermediate results where
+  produced  
+  - If necessary, all results can be recomputed 
+  - Give programmer means to influence which results should be persisted
+    or keep  in-memory  
+- Great performance advantages!
+- *Resilient distributed datasets* (RDD)
+  - Read-only collection of records, can be transformed into other
+    RDDs by deterministic operations  
+
+*** Spark programming primitives 
+
+- RDD created from stable storage or from other RDD (transformation) 
+- Example transformations on RDDs
+  - *count* number of records in RDD 
+  - *filter* records by given Boolean function 
+  - *map* each record to new records by given function  
+  - *groupByKey* 
+  - *reduceByKey* : combine two records into one by given function 
+
+*** Benefit? Example logistic regression 
+
+
+#+CAPTION: Spark performance benefits, logistic regression example
+#+ATTR_LaTeX: :width 0.8\linewidth
+#+NAME: fig:spark:benefit
+[[./figures/spark_logistic_performance.pdf]]
+
+* Conclusions 
+
+*** Conclusions 
+
+ 

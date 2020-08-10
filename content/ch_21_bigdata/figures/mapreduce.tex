@@ -1,0 +1,116 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary{arrows.meta,
+                calc, chains,
+                quotes,
+                positioning,
+                shapes.geometric}
+
+\usepackage[most]{tcolorbox} %<---- Added [most]  option
+\tcbuselibrary{listings}
+
+
+\begin{document}
+
+\tcbset{colframe=blue!15,coltitle=black,colback=white}
+
+\begin{tcblisting}{
+        title=Raw Data ,
+        enhanced, % <-- added
+        remember as = rawdata, % <-- added
+        box align=center, 
+        hbox,
+        listing only,
+        listing options={
+            language=python,
+        }
+    }
+[w1,
+ w2,
+ w3,
+ ... 
+]
+\end{tcblisting}
+\hspace{2cm}
+
+\begin{tcblisting}{
+        title=Raw Data as key/value pairs,
+        enhanced, % <-- added
+        remember as = rawdataKV, % <-- added
+        box align=center, 
+        hbox,
+        listing only,
+        listing options={
+            language=python,
+            % basicstyle=\ttfamily,
+            % keywordstyle=\color{blue}\ttfamily,
+            % stringstyle=\color{red}\ttfamily,
+            % commentstyle=\color{green}\ttfamily,
+            % morecomment={[l][\color{magenta}]{\#}},
+        }
+    }
+[(k1, v1), 
+ (k2, v2), 
+ (k1, v3), 
+ (k1, v4), 
+ (k3, v1),
+ ...
+]
+\end{tcblisting}
+\hspace{2cm}
+
+\begin{tcblisting}{
+        title=List of  key/list of value pairs,
+        enhanced, % <-- added
+        remember as = listKlistV, % <-- added
+        box align=center, 
+        hbox,
+        listing only,
+        listing options={
+            language=python,
+            % basicstyle=\ttfamily,
+            % keywordstyle=\color{blue}\ttfamily,
+            % stringstyle=\color{red}\ttfamily,
+            % commentstyle=\color{green}\ttfamily,
+            % morecomment={[l][\color{magenta}]{\#}},
+        }
+    }
+[(k1, [v1, v3, v4]),
+ (k2, [v2]),
+ (k3, [v1]),
+ ... 
+]
+\end{tcblisting}
+\hspace{2cm}
+
+\begin{tcblisting}{
+        title=List of  key/aggregated value pairs,
+        enhanced, % <-- added
+        remember as = listKaggV, % <-- added
+        box align=center, 
+        hbox,
+        listing only,
+        listing options={
+            language=python,
+            % basicstyle=\ttfamily,
+            % keywordstyle=\color{blue}\ttfamily,
+            % stringstyle=\color{red}\ttfamily,
+            % commentstyle=\color{green}\ttfamily,
+            % morecomment={[l][\color{magenta}]{\#}},
+        }
+    }
+[ (k1, u1)
+  (k2, u2),
+  (k3, u3), 
+  ... ]
+\end{tcblisting}
+
+\begin{tikzpicture}[overlay,remember picture]
+  \draw [->] (rawdata) -- (rawdataKV) node [midway, above, fill=yellow] {\Large Map}; 
+  \draw [->] (rawdataKV) -- (listKlistV)  node [midway, above, fill=yellow] {\Large Shuffle};
+  \draw [->] (listKlistV) -- (listKaggV)  node [midway, above, fill=yellow] {\Large Reduce}; 
+\end{tikzpicture}
+
+\end{document}

@@ -1,0 +1,52 @@
+
+\documentclass[tikz]{standalone}
+
+
+\input{../../templates/tikzFigureHeader}
+
+\begin{document}
+  \begin{msc}{Remote access model}
+    \declinst{u}{}{User process}
+    \declinst{c}{}{Client }
+    \declinst{s}{}{Server}
+
+    \mess{Read}{u}{c}
+    \nextlevel 
+    \mess{Read}{c}{s}
+    \nextlevel[2] 
+    \mess{Result}{s}{c}
+    \nextlevel 
+    \mess{Result}{c}{u}
+    \nextlevel[4] 
+
+    \mess{Write}{u}{c}
+    \nextlevel 
+    \mess{Write}{c}{s}
+    \nextlevel[2] 
+    \mess{Result}{s}{c}
+    \nextlevel 
+    \mess{Result}{c}{u}
+  \end{msc}
+
+  \begin{msc}{Data-caching model}
+    \declinst{u}{}{User process}
+    \declinst{c}{}{Client }
+    \declinst{s}{}{Server}
+
+    \mess{Read}{u}{c}
+    \nextlevel 
+    \mess{Get file}{c}{s}
+    \nextlevel[2] 
+    \mess{Send file}{s}{c}
+    \nextlevel 
+    \mess{Result}{c}{u}
+    \nextlevel[4] 
+
+    \mess{Write}{u}{c}
+    \nextlevel 
+    \mess{Write}{c}{c}
+    \nextlevel[3] 
+    \mess{Result}{c}{u}
+  \end{msc}
+
+\end{document}

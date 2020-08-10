@@ -69,7 +69,8 @@
 
 *** Node fails, all messages arrive in bounded time 
 
-- Validity here: If all processes start with same value, all processes
+- Validity here: If all processes start with same value, all
+  *nonfailing* processes
   must decide for this one 
 - Fault model: at most $f$ processes fail 
 - Idea: broadcast in $f+1$ rounds; there must be one round where
@@ -114,9 +115,9 @@
 *** Consensus with Byzantine Processes
 
  - Correctness conditions
-   - *Agreement*: No two nonfaulty processes decide on different values
-   - *Validity*: If all nonfaulty processes start with the same value, then this value is the only valid one
-   - *Termination*: All nonfaulty processes eventually decide
+   - *Agreement*: *No two nonfaulty* processes decide on different values
+   - *Validity*: If *all nonfaulty processes* start with the same value, then this value is the only valid one
+   - *Termination*: *All nonfaulty* processes eventually decide
  - Remarks: 
    - Restriction of the validity conditions to only nonfaulty processes because conditions for the behavior of Byzantine processes make no sense 
    - n > 3f required (triple modular redundancy not sufficient!)
@@ -418,7 +419,7 @@ information
 - Server following a new leader should *promise* allegiance to the new
   one, ignore commands from an old one
 - But old one might indeed be resurrected, and new one might fail:
-  cannot make that switch for even
+  cannot make that switch for ever
 - We need a notion of sequence or /round numbers/, indicating which
   leader is currently trusted
   - Commands from older rounds are ignored 

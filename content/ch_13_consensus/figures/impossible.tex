@@ -21,11 +21,11 @@
 \multicolumn{2}{c}{Ordered} & 
 \multicolumn{2}{}{}  \\
 \midrule 
- \multirow{4}{*}{\rotatebox{90}{Process}} & \multirow{2}{*}{Synchronous} & ok& ok & ok & ok & \multirow{2}{*}{Bounded} & \multirow{4}{*}{\rotatebox{90}{Delay}} \\
-  && \Lightning & \Lightning  &  ok & ok && \\
+ \multirow{4}{*}{\rotatebox{90}{Process}} & \multirow{2}{*}{Synchronous} & ok& ok & ok & ok & Bounded & \multirow{4}{*}{\rotatebox{90}{Delay}} \\
+  && \Lightning & \Lightning  &  ok & ok & Unbounded & \\
 %--------
-  & \multirow{2}{*}{Asynchronous} & \Lightning &\Lightning  & \Lightning & ok &\multirow{2}{*}{Unbounded}& \\
-  &&  \Lightning  & \Lightning  & \Lightning  & ok  && \\
+  & \multirow{2}{*}{Asynchronous} & \Lightning &\Lightning  & \Lightning & ok &Bounded& \\
+  &&  \Lightning  & \Lightning  & \Lightning  & ok  & Unbounded& \\
 \midrule 
   && Unicast & Multicast & Unicast & Multicast && \\
 \multicolumn{2}{}{} & 

@@ -1,21 +1,21 @@
 #+BIBLIOGRAPHY: ../bib plain
    
-** Overview, Conventional file systems 
+* Conventional file systems 
 
-- NFS, AFS, ... 
+** File systems 
 
 
-*** Distributed File System
- Basic functions of a file
+*** Basic functions of a file
  - Permanent storage
  - Sharing of information
  - Distributed file systems add salient features
  - Transparent remote access
- - Structural: hide number and location of multiple file servers
- - Access: Local and remote files are equal
- - Naming: Name gives no hint to location
- - Replication
- User mobility
+   - Structural: hide number and location of multiple file servers 
+   - Access: Local and remote files are equal
+   - Naming: Name gives no hint to location
+   - Replication
+
+*** Files and  User mobility
  - Availability and reliability
  - Always accessible, never lost
  - Performance
@@ -25,6 +25,7 @@
  - Concurrent modifications of a single file
  - Simple
  - Diskless workstations
+
 *** Distributed File Systems
  Some design assumptions/principles/guidelines
  - Clients have cycles to burn (compared to servers)
@@ -33,61 +34,54 @@
  - Minimize system-wide knowledge
  - Trust the fewest possible entities
  - Batch if possible
- - 
+
 *** Put into perspective: Storage systems
- Sharing
- Persis-
- tence
- Distributed
- cache/replicas
- Consistency
- maintenance
- Example
- Main memory
- RAM
- File system
- UNIX file system
- Distributed file system
- Sun NFS
- Web
- Web server
- Distributed shared memory
- Ivy (DSM, Ch. 18)
- Remote objects (RMI/ORB)
- CORBA
- Persistent object store
- 1
- CORBA Persistent
- Object Service
- Peer-to-peer storage system
- OceanStore (Ch. 10)
- 1
- 1
- 1
+
+Overview: 
+
+|                    | Sharing    | Persis-    | Distributed |   Consist. | Example         |
+|                    |            | tence      | cache/      |     maint. |                 |
+|                    |            |            | replicas    |            |                 |
+|--------------------+------------+------------+-------------+------------+-----------------|
+| Main memory        | $\times$   | $\times$   | $\times$    |          1 | RAM             |
+| File system        | $\times$   | \checkmark | $\times$    |          1 | UNIX FS         |
+| Distributed FS     | \checkmark | \checkmark | \checkmark  | \checkmark | NFS             |
+| Web                | \checkmark | \checkmark | \checkmark  |   $\times$ | Web server      |
+| DSM                | \checkmark | $\times$   | \checkmark  | \checkmark | Ivy, ...        |
+| RMI                | \checkmark | $\times$   | $\times$    |          1 | CORBA           |
+| Persistent         | \checkmark | \checkmark | $\times$    |          1 | CORBA           |
+| object store       |            |            |             |            | storage service |
+| P2P storage system | \checkmark | \checkmark | \checkmark  |          2 | OceanStore      |
 
 
+ \footnotesize Types of consistency:   1: strict one-copy. 3:  slightly weaker
+ guarantees. 2: considerably weaker guarantees.  (Chapter references
+ to  
+\cite{Coulouris:DistributedSystems:2011} ) 
 
- 2
- Types of consistency:
- -  1: strict one-copy. 3:  slightly weaker guarantees. 2: considerably weaker guarantees.
- References to Coulouris et al., Distributed Systems
+
 *** Basic File Model
  Structure
  - Unstructured: File is a sequence of data (bytes)
  - Structured: Indexed, B-Tree, etc.
  - Modifiability 
  - Mutable or immutable files
-*** File Access Models
- Remote service model
+
+
+*** File Access Model: Remote service 
  - Server executes file access requests
  - Performance problems (network, server)
  - Prime example: NFS (but adds caching)
- Data-caching model
+
+*** File Access Model:  Data-caching 
  - Copy data from server to client, exploit locality
  - Cache consistency problem
  - Additional problem: Unit of Data Transfer
- - File, block, byte level
- - Record level (for structured files)
+   - File, block, byte level?
+   - Record level (for structured files)? 
+
+** File sharing semantics 
+
 *** File Sharing Semantics
  When are modifications made by a user to a shared file visible to other users of this file?
  - UNIX semantics
@@ -161,7 +155,7 @@
  - Some odds and ends 
 
 
-** NFS, old and new  
+* NFS, old and new  
 
 *** Case Study: SUN Network File System
 
@@ -308,7 +302,7 @@
  - Cloud computing
  - Some odds and ends 
 
-** AFS 
+* AFS 
 
 *** Case study: Andrew File System (AFS)
  Major difference to NFS: Scalability perceived as major goal 
@@ -353,7 +347,7 @@
  - Cloud computing
  - Some odds and ends 
 
-** Ceph  
+* Ceph  
 
 *** Ceph: Marketing
  45
@@ -380,6 +374,8 @@
 
 
 
-** CaseStudy: Apache BookKeeper 
+* Amazon S3 
+
+* CaseStudy: Apache BookKeeper 
 
 https://bookkeeper.apache.org

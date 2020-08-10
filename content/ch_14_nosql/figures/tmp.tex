@@ -1,0 +1,57 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary{backgrounds,fit,matrix,shapes.callouts}
+\usepackage{forest}
+\usepackage{tikzpeople}
+
+
+\begin{document}
+
+
+  \begin{forest}
+    for tree={ font=\ttfamily, grow'=0, child anchor=west, parent
+      anchor=south, anchor=west, calign=first, edge path={
+        \noexpand\path [draw, \forestoption{edge}] (!u.south west)
+        +(7.5pt,0) |- node[fill,inner sep=1.25pt] {} (.child
+        anchor)\forestoption{edge label}; }, before typesetting
+      nodes={ if n=1 {insert before={[,phantom]}} {} }, fit=band,
+      before computing xy={l=15pt}, } [<root>,name=root
+    [.int,name=int] [.com [.google] [.apple] ]
+    [.edu, draw, rounded corners, fill=blue!10,
+      [.yale, name=yale 
+        [.chemistry, name=yalechem ] 
+        [.cs, name=yalecs 
+          [.ai, name=yaleai ]
+          [.robotics, name=yalerob]
+        ] 
+    ]
+    [.stanford] ] 
+    % [.de,name=de, draw, circle
+    %   [.paderborn,name=pb] 
+    %   [.uni-paderborn,name=upb
+    %   [.eim,name=eim] ] 
+    %   ] 
+    ]
+    % background 
+    \begin{scope}[on background layer]
+    %   % \draw [fill=green!10] (int.north west) rectangle (pb.east |-
+    %   % de.north);
+    %   % \draw [fill=blue!10] (de.north west) rectangle (pb.east |-
+    %   % eim.south);
+    %   \node [fill=green!10, fit= {(int.north west) (upb.east)
+    %     (de.north)}] (g) {}; 
+    %   \node [fill=blue!10, fit= {(de.north
+    %     west) (upb.east) (eim.south)}] (s) {}; 
+    %   \node [anchor=north east] at (g.north east) {Generic}; 
+    %   \node [anchor=north east] at  (s.north east) {Specific};
+    % DNS servers 
+      \node [draw, rounded corners, fit=(yale) (yalechem) ,
+      inner sep =0, fill=green!10] {}; 
+      \node [draw, rounded corners, fit=(yalecs) (yaleai) (yalerob),
+      inner sep =0, fill=yellow!10] {}; 
+    \end{scope}
+  \end{forest}
+
+\end{document}

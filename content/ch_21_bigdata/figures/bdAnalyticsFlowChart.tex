@@ -1,0 +1,51 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary{arrows.meta,
+                calc, chains,
+                quotes,
+                positioning,
+                shapes.geometric}
+
+
+
+\begin{document}
+
+  \begin{tikzpicture}[
+    node distance = 8mm and 16mm,
+      start chain = A going below,
+      base/.style = {draw, minimum width=32mm, minimum height=8mm,
+                     align=center, on chain=A},
+ startstop/.style = {base, rectangle, rounded corners, fill=red!10},
+   process/.style = {base, rectangle, fill=orange!30},
+        io/.style = {base, trapezium, 
+                     trapezium left angle=70, trapezium right angle=110,
+                     fill=blue!30},
+  decision/.style = {base, diamond, fill=green!30, aspect=4},
+  db/.style = {base, database, fill=blue!10,aspect=0.15},
+  every edge quotes/.style = {auto=right}]
+                    ]
+\node [db]        { Operational DB}; 
+\node [process]        { Collect, clean, integrate}; 
+\node [db]        { Data warehouse}; 
+\node [process]        { Preprocess}; 
+\node [db]        { Intermediate storage}; 
+\node [process]        { Analyse}; 
+\node [db]        { Models, patterns}; 
+\node [process, right=of A-7]        { Verify, evaluate}; 
+%% 
+\draw [->] (A-1) edge (A-2) 
+(A-2) edge (A-3) 
+(A-3) edge (A-4) 
+(A-4) edge (A-5) 
+(A-5) edge (A-6) 
+(A-6) edge (A-7) 
+(A-7) edge (A-8)
+(A-8) |- (A-4.east) 
+; 
+  \end{tikzpicture}
+
+
+
+\end{document}

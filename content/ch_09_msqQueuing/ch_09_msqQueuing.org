@@ -1,6 +1,6 @@
 #+BIBLIOGRAPHY: ../bib plain
 
-* Message queuing semantics                                        :noexport:
+* Message queuing semantics
 
 *** Pub/sub idiosyncrasies 
 
@@ -35,7 +35,7 @@ Interaction paradigm: asynchronous sending of messages
 Similar to Pub/sub (Section
 \slideref{sec:pubsub:api}[s:pubsub:characteristics]), MQ provides
 loose coupling 
-- *In time*: every looser than P/S; subscription can take place after
+- *In time*: even looser than P/S; subscription can take place after
   publication
 - *In identity*: Same 
 - *In space*: Same 
@@ -67,11 +67,11 @@ Often used to
     - Slow receivers 
   - Load balancing 
   - Scaling: automatically create new receivers if queues get full? 
-  - Assign new threads to queues/receivers? 
+    - Assign new threads to queues/receivers? 
 - Ordering?
 
 
-* Design considerations                                            :noexport:
+* Design considerations
 
 ** High-level architecture 
 
@@ -132,7 +132,7 @@ Often used to
 *** Standardisation and legacy integration 
 
 - We use MQ to integrate legacy applications
-  - Option 1: Each applications need to understand messages of each
+  - Option 1: Each application needs to understand messages of each
     other application -- unrealistic 
 - Suppose we have a standardised protocol and API
   - Option 2: only have to translate from application-specific format
@@ -243,8 +243,7 @@ queuing context with stable storage.
       :END:
 
 
-#+CAPTION: AQMP type system (from \url{http://www.amqp.org/sites/amqp.org/files/amqp.pdf
-}) 
+#+CAPTION: AQMP type system (from \url{http://www.amqp.org/sites/amqp.org/files/amqp.pdf}) 
 #+ATTR_LaTeX: :width 0.75\linewidth
 #+NAME: fig:aqmp_type
 [[./figures/amqp1.pdf]]
@@ -269,7 +268,7 @@ queuing context with stable storage.
 *** AQMP issues 
 
 Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
-- Pushed by few companies, yet claiming as open standard -- lacks
+- Pushed by few companies, yet claimed as open standard -- lacks
   competition 
 - Bridges a big semantic gap; disputable
 - Pretty complex protocol (KISS!) 
@@ -324,7 +323,7 @@ Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
 
 
 
-* Small case studies                                               :noexport:
+* Small case studies
   :PROPERTIES:
   :CUSTOM_ID: sec:mq:small_case_studies
   :END:
@@ -550,8 +549,7 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
   - Wildcards, on exactly one or zero or more words
 - Even RPC can be recreated
   - With a
-    \href{https://www.rabbitmq.com/tutorials/tutorial-six-python.html}{good
-    hint at restarting servers} and issues for exactly-once 
+    \href{https://www.rabbitmq.com/tutorials/tutorial-six-python.html}{good hint at restarting servers} and issues for exactly-once 
     delivery 
 
 *** Distributed brokers: Clustering 
@@ -587,7 +585,7 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
   non-trivial
   - Context: Apple about 1/2 million iMessages per second 
 
-* Big case study: Kafka                                            :noexport:
+* Big case study: Kafka
   :PROPERTIES:
   :CUSTOM_ID: sec:mq:kafka
   :END:
@@ -602,8 +600,7 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
   - *Getting* or *transforming* streams of data between distributed
     applications 
 - Presentation here mostly follows
-  \href{https://kafka.apache.org/documentation/#introduction}{Kafka
-  introduction  documentation}
+  \href{https://kafka.apache.org/documentation/#introduction}{Kafka introduction  documentation}
 
 *** Use cases 
   - *Real-time data feeds* (e.g., track user activity on a distributed
@@ -826,8 +823,7 @@ Topics are divided into 1 or more *partitions*
 \href{https://kafka.apache.org/documentation/#quickstart}{Quick Start}
 guide 
 - These are \ac{CLI} examples;
-  \href{https://cwiki.apache.org/confluence/display/KAFKA/Clients}{language
-  bindings exist}, of course
+  \href{https://cwiki.apache.org/confluence/display/KAFKA/Clients}{language bindings exist}, of course
   - Main languages with feature parity: Java, Python (\href{https://github.com/dpkp/kafka-python}{1}, \href{https://github.com/confluentinc/confluent-kafka-python}{2}), \href{https://github.com/edenhill/librdkafka}{C/C++}
 
 **** Create topic 
@@ -1083,8 +1079,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
   - Simple semantics, simpler setup, when sophisticated semantics are
     not required  
   - E.g.,
-    \href{http://tomasz.janczuk.org/2015/09/from-kafka-to-zeromq-for-log-aggregation.html}{log
-    aggregation via 0mq might be superior to Kafka}  -- in this
+    \href{http://tomasz.janczuk.org/2015/09/from-kafka-to-zeromq-for-log-aggregation.html}{log aggregation via 0mq might be superior to Kafka}  -- in this
     example, dropping messages when no subscriber was alive was ok 
 - 
    \href{https://content.pivotal.io/rabbitmq/understanding-when-to-use-rabbitmq-or-apache-kafka}{RabbitMq  vs. Kafka}  \cite{Dobbelaere:2017:KVR:3093742.3093908}
@@ -1107,9 +1102,9 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 
 - But not necessarily one bus to connect them all 
 
-- Groups  of microservices can choose their own instance} of MQ system  
+- Groups  of microservices can choose their own instance of MQ system  
 
-- Choice my depend on
+- Choice may depend on
   \href{https://content.pivotal.io/blog/messaging-patterns-for-event-driven-microservices}{microservice  pattern} 
 
 
@@ -1453,7 +1448,7 @@ Core building block of leader election
 #+NAME: fig:leader_elect_final_step
 [[./figures/leaderelect_graph.pdf]]
 
-**** Result 
+*** Result 
 
 #+CAPTION: Result for leader election, with spanning tree 
 #+ATTR_LaTeX: :width 0.55\linewidth :options page=24

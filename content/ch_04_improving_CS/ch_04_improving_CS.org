@@ -852,7 +852,7 @@ FE answers with a redirect to point to chosen server
 - Incurs additional round trip time! 
 
 #+CAPTION: Load balancing: Redirect 
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=3
 #+NAME: fig:lb_rewrite
 [[./figures/LB.pdf]]
 

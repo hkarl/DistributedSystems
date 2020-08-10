@@ -530,16 +530,16 @@ Goal: provide a distributed version of the object model made available by object
    
 * Examples: Java RMI, zerorpc
 *** Case study: Java RMI 
- Goal: Extend Java’s object model to a distributed one 
+ - Goal: Extend Java’s object model to a distributed one 
  - Some design decisions
- - Limited transparency 
- - Caller and callee know about their remote relationship: Caller must handle RemoteExceptions, callee must implement the Remote interface
- - Parameter-passing semantics differs between local and remote invocations 
- - Single-language design 
- - No interoperability with other languages 
- - No separate interface definition language necessary 
- - Classes not locally available can be loaded via the network 
- - Dedicated service to lookup remote object references – rmiregistry 
+   - Limited transparency 
+     - Caller and callee know about their remote relationship: Caller must handle RemoteExceptions, callee must implement the Remote interface
+     - Parameter-passing semantics differs between local and remote invocations 
+   - Single-language design 
+     - No interoperability with other languages 
+     - No separate interface definition language necessary 
+   - Classes not locally available can be loaded via the network 
+   - Dedicated service to lookup remote object references – rmiregistry 
 
 *** Remote interfaces   
  Remote interfaces in RMI 
@@ -549,7 +549,7 @@ Goal: provide a distributed version of the object model made available by object
 
 *** Parameter passing 
  - Parameter and result passing
-   - Marshalling happens via serialization ! any input parameter or result must implement the Serializable interface 
+   - Marshalling happens via serialization:  any input parameter or result must implement the ~Serializable~ interface 
    - Missing classes are downloaded 
    - Remote references can be passed between remote interfaces ! method invocations on these references will result in remote method invocations; reference is passed by-value 
    - Non-remote objects are serialized, copied, and passed by-value 
@@ -570,7 +570,7 @@ Goal: provide a distributed version of the object model made available by object
 
 
 #+CAPTION: Call sequence of a JavaRMI method invocation
-#+ATTR_LaTeX: :width 0.75\linewidth
+#+ATTR_LaTeX: :height 0.75\textheight
 #+NAME: fig:rmi_sequence
 [[./figures/rmi.pdf]]
 
@@ -867,7 +867,7 @@ It [Web Service] has an interface described in a machine-processable format (spe
 - Practically speaking: 
   - A root resource exists 
   - Possible to ask it for a list of further, comprised resources 
-  - And each resources might provide again such a list of comprised
+  - And each resource might provide again such a list of comprised
     resources (resource tree")  
 - Example: PAUL 
   - Root could tell: There are classes, room, students, lecturers,
@@ -892,7 +892,7 @@ It [Web Service] has an interface described in a machine-processable format (spe
 
 
 
-*** RESTful: Collections vs. HTTP methods 
+*** RESTful: Collections, elements vs. HTTP methods 
  
 \tiny 
  
@@ -1131,7 +1131,7 @@ But:  No DELETE, PUT,  ... supported!
 
 *** Microservices: Architecture pattern 
 
-- Alternative: *\ac{ms}* 
+- Alternative: *\ac{MS}* 
   - Chop up big binary into independently runable instances, typically
     focused on a single functionality  
   - Link them together by *loose coupling*
@@ -1332,7 +1332,6 @@ Interesting aspect: Typesafe built a platform to support such applications
 
 
 *** Typesafe: ConductR – Cluster runtime 
- 132
 
 
 - Interesting feature: A runtime for actors on a cluster

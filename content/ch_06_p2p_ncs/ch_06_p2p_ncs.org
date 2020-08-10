@@ -120,7 +120,7 @@ When a node looks for a key:
 
 
 #+CAPTION: A simple, ring-based DHT with one routing entry per node
-#+ATTR_LaTeX: :width 0.75\linewidth :options page=1
+#+ATTR_LaTeX: :height 0.75\textheight :options page=1
 #+NAME: fig:strawman_dht_few_nodes
 [[./figures/dht.pdf]]
 
@@ -129,7 +129,7 @@ When a node looks for a key:
 
 
 #+CAPTION: A simple, ring-based DHT with one routing entry per node, more nodes 
-#+ATTR_LaTeX: :width 0.65\linewidth :options page=3
+#+ATTR_LaTeX: :height 0.75\textheight :options page=3
 #+NAME: fig:strawman_dht_many_nodes
 [[./figures/dht.pdf]]
 
@@ -159,7 +159,7 @@ When a node looks for a key:
 For two example nodes, cross-cutting links are shown 
 
 #+CAPTION: More entries in forwarding table speed up forwarding
-#+ATTR_LaTeX: :width 0.65\linewidth :options page=4
+#+ATTR_LaTeX: :height 0.75\textheight :options page=4
 #+NAME: fig:dht_cutting_across
 [[./figures/dht.pdf]]
 
@@ -247,7 +247,7 @@ Content of cells?
 - Let's look at a node $v$ with GUID $v_1 v_2 v_3 \ldots v_8$
 - In row $r$ and column $c$, we store information about nodes whose
   GUID 
-  - Is the same as $v$'s in the first $r$ digits
+  - Is the same as $v$ 's in the first $r$ digits
   - But differs in digit $r+1$ 
   - And that $r+1$ digit is $c$
 - (Hence: There is never an entry in row $r$ and column $v_{r+1}$) 
@@ -308,7 +308,7 @@ Note: Variants exist
     \cite{Rowstron:2001:PSD:646591.697650}, Tapestry
     \cite{Zhao2004:Tapestry}
 - Properties
-  - Number of nodes visited for search request $\log(N)$, $N$=#nodes in overlay graph
+  - Number of nodes visited for search request $\log(N)$, $N$ =#nodes in overlay graph
     - With a full routing table, each step corrects a fixed number of
       bits in GUID
   - Needed property: Keys and node GUIDs are uniformly distributed in
@@ -468,42 +468,43 @@ Note: Variants exist
 
 
 - Scale
-  - IPv4 is limited to 232 addressable nodes. The IPv6 name space is
-    much more generous (2128), but addresses in both versions are
+  - IP: IPv4 is limited to $2^{32}$  addressable nodes. The IPv6 name
+    space is 
+    much more generous ($2^{128}$), but addresses in both versions are
     hierarchically structured and much of the space is pre-allocated
     according to administrative requirements.  
-  - Peer-to-peer systems can address more objects. The GUID name space
-    is very large and flat (>2128), allowing it to be much more fully
-    occupied.  
+  - P2P: Peer-to-peer systems can address more objects. The GUID name
+    space is very large and flat ($>2^{128}$), allowing it to be much
+    more fully occupied.
 - Load balancing
-  - Loads on routers are determined by network topology and associated
-    traffic patterns. 
-  - Object locations can be randomized and hence traffic patterns are
-    divorced from the network topology. 
+  - IP: Loads on routers are determined by network topology and
+    associated traffic patterns.
+  - P2P: Object locations can be randomized and hence traffic patterns
+    are divorced from the network topology.
 
 *** Comparison: IP routing vs overlay routing (2)
 
 - Network dynamics (addition/deletion of objects/nodes)
   - IP routing tables are updated asynchronously on a best-efforts
     basis with time constants on the order of 1 hour. (?) 
-  - Routing tables can be updated synchronously or asynchronously with
-    fractions of a second delays. 
+  - P2P: Routing tables can be updated synchronously or asynchronously
+    with    fractions of a second delays.  
 - Fault tolerance
-  - Redundancy is designed into the IP network by its managers,
+  - IP: Redundancy is designed into the IP network by its managers,
     ensuring tolerance of a single router or network connectivity
     failure. n-fold replication is costly. 
-  - Routes and object references can be replicated n-fold, ensuring
+  - P2P: Routes and object references can be replicated n-fold, ensuring
     tolerance of n failures of nodes or connections. 
 
 *** Comparison: IP routing vs overlay routing (3) 
 - Target identification
-  - Each IP address maps to exactly one target node. (except for
+  - IP: Each IP address maps to exactly one target node. (except for
     anycast routing) 
-  - Messages can be routed to the nearest replica of a target object. 
+  - P2P: Messages can be routed to the nearest replica of a target object. 
 - Security and anonymity
-  - Addressing is only secure when all nodes are trusted. Anonymity
+  - IP: Addressing is only secure when all nodes are trusted. Anonymity
     for the owners of addresses is not achievable. 
-  - Security can be achieved even in environments with limited
+  - P2P: Security can be achieved even in environments with limited
     trust. A limited degree of anonymity can be provided. 
 
 

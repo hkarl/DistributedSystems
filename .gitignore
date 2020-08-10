@@ -40,6 +40,10 @@ content/ch*/ch*.tex
 content/ch*/*.rel
 content/ch*/figures/*.rel
 
+# weirdo files
+content/da_consensus
+content/potsdam_transport
+
 
 # Intermediate files, perhaps useful later
 content/ch_01_basic_CS/code.org

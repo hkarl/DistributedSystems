@@ -1,4 +1,4 @@
-#+TITLE: Big data and the Map/Reduce programming model
+#+TITLE: Big data analytics and the Map/Reduce programming model
 #+include: "../slidehead.org"
 
 \begin{frame}

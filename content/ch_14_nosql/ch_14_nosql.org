@@ -1,8 +1,8 @@
 #+BIBLIOGRAPHY: ../bib plain
 
-* CAP and friends                                                  :noexport:
+* CAP and friends
 
-** Distribute store
+** Distributed data store
 
 *** The story so far 
 
@@ -20,7 +20,7 @@
 - What should a (distributed, replicated) data store do?
   - When you make a request, it should *answer*
     - ... and not just with an error message
-    - it should be *available*
+    - ie., it should be *available*
   - When you ask the same question at different places, it should give
     the *same answer*
     - Slightly looser requirement then *all copies should be
@@ -28,9 +28,6 @@
     - It should be *consistent* 
 
 *** Distributed data store -- example 
-
-
-
 ****                                                              :B_columns:
      :PROPERTIES:
      :BEAMER_env: columns
@@ -54,7 +51,7 @@ Simple example:
 
 
 #+CAPTION: Simple distributed data store example, no faults
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=1
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=1
 #+NAME: fig:nosql:store:simple
 [[./figures/cap.pdf]]
 
@@ -91,10 +88,9 @@ Simple example:
       :END:
 
 #+CAPTION: Partitioned  data store example
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=2
 #+NAME: fig:nosql:store:partitioned
 [[./figures/cap.pdf]]
-
 
 
 
@@ -107,15 +103,13 @@ Simple example:
      :BEAMER_env: theorem
      :END:
 
- - https://people.eecs.berkeley.edu/~brewer/cs262b-2004/PODC-keynote.pdf
-
-
-A distributed data store cannot at most two of the following three
+A distributed data store can have at most two of the following three
 properties: 
 - Availability
 - Consistency
 - Partition-tolerance 
 
+Sources: \cite{fox99:_harves_yield_scalab_toler_system}, \cite{brewer12:_cap} \href{https://people.eecs.berkeley.edu/~brewer/cs262b-2004/PODC-keynote.pdf}{E. Brewer, PODC keynote} 
 
 *** Pacelec 
 
@@ -136,7 +130,8 @@ A more detailed interpretation:
 - Conventional data bases: SQL as query language, ACID as transaction
   semantics
 - Are subject to these same fundamentals!
-- Typically: partitions /never happen/ \Smiley 
+- Strive to provide Availability and Consistency 
+- Typical assumption: partitions /never happen/ \Smiley 
 
 *** Tradeoffs
 
@@ -154,12 +149,12 @@ A more detailed interpretation:
 
 
 #+CAPTION: The CAP landscape
-#+ATTR_LaTeX: :width 0.75\linewidth :options page=3
+#+ATTR_LaTeX: :height 0.8\textheight :options page=3
 #+NAME: fig:nosql:cap_landscape
 [[./figures/cap.pdf]]
 
 
-*** BASE 
+*** \ac{BASE} 
 
 One design choice: give up consistency! 
 
@@ -168,6 +163,12 @@ One design choice: give up consistency!
 - Because of Eventual consistency
   - In absence of updates, state will converge and system become
     consistent 
+
+
+#+BEAMER: \pause
+
+- Overview: \cite{pritchett08:_base}, with nice tutorial example and
+  relation to message queueing 
 
 ** Eventual consistency 
 
@@ -187,7 +188,7 @@ consistent
   - Possible bonus material 
 
 
-* NoSql                                                            :noexport:
+* NoSql
 
 ** Overview 
 *** From SQL to NoSql 
@@ -264,13 +265,13 @@ consistent
 
 
 #+CAPTION: Full replication 
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=1
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=1
 #+NAME: fig:nosql:fullrep
 [[./figures/nosql.pdf]]
 
 
 #+CAPTION: Balanced sharding
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=2
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=2
 #+NAME: fig:nosql:balanced_sharding 
 [[./figures/nosql.pdf]]
 
@@ -282,13 +283,13 @@ consistent
       :END:
 
 #+CAPTION: Unbalanced sharding
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=3
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=3
 #+NAME: fig:nosql:unbalanced_sharding 
 [[./figures/nosql.pdf]]
 
 
 #+CAPTION: Combined replication and  sharding
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=4
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=4
 #+NAME: fig:nosql:repl_shard
 [[./figures/nosql.pdf]]
 
@@ -352,7 +353,7 @@ consistent
 
 
   
-* Key-value database                                               :noexport:
+* Key-value database
   :PROPERTIES:
   :CUSTOM_ID:       sec:keyvalue_stores
   :END:
@@ -360,8 +361,8 @@ consistent
 *** Already covered 
 
 - We have already covered from a usage perspective 
-  - Memcached (Section~\sectionref{sec:memcached})
-  - Redis (Section~\sectionref{sec:redis})
+  - Memcached (Section \sectionref{sec:memcached})
+  - Redis (Section \sectionref{sec:redis})
 - We briefly look at some more examples
 - And at architectural choices 
 
@@ -725,7 +726,7 @@ distributed system   https://github.com/etcd-io/etcd
 
 
 #+CAPTION: Name servers for different zones
-#+ATTR_LaTeX: :width 0.89\linewidth :options page=5
+#+ATTR_LaTeX: :height 0.9\textheight :options page=5
 #+NAME: fig:dns:nameservers
 [[./figures/dns.pdf]]
 
@@ -754,7 +755,7 @@ distributed system   https://github.com/etcd-io/etcd
 ****  Iterative resolution
 
 #+CAPTION: Iterative DNS resolution 
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=2
 #+NAME: fig:dns:iterative
 [[./figures/dns.pdf]]
 
@@ -764,7 +765,7 @@ distributed system   https://github.com/etcd-io/etcd
 ****  Recursive resolution
 
 #+CAPTION: Recursive DNS resolution 
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=3
 #+NAME: fig:dns:iterative
 [[./figures/dns.pdf]]
 
