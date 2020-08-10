@@ -221,7 +221,7 @@ Some numbers
 * Organization, exam, material
 
 *** Homework assignments
- Exercises as “traditional” assignments 
+ “Traditional” assignments 
  - This lecture will also include some practical exercises 
  - Programming
  - (We used to do VMWare-based actual installations, but nobody was interested ) 
@@ -231,18 +231,15 @@ Some numbers
 
 For the 6 ECTS version: We will do mini-projects! 
 - Groups of 3-4 students
-- Pick an interesting topic
-- Work on it, present it to the class 
-- Example topics:
-  - WebChat, Three-tier Web app, RabbitMQ, Kafka, RabbitMQ,
-    Microservice-Chain based on Message queuing, Zookeeper recipes,
-    grab data from doodle, fix existing WebApp, lambda functions,
-    ElasticSearch, ...        
+- Build a three-tier web application, with all bells and whistles!
+  - Front-end, middleware, backend, storage, distributed,
+    load-balancer, fault injection, ... 
+- Work on it, present it to class 
 
 
 *** Exam
 
- - Written exam
+ - Probably: ORAL exam
  - Date and time: 
    - First instance: ??? (time and location: unknown) 
    - Second instance: ?? 
@@ -271,7 +268,5 @@ For the 6 ECTS version: We will do mini-projects!
 
 *** Cancelled classes 
 
-- Oct 8, Oct 25 (1.5), Nov 1 (1.5), Nov 29 (1.5)
-- We miss 5.5 classes! 
-- How to compensate for this? 
+Impossible to say at this point 
 
