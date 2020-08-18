@@ -93,7 +93,7 @@ endif
 
 %-handout.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib ../book/book.aux  
 	-${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
-	-${BIBCOMMAND} $(basename $<)
+	-${BIBCOMMAND} $(patsubst %-slides.tex,%-handout,$<)
 	-${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
 	-${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-handout,$<) "\\def\\OutputStyle{handout}\\input{$<}"
 	cp $@ ../../output/handout/
@@ -101,7 +101,7 @@ endif
 %-slides169.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib  ../book/book.aux 
 	-${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
 ifndef quick
-	${BIBCOMMAND} $(basename $<)169
+	${BIBCOMMAND} $(patsubst %-slides.tex,%-slides169,$<)
 	#cp $(basename $<).bbl  $(basename $<)169.bbl
 	-${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
 	-${PDFLATEX}  -jobname $(patsubst %-slides.tex,%-slides169,$<) "\\def\\OutputStyle{presentation,aspectratio=169}\\input{$<}"
