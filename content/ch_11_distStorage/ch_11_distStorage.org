@@ -1151,7 +1151,7 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 - Provide a service that provides such functionality to distributed
   applications
   - Has to be distributed itself 
-- Enter \href{http://zookeeper.apache.org}{*Zookeeper*}
+- Enter \href{http://zookeeper.apache.org}{Zookeeper}
   - Specifically, \href{https://zookeeper.apache.org/doc/current/zookeeperOver.html}{Zookeeper internals} and \href{}{Zookeeper    Overview}
     
 *** Zookeeper high-level view 
