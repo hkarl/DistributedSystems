@@ -326,7 +326,7 @@ monitor*) or in a distributed fashion
 
 
 - A cannot commit as it waits for coordinator 
-- Coordinator blocks for crashes B 
+- Coordinator blocks for crashed B 
 
 
 *** 2PC with crashing coordinator 
@@ -368,7 +368,7 @@ monitor*) or in a distributed fashion
 - Idea: Try to find out! Talk to other participant 
   - Other participant is in ~Commit~, ~Abort~, or ~Ready~: clear
   - in ~Voted~ itself: Talk to a third node
-- What if all participants in ~Ready~?
+- What if all participants in ~Voted~?
   - We cannot decide \Sadey
   - Because coordinator might already have committed or aborted before
     telling anybody!
@@ -524,7 +524,7 @@ A commit protocol is called *blocking* when
 
 *** Run with partition 
 
-- Similar scenario to \slideref{sec:distTrans:2pc}[s:distTrans:2pc:twocrashes]
+- Similar scenario to Section \slideref{sec:distTrans:2pc}[s:distTrans:2pc:twocrashes]
 - Difference: Coordinator crashes, but node A is *partitioned* off
   from the other nodes (alive, but unable to communicate)
 
@@ -604,8 +604,7 @@ A commit protocol is called *blocking* when
    - Danger of blocking often considered negligible in practice
    - But that jeopardises ACID guarantee (cp. 
      \href{http://www.bailis.org/blog/when-is-acid-acid-rarely/}{blog},
-     \href{https://www.cs.rutgers.edu/~pxk/417/notes/content/transactions.html}{from
-     ACID to BASE})    
+     \href{https://www.cs.rutgers.edu/~pxk/417/notes/content/transactions.html}{from ACID to BASE})    
  - 3PC rarely implemented
    - Example \href{https://docs.oracle.com/cd/B19306_01/server.102/b14231/ds_txns.htm}{Oracle description} 
 
@@ -1091,21 +1090,21 @@ class Snapshot:
 *** Example run: Three node setup  
 
 #+CAPTION: Three node setup for  distributed snapshot example
-#+ATTR_LaTeX: :height 0.8\textheight :options page=2
+#+ATTR_LaTeX: :height 0.7\textheight :options page=2
 #+NAME: fig:distTrans:snapshot:setup
 [[./figures/snapshot.pdf]]
 
 *** Example run: Step 1
 
 #+CAPTION:  Distributed snapshot example run, step 1 
-#+ATTR_LaTeX: :height 0.8\textheight :options page=3
+#+ATTR_LaTeX: :height 0.7\textheight :options page=3
 #+NAME: fig:distTrans:snapshot:run1
 [[./figures/snapshot.pdf]]
 
 *** Example run: Step 2
 
 #+CAPTION:  Distributed snapshot example run, step 2
-#+ATTR_LaTeX: :height 0.8\textheight :options page=4
+#+ATTR_LaTeX: :height 0.7\textheight :options page=4
 #+NAME: fig:distTrans:snapshot:run2
 [[./figures/snapshot.pdf]]
 
@@ -1114,7 +1113,7 @@ class Snapshot:
 *** Example run: Step 3
 
 #+CAPTION:  Distributed snapshot example run, step 3
-#+ATTR_LaTeX: :height 0.8\textheight :options page=5
+#+ATTR_LaTeX: :height 0.7\textheight :options page=5
 #+NAME: fig:distTrans:snapshot:run3
 [[./figures/snapshot.pdf]]
 
@@ -1122,7 +1121,7 @@ class Snapshot:
 *** Example run: Step 4
 
 #+CAPTION:  Distributed snapshot example run, step 4
-#+ATTR_LaTeX: :height 0.8\textheight :options page=6
+#+ATTR_LaTeX: :height 0.7\textheight :options page=6
 #+NAME: fig:distTrans:snapshot:run4
 [[./figures/snapshot.pdf]]
 
@@ -1130,7 +1129,7 @@ class Snapshot:
 *** Example run: Step 5
 
 #+CAPTION:  Distributed snapshot example run, step 5
-#+ATTR_LaTeX: :height 0.8\textheight :options page=7
+#+ATTR_LaTeX: :height 0.7\textheight :options page=7
 #+NAME: fig:distTrans:snapshot:run5
 [[./figures/snapshot.pdf]]
 
@@ -1138,7 +1137,7 @@ class Snapshot:
 *** Example run: Step 6
 
 #+CAPTION:  Distributed snapshot example run, step 6
-#+ATTR_LaTeX: :height 0.8\textheight :options page=8
+#+ATTR_LaTeX: :height 0.7\textheight :options page=8
 #+NAME: fig:distTrans:snapshot:run6
 [[./figures/snapshot.pdf]]
 
@@ -1146,7 +1145,7 @@ class Snapshot:
 *** Example run: Step 7
 
 #+CAPTION:  Distributed snapshot example run, step 7
-#+ATTR_LaTeX: :height 0.8\textheight :options page=9
+#+ATTR_LaTeX: :height 0.7\textheight :options page=9
 #+NAME: fig:distTrans:snapshot:run7
 [[./figures/snapshot.pdf]]
 
@@ -1154,7 +1153,7 @@ class Snapshot:
 *** Example run: Step 8
 
 #+CAPTION:  Distributed snapshot example run, step 8
-#+ATTR_LaTeX: :height 0.8\textheight :options page=10
+#+ATTR_LaTeX: :height 0.7\textheight :options page=10
 #+NAME: fig:distTrans:snapshot:run8
 [[./figures/snapshot.pdf]]
 
@@ -1162,7 +1161,7 @@ class Snapshot:
 *** Example run: Step 9
 
 #+CAPTION:  Distributed snapshot example run, step 9
-#+ATTR_LaTeX: :height 0.8\textheight :options page=11
+#+ATTR_LaTeX: :height 0.7\textheight :options page=11
 #+NAME: fig:distTrans:snapshot:run9
 [[./figures/snapshot.pdf]]
 
@@ -1170,7 +1169,7 @@ class Snapshot:
 *** Example run: Step 10
 
 #+CAPTION:  Distributed snapshot example run, step 10
-#+ATTR_LaTeX: :height 0.8\textheight :options page=12
+#+ATTR_LaTeX: :height 0.7\textheight :options page=12
 #+NAME: fig:distTrans:snapshot:run10
 [[./figures/snapshot.pdf]]
 
@@ -1178,7 +1177,7 @@ class Snapshot:
 *** Example run: Step 11
 
 #+CAPTION:  Distributed snapshot example run, step 11
-#+ATTR_LaTeX: :height 0.8\textheight :options page=13
+#+ATTR_LaTeX: :height 0.7\textheight :options page=13
 #+NAME: fig:distTrans:snapshot:run11
 [[./figures/snapshot.pdf]]
 
@@ -1186,7 +1185,7 @@ class Snapshot:
 *** Example run: Step 12
 
 #+CAPTION:  Distributed snapshot example run, step 12
-#+ATTR_LaTeX: :height 0.8\textheight :options page=14
+#+ATTR_LaTeX: :height 0.7\textheight :options page=14
 #+NAME: fig:distTrans:snapshot:run12
 [[./figures/snapshot.pdf]]
 
