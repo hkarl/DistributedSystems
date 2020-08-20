@@ -528,7 +528,9 @@ Goal: provide a distributed version of the object model made available by object
    - A binder service can provide such bootstrapping (e.g., RMIregistry) 
 
    
-* Examples: Java RMI, zerorpc
+* Examples
+
+** JavaRMI 
 *** Case study: Java RMI 
  - Goal: Extend Java’s object model to a distributed one 
  - Some design decisions
@@ -927,7 +929,7 @@ From \cite{RESTRepresen19:online}
   - http://paul.upb.de/classes/175/update  : gives details on class
     175 (GET) or uploads new details (POST)  
 - RESTful: no actions in URL, expressed ONLY via HTTP action
-  - http://paul.upb.de/classes/  :  gives list (GET); creates new one
+  - http://paul.upb.de/classes/  :  gives list (GET); creates new 
     individual in this collection (POST)  
   - http://paul.upb.de/classes/175/  : gives details on class 175
     (GET), creates new one or update existing one (PUT)  
