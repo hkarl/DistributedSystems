@@ -27,6 +27,7 @@
 #+LATEX_HEADER: \setbeamertemplate{bibliography item}{\insertbiblabel}
 #+LATEX_HEADER: \setbeamertemplate{section in toc}[sections numbered]
 #+LATEX_HEADER: \setbeamertemplate{subsection in toc}[subsections numbered]
+#+LATEX_HEADER: \setbeamertemplate{caption}[numbered]
 #+LATEX_HEADER: \usepackage{../templates/msc}
 #+LATEX_HEADER: \graphicspath{{./figures/}}
 #+LATEX_HEADER: \usepackage{amsmath,amssymb}
@@ -72,3 +73,4 @@
 
 #+LATEX_HEADER: \def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
 
+#+LATEX_HEADER: % \renewcommand{\thefigure}{3.\arabic{figure}}
