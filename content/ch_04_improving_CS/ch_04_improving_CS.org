@@ -6,7 +6,7 @@
 
 - Basic structure of client/server systems
 - RPC, RMI, microservices and friends as a programming abstraction
-- Who to make these structures fit for real-life deployment?
+- How to make these structures fit for real-life deployment?
   - Where things go wrong 
 
 *** Issues and requirements 
@@ -15,7 +15,7 @@
    - Latency
    - Average, maximum, quantiles? 
  - Dependability 
-   - Fault tolerance (nothing bad happens when something goes wrong)  
+   - Safety (nothing bad happens, even when something goes wrong)  
    - Availability (good things still happen when something goes wrong)
    - Security (good things still happen despite attacks) 
 
@@ -38,32 +38,31 @@
 
 
 *** Fault assumptions 
- Everything is completely reliable 
- - (not realistic)
+ - Everything is completely reliable (not realistic)
  - Processes can fail
- - With or without warning
- - Permanent or transient failure
- - Give wrong results
- - Malicious Byzantine failure
+   - With or without warning
+   - Permanent or transient failure
+   - Give wrong results
+   - Malicious Byzantine failure
  - Data can be
- - Lost
- - Falsified
- - Reordered
- - Delayed
- - Whether this is failure or not depends on communication model
+   - Lost
+   - Falsified
+   - Reordered
+   - Delayed
+     - Whether this is failure or not depends on communication model
 
 *** What can go wrong? Taxonomy 
 
 
-- *Fault*: a defect in the system under consideration 
+- *Fault*: a defect in the *system under consideration*
   - May or may not lead to observable misbehavior 
-  - E.g.: an alpha particle flips a bit in a memory cell 
+  - E.g.: an alpha particle flips a bit in a memory cell
 - *Error*: Discrepancy between intended and actual behavior of system 
   - At runtime, errors are the manifestation of a fault in an
     unexpected state 
-  - Do not necessarily cause failure 
-  - E.g.: memory cell was written with a 1, subsequent read returns a
-    0 owing to the bit flit fault  
+    - E.g.: memory cell was written with a 1, subsequent read returns a
+      0 owing to the bit flit fault  
+  - Do not necessarily cause failure
 - *Failure*: System displays behavior contrary to specification 
   - Caused by error
   - Observable from outside of the system 
@@ -84,7 +83,7 @@
  - Performability: ability of a system to perform according to
    specifications even in the presence of failures  
  - Safety: absence of catastrophic consequences for users/environment
- - Distinction: system is "fail safe" or not (train, aircraft) 
+ - Distinction: system is *fail safe* or not (train, aircraft) 
  - Typical aspects: reliability, availability 
 
 *** System metrics: reliability 
@@ -318,7 +317,7 @@ For exponentially distributed lifetimes with rate $\lambda$, the
 hazard rate is  
 
 $$h(t) = \frac{f_X(t)}{1-F_X(t)} = 
-\frac{\lambda \mathrm{e}^{-\lambda t} }{\mathrm{e}^{-\lambda t}}$$ 
+\frac{\lambda \mathrm{e}^{-\lambda t} }{\mathrm{e}^{-\lambda t}} = \lambda$$ 
 
 It is *constant* over time! 
 
@@ -413,7 +412,7 @@ How to operate redundant resources?
   - Flat group
   - Hierarchical group
 - We will reconsider process groups once we talk about replicated data
-  and consistency \ref{ch:distributed-storage}
+  and consistency (Chapter \ref{ch:distributed-storage}) 
 
 *** How much redundancy? 
 
@@ -478,7 +477,7 @@ Approach: *Stochastic multiplexing*
 *** Practical detectors: Scope 
 
 - Only to/with neighbors
-- Forward liveness information to all nodes - *gossiping* 
+- Forward liveness information to all nodes -- *gossiping* 
 
 
 
@@ -988,6 +987,7 @@ web.bla.com         IN CNAME  worker3.bla.com
 *** How good is random choice? 
 
 - Goal: We'd like similar load levels at all workers
+  - Why? Mostly, because of latency 
 - Analogy: *Balls in Bins*
   - Requests are balls, put into bins
   - Desirable: for $m$ balls and $n$ bins, we'd like a maximum load of
@@ -1019,12 +1019,11 @@ $$ \frac{m}{n} + \Theta\left( \sqrt{\frac{m \log n}{n}} \right),  $$
 which is just (approximately) $\log n$ more than ideal case
 \cite{Raab1998:ballsinbins}! 
 
-*** Does poling help? 
+*** Does polling help? 
 
-- Suppose we allow some limited checking of server load - does that
-help? 
+- Suppose we allow some limited checking of server load - does that help? 
 - E.g., front end checks $d$ randomly selected servers and uses the
-  less loaded one 
+  least loaded one 
 
 
 #+BEAMER: \pause
@@ -1359,7 +1358,7 @@ Color indicates responsible server
 
 *** Consistent hashing, adding server 
 
-When adding a server, most values keys stay with the same server 
+When adding a server, most values' keys stay with the same server 
 
 
 ****                                                              :B_columns:
@@ -1488,7 +1487,7 @@ Compare \url{https://linuxtechme.wordpress.com/2012/03/29/470/}
 
 * Summary 
 
-** Summary 
+*** Summary 
 
 - Client/server systems still the workhorse architecture for many
   situations
