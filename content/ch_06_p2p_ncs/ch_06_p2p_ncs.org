@@ -308,7 +308,8 @@ Note: Variants exist
     \cite{Rowstron:2001:PSD:646591.697650}, Tapestry
     \cite{Zhao2004:Tapestry}
 - Properties
-  - Number of nodes visited for search request $\log(N)$, $N$ =#nodes in overlay graph
+  - Number of nodes visited for search request $\log(N)$
+    - $N$ = #nodes in overlay graph
     - With a full routing table, each step corrects a fixed number of
       bits in GUID
   - Needed property: Keys and node GUIDs are uniformly distributed in
