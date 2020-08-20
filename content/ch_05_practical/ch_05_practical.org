@@ -45,6 +45,9 @@ We need to automate the following tasks:
 
 * Execution environment 
 
+
+** Question? 
+
 *** Question 1: Get an execution environment 
 
 - Real hardware: Talk to your sys admin, procurement office, ... 
@@ -63,8 +66,7 @@ We need to automate the following tasks:
 - To get a new virtual machine on a cloud, follow the cloud provider's
   instructions
   - Example
-    \href{https://aws.amazon.com/getting-started/tutorials/launch-a-virtual-machine/}{Amazon
-    Elastic Cloud}
+    \href{https://aws.amazon.com/getting-started/tutorials/launch-a-virtual-machine/}{Amazon Elastic Cloud}
   - Lot's of clicking through web pages
   - Gives you at the end an IP address, key pair for ssh access 
 
