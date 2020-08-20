@@ -197,13 +197,13 @@ queuing context with stable storage.
 
 ***  Features 
   - Pub/sub and transactions 
+  - Quoting     http://www.amqp.org/sites/amqp.org/files/2014.05.01%20ISO%2019464%20AMQP-ORG_0.pdf
+    (slide 15): 
 
 **** From                                                       :B_quotation:
      :PROPERTIES:
      :BEAMER_env: quotation
      :END:
-    http://www.amqp.org/sites/amqp.org/files/2014.05.01%20ISO%2019464%20AMQP-ORG_0.pdf
-    (slide 15)
     - Efficient: binary connection-oriented protocol
     - Reliable: fire-and-forget to reliable, *exactly-once* delivery
     - Portable data representation: cross-platform, full-fidelity
@@ -274,11 +274,11 @@ Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
 - Pretty complex protocol (KISS!) 
 - Non-backward compatible changes were made; and specification size
   increased considerably
-  - Quote:  /The 1.0 protocol should have been 90% the size of 0.8,
+  - Quote:  "The 1.0 protocol should have been 90% the size of 0.8,
     parts chopped out, some new bits added, and with fixes and
-    clarifications./ ... /AMQP's positioning as Enterprise Technology
+    clarifications. ... AMQP's positioning as Enterprise Technology
     has made the Working Group tolerant of complexity that would not
-    have survived one hour on the Internet./
+    have survived one hour on the Internet."
     \cite{Hintjens:2008:WhatiswrongwithAMQP} 
 
 
@@ -293,7 +293,7 @@ Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
     scenarios -- KISS 
   - \href{https://github.com/mqtt/mqtt.github.io/wiki}{Community page}
     with examples   
-- Supported via plugins by several of the systems described in Section
+- Supported via plugins by several of the systems described in Sections
   \slideref{sec:mq:small_case_studies}  and \slideref{sec:mq:kafka}
 - An \ac{OASIS}
   \href{http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html}{standard}  
@@ -1042,9 +1042,9 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 
 **** Questions 
 
-- How to elect leaders? \slideref{sec:leader_election}
+- How to elect leaders? Section \slideref{sec:leader_election}
 - How to take committed messages into account during such a process?
-  \slideref{sec:leader:quorum} 
+  Section \slideref{sec:leader:quorum} 
 
 
 *** Other aspects 

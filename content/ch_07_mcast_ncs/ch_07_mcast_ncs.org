@@ -60,7 +60,7 @@
 - Multicast: A single action for sender
   - Convenient 
   - Underlying communication system (e.g., IP) distributed message
-  - Much cheaper than mutliple unicasts (e.g., Ethernet, wireless) 
+  - Much cheaper than multiple unicasts (e.g., Ethernet, wireless) 
   - But: Likely imperfect 
 
 *** Imperfections in multicast 
@@ -68,7 +68,7 @@
 - Delays might vary strongly between receivers
   - To the point of being delivered out of order 
 - Multicast message might not reach all receivers, just some
-- Sender or recevier(s) might crash 
+- Sender or receiver(s) might crash 
 
 *** Idea: Multicast protocol 
 
@@ -1322,7 +1322,7 @@ LamportTime transformation of a given distributed  algorithm A to L(A)
 
 Two events are independent concurrent if 
 - neither   $e \rightarrow e’$
-- nor $ e’ \rightarrow e$ 
+- nor $e’ \rightarrow e$ 
 
 
 
