@@ -1123,8 +1123,6 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 - Leader in charge of applying updates
 - What happens if leader fails?
 
-
-
 #+BEAMER: \pause
 
 - We need a new leader out of the followers 
@@ -1230,6 +1228,207 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 #+NAME: fig:LCR_ring_complete
 [[./figures/leaderelect_ring.pdf]]
 
+
+
+** Randomized timeout 
+
+*** Scenario  assumptions 
+
+  - All nodes can talk directly to each other (broadcast)
+    - But latencies between nodes can vary
+  - Number of nodes globally known 
+  - Processes can fail, recover at indeterminate times
+  - Time to broadcast is much smaller than MTTF, MTTR
+  - In typical operation, nodes only talks to leader, but not to other
+    nodes 
+
+*** Source 
+
+- Compare *Raft* 
+\cite{10.5555/2643634.2643666,ongaro14:_in_searc_under_consen_algor_exten_version,raft20:_raft_consen_algor_github}
+- In particular, \cite[Section 5.2]{ongaro14:_in_searc_under_consen_algor_exten_version} 
+- Animation \cite{raft20:_secret_lives_data} has part on leader
+  election, somewhere in the middle (start and end might be confusing) 
+
+*** Idea: Randomized self-election 
+
+- Leader heartbeats its followers
+- Followers use a *randomized* timeout
+- If no (not enough) heartbeats received before timeout, announce
+  yourself as leader to other nodes
+  - Wait for votes 
+- Confirmed leader if majority of other nodes agrees 
+
+*** Dealing with conflicts 
+
+- Each leader has a *term number*
+  - Included in all leader messages, in particular, heartbeat 
+- When starting election, follower increments term number
+  - Includes it in election message 
+- Rule: In each term, any node votes for *at most one* candidate
+  - First-come, first-voted 
+  - Declaring yourself candidate counts as a vote
+  - Current leader votes for a candidate with a higher term number 
+
+
+*** Finite state machine 
+
+
+#+CAPTION: Raft's leader election  finite state machine; messages not shown  
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:raft_LE:fsm
+[[./figures/raft_LE.pdf]]
+
+
+(Homework: draw a complete version of this FSM with all messages!) 
+
+*** Possible results (from candidate's perspective) 
+
+**** New leader found 
+
+- Candidate receives majority of votes
+  - It won; inform all other nodes (start sending heartbeats)  
+
+**** Another candidate wins 
+
+- Another candidate: same or higher term number! 
+  - Declares itself winner because it has majority of votes
+  - Apparently started vote (more or less) concurrently 
+
+**** Nobody wins 
+
+- Split vote; multiple concurrent candidates 
+- Just timeout in candidate state, start new vote with new term 
+
+*** Timeout choice 
+
+- Timeout to become candidate should be
+  - 1-2 orders of magnitudes longer than broadcast time (typically few
+    milliseconds) 
+  - several orders of magnitudes shorter than MTBF (typically hours,
+    days, months)
+  - Common values: 150--300ms 
+
+*** Timeout randomization
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+- How much randomization?
+\pause 
+  - Very little: many "collisions" between candidates
+  - A lot: waiting too long for leader 
+
+\pause 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+
+
+#+CAPTION: Performance of Raft leader election (Figure 16 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})  
+#+ATTR_LaTeX: :width 0.9\linewidth 
+#+NAME: fig:raft:performance 
+[[./figures/raft_performance.pdf]]
+
+
+
+
+
+** Bully                                                           :noexport:
+
+*** Different scenario for leader election 
+
+- Suppose
+  - Have UIDs (with total order, e.g., numbers)  
+  - All processes can talk to each directly
+    - No need for spanning tree
+  - But processes can fail and recover at indeterminate times 
+- In typical operation, node only talks to its leader, but not to
+  other nodes 
+- When node detects a failed leader, which other nodes to talk to to
+  become leader?
+  - All with higher ID
+  - But they might be down as well 
+
+*** Bully algorithm
+ Assumption 
+ - All nodes know already the unique IDs of all other nodes
+ - So leader choice is trivial, but ... 
+ - ... nodes, including coordinators, may fail 
+ - Algorithm
+   - Once a node suspects the coordinator of having failed, it sends
+     an ELECTION message to all nodes with a larger ID  
+   - If initiator does get no answer at all, it becomes the new coordinator 
+   - If this initiator gets an answer from one of these nodes, that
+     node will take over coordinator role 
+     - How to handle multiple answering nodes? 
+     - Recursive process of becoming initiators again, until one node
+       does not get any answers any more  
+
+
+*** Finite state machine 
+
+Simplified; no messages shown 
+
+
+#+CAPTION: Bully algorithm finite state machine 
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:bully:fsm
+[[./figures/bully_fsm.pdf]]
+
+
+
+*** Bully example: Spurious suspicion 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.3
+      :END:
+
+- Node 4 in correctly suspects leader
+- Causes 6 to worry
+- Leader 7 calms everybody 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.7
+      :END:
+
+
+
+#+CAPTION: Bully example: Spurious suspicion
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+NAME: fig:bully:spurious
+[[./figures/bully.pdf]]
+
+
+
+
+*** Bully: Spurious with failed follower 
+
+
+#+CAPTION: Spurious suspicion with a failed intermediate node
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=3
+#+NAME: fig:bully:failed_intermediate
+[[./figures/bully.pdf]]
+
+*** Bully: Spurious with failed leader 
+
+
+#+CAPTION: Spurious suspicion with a failed leader
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=4
+#+NAME: fig:bully:failed_leader
+[[./figures/bully.pdf]]
 
 
 ** In general graphs 
@@ -1455,98 +1654,6 @@ Core building block of leader election
 #+NAME: fig:leader_elect_result
 [[./figures/leaderelect_graph.pdf]]
 
-
-
-** Bully 
-
-*** Different scenario for leader election 
-
-- Suppose
-  - Have UIDs (with total order, e.g., numbers)  
-  - All processes can talk to each directly
-    - No need for spanning tree
-  - But processes can fail and recover at indeterminate times 
-- In typical operation, node only talks to its leader, but not to
-  other nodes 
-- When node detects a failed leader, which other nodes to talk to to
-  become leader?
-  - All with higher ID
-  - But they might be down as well 
-
-*** Bully algorithm
- Assumption 
- - All nodes know already the unique IDs of all other nodes
- - So leader choice is trivial, but ... 
- - ... nodes, including coordinators, may fail 
- - Algorithm
-   - Once a node suspects the coordinator of having failed, it sends
-     an ELECTION message to all nodes with a larger ID  
-   - If initiator does get no answer at all, it becomes the new coordinator 
-   - If this initiator gets an answer from one of these nodes, that
-     node will take over coordinator role 
-     - How to handle multiple answering nodes? 
-     - Recursive process of becoming initiators again, until one node
-       does not get any answers any more  
-
-
-*** Finite state machine 
-
-Simplified; no messages shown 
-
-
-#+CAPTION: Bully algorithm finite state machine 
-#+ATTR_LaTeX: :width 0.75\linewidth
-#+NAME: fig:bully:fsm
-[[./figures/bully_fsm.pdf]]
-
-
-
-*** Bully example: Spurious suspicion 
-
-****                                                              :B_columns:
-     :PROPERTIES:
-     :BEAMER_env: columns
-     :END:
-
-*****                                                                 :BMCOL:
-      :PROPERTIES:
-      :BEAMER_col: 0.3
-      :END:
-
-- Node 4 in correctly suspects leader
-- Causes 6 to worry
-- Leader 7 calms everybody 
-
-*****                                                                 :BMCOL:
-      :PROPERTIES:
-      :BEAMER_col: 0.7
-      :END:
-
-
-
-#+CAPTION: Bully example: Spurious suspicion
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
-#+NAME: fig:bully:spurious
-[[./figures/bully.pdf]]
-
-
-
-
-*** Bully: Spurious with failed follower 
-
-
-#+CAPTION: Spurious suspicion with a failed intermediate node
-#+ATTR_LaTeX: :width 0.8\linewidth :options page=3
-#+NAME: fig:bully:failed_intermediate
-[[./figures/bully.pdf]]
-
-*** Bully: Spurious with failed leader 
-
-
-#+CAPTION: Spurious suspicion with a failed leader
-#+ATTR_LaTeX: :width 0.8\linewidth :options page=4
-#+NAME: fig:bully:failed_leader
-[[./figures/bully.pdf]]
 
 
 ** Practical? 

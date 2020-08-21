@@ -1,0 +1,28 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+
+\usetikzlibrary{arrows,automata}
+
+\begin{document}
+
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=3cm,
+                    semithick]
+
+
+\node[initial, state] (f) {Follower}; 
+\node[state] (l) [above right = of f] {Leader}; 
+\node[state] (c) [below right = of f] {Candidate}; 
+
+\path 
+(f) edge [bend right=40] node [align=center, below, rotate=-45] {time out, \\start election} (c)
+(c) edge [out=240, in=300, looseness=3 ] node [align=center, below] {time out\\new election} (c)
+ (c) edge [bend right=40] node [align=center, right] {receive \\majority\\ vote} (l)
+ (c) edge [bend right=40] node [align=center, above, rotate=-45] {current\\ leader \\discovered} (f)
+; 
+
+\end{tikzpicture}
+ 
+
+\end{document}
