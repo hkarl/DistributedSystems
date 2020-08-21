@@ -667,7 +667,10 @@ Rules:
 | Messages sent   | Update (possibly, fetch) | Poll, update |
 | Response time   | Immediate or fetch delay | Fetch delay  |
 
-Assumption: one server, several clients with their own cache each
+Assumption: one server, several clients with their own cache each, *no
+fault tolerance*! 
+
+
 
 ** Consistency protocols 
    :PROPERTIES:
