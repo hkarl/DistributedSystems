@@ -842,6 +842,9 @@ things are said to be good for you in some abstract way. (Tanenbaum)
 - Delay in message times
 
 ** Snapshot 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:snapshot
+   :END:
 
 
 *** Deadlock detection 

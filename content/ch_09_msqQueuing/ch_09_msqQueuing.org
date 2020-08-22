@@ -1231,6 +1231,9 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 
 
 ** Randomized timeout 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:raft_le
+   :END:
 
 *** Scenario  assumptions 
 

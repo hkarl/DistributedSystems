@@ -1,7 +1,7 @@
 #+BIBLIOGRAPHY: ../bib plain
 
 
-* Modeling consensus 
+* Modeling consensus
   :PROPERTIES:
   :CUSTOM_ID: sec:consensus:consensus
   :END:
@@ -126,7 +126,7 @@
    - Reason: In version for failing processes all processes that decide have to agree – even processes that fail after they have decided! 	
 
 
-* Impossibility 
+* Impossibility
 
 
 *** \ac{FLP} result 
@@ -187,7 +187,346 @@ process. \cite{Fischer:1985:IDC:3149.214121}
 [[./figures/impossible.pdf]]
 
 
-* PAXOS
+* Raft
+
+** A practical consensus protocol 
+
+*** Practical candidates
+
+- For realistic, yet nontrivial cases, finding good protocols is hard
+  (as the problem is hard) 
+  - Combining asynchrony with fault tolerance in a meaningful way 
+- Two main candidates
+  - PAXOS: provably correct consensus protocol 
+    - E.g., used in Zookeeper, Kafka, Google's Chubby,  ...
+    - Original publication considered difficult to read
+      \cite{Lamport:1998:PP:279227.279229}; followup paper tried to
+      simplify exposition \cite{paxos-made-simple}; tutorial
+      \cite{Meling2013}
+    - Notorious for being  difficult to understand and to implement
+  - Raft \cite{10.5555/2643634.2643666}: Simpler structure, same guarantees
+
+
+*** Raft goal: Log replication  
+
+*Log replication* for replicated (deterministic) finite state machines 
+- Suppose we have an FSM, replicated on multiple machines 
+- Clients issue events (commands) to that FSM 
+- Goal: Ensure that all commands appear in the same order at all
+  machines
+  - Commands are stored in a *command log*, hence the name 
+  - Consensus on order! 
+  - Recall total order multicast!!
+- Formally:
+  - *Safety*: Never return an incorrect result
+  - *Available*: As long as any majority of servers is operational and
+    can communicate, progress is made
+  - *Timing-independent*: Specific, precise choice of timer values
+    does not matter 
+
+*** Challenges
+
+  - Machines can fail and recover
+  - Message lost, arbitrarily delayed
+  - Membership changes (nodes added, dropped) 
+
+We *finally* build a really fault-tolerant protocol for the general
+case! 
+
+*** Raft  sources 
+
+- Main paper: \cite{10.5555/2643634.2643666}
+- Extended version:  \cite{ongaro14:_in_searc_under_consen_algor_exten_version}
+  - Strongly recommended to read it! Very accessible, clear
+    presentation; good comparison to Paxos and limitations of formal proofs!
+  - Section here mostly follows this paper 
+- Github presence: \cite{raft20:_raft_consen_algor_github}
+- Animation \cite{raft20:_secret_lives_data}
+
+
+** Raft structure 
+
+*** Components 
+
+- Leader election
+  - Already covered -- compare Section \ref{sec:raft_le}
+- Log replication 
+- Safety mechanisms 
+
+*** Raft basics 
+
+(Compare \cite[Section 5]{ongaro14:_in_searc_under_consen_algor_exten_version})  
+
+**** Terms and leaders 
+
+- Leaders are elected and responsible for terms of varying duration 
+- Term numbers are monotonically increasing
+- Term numbers are a *logical clock*
+  - Whenever a term number larger than a machine's own term is seen,
+    it is updated to larger number 
+- Any term has *at most* one leader
+  - It might have none if leader election fails 
+
+*** Raft basics (2)
+
+
+**** Clients and leaders 
+
+- Clients issue events/actions to replicated FSM 
+- Clients only talk to leaders 
+  - Non-leaders redirect clients to current leader 
+
+
+**** Leaders and log 
+
+- Only leader appends to log to ensure order 
+- Leader only confirms to client once it has confirmation from
+  majority of servers 
+- Challenge: what happens when leader election and log updates
+  overlap? 
+
+
+** Log replication 
+
+*** Log replication 
+
+The log: 
+
+- List of commands for the FSM, held by each node 
+- Index by (term, index inside term) tuple 
+- Logs contain *committed* and *uncommitted* entries
+  - Committed entries are a prefix (if one entry is committed, so are
+    all its predecessors; identified by *commit counter* 
+    - This highest index is included in all leader messages 
+  - *Committed*: Safe to apply command to FSM 
+  - *Uncommitted*: Still not sufficiently confirmed from other
+    replicas 
+
+*** Log example 
+
+#+CAPTION: Example Raft log; colors and numbers show terms (Figure 6 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})
+#+ATTR_LaTeX: :width 0.8\textheight
+#+ATTR_LaTeX: :caption \caption{Example Raft log (Figure 6 from \cite{}) \label{fig:raft:log}}
+#+NAME: fig:raft:log
+[[./figures/raft_log.pdf]]
+
+Note that not all followers are up to date with the committed index of
+the current leader 
+
+*** Basic operation for log replication 
+
+- Client sends command to leader 
+- Leader appends command to its log (as uncommitted entry)
+- Sends command to all followers to replicate it
+  - Waits for ACKs from majority (condition for commit)
+    - Watch out for subtleties with leader changes (see below)
+  - Retries indefinitely! 
+- Followers only accept and ACK command if no gap in index sequence!
+- With enough ACKs, leader
+  - commits entry,
+  - applies it to its FSM 
+  - sends result of FSM action back to client 
+
+
+
+*** Properties 
+
+To quote \cite{ongaro14:_in_searc_under_consen_algor_exten_version}: 
+
+If two entries in different logs have the same index and term, then
+- they store the same command 
+- the logs are identical in all preceding entries 
+
+
+
+*** Committing on followers 
+
+- Leader decides when a log entry can be committed
+  - Leads to update of commit counter 
+- Commit counter is distributed to followers
+  - At least with heartbeats!
+- Hence, followers can find out which entires are committed and should
+  be applied to state machine 
+
+
+
+
+** Leader crash 
+
+*** Problem: Leader crash 
+
+Logs of new leader in new term might be inconsistent with follower
+logs; these are *uncommitted* entries  
+
+#+CAPTION: Logs when leader changes (Figure 7 from )
+#+ATTR_LaTeX: :width 0.6\textheight
+#+ATTR_LaTeX: :caption \caption{Logs when leader changes (Figure 7 from ) \label{fig:raft:log_leader_change}}
+#+NAME: fig:raft:log_leader_change
+[[./figures/raft_log_leader_change.pdf]]
+
+*** Possible options 
+
+
+**** Cases 
+
+- Case a, b: Unproblematic; new leader has superset
+- Case c, d: Leader misses entries from previous terms
+  - Could happen if those nodes where leader in previous terms, but
+    did not manage to commit them 
+- Case e, f: Combination 
+
+\pause 
+**** Uncommitted? 
+
+How do we know these are uncommitted entries at other nodes? 
+- Leader election needs to assure that!
+- Need an additional condition there (see below!) 
+
+*** Options 
+
+- Send old entries from followers to new leader
+  - Possible, done in some protocols, but complicated 
+- Force followers to abandon their entries, follow new leader!
+  - Raft approach
+  - Entries in follower will be overwritten by leader log
+  - Handled via consistency check: followers delete everything after
+    last entry where they agree with leader
+  - No specific actions needed! Normal replication will kick in after
+    follower logs are shortened
+\pause 
+- Note: we only remove uncommitted entires
+  - I.e.: not yet applied to state machine, not yet sent back to
+    client
+  - Client would have to resend! 
+
+
+*** Consequence 
+
+
+*Leader Only Appends* Property: 
+
+- A leader only appends to its own log 
+- It never deletes, inserts, reorders, ... anything in its log 
+
+
+** Safety
+
+*** Problematic case 
+
+- Leader election so far cannot guarantee that new leader only misses
+  uncommitted entries
+  - As assumed above
+  - If it did miss committed entries, we could not just roll back
+    other logs like we did above
+  - That would lead to inconsistent FSM sequences!
+- Example scenario:
+  - Follower A down for a term
+  - Other leader B commits entires (majority of nodes is still up!)
+  - A comes up, becomes leader in following term, and does lack the
+    committed entries 
+\pause 
+- Hence: We need a restriction on leader election to avoid such cases! 
+
+*** Restricted leader election 
+
+- Follower votes for a candidate only if the candidate's log is *at
+  least as up to date* as the follower's log 
+  - Up to date: Compare (term, index) number, lexicographically
+- Ensures that candidate becomes leader only if it is at least as up
+  to date as a majority of all nodes
+  - Hence, it cannot miss committed (!) entries 
+
+*** Committing entries from previous terms 
+
+- Recall: Entries from *current* term: leader can commit once ack'ed by
+  majority of participants 
+- But what about entries from *previous* terms that are uncommitted? 
+- Possible issue:
+  - Leader crashes, has uncommitted entries
+  - New leader takes over in new term; it might have copy of those
+    entires 
+  - New leader tries to replicate them 
+  - Can new leader commit once majority has acknowledged? 
+
+*** Majority acknowledges entries from previous terms 
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.3
+      :END:
+
+Problem: Just because an entry is stored on majority of servers is
+  not sufficient to commit it 
+
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.7
+      :END:
+
+
+#+CAPTION: Raft unable to commit across terms (Fig. 8 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})
+#+ATTR_LaTeX: :width 0.6\textheight
+#+ATTR_LaTeX: :caption \caption{Raft unable to commit across terms (Fig. 8 from ) \cite{ongaro14:_in_searc_under_consen_algor_exten_version}) \label{fig:raft:no_commit}}
+#+NAME: fig:raft:no_commit
+[[./figures/raft_no_commit.pdf]]
+
+
+*** Solution: Don't count replicas for previous term's entries 
+
+- Basic idea: hold off until committing terms from *previous* terms
+  until at least one entry from *current* term is committed 
+- Then, a competing candidate (with a contradicting entry on earlier
+  indices)
+  - cannot possibly win a later election and
+  - can, hence, not push through the contradicting entry for the
+    previous term 
+
+
+(The full, formal safety argument is a bit more complex, but still not
+too hard \cite[Section 5.4.3]{ongaro14:_in_searc_under_consen_algor_exten_version})  
+
+** Other mechanisms 
+
+*** Log compaction 
+
+  - Deal with log that grows above bounds 
+  - Take a snapshot (compare Section \ref{sec:snapshot}) of entire state (logs on
+    all participants) to stable storage 
+  - Delete logs up to that point 
+
+***  Membership changes
+  - Challenge: Updating *configuration* is non-atomic
+  - Could lead to two current leaders, some from new, some from old
+    configuration 
+  - Approach: during transition, require majorities from *both* old
+    and new configuration 
+
+*** Raft conclusion 
+
+- Overall, a practical, powerful, relatively simple scheme to drive
+  replicated FSMs 
+- *Much* simpler compared to alternative schemes like PAXOS 
+
+
+*** Membership change: Problematic example 
+#+CAPTION: Two leaders during configuration change (Fig. 10 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})
+#+ATTR_LaTeX: :width 0.6\textheight
+#+ATTR_LaTeX: :caption \caption{Two leaders during configuration change (Fig. 10 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version}) }
+#+NAME: fig:raft:reconfig_two_leaders
+[[./figures/raft_no_commit.pdf]]
+
+
+
+
+
+* PAXOS                                                            :noexport:
   :PROPERTIES:
   :CUSTOM_ID: sec:consensus:paxos
   :END:
@@ -706,7 +1045,7 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
       - \href{https://raft.github.io}{Interactive animation}
 
 
-* Log replication
+* Log replication                                                  :noexport:
 
 
 *** How to use Paxos to build Kafka 
@@ -778,7 +1117,7 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
   \cite{Malkhi:2012:PCF:2146382.2146391} 
 
 
-* Byzantine agreement 
+* Byzantine agreement
    :PROPERTIES:
    :CUSTOM_ID: sec:consensus:byzt_alg
    :END:
@@ -1160,7 +1499,7 @@ def vote(id, initial_vote, num_proc, f):
    
 
  
-* Case studies 
+* Case studies
 
 *** Systems so far 
 
@@ -1191,8 +1530,7 @@ etcd is written in Go and uses the Raft consensus algorithm to manage a highly-a
 
 - Designed for small amounts of key/value data, able to fit in memory 
 - With
-\href{https://github.com/etcd-io/etcd/tree/master/etcdctl}{command-line
-client} (in particular, ~put~, ~get~, ~del~ operations) 
+\href{https://github.com/etcd-io/etcd/tree/master/etcdctl}{command-lineclient} (in particular, ~put~, ~get~, ~del~ operations) 
 
 
 
