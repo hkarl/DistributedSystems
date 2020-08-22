@@ -726,7 +726,7 @@ distributed system   https://github.com/etcd-io/etcd
 
 
 #+CAPTION: Name servers for different zones
-#+ATTR_LaTeX: :height 0.9\textheight :options page=5
+#+ATTR_LaTeX: :height 0.7\textheight :options page=5
 #+NAME: fig:dns:nameservers
 [[./figures/dns.pdf]]
 
@@ -902,6 +902,13 @@ distributed system   https://github.com/etcd-io/etcd
 
 ** Conclusions 
 
+- SQL semantics usually implies the database semantics, not
+  necessarily the query language 
+- NoSQL looks at alternative models for distributed databases and
+  their many shapes 
+- Key insight is CAP theorem / PACELEC interpretation 
+- Even systems like DNS can be seen as very specific design choices on
+  that spectrum 
 
 
 
