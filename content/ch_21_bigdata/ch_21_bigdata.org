@@ -17,7 +17,7 @@
 
 *****                                                                 :BMCOL:
       :PROPERTIES:
-      :BEAMER_col: 0.5
+      :BEAMER_col: 0.6
       :END:
 
 Example: \ac{LHC} at \ac{CERN}, ca. late 2018 
@@ -32,7 +32,7 @@ Example: \ac{LHC} at \ac{CERN}, ca. late 2018
 
 *****                                                                 :BMCOL:
       :PROPERTIES:
-      :BEAMER_col: 0.5
+      :BEAMER_col: 0.4
       :END:
 
 
@@ -46,8 +46,8 @@ Example: \ac{LHC} at \ac{CERN}, ca. late 2018
 *** Data volume in general 
 
 - \href{https://blog.microfocus.com/how-much-data-is-created-on-the-internet-each-day/}{Overview}
-- Fujitsu: Total amount of data stored up to 2013: 3 Zettabytes= $3
-  \cdot   10^\{21$} = 3 million Petabytes = 3 billion Terabytes  
+- Fujitsu: Total amount of data stored up to 2013: 
+  3 Zettabytes= $3\cdot   10^{21}$ = 3 million Petabytes = 3 billion Terabytes  
 - IDC: 2,8 Zettabytes produced 2012; 2020 predicted 40 Zettabytes per
   year
   - 2025: 463 \cdot 10^9 GB/day, about 150  Zettabytes per year  
@@ -70,6 +70,24 @@ Example: \ac{LHC} at \ac{CERN}, ca. late 2018
   - Versatility: use the same data for many purposes 
   - Value: build things that people want...  
 - Compared to SQL: Speed, flexibility, scalability given larger weight than formal strictness of SQL 
+
+
+
+*** Goals for this chapter 
+
+- Main design choices for big-data processing, specifically to
+  support machine-learning applications 
+- Understand main options for tools 
+- Judge complexity of developing applications on a specific setup
+  (Spark) 
+
+
+*** Challenges 
+
+- Storage volume 
+- Replication for dependability 
+- Processing? 
+- Rare chance: Co-design infrastructure and programming model!
 
 
 
@@ -294,6 +312,8 @@ for i in range(numIterations):
 
 * MapReduce
 
+** Basic MR
+
 *** Programming model
  - Goal: Provide a simple programming model, applicable to wide range of applications
  - Idea: Represent data as key/value pairs  <k1, v1>
@@ -390,6 +410,162 @@ specify some more utility functions:
 - *Output writer*: turn output into files in file system 
 
 
+** Flyod's kMeans and MR 
+
+*** Structure 
+
+Pause video - think how to turn Floyd's algorithm into an *iterative*
+MR execution 
+
+*** kMeans as map/reduce 
+
+- Mapper
+  - Input: subset of data vectors, current centres 
+  - Output: List of pairs (closest centre, data vector)
+- Shuffle
+  - Reorder into lists of pairs: (centre, list of corresponding data
+    vectors) 
+- Reducer 
+  - Input: (centre, list of corresponding data vectors) 
+  - Output: new centre (component-wise arithmetic mean of data vectors) 
+
+
+***  kMeans as MR job: Structure 
+
+
+#+CAPTION: Structuring kMeans as an MR job
+#+ATTR_LaTeX: :width 0.9\linewidth
+#+NAME: fig:mr:kmeans:structure
+[[./figures/mr_kMeans.pdf]]
+
+
+
+*** kMeans MR Python sketch 
+
+\tiny 
+
+#+BEGIN_SRC python 
+def distance (x,y):
+    return  (x[0]-y[0])**2 + (x[1]-y[1])**2
+
+def findClosest (p, c):
+    d = ((distance(p, c[i]),i) for i in range(len(c)))
+    return min(d)[1]
+
+def center (v):
+    # print v 
+    if len(v)>0:
+        return ( sum([x[0] for x in v])/len(v),  
+                 sum([x[1] for x in v])/len(v), )
+    else:
+        return ( (uniform(0,100), uniform(0,50), ))
+
+#########################
+
+def mapper (vecs, kmeans):
+    return [ (findClosest (v, kmeans), v) for v in vecs]
+
+def reducer (k, vecs):
+    return center (vecs)
+#+END_SRC
+
+*** kMeans MR Python sketch (2) 
+\tiny 
+
+#+BEGIN_SRC python 
+# split up the vectors in mappers many partitions
+datapartitions = list(chunks(data, numSamples/numMappers))
+
+for i in range(numIters):
+
+    # apply mapper to each one, produces a list of lists with (closest center, vector) 
+    mappedData = [mapper (d, kmeans) for d in datapartitions]
+
+    
+    # flatten the mappedData to remove the numMapper many sublists, then shuffle around according to key 
+    # produces a list of (center, list of closest vectors) 
+    flattenedData = list(itertools.chain.from_iterable (mappedData))
+    shuffledData = [(k, [m[1] for m in flattenedData if m[0] == k])
+                    for k in range(numK)]
+
+
+    # and apply reducer, updating the centers immediately: 
+    kmeans = [reducer(k, v) for (k,v) in shuffledData ]
+    pprint.pprint (kmeans) 
+#+END_SRC
+
+
+
+** Distributed MR 
+
+*** Storage 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.6
+      :END:
+
+
+- Typical: LARGE, unstructured text files 
+- Break them up in chunks 
+- Store chunks on multiple serversfor higher throughput
+- Store chunks redundantly 
+- Keep track of chunks in a master 
+\pause 
+- Efficient: Sequential read, atomic append 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.4
+      :END:
+
+
+
+#+CAPTION: Breaking up files in blocks  
+#+ATTR_LATEX: :width 0.9\linewidth
+#+NAME: fig:bd:chunks 
+[[./figures/bd_store_files.png]]
+
+
+
+*** Preparing Map/Reduce for distributed execution 
+
+- Input data is split over many
+  - Natural place to run map functions 
+  - Data might be in several files per machine 
+  - Distributed, redundant file system! 
+  - Needs to provide "small", semantically relatable intermediate
+    results 
+- Reducers need grouped input 
+  - To be provided by shuffle
+  - Can be run on same or other worker machines 
+- Shuffle is the same for all types of jobs 
+  - Can be implemented in both mappers and reducers 
+
+
+
+*** Distributed MR: Core idea 
+
+
+#+CAPTION: Core structure of running map/reduce in a cluster
+#+ATTR_LaTeX: :width 0.9\linewidth
+#+NAME: fig:mr:structure
+[[./figures/distrMR_structure.pdf]]
+
+
+
+
+
+
+
+
 *** MapReduce big picture 
 
 
@@ -397,6 +573,44 @@ specify some more utility functions:
 #+ATTR_LATEX: :width 0.9\linewidth
 #+NAME: fig:mapreduce:overview
 [[./figures/mapreduce.pdf]]
+
+
+
+*** MapReduce execution overview 
+
+
+#+CAPTION: MapReduce execution overview from a process perspective
+#+ATTR_LaTeX: :width 0.9\linewidth
+#+NAME: fig:mr:execution_overview
+[[./figures/mr_execution_overiew.pdf]]
+
+
+
+*** Questions to solve 
+
+- Which worker is picked to run which map job? 
+- Redundant data storage, but multiple M&R jobs overlap, compete for
+  resources 
+  - How to know? Applications announce, history, predictions, …? 
+- When to start reducing? 
+  - How much to overlap mapping, shuffling, and reducing phases? 
+- Which partition is sent to which reduce worker? 
+- Complex tuning problems! Performance not evident 
+    
+
+
+*** MapReduce code example: Count word frequencies 
+
+#+CAPTION: Word count -- from google code examples
+#+ATTR_LaTeX: :width 0.9\linewidth
+#+NAME: fig:mr:word_count:google
+[[./figures/mr_wordcount.pdf]]
+
+
+
+
+
+** 
 
 * todo								   :noexport:
 
@@ -498,31 +712,6 @@ specify some more utility functions:
 
 
 
-*** Preparing Map/Reduce for distributed execution 
-
-- Input data is split over many
-  - Natural place to run map functions 
-  - Data might be in several files per machine 
-  - Distributed, redundant file system! 
-- Reducers need grouped input 
-  - To be provided by shuffle
-  - Can be run on same or other worker machines 
-- Shuffle is the same for all types of jobs 
-  - Can be implemented in both mappers and reducers 
-
-
-
-*** Distributed MR: Core idea 
-
-
-#+CAPTION: Core structure of running map/reduce in a cluster
-#+ATTR_LaTeX: :width 0.9\linewidth
-#+NAME: fig:mr:structure
-[[./figures/distrMR_structure.pdf]]
-
-
-
-
 *** Example: distributed word count, Map/Reduce style		   :noexport:
  Worker Map #1
 
@@ -616,118 +805,27 @@ specify some more utility functions:
 
 
 
-*** MapReduce execution overview 
-
-
-#+CAPTION: MapReduce execution overview from a process perspective
-#+ATTR_LaTeX: :width 0.9\linewidth
-#+NAME: fig:mr:execution_overview
-[[./figures/mr_execution_overiew.pdf]]
-
-
-
-*** Questions to solve 
-
-- Which worker is picked to run which map job? 
-- Redundant data storage, but multiple M&R jobs overlap, compete for
-  resources 
-  - How to know? Applications announce, history, predictions, …? 
-- When to start reducing? 
-  - How much to overlap mapping, shuffling, and reducing phases? 
-- Which partition is sent to which reduce worker? 
-- Complex tuning problems! Performance not evident 
-    
-
-
-*** MapReduce code example: Count word frequencies 
-
-#+CAPTION: Word count -- from google code examples
-#+ATTR_LaTeX: :width 0.9\linewidth
-#+NAME: fig:mr:word_count:google
-[[./figures/mr_wordcount.pdf]]
-
-
-
-
-*** kMeans as map/reduce 
-
-- Mapper
-  - Input: subset of data vectors, current centres 
-  - Output: List of pairs (closest centre, data vector)
-- Shuffle
-  - Reorder into lists of pairs: (centre, list of corresponding data
-    vectors) 
-- Reducer 
-  - Input: (centre, list of corresponding data vectors) 
-  - Output: new centre (component-wise arithmetic mean of data vectors) 
-
-
-***  kMeans as MR job: Structure 
-
-
-#+CAPTION: Structuring kMeans as an MR job
-#+ATTR_LaTeX: :width 0.9\linewidth
-#+NAME: fig:mr:kmeans:structure
-[[./figures/mr_kMeans.pdf]]
-
-
-
-*** kMeans MR Python sketch 
-
-#+BEGIN_SRC python 
-def distance (x,y):
-    return  (x[0]-y[0])**2 + (x[1]-y[1])**2
-
-def findClosest (p, c):
-    d = ((distance(p, c[i]),i) for i in range(len(c)))
-    return min(d)[1]
-
-def center (v):
-    # print v 
-    if len(v)>0:
-        return ( sum([x[0] for x in v])/len(v),  
-                 sum([x[1] for x in v])/len(v), )
-    else:
-        return ( (uniform(0,100), uniform(0,50), ))
-
-#########################
-
-def mapper (vecs, kmeans):
-    return [ (findClosest (v, kmeans), v) for v in vecs]
-
-def reducer (k, vecs):
-    return center (vecs)
-#+END_SRC
-
-*** kMeans MR Python sketch (2) 
-
-#+BEGIN_SRC python 
-# split up the vectors in mappers many partitions
-datapartitions = list(chunks(data, numSamples/numMappers))
-
-for i in range(numIters):
-
-    # apply mapper to each one, produces a list of lists with (closest center, vector) 
-    mappedData = [mapper (d, kmeans) for d in datapartitions]
-
-    
-    # flatten the mappedData to remove the numMapper many sublists, then shuffle around according to key 
-    # produces a list of (center, list of closest vectors) 
-    flattenedData = list(itertools.chain.from_iterable (mappedData))
-    shuffledData = [(k, [m[1] for m in flattenedData if m[0] == k])
-                    for k in range(numK)]
-
-
-    # and apply reducer, updating the centers immediately: 
-    kmeans = [reducer(k, v) for (k,v) in shuffledData ]
-    pprint.pprint (kmeans) 
-#+END_SRC
-
-
 
 * Frameworks 
 
 ** Old and new 
+
+*** Why frameworks? 
+- Reusable vs. custom code? 
+  - Map, reduce: specific to a problem 
+  - Shuffle, reading/writing data, …: Generic, reusable 
+
+\pause 
+
+- BigData frameworks! 
+  - Job: Which data, which map, which reduce, where to write output 
+  - Early examples:  Google internal, Hadoop Map/Reduce
+  - Current examples: Spark
+
+\pause 
+
+- Common confusion: M/R the model vs. M/R the framework 
+
 
 *** Early vs. current MR frameworks 
 
@@ -757,9 +855,10 @@ for i in range(numIters):
 
 *****                                                                 :BMCOL:
       :PROPERTIES:
-      :BEAMER_col: 0.5
+      :BEAMER_col: 0.6
       :END:
 
+\small 
  Setup: cluster with about 1800 machines
  - Dual 2GHz Xeon, 4 GB memory, two 160 GB IDE disks
  - Gigabit Ethernet, \aprox 100-200 Gbps aggregate bandwidth 
@@ -770,13 +869,13 @@ for i in range(numIters):
 
 *****                                                                 :BMCOL:
       :PROPERTIES:
-      :BEAMER_col: 0.5
+      :BEAMER_col: 0.4
       :END:
 
 
 
 #+CAPTION: Sorting by MR - ca. 2004
-#+ATTR_LaTeX: :height 0.9\textheight
+#+ATTR_LaTeX: :height 0.6\textheight
 #+NAME: fig:mr:sorting
 [[./figures/mr_sorting.pdf]]
 
@@ -933,5 +1032,13 @@ http://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/YARN.html
 * Conclusions 
 
 *** Conclusions 
+
+- Big Data Analytics = Machine learning & data mining applied to lots of data 
+  - Setting up data analytics pipeline needs many steps 
+  - Many subproblems with off-the-shelf, standard solutions 
+  - But combining them requires domain knowledge and ML expertise 
+- Big Data Infrastructure = Setup and frameworks to efficiently deal with BDA tasks
+  - Standard frameworks, a handful of contenders 
+  - Not no clear universal winner available 
 
  
