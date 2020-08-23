@@ -1,6 +1,16 @@
 #+BIBLIOGRAPHY: ../bib plain
 
 
+* Building a web search engine 
+
+*** NOTE: Immature chapter 
+
+- This chapter is still in an immature state
+- Probably will not be treated in class 
+- Serves as "general interest" material 
+
+** Context 
+
 *** Web search – Google as case study 
  Overall setup: Several clusters worldwide, each self-sufficient
  - Serving a google query 
@@ -38,6 +48,9 @@
  - Think about power!
  - Power supply density limited in data centers
  - Cooling is a problem 
+
+** BigTable 
+
 *** Google BigTable
  How to provide a convenient API to store data for search engines? On top of the GFS? 
  - Answer: BigTable 
