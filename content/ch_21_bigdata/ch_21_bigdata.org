@@ -414,7 +414,7 @@ specify some more utility functions:
 
 *** Structure 
 
-Pause video - think how to turn Floyd's algorithm into an *iterative*
+Pause video - think how to turn Lloyd's algorithm into an *iterative*
 MR execution 
 
 *** kMeans as map/reduce 
