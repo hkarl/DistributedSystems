@@ -646,7 +646,7 @@ print("Received request: %s" % message)
 
 #+BEAMER: \pause
 
-- In general, we cannot assume but parts are written using the same
+- In general, we cannot assume that parts are written using the same
   language!
 
 - We need to translate between different representations 
