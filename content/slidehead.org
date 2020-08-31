@@ -11,8 +11,10 @@
 #+LaTeX_CLASS_OPTIONS: [ignorenonframetext,\\OutputStyle,nooutline]
 #+BEAMER_HEADER:
 
-#+LATEX_HEADER: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Table of contents}\tableofcontents[currentsection,hideothersubsections]\end{frame}}
-#+LATEX_HEADER: \AtBeginSubsection[]{\begin{frame}<beamer>\frametitle{Table of contents} \tableofcontents[currentsubsection,currentsection,subsectionstyle=show/shaded/hide]\end{frame}}
+#+LATEX_HEADER: \newif\iflattersubsect
+
+#+LATEX_HEADER: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Table of contents}\tableofcontents[currentsection,hideothersubsections]\end{frame} \lattersubsectfalse}
+#+LATEX_HEADER: \AtBeginSubsection[]{\iflattersubsect \begin{frame}<beamer>\frametitle{Table of contents} \tableofcontents[currentsubsection,currentsection,subsectionstyle=show/shaded/hide]\end{frame}\fi\lattersubsecttrue}
 
 #+LATEX_HEADER: \usepackage{xr-hyper}
 #+LATEX_HEADER: \usepackage{tikz}
