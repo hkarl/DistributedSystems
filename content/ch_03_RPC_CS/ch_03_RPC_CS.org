@@ -757,7 +757,7 @@ It [Web Service] has an interface described in a machine-processable format (spe
 
 *****                                                                 :BMCOL:
       :PROPERTIES:
-      :BEAMER_col: 0.5
+      :BEAMER_col: 0.6
       :END:
  Required
  - A *transport protocol* between client and server
@@ -769,7 +769,7 @@ It [Web Service] has an interface described in a machine-processable format (spe
 
 *****                                                                 :BMCOL:
       :PROPERTIES:
-      :BEAMER_col: 0.5
+      :BEAMER_col: 0.4
       :END:
 
 
