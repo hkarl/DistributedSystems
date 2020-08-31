@@ -96,8 +96,7 @@ GET requests can refer to a static web page (simply delivered by the server) or 
 
 #+BEAMER: \pause
 - Example simple servers
-  - Python's 
-\href{https://docs.python.org/3.5/library/http.server.html#module-http.server}{http.server}
+  - Python's \href{https://docs.python.org/3.5/library/http.server.html#module-http.server}{http.server}
   - npm's \href{https://www.npmjs.com/package/http-server}{http-server}
 
 
@@ -1507,7 +1506,7 @@ Core aspect: Use received JSON in template
 
 * Conclusion 
 
-** Conclusion 
+*** Conclusion 
 
 - HTML and HTTP as such relatively simple request/reply protocols 
 - Imply stateless design, which complicates matters considerably
