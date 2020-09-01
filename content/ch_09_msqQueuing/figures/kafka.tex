@@ -47,16 +47,22 @@ lqueue/.pic={
 \node [draw, above=of k] (a1)  {App}; 
 \node [draw, above right =of k, xshift=-1cm]  (a2)  {App}; 
 \node [draw, above left =of k, xshift=+1cm]  (a3)  {App}; 
+\node [above of= a2, anchor=east] {Producer}; 
 
 \node [draw, below left =of k, xshift=+1cm] (c1)   {App}; 
 \node [draw, below  =of k]  (c2)  {App}; 
 \node [draw, below right  =of k, xshift=-1cm] (c3)   {App}; 
+\node [below = of c2, anchor=north, yshift=0.8cm] {Consumer}; 
+
 
 \node [draw, right =of k, yshift=0.5cm] (s1)   {App}; 
 \node [draw, right  =of k, yshift=-0.5cm] (s2)   {App}; 
+\node [right = of s1, anchor=north, yshift=-0.4cm, rotate=270] {Stream}; 
 
 \node [database, left =of k, yshift=0.5cm] (db1)   {App}; 
 \node [database, left  =of k, yshift=-0.5cm] (db2)   {App}; 
+\node [left = of db1, anchor=north, yshift=-0.2cm, rotate=90] {Connect}; 
+
 
 \foreach \x in {a1,a2,a3} \draw [->]  (\x) -- (k); 
 \foreach \x in {c1,c2,c3} \draw [->] (k) -- (\x); 
@@ -68,6 +74,8 @@ lqueue/.pic={
 \end{tikzpicture}
 
 % Kafka queues: 
+
+% \end{document}
 
 \begin{tikzpicture}
   
@@ -97,8 +105,8 @@ lqueue/.pic={
   \pic (q) at (0,0) {lqueue=5};
   
   \node [above=of q-5] (p)  {Producers write};
-  \node [below=of q-2, xshift=-1cm, align=center] (ca) {Consumer A \\writes, offset =2};
-  \node [below=of q-4, xshift=+1cm, align=center] (cb) {Consumer B \\writes, offset =4};
+  \node [below=of q-2, xshift=-1cm, align=center] (ca) {Consumer A \\reads, offset =2};
+  \node [below=of q-4, xshift=+1cm, align=center] (cb) {Consumer B \\reads, offset =4};
   
   \draw [->] (q-2) -- (ca); 
   \draw [->] (q-4) -- (cb); 
