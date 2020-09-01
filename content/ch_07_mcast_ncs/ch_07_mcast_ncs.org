@@ -37,7 +37,7 @@
   \slideref{sec:cs:multitier}[s:cs:servergroup]
 - Multicast useful
   - From client to all servers in group
-    - Typically, sender does *not* receiver message
+    - Typically, sender does *not* receive message
   - From server to all servers in group
     - Typically, sender *does* receive message as well 
 
@@ -100,6 +100,14 @@
 
 
 * Ordering semantics
+
+*** Assumption 
+
+*NO GROUP CHANGES* 
+
+\pause 
+
+At first 
 
 ** Reliable 
 
@@ -1133,13 +1141,13 @@ ordered set T
 
 *** Indistinguishable 
 
-Crucial property: from the perspective of a single process alone, a
-logical time is indistinguishable from real time 
+ - Crucial property: from the perspective of a single process alone, a
+   logical time is indistinguishable from real time
  - Formally: for every execution with logical time L there is another
    execution  so that 
- - Events occur (in real time) in the order of logical time L 
- - For every process: a’ is indistinguishable from a
- - So-called *rubberband transformation*
+   - Events occur (in real time) in the order of logical time L 
+   - For every process: a’ is indistinguishable from a
+   - So-called *rubberband transformation*
 
 *** Assignment of Logical Time – Example  
 
