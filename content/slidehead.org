@@ -16,6 +16,11 @@
 #+LATEX_HEADER: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Table of contents}\tableofcontents[currentsection,hideothersubsections]\end{frame} \lattersubsectfalse}
 #+LATEX_HEADER: \AtBeginSubsection[]{\iflattersubsect \begin{frame}<beamer>\frametitle{Table of contents} \tableofcontents[currentsubsection,currentsection,subsectionstyle=show/shaded/hide]\end{frame}\fi\lattersubsecttrue}
 
+
+#+LATEX_HEADER: \usepackage{etoolbox}
+#+LATEX_HEADER: \makeatletter \patchcmd{\beamer@sectionintoc}{\vskip1.5em}{\vskip0.25cm}{}{}\makeatother 
+
+
 #+LATEX_HEADER: \usepackage{xr-hyper}
 #+LATEX_HEADER: \usepackage{tikz}
 #+LATEX_HEADER: \usetikzlibrary{tikzmark}
