@@ -330,6 +330,9 @@ Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
 
 ** UNIX MQ 
 
+*** MQ built-in 
+
+- Simple message queueing functionality built into Unix 
 - Recall KMS discussion
 - In SysV, in POSIX 
 - Check, e.g., ~man mq_overview~ 
@@ -677,7 +680,7 @@ Topics are divided into 1 or more *partitions*
   - Partition must fit on one server
 - Producers *append* to partitions
 - Retained in Kafka cluster for configurable time
-  - Unconsumed *and consumed* records
+  - Not yet consumed  *and consumed* records
     - Can act as a limited-term storage system! 
 
 
@@ -755,7 +758,7 @@ Topics are divided into 1 or more *partitions*
 
 
 #+CAPTION: Consumer groups in Kafka
-#+ATTR_LaTeX: :height 0.6\textheight :options page=4
+#+ATTR_LaTeX: :height 0.5\textheight :options page=4
 #+NAME: fig:kafka_consumer_groups
 [[./figures/kafka.pdf]]
 
