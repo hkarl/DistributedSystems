@@ -141,7 +141,7 @@ When a node looks for a key:
 - This *is* a distributed hash table 
 - But the search overhead is terrible: on average, O(#nodes) search
   steps to find the server in charge of a randomly selected key
-- (Memory overhead is, good, though: constant) 
+- (Memory overhead is good, though: constant) 
 
 * Chord
 
@@ -519,7 +519,7 @@ Note: Variants exist
 - At some point, considered a vital threat to entire entertainment
   industry
   - And had a lion share of Internet traffic (late 1990s to about  mid/late 2000s)
-    - 40ß% to 70% of all Internet traffic in 2009 
+    - 40% to 70% of all Internet traffic in 2009 
 
 
 *** Early examples & generations  
