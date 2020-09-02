@@ -27,7 +27,7 @@
       identical*
     - It should be *consistent* 
 
-*** Distributed data store -- example 
+*** Distributed data store -- example no faults 
 ****                                                              :B_columns:
      :PROPERTIES:
      :BEAMER_env: columns
@@ -39,7 +39,7 @@
       :END:
 
 Simple example: 
-- Both readers should eventually be able to answer 42
+- Both readers should eventually receive 42
 - This will take some time (latency to answer request), but is
   possible  
 
@@ -135,7 +135,7 @@ A more detailed interpretation:
 
 *** Tradeoffs
 
-- Let's admit that partitions to happen
+- Let's admit that partitions do happen
   - Inside and between data centers
 - We then see different tradoffs:
   - Available and consistent (but ignore partitions): conventional
@@ -531,11 +531,11 @@ https://github.com/voldemort/voldemort
 
 Not much concrete information available \Sadey 
 
-   - REdis vs. Memcached
+   - Redis vs. Memcached
      - persistent by default
      - cluster support: https://redis.io/topics/cluster-tutorial
      - high availability tools: https://redis.io/topics/sentinel
-   - REDIS vs. CAP: CP?
+   - Redis vs. CAP: CP?
      - Compare: https://aphyr.com/posts/283-jepsen-redis
      - http://blog.nahurst.com/visual-guide-to-nosql-systems
 
