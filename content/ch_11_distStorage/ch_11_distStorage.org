@@ -7,7 +7,7 @@
 
 - Multicast: Send message to multiple receivers
   - Worry about relative ordering of multiple messages
-- Pub/sub: Send message multiple subscribers
+- Pub/sub: Send message to multiple subscribers
   - Similar; more flexible notion of who receives
 - Message queueing: send message to one out of group
   - Which one?
@@ -223,7 +223,7 @@ the processes); it  will ensure /consistency/
 
 *** Strict consistency
 
-****  Strict consistency:                                      :B_definition:
+****  Strict consistency                                       :B_definition:
      :PROPERTIES:
      :BEAMER_env: definition
      :END:
@@ -393,7 +393,7 @@ print ("C:", y, z)
 - Depends on read/write ratios, how often do readers or writers
   change, desired degree of replication, ...
 - Shared characteristic: *slow* 
-- See
+- See section 
   \slideref{sec:distStor:consistency_protocols}[s:distStor:consistency_protocols]
   for details 
 - But: Devil is in the details \cite{Adve:2010:MMC:1787234.1787255}
@@ -786,7 +786,7 @@ process that wants to write
 *** Local-write protocol without backup, example  
 
 #+CAPTION: Local write: migrate single server 
-#+ATTR_LaTeX: :height 0.65\textheight :options page=4
+#+ATTR_LaTeX: :height 0.5\textheight :options page=4
 #+NAME: fig:distStor:migrate_no_backup
 [[./figures/updateProtocols.pdf]]
 
@@ -1060,7 +1060,7 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 [[./figures/quorum.pdf]]
 
 
-** Epidemic protocols 
+** Epidemic protocols                                              :noexport:
 
 
 
