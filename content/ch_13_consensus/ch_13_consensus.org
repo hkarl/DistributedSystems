@@ -165,7 +165,7 @@ process. \cite{Fischer:1985:IDC:3149.214121}
     consensus can be made arbitrarily small
     - I.e: $P (\text{some nodes decide 0, others 1}) < \epsilon$
     - $\epsilon$ determines round number 
-  - Practically algorithms -- PAXOS and RAFT -- up next 
+  - Practical algorithm --  RAFT -- up next (we skip PAXOS) 
 
 
 *** Further consequences 
@@ -305,7 +305,7 @@ The log:
 *** Log example 
 
 #+CAPTION: Example Raft log; colors and numbers show terms (Figure 6 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})
-#+ATTR_LaTeX: :width 0.8\textheight
+#+ATTR_LaTeX: :width 0.6\textheight
 #+ATTR_LaTeX: :caption \caption{Example Raft log (Figure 6 from \cite{}) \label{fig:raft:log}}
 #+NAME: fig:raft:log
 [[./figures/raft_log.pdf]]
@@ -358,9 +358,9 @@ If two entries in different logs have the same index and term, then
 Logs of new leader in new term might be inconsistent with follower
 logs; these are *uncommitted* entries  
 
-#+CAPTION: Logs when leader changes (Figure 7 from )
+#+CAPTION: Logs when leader changes (Figure 7 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})
 #+ATTR_LaTeX: :width 0.6\textheight
-#+ATTR_LaTeX: :caption \caption{Logs when leader changes (Figure 7 from ) \label{fig:raft:log_leader_change}}
+#+ATTR_LaTeX: :caption \caption{Logs when leader changes (Figure 7 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version}) \label{fig:raft:log_leader_change}}
 #+NAME: fig:raft:log_leader_change
 [[./figures/raft_log_leader_change.pdf]]
 
@@ -526,7 +526,7 @@ too hard \cite[Section 5.4.3]{ongaro14:_in_searc_under_consen_algor_exten_versio
 
 
 
-* PAXOS                                                            :noexport:
+* PAXOS
   :PROPERTIES:
   :CUSTOM_ID: sec:consensus:paxos
   :END:
