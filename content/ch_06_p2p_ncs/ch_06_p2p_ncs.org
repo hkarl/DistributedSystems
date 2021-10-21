@@ -214,7 +214,7 @@ Basic version only, details later:
 *** An alternative distance definition 
 
 - We still use GUIDs of, say 128 bits
-- We write them as hexadecimal numbers, e.g., 65A1FC
+- We write them as hexadecimal numbers, e.g., 65A1FC... (32 digits)
 - When comparing two GUIDs, we go digit-by-digit in this hexadecimal
   representation 
 
@@ -223,28 +223,29 @@ Basic version only, details later:
 - Based on hexadecimal GUIDs, we organise the routing table in rows
   and columns
   - 16 columns, one per possible digit value
-  - 128 / 16 = 8 rows, numbered 0 to 7 
+  - 128 / 4 = 32 rows, numbered 0 to 31
 - A table entry stores information about one (or several) other nodes
   - At least: their GUID and IP 
 
 \footnotesize 
-|   | 0 | 1 | 2 | 3 | 4 | 5 | 6 |          7 | 8 | 9 | A | B | C | D | E | F |
-|---+---+---+---+---+---+---+---+------------+---+---+---+---+---+---+---+---|
-| 0 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
-| 1 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
-| 2 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
-| 3 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
-| 4 |   |   |   |   |   |   |   | (GUID, IP) |   |   |   |   |   |   |   |   |
-| 5 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
-| 6 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
-| 7 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+|     | 0 | 1 | 2 | 3 | 4 | 5 | 6 |          7 | 8 | 9 | A | B | C | D | E | F |
+|-----+---+---+---+---+---+---+---+------------+---+---+---+---+---+---+---+---|
+|   0 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+|   1 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+|   2 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+|   3 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+|   4 |   |   |   |   |   |   |   | (GUID, IP) |   |   |   |   |   |   |   |   |
+|   5 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+|   6 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+|   7 |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
+| ... |   |   |   |   |   |   |   |            |   |   |   |   |   |   |   |   |
 
 
 *** An alternative routing table 
 
 Content of cells? 
 
-- Let's look at a node $v$ with GUID $v_1 v_2 v_3 \ldots v_8$
+- Let's look at a node $v$ with GUID $v_1 v_2 v_3 \ldots v_32$
 - In row $r$ and column $c$, we store information about nodes whose
   GUID 
   - Is the same as $v$ 's in the first $r$ digits
@@ -298,7 +299,7 @@ Note: Variants exist
 
 - This generalises to any grouping of bits in a GUID
   - Does not have to be four bits grouped into a hexadecimal digit
-- Trades off routing table site vs. number of hops
+- Trades off routing table size vs. number of hops
   - With correspondingly more or less columns and rows 
 
 
