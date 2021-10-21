@@ -14,6 +14,7 @@
    - Throughput
    - Latency
    - Average, maximum, quantiles? 
+\pause
  - Dependability 
    - Safety (nothing bad happens, even when something goes wrong)  
    - Availability (good things still happen when something goes wrong)
@@ -39,11 +40,13 @@
 
 *** Fault assumptions 
  - Everything is completely reliable (not realistic)
+\pause 
  - Processes can fail
    - With or without warning
    - Permanent or transient failure
    - Give wrong results
    - Malicious Byzantine failure
+\pause 
  - Data can be
    - Lost
    - Falsified
@@ -57,17 +60,20 @@
 - *Fault*: a defect in the *system under consideration*
   - May or may not lead to observable misbehavior 
   - E.g.: an alpha particle flips a bit in a memory cell
+\pause 
 - *Error*: Discrepancy between intended and actual behavior of system 
   - At runtime, errors are the manifestation of a fault in an
     unexpected state 
     - E.g.: memory cell was written with a 1, subsequent read returns a
       0 owing to the bit flit fault  
   - Do not necessarily cause failure
+\pause 
 - *Failure*: System displays behavior contrary to specification 
   - Caused by error
   - Observable from outside of the system 
   - E.g., incorrect memory value might cause observable misbehavior,
     or it might be correct (e.g., redundancy)  
+\pause 
 - Hence: proper terminology would be to talk about *error-tolerant* systems 
 
 
@@ -78,13 +84,17 @@
      :BEAMER_env: definition
      :END:
  - Umbrella term, used to talk about a wide range of metrics and
-   properties in an informal fashion 
- - Maintainability: ability to undergo modifications and repairs
- - Performability: ability of a system to perform according to
-   specifications even in the presence of failures  
- - Safety: absence of catastrophic consequences for users/environment
- - Distinction: system is *fail safe* or not (train, aircraft) 
+   properties in an informal fashion
+\pause 
+ - Example aspects  
+   - Maintainability: ability to undergo modifications and repairs
+   - Performability: ability of a system to perform according to
+     specifications even in the presence of failures  
+   - Safety: absence of catastrophic consequences for users/environment
+\pause 
  - Typical aspects: reliability, availability 
+\pause 
+ - Distinction: system is *fail safe* or not (train, aircraft) 
 
 *** System metrics: reliability 
 
@@ -113,6 +123,7 @@
    operational at an arbitrarily chosen point in time 
 
 
+\pause 
 **** Repairable system 
  - Key idea: \ac{MTTF}, \ac{MTTR}, \ac{MTBF} 
    - Side discussion: how meaningful are MTTFs anyway? 
@@ -224,8 +235,7 @@ The expected lifetime is also called the *\acf{MTTF}*
 - How long does it take, on average, from one failure to the next?
   - *\acf{MTBF}*
   - Expected value of the sum of two random variables
-- If repair and failure times are stochastically independent:
-  Expectation of sum is sum of expectation
+- Expectation of sum is sum of expectation
   - Then: *MTBF = MTTF + MTTR* 
 
 *** Computing availability 
@@ -307,7 +317,7 @@ $$ h(t) =
 \cdot \frac{1}{\delta t} = \frac{f_X(t)}{1-F_X(t)}
 $$
 
-
+\pause
 **** Hazard rate, exponential distribution                        :B_example:
      :PROPERTIES:
      :BEAMER_env: example
@@ -378,17 +388,17 @@ How to operate redundant resources?
 
 - *Cold* standby
   - Redundant resource powered off, needs to be
-    installed and booted at failure time 
+    installed and booted at failure time  \pause 
 - *Warm* standby
   - Redundant resource installed and running, but does
     not process anything  
   - At failure, put necessary state from failed resource; trigger
-    processing  
+    processing  \pause 
 - *Hot* standby
   - Redundant resource installed and running, but does not process
     anything 
   - Necessary state is mirrored continuously (ideally, within fixed
-    deadlines) 
+    deadlines) \pause 
 - *Active/active*
   - Both actual and redundant resource are up and running, process all
     requests
@@ -775,9 +785,6 @@ Problem: Performance
   - Can these bottlenecks be scaled out independently?
 
 
-#+BEAMER: \pause
-- Bottleneck: Front ends 
-  - They *are* largely independent 
  
 *** Server farms
 
@@ -1391,13 +1398,15 @@ When adding a server, most values' keys stay with the same server
 
 *** Adding or removing? 
 
-- For both simple and consistent hashing, behaviour under adding or
-  removing servers is basically similar
 - Consistent hashing performs better with more points per server
   (better uniformity of resulting intervals)
   - Common rule of thumb: 100 to 200 points per server 
 
+*** Finding server 
 
+- Clients need to know all points chosen by all servers 
+- Mapping key to server is more than simple hash computation
+  - But still computationally feasible 
 
 ** Memcached 
    :PROPERTIES:
