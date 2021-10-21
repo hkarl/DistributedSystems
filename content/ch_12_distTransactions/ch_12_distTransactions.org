@@ -117,7 +117,7 @@ X.set(tmp)
 
 *** Example problem: Inconsistent retrieval  
 
-- Bank with many accounts X, Y, Z ...  -- some of all balances?
+- Bank with many accounts X, Y, Z ...  -- sum of all balances?
 - While transfers take place? 
 
 
@@ -173,7 +173,7 @@ Y.set(tmp)
 
 *** Transaction property: Consistency 
 
-- A transaction transforms a consistent state in some other consistent
+- A transaction transforms a consistent state into some other consistent
   state
   - E.g., banking transaction: no money is lost during transfers
 - Typically responsibility of transaction code/its programmer
@@ -493,13 +493,15 @@ A commit protocol is called *blocking* when
 - Apparently, not much difference?
   - Cannot the same thing happen in ~PreCommit~ as did above?
 - Critical cases:
-  - Coordinator  blocked in ~PreCommit~: All have voted for commit;
+  - Coordinator  times out in ~PreCommit~: All have voted for commit;
     commit is safe
-  - Participant blocked in ~PreCommit~: contact others
-    - If majority of others nodes  in ~PreCommit~ as well, commit is
-      safe (because coordinator *also* agreed!) 
-    - If majority of  other nodes  in ~Ready~, abort is safe --
+  - Participant times out in ~Voted~ or in  ~PreCommit~: contact others
+    - If any other in ~Ready~, ~Abort~: Abort; if any in ~Commit~,
+      ~Commit~ as well 
+    - If *majority* of  other nodes  in ~Ready~, abort is safe --
       because  a recovering node might have voted for abort
+    - If *majority* of others nodes  in ~PreCommit~ as well, commit is
+      safe (because coordinator *also* agreed!) 
   - Note: Recovering participant could at worst recover to
     ~PreCommit~ but *not* to ~Commit~ as in 2PC! 
 
