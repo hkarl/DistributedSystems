@@ -474,11 +474,13 @@ We will revisit *binding* and *service discovery* later
 * From RPC to RMI
 *** Remote Method Invocation & Distributed objects
 Goal: provide a distributed version of the object model made available by object-oriented programming languages
- - Ingredients of a “normal” object model (think: Java, C++, …)
+ 
+Ingredients of a “normal” object model (think: Java, C++, …)
  - Program: Collection of objects, each with data & methods,
    interacting with each other by means of method invocations
  - Object references: Necessary to access (identify) any object 
- - Interfaces: Defines signature of a set of methods, possibly implemented by a call 
+ - Interfaces: Defines signature of a set of methods, possibly
+   implemented by a class 
  - Action: Invoke a method; effects: state change, new instance created, further method invocations 
  - Exceptions
  - Garbage collection
