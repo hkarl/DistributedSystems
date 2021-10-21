@@ -5,28 +5,29 @@
 
 \begin{document}
 \begin{tikzpicture}[auto, xscale=3,
-block/.style = {rectangle, draw=black, thick, align=left}]
+block/.style = {rectangle, draw=black, thick, align=center}]
 
 
-\node[block] at (1,1) (fe) {Front end}; 
-\node[block] at (0,1) (router) {Router}; 
-
-\draw (-0.5,0) -- (6.5,0);
-\draw (router.south) -- (0,0); 
-\draw (fe.south) -- (1,0); 
+\node[block] at (1,1) (fe) {Dispatcher thread}; 
 
 
-\foreach \x \in in {1, ..., 6}  {
-  \node[block] at (\x, -1) (wt\x) {Worker machine} ;
+\draw (0.5,0) to node [above] {Shared memory} (4.5,0) ;
+%\draw (fe.south) -- (0,0); 
+ \draw (fe.south) -- (1,0); 
+
+
+\foreach \x \in in {1, ..., 4}  {
+  \node[block] at (\x, -1) (wt\x) {Worker \\thread} ;
   \draw [-] (\x, 0) -- (wt\x.north);
 }
 
+\node [circle, draw] (socket) at (0.5, 0) {}; 
+\node [below=0.1cm of socket] {Socket}; 
 
-
-\node [above left= of router] (incoming) {}; 
-\node [left = of router]  (outgoing) {}; 
-\draw [<-] (router) -- (incoming) node [above] {Incoming requests}; 
-\draw [->] (router) -- (outgoing) node [below] {Outgoing reply}; 
+\node [above left= 0.5 and 1.5 of socket] (incoming) {}; 
+\node [below left = 0.5 and 1.5  of socket]  (outgoing) {}; 
+\draw [<-] (socket) -- (incoming) node [above, align=center] {Incoming \\ request}; 
+\draw [->] (socket) -- (outgoing) node [below, align=center] {Outgoing \\ reply}; 
 
 
 
