@@ -18,7 +18,7 @@ In general: architectures and protocols of communication systems
  - Structure, design, performance evaluation, implementation, …
  - For all types of communication: computer networks, voice communication, data & multimedia content
 
-*** Main research topics 
+*** Main research topics                                           :noexport:
  More specifically
  - Future mobile and wireless communication
  - What comes after GSM, UMTS, WLAN?
@@ -117,6 +117,20 @@ block/.style = {rectangle, draw=black, thick, align=center}]
  - Programming 
 
 
+*** Crucial aspects of distributed systems 
+
+
+- *Autonomy*
+  - Entities in a distributed system are autonomous, independent
+    entities
+  - But cooperative, not antagonistic
+#+BEAMER: \pause
+- *Transparency* 
+  - Distributed as such not of interest to user
+  - Should be hidden from user: distribution is invisible,
+    *transparent* 
+
+
 *** Structure  of this class 
 
 
@@ -124,7 +138,8 @@ block/.style = {rectangle, draw=black, thick, align=center}]
 #+NAME: fig:structure_class 
 [[./figures/structure.pdf]]
 
-* An example for this class: FND  
+
+* An example for this class: FND                                   :noexport:
 
 *** Fake News Detector 
 
@@ -205,20 +220,14 @@ Some numbers
   - No consistent notion of time  (no global clock) 
 
 
-*** Crucial aspects
-
-
-- *Autonomy*
-  - Entities in a distributed system are autonomous, independent
-    entities
-  - But cooperative, not antagonistic
-#+BEAMER: \pause
-- *Transparency* 
-  - Distributed as such not of interest to user
-  - Should be hidden from user: distribution is invisible,
-    *transparent* 
-
 * Organization, exam, material
+
+*** Lecture 
+
+- Current plan: Flipped classroom 
+  - Pre-recorded screencasts
+  - Slides, handwritten notes, ... will all be provided via PANDA
+- Q-and-A during original timeslots for the class 
 
 *** Homework assignments
  “Traditional” assignments 
@@ -239,8 +248,8 @@ For the 6 ECTS version: We will do mini-projects!
 
 *** Exam
 
- - Probably: ORAL exam
- - Date and time: 
+ - Probably: ORAL exam (depends on number of participants) 
+ - If written exam, date and time unclear 
    - First instance: ??? (time and location: unknown) 
    - Second instance: ?? 
  - Material of both lecture and exercises is relevant for the exam
