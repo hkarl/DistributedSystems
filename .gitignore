@@ -37,6 +37,7 @@ content/ch*/ch*-handout.pdf
 content/ch*/figures/*.pdf
 content/ch*/figures/*/*.pdf
 content/ch*/ch*.tex
+content/ch*/ch*.tex~
 content/ch*/*.rel
 content/ch*/figures/*.rel
 
@@ -244,7 +245,12 @@ TSWLatexianTemp*
 
 # auto folder when using emacs and auctex
 /auto/*
+*/auto/*
+*/*/auto/*
+*/*/*/auto/*
 
 # expex forward references with \gathertags
 *-tags.tex
 /content/templates/msc.pdf
+/content/book/book.tex~
+.DS_Store
