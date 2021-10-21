@@ -394,16 +394,16 @@ def Receive("order", q, j):
 def init(): 
     Sendqueue = []
     DeliverQueue = [] // sorted (m, seqnr) pairs
-        NextDeliver = 1  
+    NextDeliver = 1  
 def Originate(m):
     Sendqueue += m
-def Token_received(): 
+def Token_received(token): 
     For m in Sendqueue: 
         Transmit(m, token.seqnr++)
     Send(token, neighboring node)  // reliable unicast 
 def Receive(m, seqnr):
-    Insert (m, seqnr) in DeliverQeue, sorted by seqnr 
-    While (m, seqnr) == (. , NextDeliver):
+    Insert (m, seqnr) in DeliverQueue, sorted by seqnr 
+    While seqnr == NextDeliver:
         Deliver(m)
         NextDeliver++
 #+END_SRC
@@ -477,7 +477,7 @@ def Receive(m, seqnr):
   - Even if only potentially
 - Knowing that r1 originated before r2 is not good enough 
   - They might not have anything to do with each other
-- Not trivial implementation problem! 
+- Nontrivial implementation problem! 
 
 
 
