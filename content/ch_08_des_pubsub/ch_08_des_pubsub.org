@@ -125,7 +125,7 @@ Earliest example perhaps \cite{Birman:1987:VirtualSync}
 - Publications metadata: list of *typed* key/value pairs 
   - Values can have multiple types, e.g., string, boolean, int, ...
 - Subscriptions: predicates
-  - Disjunction of conjunctions of *constraints* on key/value pairs
+  - Conjunction of disjunction of *constraints* on key/value pairs
   - Constraint: which key, an operator, value
     - E.g., ~price < 100~; ~name = "UPB"~
   - Example predicate: ~[name="UPB" AND (class="Vorlesung" OR
