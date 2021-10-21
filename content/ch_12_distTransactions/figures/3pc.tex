@@ -15,7 +15,7 @@
 \node[initial, state] (init) {Init}; 
 \node[state, below=of init] (col) {Collect}; 
 \node[state, accepting, below left=of col] (ab) {Abort}; 
-\node[state, accepting, below right=of col] (pc) {PreCommit}; 
+\node[state, below right=of col] (pc) {PreCommit}; 
 \node[state, accepting, below =of pc] (com) {Commit}; 
 
 \path (init) edge node {Request commit:\\\texttt{VOTE\_REQUEST}} (col)
@@ -36,7 +36,7 @@
 \node[initial, state] (r) {Ready}; 
 \node[state, below=of r] (waiting) {Voted}; 
 \node[state, accepting, below left=of col] (ab) {Abort}; 
-\node[state, accepting, below right=of col] (pc) {PreCommit}; 
+\node[state, below right=of col] (pc) {PreCommit}; 
 \node[state, accepting, below=of pc] (com) {Commit}; 
 
 \path (r) edge node{\texttt{VOTE\_REQUEST}:\\\texttt{VOTE\_COMMIT}} (col)
