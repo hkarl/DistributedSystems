@@ -243,13 +243,13 @@ queuing context with stable storage.
       :END:
 
 
-#+CAPTION: AQMP type system (from \url{http://www.amqp.org/sites/amqp.org/files/amqp.pdf}) 
+#+CAPTION: AMQP type system (from \url{http://www.amqp.org/sites/amqp.org/files/amqp.pdf}) 
 #+ATTR_LaTeX: :width 0.75\linewidth
 #+NAME: fig:aqmp_type
 [[./figures/amqp1.pdf]]
 
 
-*** AQMP other functions 
+*** AMQP other functions 
 
 - Transport layer 
   - Nodes connected by “links” 
@@ -265,7 +265,7 @@ queuing context with stable storage.
     ACID properties)  
 - Security layer 
 
-*** AQMP issues 
+*** AMQP issues 
 
 Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
 - Pushed by few companies, yet claimed as open standard -- lacks
@@ -444,7 +444,7 @@ e-business and developing e-business applications.
   - /Networks of brokers/ to distribute queues over multiple hosts 
 - Clients: 
   - Need a broker URL (node + port) 
-  - Available in many languages, over various transport protocols (e.g., AQMP) 
+  - Available in many languages, over various transport protocols (e.g., AMQP) 
 
 
  
@@ -460,57 +460,6 @@ e-business and developing e-business applications.
 - Lot's of plugins
 - Open source plus commercial distribution (Pivotal) 
 
-
-
-*** Clients, Python 
-**** Plain 
-
-- \href{http://pypi.python.org/pypi/pika}{pika}; reference, but
-  not really thread-safe
-- \href{https://www.amqpstorm.io}{AMQPStorm}: similar functionality,
-  different approach to thread-safety 
-
-**** For projects 
-
-- \href{http://docs.celeryproject.org/en/latest/}{Celery}: distributed
-  task queue (e.g., often used in Django apps)  
-
-*** Example pika 
-
-\tiny 
-**** Sending message 
-
-#+BEGIN_SRC python
-import pika
-connection = pika.BlockingConnection()
-channel = connection.channel()
-channel.basic_publish(exchange='example',
-                      routing_key='test',
-                      body='Test Message')
-connection.close()
-#+END_SRC
-
-**** Blocking consumer 
-
-#+BEGIN_SRC python 
-import pika
-connection = pika.BlockingConnection()
-channel = connection.channel()
-
-for method_frame, properties, body in channel.consume('test'):
-    # Display the message parts and ack the message
-    print(method_frame, properties, body)
-    channel.basic_ack(method_frame.delivery_tag)
-
-    # Escape out of the loop after 10 messages
-    if method_frame.delivery_tag == 10:
-        break
-
-# Cancel the consumer and return any pending messages
-requeued_messages = channel.cancel()
-print('Requeued %i messages' % requeued_messages)
-connection.close()
-#+END_SRC
 
 *** RabbitMQ messaging model 
 
@@ -573,7 +522,7 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
 *** Distributed brokers:  Federation
 
   - Individual or clustered brokers can connect in federation mode
-  - Message exchange via AQMP; no need for highly dependable links 
+  - Message exchange via AMQP; no need for highly dependable links 
   - Emphasises availability and partition tolerance, sacrifices
     consistency (see CAP Theorem, Section  
     \slideref{sec:CAPTheorem}[s:CAPTheorem]) 
@@ -587,6 +536,57 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
   \href{https://content.pivotal.io/blog/rabbitmq-hits-one-million-messages-per-second-on-google-compute-engine}{1  million events / second} possible but
   non-trivial
   - Context: Apple about 1/2 million iMessages per second 
+
+
+*** Clients, Python 
+**** Plain 
+
+- \href{http://pypi.python.org/pypi/pika}{pika}; reference, but
+  not really thread-safe
+- \href{https://www.amqpstorm.io}{AMQPStorm}: similar functionality,
+  different approach to thread-safety 
+
+**** For projects 
+
+- \href{http://docs.celeryproject.org/en/latest/}{Celery}: distributed
+  task queue (e.g., often used in Django apps)  
+
+*** Example pika 
+
+\tiny 
+**** Sending message 
+
+#+BEGIN_SRC python
+import pika
+connection = pika.BlockingConnection()
+channel = connection.channel()
+channel.basic_publish(exchange='example',
+                      routing_key='test',
+                      body='Test Message')
+connection.close()
+#+END_SRC
+
+**** Blocking consumer 
+
+#+BEGIN_SRC python 
+import pika
+connection = pika.BlockingConnection()
+channel = connection.channel()
+
+for method_frame, properties, body in channel.consume('test'):
+    # Display the message parts and ack the message
+    print(method_frame, properties, body)
+    channel.basic_ack(method_frame.delivery_tag)
+
+    # Escape out of the loop after 10 messages
+    if method_frame.delivery_tag == 10:
+        break
+
+# Cancel the consumer and return any pending messages
+requeued_messages = channel.cancel()
+print('Requeued %i messages' % requeued_messages)
+connection.close()
+#+END_SRC
 
 * Big case study: Kafka
   :PROPERTIES:
@@ -607,7 +607,7 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
 
 *** Use cases 
   - *Real-time data feeds* (e.g., track user activity on a distributed
-    web server farm  
+    web server farm)  
     - Stream processing often with additional frameworks like Storm on
       top 
   - Conventional messaging system (e.g., competes with ActiveMQ) 
@@ -636,7 +636,7 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
 
 - *Producer*: Publish stream of records to one or more topics 
 - *Consumer*: Subscribe to one or more topics, processing message stream 
-- *Streams*: Transforming one or more input streams into one of more
+- *Streams*: Transforming one or more input streams into one or more
   output streams 
 - *Connector*:  Connect streams on Kafka topic to external systems 
 
@@ -976,7 +976,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 
 - Design issue: push vs. pull? 
 - Kafka: pull!
-  - Consumer sends ~fetch (from, who much)~ messages to partition leader
+  - Consumer sends ~fetch (from, how much)~ messages to partition leader
   - Batching built-in
   - Delays acceptable if no/not enough data is available
 - Only state to keep per partition: where in partition is a consumer?
