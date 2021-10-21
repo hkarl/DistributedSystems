@@ -45,7 +45,8 @@ representation data
 
 *** The request/reply protocol: HTTP
 
- HTTP essentially a simple protocol
+ HTTP essentially a simple, cleartext protocol
+\pause 
  - Request primitives
    - GET: Obtain content of URL of interest
    - HEAD: Similar to GET, but only provide meta data, not actual content 
@@ -53,6 +54,7 @@ representation data
      data provided in the POST message
    - PUT: Provide URL where the data provided in the PUT message should be stored 
    - ... plus various others (DELETE, OPTIONS, TRACE)
+\pause 
  - Reply: Return page, plus error code, status, ... 
    - REDIRECT: Important example, error code telling the browser to
      use the returned URL instead
@@ -66,16 +68,27 @@ GET requests can refer to a static web page (simply delivered by the server) or 
  - Server might also compute the request page on the fly, depending on
    parameters in the request
  - Typical: “?” to signal that, key=value pairs separated by “&”
- - GET \url{http://somewhere.net/some/path/somewhere?key=somekey&param1=xyz&param2=abc}
+ - Example GET: \url{http://somewhere.net/some/path/somewhere?key=somekey&param1=xyz&param2=abc}
+ - Compare \url{https://tools.ietf.org/html/rfc7231#section-4.3.1}
 
 *** Requests and state 
  - Convention: GET does not alter state of resource 
  - POST requests refer to a program execution
+   - Compare \url{https://tools.ietf.org/html/rfc7231#section-4.3.3}
    - POST provides parameters to the program
    - Parameters usually depend on user input 
    - Typically, POST will alter state 
    - Output of the program is delivered back to the client and rendered as the page
 
+*** POST and parameters 
+
+- In GET, parameters typically carried as part of the URL
+  (...?key1=value1&key2=value2) 
+- In POST, URL usually not modified
+- With usual content types, parameters are instead part of the message
+  body
+  - Again using key=value syntax
+  - Usual content type: ~application/x-www-form-urlencoded~
 
 ** Web servers
    :PROPERTIES:
@@ -1508,8 +1521,8 @@ Core aspect: Use received JSON in template
 
 *** Conclusion 
 
-- HTML and HTTP as such relatively simple request/reply protocols 
-- Imply stateless design, which complicates matters considerably
+- HTTP as such relatively simple request/reply protocol
+- Implies stateless design, which complicates matters considerably
 - Both server- and client-side programming expertise is necessary for
   full-fledged, modern applications (/full-stack developer/) 
 - With current developments, interactive Web applications not too
