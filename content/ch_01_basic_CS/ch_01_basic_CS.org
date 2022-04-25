@@ -5,7 +5,7 @@
 \end{frame}
 
 
-* Overview 
+* Overview
   
 *** Goals of this chapter 
 
@@ -24,7 +24,7 @@ You should be able to understand
 - write simple example code 
 
 
-* Background: System model 
+* Background: System model
 
 ** Nodes and data exchange 
 
@@ -321,7 +321,7 @@ are allowed to occur
 
 * Background: Some messaging APIs
 
-** Sockets 
+** Sockets
 
 *** API for communication: Sockets 
  Suitable for both messages and streams 
@@ -723,106 +723,86 @@ print("Received request: %s" % message)
 
 
 *** Example: msgbuf string  
+    :PROPERTIES:
+    :BEAMER_opt: fragile
+    :END:
 
-
-#+BEGIN_LaTeX 
-\begin{adjustbox}{width=0.75\textwidth}
-\begin{varwidth}{\textwidth}
-#+END_LaTeX 
-
-
-
-
-#+BEGIN_EXAMPLE
 fixstr stores a byte array whose length is upto 31 bytes:
+\begin{verbatim}
 +--------+========+
 |101XXXXX|  data  |
 +--------+========+
+\end{verbatim}
 
 str 8 stores a byte array whose length is upto (2^8)-1 bytes:
+\begin{verbatim}
 +--------+--------+========+
 |  0xd9  |YYYYYYYY|  data  |
 +--------+--------+========+
+\end{verbatim}
 
 str 16 stores a byte array whose length is upto (2^16)-1 bytes:
+\begin{verbatim}
 +--------+--------+--------+========+
 |  0xda  |ZZZZZZZZ|ZZZZZZZZ|  data  |
 +--------+--------+--------+========+
-
-#+END_EXAMPLE
-
-#+BEGIN_LaTeX 
-\end{varwidth}
-\end{adjustbox}
-#+END_LaTeX 
+\end{verbatim}
 
 *** Example: msgbuf array
+    :PROPERTIES:
+    :BEAMER_opt: fragile
+    :END:
 
 
-
-#+BEGIN_LaTeX 
-\begin{adjustbox}{width=0.75\textwidth}
-\begin{varwidth}{\textwidth}
-#+END_LaTeX 
-
-#+BEGIN_EXAMPLE
 fixarray stores an array whose length is upto 15 elements:
+\begin{verbatim}
 +--------+~~~~~~~~~~~~~~~~~+
 |1001XXXX|    N objects    |
 +--------+~~~~~~~~~~~~~~~~~+
+\end{verbatim}
 
 array 16 stores an array whose length is upto (2^16)-1 elements:
+\begin{verbatim}
 +--------+--------+--------+~~~~~~~~~~~~~~~~~+
 |  0xdc  |YYYYYYYY|YYYYYYYY|    N objects    |
 +--------+--------+--------+~~~~~~~~~~~~~~~~~+
+\end{verbatim}
 
 array 32 stores an array whose length is upto (2^32)-1 elements:
+\begin{verbatim}
 +--------+--------+--------+--------+--------+~~~~~~~~~~~~~~~~~+
 |  0xdd  |ZZZZZZZZ|ZZZZZZZZ|ZZZZZZZZ|ZZZZZZZZ|    N objects    |
 +--------+--------+--------+--------+--------+~~~~~~~~~~~~~~~~~+
-#+END_EXAMPLE
-
-
-#+BEGIN_LaTeX 
-\end{varwidth}
-\end{adjustbox}
-#+END_LaTeX 
-
-
+\end{verbatim}
 
 *** Example: msgbuf map 
+    :PROPERTIES:
+    :BEAMER_opt: fragile
+    :END:
 
 
-#+BEGIN_LaTeX 
-\begin{adjustbox}{width=0.75\textwidth}
-\begin{varwidth}{\textwidth}
-#+END_LaTeX 
-
-
-#+BEGIN_EXAMPLE
 fixmap stores a map whose length is upto 15 elements
+\begin{verbatim}
 +--------+~~~~~~~~~~~~~~~~~+
 |1000XXXX|   N*2 objects   |
 +--------+~~~~~~~~~~~~~~~~~+
+\end{verbatim}
 
 map 16 stores a map whose length is upto (2^16)-1 elements
+
+\begin{verbatim}
 +--------+--------+--------+~~~~~~~~~~~~~~~~~+
 |  0xde  |YYYYYYYY|YYYYYYYY|   N*2 objects   |
 +--------+--------+--------+~~~~~~~~~~~~~~~~~+
+\end{verbatim}
 
 map 32 stores a map whose length is upto (2^32)-1 elements
+\begin{verbatim}
 +--------+--------+--------+--------+--------+~~~~~~~~~~~~~~~~~+
 |  0xdf  |ZZZZZZZZ|ZZZZZZZZ|ZZZZZZZZ|ZZZZZZZZ|   N*2 objects   |
 +--------+--------+--------+--------+--------+~~~~~~~~~~~~~~~~~+
+\end{verbatim}
 
-#+END_EXAMPLE
-
-
-
-#+BEGIN_LaTeX 
-\end{varwidth}
-\end{adjustbox}
-#+END_LaTeX 
 
 
 *** How to know what to translate into wire format? 
@@ -870,10 +850,6 @@ b'\x82\xa7compact\xc3\xa6schema\x00'
      :BEAMER_env: block
      :END:
 
-#+BEGIN_LaTeX 
-\begin{adjustbox}{width=0.75\textwidth}
-\begin{varwidth}{\textwidth}
-#+END_LaTeX 
 
 #+BEGIN_SRC python
 >>> umsgpack.packb(
@@ -888,10 +864,6 @@ b'\x97\x01\xc3\xc2\xce\xff\xff\xff\xff\x82\xa3foo\xc4\x03\x80\x01\
 >>> 
 #+END_SRC
 
-#+BEGIN_LaTeX 
-\end{varwidth}
-\end{adjustbox}
-#+END_LaTeX 
 
 
 *** Option 2.1: Explicit annotation in source code 
@@ -901,11 +873,8 @@ b'\x97\x01\xc3\xc2\xce\xff\xff\xff\xff\x82\xa3foo\xc4\x03\x80\x01\
 - Typically, using library functions
 - Put type information into 
 
-*** Option 2.1: Explicit annotation -- C-Example 
-#+BEGIN_LaTeX 
-\begin{adjustbox}{scale=0.5}
-\begin{varwidth}{\textwidth}
-#+END_LaTeX 
+*** Option 2.1: Explicit annotation -- C-Example (1)
+
 
 #+BEGIN_SRC C
 #include <msgpack.h>
@@ -920,7 +889,14 @@ int main(void)
     /* serialize values into the buffer using msgpack_sbuffer_write callback function. */
     msgpack_packer pk;
     msgpack_packer_init(&pk, &sbuf, msgpack_sbuffer_write);
+    // ... 
+#+END_SRC
 
+*** Option 2.1: Explicit annotation -- C-Example (2)
+
+
+#+BEGIN_SRC C
+    // ... 
     msgpack_pack_array(&pk, 3);
     msgpack_pack_int(&pk, 1);
     msgpack_pack_true(&pk);
@@ -931,7 +907,14 @@ int main(void)
     /* deserialized object is valid during the msgpack_zone instance alive. */
     msgpack_zone mempool;
     msgpack_zone_init(&mempool, 2048);
+    // ... 
+#+END_SRC
 
+*** Option 2.1: Explicit annotation -- C-Example (3)
+
+
+#+BEGIN_SRC C
+    // ... 
     msgpack_object deserialized;
     msgpack_unpack(sbuf.data, sbuf.size, NULL, &mempool, &deserialized);
 
@@ -946,12 +929,6 @@ int main(void)
 }
 #+END_SRC
 
-#+BEGIN_LaTeX 
-\end{varwidth}
-\end{adjustbox}
-#+END_LaTeX 
-
-
 *** Option 2.2: Separate specification of types 
 
 - Separate from the program code: describe data structure 
@@ -960,7 +937,7 @@ int main(void)
 
 
 #+CAPTION: Packing and unpacking data based on external data definition
-#+ATTR_LaTeX: :width 0.85\textwidth
+#+ATTR_LaTeX: :width 0.95\textwidth
 #+NAME: fig:packunpack
 [[./figures/idl.pdf]]
 
@@ -977,7 +954,6 @@ int main(void)
   - For different target languages (Java, C++, Go, Python, C#) 
 
   - Some runtime library support 
-
 *** Protocol Buffers: proto example 
 
 Examples follow https://developers.google.com/protocol-buffers/docs/pythontutorial
@@ -990,16 +966,14 @@ message Person {
 }
 #+END_SRC
 
+*** Protocol Buffers: proto example (2): addressbook.proto
 
-*** Protocol Buffers: proto example (2) 
-
-
-**** addressbook.proto 
-
-#+BEGIN_LaTeX 
-\begin{adjustbox}{width=0.55\textwidth}
-\begin{varwidth}{\textwidth}
-#+END_LaTeX 
+\vskip-2.5cm
+****                     
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:
 
 #+BEGIN_SRC python 
 syntax = "proto2";
@@ -1017,6 +991,18 @@ message Person {
     WORK = 2;
   }
 
+#+END_SRC
+
+
+****                    
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
+
+
+#+BEGIN_SRC python 
+
   message PhoneNumber {
     required string number = 1;
     optional PhoneType type = 2 [default = HOME];
@@ -1030,10 +1016,10 @@ message AddressBook {
 }
 #+END_SRC
 
-#+BEGIN_LaTeX 
-\end{varwidth}
-\end{adjustbox}
-#+END_LaTeX 
+
+
+
+
 
 *** Protocol Buffers: Compile 
 
@@ -1043,6 +1029,7 @@ protoc addressbook.proto
 
 
 Produces ~adressbook_pb2.py~ 
+
 
 *** Use generate class to old data 
 
@@ -1060,6 +1047,7 @@ phone.type = addressbook_pb2.Person.HOME
 **** With attribute checks 
 
 Cannot assign to undefined fields 
+
 
 *** Pack and unpack from ProtocolBuffer class
 
@@ -1080,7 +1068,9 @@ person.ParseFromString(f.read())
 
 
 
-* Client/server, basic structure 
+
+
+* Client/server, basic structure
 
 
 ** Basics  of client/server 
@@ -1167,12 +1157,6 @@ $\rightarrow$ *Client/server paradigm*
  #+END_SRC
 
 
- #+BEGIN_LaTeX
- \begin{tikzpicture}[remember picture]
-   \draw[overlay, ->, line width=5pt, red] (pic cs:doOp) -- (pic cs:receiveReq);
-   \draw[overlay, ->, line width=5pt, red] (pic cs:sendReply) -- (pic cs:receiveReply);
- \end{tikzpicture}
- #+END_LaTeX
 
 *** Client/Server Paradigm
  Roles are not fixed!
@@ -1185,8 +1169,6 @@ $\rightarrow$ *Client/server paradigm*
 [[./figures/rolesNotFixed.pdf]]
 
 *** Behavior in time: Synchronous request
-
-\zrc
 
 ****                                                        :B_columns:BMCOL:
      :PROPERTIES:
@@ -1202,7 +1184,7 @@ $\rightarrow$ *Client/server paradigm*
 A client asks a server to perform some processing 
 - Server is synchronous: Cannot proceed until request has arrived
 - Client is synchronous: After sending the request, client  blocks until the result arrives 
-
+  
 *****                                                        :B_column:BMCOL:
       :PROPERTIES:
       :BEAMER_env: column
@@ -1219,7 +1201,6 @@ A client asks a server to perform some processing
 
 *** Behavior in time: Asynchronous request
 
-\zrc 
 
 ****                                                        :B_columns:BMCOL:
      :PROPERTIES:
@@ -1432,13 +1413,7 @@ Request/reply is seemingly trivial
  #+END_SRC
 
 
- #+BEGIN_LaTeX
- \begin{tikzpicture}[remember picture]
-   \draw[overlay, ->, line width=5pt, red] (pic cs:doOp) -- (pic cs:receiveReq);
-   \draw[overlay, ->, line width=5pt, red] (pic cs:sendReply) -- (pic cs:receiveReply);
- \end{tikzpicture}
- #+END_LaTeX
-
+ 
 *** What if no reply received? 
 
 Issue 1: doOperation does not receive reply
