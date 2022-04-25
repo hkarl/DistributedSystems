@@ -1,5 +1,10 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
+
+
 * Overall requirements
 
 *** The story so far 
@@ -465,7 +470,7 @@ Approach: *Stochastic multiplexing*
 
 
 #+CAPTION: Failure detector diverges from ground truth
-#+ATTR_LaTeX: :width 0.95\linewidth
+#+ATTR_LaTeX: :width 0.75\linewidth
 #+NAME: fig:failure_detector
 [[./figures/failure_detector.pdf]]
 
@@ -682,7 +687,7 @@ Replication of a server can lead to consistency problems
 
 
 #+CAPTION: Proxy between client and server
-#+ATTR_LaTeX: :width 0.85\linewidth
+#+ATTR_LaTeX: :width 0.55\linewidth
 #+NAME: fig:proxy
 [[./figures/proxy.pdf]]
 
@@ -700,7 +705,7 @@ Replication of a server can lead to consistency problems
 
 
 #+CAPTION: Proxy between client and server
-#+ATTR_LaTeX: :width 0.85\linewidth
+#+ATTR_LaTeX: :width 0.65\linewidth
 #+NAME: fig:proxy
 [[./figures/proxyServer.pdf]]
 
@@ -836,7 +841,7 @@ To improve performance, use multiple servers (server farm)
 
 
 #+CAPTION: Load balancing: Reply via front end
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=2
 #+NAME: fig:lb_via_frontend
 [[./figures/LB.pdf]]
 
@@ -858,7 +863,7 @@ FE answers with a redirect to point to chosen server
 - Incurs additional round trip time! 
 
 #+CAPTION: Load balancing: Redirect 
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=3
+#+ATTR_LaTeX: :width 0.65\linewidth :options page=3
 #+NAME: fig:lb_rewrite
 [[./figures/LB.pdf]]
 
@@ -881,7 +886,7 @@ Idea: inform DNS about multiple IP addresses  for the same name
 - Let DNS choose worker! 
 
 #+CAPTION: Load balancing: DNS picks worker 
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=5
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=5
 #+NAME: fig:lb_rewrite
 [[./figures/LB.pdf]]
 
@@ -1358,7 +1363,7 @@ Color indicates responsible server
 
 
 #+CAPTION: Consistent hashing
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=2
 #+NAME: fig:consistent_hashing 
 [[./figures/consistentHashing/hashing.pdf]]
 
@@ -1380,7 +1385,7 @@ When adding a server, most values' keys stay with the same server
 
 
 #+CAPTION: Consistent hashing, four servers
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=2
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=2
 #+NAME: fig:consistent_hashing_four  
 [[./figures/consistentHashing/hashing.pdf]]
 
@@ -1391,7 +1396,7 @@ When adding a server, most values' keys stay with the same server
 
 
 #+CAPTION: Consistent hashing, five servers
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+ATTR_LaTeX: :width 0.85\linewidth :options page=3
 #+NAME: fig:consistent_hashing_five  
 [[./figures/consistentHashing/hashing.pdf]]
 
