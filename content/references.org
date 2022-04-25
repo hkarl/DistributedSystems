@@ -8,7 +8,6 @@
     :BEAMER_OPT: allowframebreaks
     :END:
 
-\renewcommand*{\bibfont}{\tiny}
 \printbibliography[heading=none]
 
 ** Acronyms 
@@ -18,5 +17,4 @@
     :BEAMER_OPT: allowframebreaks
     :END:
 
-\tiny
 \input{../acronyms}
