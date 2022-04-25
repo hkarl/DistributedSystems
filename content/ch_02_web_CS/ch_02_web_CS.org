@@ -1,5 +1,9 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
+
 
 * Basic structure
     
@@ -592,7 +596,7 @@ class article_detail(TemplateView):
 </ul>
 #+END_SRC
 
-** Running a Web framework 
+*** Running a Web framework 
 - Templates to render HTML as result, allowing access to Python data
   structures 
   - Can integrate various templating engines (in particular, Jinja2
