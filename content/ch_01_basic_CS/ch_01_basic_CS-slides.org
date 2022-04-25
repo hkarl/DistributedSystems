@@ -2,12 +2,11 @@
 
 #+TITLE: Basic client/server systems
 #+include: "../slidehead.org"
+
+#+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
+#+BEAMER_HEADER: \date{SS 22}
+
  
-
-\begin{frame}
-  \titlepage
-\end{frame}
-
 
 #+include: "./ch_01_basic_CS.org" 
 #+include: "../references.org"
