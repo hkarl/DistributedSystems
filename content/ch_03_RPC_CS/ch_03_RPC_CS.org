@@ -1,5 +1,10 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
+
+
 * RPC
 
 ** RPC basics 
@@ -53,7 +58,7 @@ Allow procedure calls across address spaces
 
 
 #+CAPTION: Idea of remote procedure call
-#+ATTR_LaTeX: :width 0.95\linewidth
+#+ATTR_LaTeX: :width 0.7\linewidth
 #+NAME: fig:ideaRPC
 [[./figures/ideaRPC.pdf]]
 
@@ -249,7 +254,7 @@ What if things go wrong?
 
 
 #+CAPTION: Request/reply, timeout on request  
-#+ATTR_LaTeX: :width \linewidth :options page=2
+#+ATTR_LaTeX: :height 0.6\textheight :options page=2
 #+NAME: fig:rpc_timeout_request
 [[./figures/rpc_rrp.pdf]] 
 
@@ -279,7 +284,7 @@ What if things go wrong?
 
 
 #+CAPTION: Request/reply with reply lost, recompute 
-#+ATTR_LaTeX: :width \linewidth :options page=3
+#+ATTR_LaTeX: :height 0.6\textheight :options page=3
 #+NAME: fig:rpc_rrp_noerrors
 [[./figures/rpc_rrp.pdf]] 
 
@@ -305,7 +310,7 @@ What if things go wrong?
       :END:
 
 #+CAPTION: Request/reply, reply cache 
-#+ATTR_LaTeX: :width \linewidth :options page=4
+#+ATTR_LaTeX: :height 0.5\textheight :options page=4
 #+NAME: fig:rpc_rrp_noerrors
 [[./figures/rpc_rrp.pdf]] 
 
@@ -332,7 +337,7 @@ What if things go wrong?
       :END:
 
 #+CAPTION: Request/reply, server restart
-#+ATTR_LaTeX: :width \linewidth :options page=5
+#+ATTR_LaTeX: :height 0.5\textheight :options page=5
 #+NAME: fig:rpc_rrp_noerrors
 [[./figures/rpc_rrp.pdf]] 
 
@@ -382,7 +387,7 @@ What if things go wrong?
 
 
 #+CAPTION: No problems
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=1,keepaspectratio
+#+ATTR_LaTeX: :height 0.6\textheight :options page=1,keepaspectratio
 #+NAME: fig:ack:noproblem
 [[./figures/acks.pdf]]
 
@@ -395,7 +400,7 @@ What if things go wrong?
 
 
 #+CAPTION: Paket delay gets repaired
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=2,keepaspectratio
+#+ATTR_LaTeX: :height 0.6\textheight :options page=2,keepaspectratio
 #+NAME: fig:ack:paketdelay
 [[./figures/acks.pdf]]
 
@@ -403,7 +408,7 @@ What if things go wrong?
 
 
 #+CAPTION: Uncoverable problem 
-#+ATTR_LaTeX: :height 0.8\textheight :options page=3,keepaspectratio
+#+ATTR_LaTeX: :height 0.6\textheight :options page=3,keepaspectratio
 #+NAME: fig:ack:unrecoverable
 [[./figures/acks.pdf]]
 
@@ -574,7 +579,7 @@ Ingredients of a “normal” object model (think: Java, C++, …)
 
 
 #+CAPTION: Call sequence of a JavaRMI method invocation
-#+ATTR_LaTeX: :height 0.75\textheight
+#+ATTR_LaTeX: :height 0.6\textheight
 #+NAME: fig:rmi_sequence
 [[./figures/rmi.pdf]]
 
@@ -600,7 +605,7 @@ From http://www.zerorpc.io
 
 Note: port number identifies object 
 
-\tiny
+\small 
 ****                                                              :B_columns:
      :PROPERTIES:
      :BEAMER_env: columns
@@ -646,7 +651,7 @@ print c.hello("RPC")
      :BEAMER_env: columns
      :END:
 
-\tiny
+\small
 ***** Server                                                          :BMCOL:
       :PROPERTIES:
       :BEAMER_col: 0.5
@@ -776,7 +781,7 @@ It [Web Service] has an interface described in a machine-processable format (spe
 
 
 #+CAPTION: Structure of Web service components
-#+ATTR_LaTeX: :width 0.95\linewidth
+#+ATTR_LaTeX: :width 0.8\linewidth
 #+NAME: fig:webservice_structure
 [[./figures/wsdl.pdf]]
 
@@ -991,7 +996,7 @@ But:  No DELETE, PUT,  ... supported!
 
 
 #+CAPTION: Screenshot of Swagger tutorial API example
-#+ATTR_LaTeX: :width 0.9\linewidth
+#+ATTR_LaTeX: :width 0.7\linewidth
 #+NAME: fig:swagger_screenshot
 [[./figures/swagger-screenshot.png]]
 
@@ -1010,6 +1015,8 @@ But:  No DELETE, PUT,  ... supported!
      :PROPERTIES:
      :BEAMER_env: exampleblock
      :END:
+\small 
+
 #+BEGIN_SRC python
  import requests
  import json
@@ -1059,7 +1066,7 @@ But:  No DELETE, PUT,  ... supported!
 
 
 #+CAPTION: Fake News Detector System
-#+ATTR_LaTeX: :width 0.95\linewidth
+#+ATTR_LaTeX: :width 0.9\linewidth
 #+NAME: fig:fad
 [[./figures/fad.pdf]]
 
@@ -1095,7 +1102,7 @@ But:  No DELETE, PUT,  ... supported!
 
 
 #+CAPTION: HAL9000-based FAD system
-#+ATTR_LaTeX: :width 0.95\linewidth
+#+ATTR_LaTeX: :width 0.9\linewidth
 #+NAME: fig:fad_hal
 [[./figures/fad_hal.pdf]]
 
@@ -1125,7 +1132,7 @@ But:  No DELETE, PUT,  ... supported!
 
 
 #+CAPTION: FAD based on coarse-grained partitioning
-#+ATTR_LaTeX: :width 0.95\linewidth
+#+ATTR_LaTeX: :width 0.9\linewidth 
 #+NAME: fig:fad_coarse
 [[./figures/fad_coarse.pdf]]
 
@@ -1175,13 +1182,13 @@ But:  No DELETE, PUT,  ... supported!
 
 
 #+CAPTION: Orchestration style
-#+ATTR_LaTeX: :width 0.75\linewidth :options page=1
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=1
 #+NAME: fig:ms_orchestration
 [[./figures/orch_choreo.pdf]]
 
 
 #+CAPTION: Choreography style
-#+ATTR_LaTeX: :width 0.75\linewidth :options page=2
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=2
 #+NAME: fig:ms_choreography
 [[./figures/orch_choreo.pdf]]
 
@@ -1215,7 +1222,7 @@ But:  No DELETE, PUT,  ... supported!
       :END:
 
 #+CAPTION: Scaling out a microservice
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+ATTR_LaTeX: :height 0.6\textheight :options page=3
 #+NAME: fig:ms_scaling
 [[./figures/orch_choreo.pdf]]
 
