@@ -1,5 +1,10 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
+
+
 * Deployment tools: Why and what for? 
 
 *** Introduction 
@@ -12,7 +17,7 @@
   cycle? 
 
 
-*** Tasks 
+*** Tasks  
 
 We need to automate the following tasks: 
 
