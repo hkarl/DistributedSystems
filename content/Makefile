@@ -25,6 +25,13 @@ slides169Pdf := $(patsubst %.org,%169.pdf,$(SOURCE))
 handoutPdf := $(patsubst %-slides.org,%-handout.pdf,$(SOURCE))
 bookTex := $(patsubst %.org,%-chapter.tex,$(wildcard *.org))
 
+# Setting environment for HPI slides right
+.EXPORT_ALL_VARIABLES:
+TEXINPUTS=".:../hpi-slides/src:./hpi-slides/src::"
+TFMFONTS=".:../hpi-slides/src:./hpi-slides/src::"
+TTFONTS=".:../hpi-slides/src:./hpi-slides/src::"
+
+
 
 # build order for all is important; have to make sure that
 # book.aux file exists for inter-chapter cross-references 
