@@ -6,10 +6,11 @@
 
 
 
-# on Holger's Mac: 
-EMACS="/Applications/Aquamacs 2.app/Contents/MacOS/Aquamacs"
+EMACS=emacs
+# typical alternatives can be something like:
+# EMACS="/Applications/Emacs.app/Contents/MacOS/Emacs" 
 
-EMACSEXPORTPROG="(progn (add-to-list 'load-path (expand-file-name \"~/.emacs.d/org-mode/lisp\")) (require 'org)  (setq org-latex-listings 'minted) (setq org-latex-minted-options '((\"frame\" \"lines\") (\"linenos=false\") (\"mathescape\" \"true\") (\"breaklines\") (\"autogobble\") (\"escapeinside\" \"??\") )) (setq org-latex-prefer-user-labels t) (org-beamer-export-to-latex))"
+EMACSEXPORTPARAMS= --batch -l ../templates/emacs_init.el -f org-beamer-export-to-latex
 
 # pdflatex command
 PDFLATEX=pdflatex -shell-escape -interaction=nonstopmode
@@ -78,8 +79,8 @@ slides169: $(slides169Pdf)
 
 %-slides.tex: %-slides.org %.org ../slidehead.org  ../references.org ../acronyms.tex
 	echo "building beamer tex file", $<, $@
-	${EMACS} -Q --batch $<  -eval ${EMACSEXPORTPROG}
-	grep -v "begin{LaTeX}" $@ | grep -v "end{LaTeX}" | sponge $@
+	${EMACS} $<  ${EMACSEXPORTPARAMS}
+	# grep -v "begin{LaTeX}" $@ | grep -v "end{LaTeX}" | sponge $@
 
 
 %-slides.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib ../book/book.aux 

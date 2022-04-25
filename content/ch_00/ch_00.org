@@ -1,15 +1,19 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
+
 * Introduction 
 
 *** Who are we
 
- Fachgebiet „Rechnernetze“ 
+ Fachgebiet „Internet-Technologie und Softwarisierung“ (ITSW)
  - Prof. Dr. Holger Karl 
- - hkarl@ieee.org oder holger.karl@upb.de 
- - O3.162  
- - Office hours: see web page 
- - Web page: http://wwwcs.uni-paderborn.de/cs/cn/
+ - holger.karl@hpi.de 
+ - A-E.8  
+ - Office hours: on demand
+ - Web page: https://hpi.de/karl/home.html
 
 
 *** Main research topics
@@ -28,7 +32,7 @@ In general: architectures and protocols of communication systems
  - Buzzwords: Software-Defined Networking; 
  - Network Function Virtualization 
 
-*** Teaching FG Rechnernetze (Karl)
+*** Teaching FG ITSW                                               :noexport:
 
 
 
@@ -224,23 +228,31 @@ Some numbers
 
 *** Lecture 
 
-- Current plan: Flipped classroom 
-  - Pre-recorded screencasts
-  - Slides, handwritten notes, ... will all be provided via PANDA
-- Q-and-A during original timeslots for the class 
+- Current plan: Classic in-person lectures + homework assignments 
+  - Supported by pre-recorded screencasts (from an older instance):
+    [[https://www.youtube.com/playlist?list=PLcVYkCRLcLtGHzfmkfYjdN8Ai9tkHaHvi][YouTube Playlist]]
+  - Slides, handwritten notes, ... will all be provided via Moodle
+  - Recording is intended
+  - Live streaming is intended, but no guarantees 
+
+*** Time slots 
+
+- *Currently*:
+  - Tuesday, 15:15 - 16:45, HS 3
+  - Wednesday, 9:15 - 10:45, HS 2 
+- We can try to find better alternatives! 
+
 
 *** Homework assignments
- “Traditional” assignments 
+ “Traditional” homework assignments 
  - This lecture will also include some practical exercises 
- - Programming
- - (We used to do VMWare-based actual installations, but nobody was interested ) 
  - Assignments will be discussed in “Tafelübung”; they will not be graded or used for bonus points, … 
 
-*** Project!
+*** Mini-Project!
 
-For the 6 ECTS version: We will do mini-projects! 
+We will do mini-projects! 
 - Groups of 3-4 students
-- Build a three-tier web application, with all bells and whistles!
+- Build a three-tier web application, with some bells and whistles!
   - Front-end, middleware, backend, storage, distributed,
     load-balancer, fault injection, ... 
 - Work on it, present it to class 
@@ -248,17 +260,16 @@ For the 6 ECTS version: We will do mini-projects!
 
 *** Exam
 
- - Probably: ORAL exam (depends on number of participants) 
- - If written exam, date and time unclear 
-   - First instance: ??? (time and location: unknown) 
-   - Second instance: ?? 
+ - Probably: ORAL exam (depends on number of participants)
+   - To be decided during the first few lectures 
+   - If written exam, date and time unclear 
  - Material of both lecture and exercises is relevant for the exam
 
 *** Material
 
- - There will be no script 
+ - There will be no script (only  PDFs for slides) 
  - Slides will be available on the class web page prior to lecture 
- - You should have a look at at least one of the recommended textbooks 
+ - It cannot hurt to look at at least one of the recommended textbooks 
 
 *** Textbooks
   
@@ -269,13 +280,17 @@ For the 6 ECTS version: We will do mini-projects!
   - Coulouris, Distributed Systems
     \cite{Coulouris:DistributedSystems:2011}  
 - Lot's of material online 
-- See also Mendeley group: \url{https://www.mendeley.com/community/lecture-distributedsystems-upb} 
 
 
  
 
 
-*** Cancelled classes 
+*** Cancelled classes, compensate for missed classes
 
-Impossible to say at this point 
+- Future: Impossible to say at this point 
+- How to compensate for late start?
+  - Start a bit early every Wednesday, say 8:45?
+  - Look for some additional timeslots?
+    - Evenings? 
+
 
