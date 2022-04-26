@@ -1,5 +1,10 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
+
+
 * Message queuing semantics
 
 *** Pub/sub idiosyncrasies 
@@ -1208,7 +1213,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 
 
 #+CAPTION: LCR example ring
-#+ATTR_LaTeX: :width 0.75\linewidth :options page=1
+#+ATTR_LaTeX: :height 0.5\textheight :options page=1
 #+NAME: fig:LCR_ring_start
 [[./figures/leaderelect_ring.pdf]]
 
@@ -1281,7 +1286,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 
 
 #+CAPTION: Raft's leader election  finite state machine; messages not shown  
-#+ATTR_LaTeX: :width 0.75\linewidth
+#+ATTR_LaTeX: :width 0.65\textheight
 #+NAME: fig:raft_LE:fsm
 [[./figures/raft_LE.pdf]]
 
@@ -1337,7 +1342,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 
 
 #+CAPTION: Performance of Raft leader election (Figure 16 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})  
-#+ATTR_LaTeX: :width 0.9\linewidth 
+#+ATTR_LaTeX: :width 0.5\linewidth 
 #+NAME: fig:raft:performance 
 [[./figures/raft_performance.pdf]]
 
@@ -1383,7 +1388,7 @@ Simplified; no messages shown
 
 
 #+CAPTION: Bully algorithm finite state machine 
-#+ATTR_LaTeX: :width 0.75\linewidth
+#+ATTR_LaTeX: :width 0.6\linewidth
 #+NAME: fig:bully:fsm
 [[./figures/bully_fsm.pdf]]
 
@@ -1498,7 +1503,7 @@ Core building block of leader election
 
 
 #+CAPTION: Finite state machine for spanning tree
-#+ATTR_LaTeX: :width 0.75\linewidth :options page=1
+#+ATTR_LaTeX: :width 0.5\linewidth :options page=1
 #+NAME: fig:spanning_tree_FSM 
 [[./figures/leaderelect_graph_FSM.pdf]]
 
@@ -1527,26 +1532,26 @@ Core building block of leader election
 *** Example election 
 
 #+CAPTION: Example graph for leader election, step 1 
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=3
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=3
 #+NAME: fig:leader_elect_step1
 [[./figures/leaderelect_graph.pdf]]
 
 
 #+CAPTION: Example graph for leader election, step 2 
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=4
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=4
 #+NAME: fig:leader_elect_step2
 [[./figures/leaderelect_graph.pdf]]
 
 *** Example election 
 
 #+CAPTION: Example graph for leader election, step 3
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=5
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=5
 #+NAME: fig:leader_elect_step3
 [[./figures/leaderelect_graph.pdf]]
 
 
 #+CAPTION: Example graph for leader election, step 4
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=6
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=6
 #+NAME: fig:leader_elect_step4
 [[./figures/leaderelect_graph.pdf]]
 
@@ -1554,13 +1559,13 @@ Core building block of leader election
 *** Example election 
 
 #+CAPTION: Example graph for leader election, step 5 
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=7
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=7
 #+NAME: fig:leader_elect_step5
 [[./figures/leaderelect_graph.pdf]]
 
 
 #+CAPTION: Example graph for leader election, step 6
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=10
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=10
 #+NAME: fig:leader_elect_step6
 [[./figures/leaderelect_graph.pdf]]
 
@@ -1568,13 +1573,13 @@ Core building block of leader election
 *** Example election 
 
 #+CAPTION: Example graph for leader election, step 7
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=11
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=11
 #+NAME: fig:leader_elect_step7
 [[./figures/leaderelect_graph.pdf]]
 
 
 #+CAPTION: Example graph for leader election, step 8
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=12
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=12
 #+NAME: fig:leader_elect_step8
 [[./figures/leaderelect_graph.pdf]]
 
@@ -1582,39 +1587,39 @@ Core building block of leader election
 *** Example election 
 
 #+CAPTION: Example graph for leader election, step 9
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=13
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=13
 #+NAME: fig:leader_elect_step9
 [[./figures/leaderelect_graph.pdf]]
 
 
 #+CAPTION: Example graph for leader election, step 10
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=14
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=14
 #+NAME: fig:leader_elect_step10
 [[./figures/leaderelect_graph.pdf]]
 
 *** Example election 
 
 #+CAPTION: Example graph for leader election, step 11 
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=15
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=15
 #+NAME: fig:leader_elect_step11
 [[./figures/leaderelect_graph.pdf]]
 
 
 #+CAPTION: Example graph for leader election, step 12
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=16
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=16
 #+NAME: fig:leader_elect_step12
 [[./figures/leaderelect_graph.pdf]]
 
 *** Example election 
 
 #+CAPTION: Example graph for leader election, step 13
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=17
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=17
 #+NAME: fig:leader_elect_step13
 [[./figures/leaderelect_graph.pdf]]
 
 
 #+CAPTION: Example graph for leader election, step 14
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=18
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=18
 #+NAME: fig:leader_elect_step14
 [[./figures/leaderelect_graph.pdf]]
 
@@ -1622,13 +1627,13 @@ Core building block of leader election
 *** Example election 
 
 #+CAPTION: Example graph for leader election, step 15
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=19
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=19
 #+NAME: fig:leader_elect_step15
 [[./figures/leaderelect_graph.pdf]]
 
 
 #+CAPTION: Example graph for leader election, step 16
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=20
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=20
 #+NAME: fig:leader_elect_step16
 [[./figures/leaderelect_graph.pdf]]
 
@@ -1636,20 +1641,20 @@ Core building block of leader election
 *** Example election 
 
 #+CAPTION: Example graph for leader election, step 17 
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=21
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=21
 #+NAME: fig:leader_elect_step17
 [[./figures/leaderelect_graph.pdf]]
 
 
 #+CAPTION: Example graph for leader election, step 18
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=22
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=22
 #+NAME: fig:leader_elect_step18
 [[./figures/leaderelect_graph.pdf]]
 
 *** Example election 
 
 #+CAPTION: Example graph for leader election, final step
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=23
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=23
 #+NAME: fig:leader_elect_final_step
 [[./figures/leaderelect_graph.pdf]]
 
