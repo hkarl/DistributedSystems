@@ -1,10 +1,10 @@
 #+TITLE: Group communication
 #+include: "../slidehead.org"
 
-\begin{frame}
-\titlepage
-\end{frame}
+#+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
+#+BEAMER_HEADER: \date{SS 22}
 
+\setcounter{chapter}{7}
 
 #+include: "./ch_07_mcast_ncs.org"
 #+include: "../references.org"

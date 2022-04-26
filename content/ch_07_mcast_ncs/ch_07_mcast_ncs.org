@@ -1,5 +1,8 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
 
 
 * Multicasting
@@ -233,7 +236,7 @@ Remember: No group changes so far!
       :END:
 
 #+CAPTION: FIFO message ordering
-#+ATTR_LaTeX: :width 0.8\linewidth :options page=2
+#+ATTR_LaTeX: :height 0.6\textheight :options page=2
 #+NAME: fig:mc:fifo
 [[./figures/mcast_ordering.pdf]]
 
@@ -247,7 +250,7 @@ Remember: No group changes so far!
   
 
 #+CAPTION: Holdback in multicast
-#+ATTR_LaTeX: :width 0.75\linewidth :options page=3
+#+ATTR_LaTeX: :width 0.65\linewidth :options page=3
 #+NAME: fig:mc:holdback
 [[./figures/mcast_ordering.pdf]]
 
@@ -275,7 +278,7 @@ Remember: No group changes so far!
 *** Atomic order 
 
 #+CAPTION: Atomic message ordering
-#+ATTR_LaTeX: :height 0.9\textheight :options page=4
+#+ATTR_LaTeX: :height 0.6\textheight :options page=4
 #+NAME: fig:mc:atomic
 [[./figures/mcast_ordering.pdf]]
 
@@ -1152,7 +1155,7 @@ ordered set T
 *** Assignment of Logical Time – Example  
 
 #+CAPTION: Events with logical time stamps 
-#+ATTR_LaTeX: :height 0.9\textheight :options page=4
+#+ATTR_LaTeX: :height 0.6\textheight :options page=4
 #+NAME: fig:time_not_causal
 [[./figures/logicalTime.pdf]]
 
@@ -1172,7 +1175,7 @@ ordered set T
       :END:
 
 #+CAPTION: Events with logical time stamps 
-#+ATTR_LaTeX: :height 0.9\textheight :options page=4
+#+ATTR_LaTeX: :height 0.6\textheight :options page=4
 #+NAME: fig:time_not_causal
 [[./figures/logicalTime.pdf]]
 
@@ -1182,7 +1185,7 @@ ordered set T
       :END:
 
 #+CAPTION: Events with logical time stamps -- rearranged
-#+ATTR_LaTeX: :height 0.9\textheight :options page=5
+#+ATTR_LaTeX: :height 0.6\textheight :options page=5
 #+NAME: fig:time_not_causal
 [[./figures/logicalTime.pdf]]
 
@@ -1240,7 +1243,7 @@ LamportTime transformation of a given distributed  algorithm A to L(A)
       :END:
 
 #+CAPTION: Events with logical time stamps 
-#+ATTR_LaTeX: :height 0.9\textheight :options page=4
+#+ATTR_LaTeX: :height 0.6\textheight :options page=4
 #+NAME: fig:time_not_causal
 [[./figures/logicalTime.pdf]]
 
@@ -1250,7 +1253,7 @@ LamportTime transformation of a given distributed  algorithm A to L(A)
       :END:
 
 #+CAPTION: Events with LamportTime as timestamps 
-#+ATTR_LaTeX: :height 0.9\textheight :options page=6
+#+ATTR_LaTeX: :height 0.6\textheight :options page=6
 #+NAME: fig:time_not_causal
 [[./figures/logicalTime.pdf]]
 
@@ -1407,7 +1410,7 @@ Update VT
 
 
 #+CAPTION: An example CBCAST execution
-#+ATTR_LaTeX: :width 0.95\linewidth
+#+ATTR_LaTeX: :width 0.75\linewidth
 #+NAME: fig:cbcast_example
 [[./figures/cbcast_example.pdf]]
 
