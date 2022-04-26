@@ -1,9 +1,10 @@
 #+TITLE: Distributed transactions
 #+include: "../slidehead.org"
 
-\begin{frame}
-\titlepage
-\end{frame}
+#+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
+#+BEAMER_HEADER: \date{SS 22}
+
+\setcounter{chapter}{12}
 
 
 #+include: "./ch_12_distTransactions.org"

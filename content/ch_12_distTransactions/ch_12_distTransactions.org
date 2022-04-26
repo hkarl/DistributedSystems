@@ -1,5 +1,8 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
 
 * Reminder: Transactions, non-distributed
 
@@ -533,6 +536,12 @@ A commit protocol is called *blocking* when
 
 *** Run with partition -- Options? 
 
+
+***** 								      :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
 - Options for B, C, E?
   - Never received ~PRE_COMMIT~, so they abort 
 - Options for A?
@@ -804,7 +813,7 @@ class MuTex:
 
 
 #+CAPTION: Example run of Ricart-Agrawala mutual exclusion
-#+ATTR_LaTeX: :height 0.75\textheight
+#+ATTR_LaTeX: :height 0.6\textheight
 #+NAME: fig:distTrans:mutex
 [[./figures/mutex.pdf]]
 
