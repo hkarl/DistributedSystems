@@ -1,5 +1,10 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
+
+
 * Publish/Subscribe 
   :PROPERTIES:
   :CUSTOM_ID: sec:pubsub

@@ -2,10 +2,9 @@
 
 #+include: "../slidehead.org"
 
-\begin{frame}
-\titlepage
-\end{frame}
-
-
+#+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
+#+BEAMER_HEADER: \date{SS 22}
+ 
+\setcounter{chapter}{8}
 #+include: "./ch_08_des_pubsub.org"
 #+include: "../references.org"
