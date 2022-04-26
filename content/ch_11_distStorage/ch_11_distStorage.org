@@ -1,5 +1,8 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
 
 * Replication vs. consistency
 
@@ -119,7 +122,7 @@ Object itself or RMI skeleton deals with  replication
 
 
 #+CAPTION: Replication handled by 
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=3
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=3
 #+NAME: fig:distStor:replication_object
 [[./figures/scenarios.pdf]]
 
@@ -428,7 +431,7 @@ Necessary condition:
 *** Causal consistency: Example
 
 #+CAPTION: Causally consistent example
-#+ATTR_LaTeX: :width 0.75\linewidth :options page=6
+#+ATTR_LaTeX: :width 0.7\linewidth :options page=6
 #+NAME: fig:distStor:causally_consistent
 [[./figures/consistency_mscs.pdf]]
 
@@ -474,7 +477,7 @@ Necessary Condition:
 *** FIFO consistency: Example 
 
 #+CAPTION: FIFO consistent example
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=8
+#+ATTR_LaTeX: :height 0.6\textheight :options page=8
 #+NAME: fig:distStor:fifo_consistent
 [[./figures/consistency_mscs.pdf]]
 
@@ -717,7 +720,7 @@ fault tolerance*!
 
 
 #+CAPTION: Primary without backup 
-#+ATTR_LaTeX: :height 0.5\textheight :options page=1 
+#+ATTR_LaTeX: :height 0.4\textheight :options page=1 
 #+NAME: fig:distStor:primary_no_backup
 [[./figures/updateProtocols.pdf]]
 
@@ -742,7 +745,7 @@ Assumptions for graphs:
     :END:
 
 #+CAPTION: Primary with backup and blocking write operations
-#+ATTR_LaTeX: :height 0.6\textheight :options page=2
+#+ATTR_LaTeX: :height 0.5\textheight :options page=2
 #+NAME: fig:distStor:primary_blocking_write
 [[./figures/updateProtocols.pdf]]
 
@@ -754,7 +757,7 @@ Assumptions for graphs:
 Writer may proceed even if data not written yet 
 
 #+CAPTION: Primary with backup and blocking write operations
-#+ATTR_LaTeX: :height 0.5\textheight :options page=3
+#+ATTR_LaTeX: :height 0.45\textheight :options page=3
 #+NAME: fig:distStor:primary_non_blocking_write
 [[./figures/updateProtocols.pdf]]
 
@@ -786,7 +789,7 @@ process that wants to write
 *** Local-write protocol without backup, example  
 
 #+CAPTION: Local write: migrate single server 
-#+ATTR_LaTeX: :height 0.5\textheight :options page=4
+#+ATTR_LaTeX: :height 0.4\textheight :options page=4
 #+NAME: fig:distStor:migrate_no_backup
 [[./figures/updateProtocols.pdf]]
 
@@ -877,7 +880,7 @@ Possible approach:
 Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 
 #+CAPTION: Replicated objects invoke methods, answer via their coordinators (shown in red)  
-#+ATTR_LaTeX: :height 0.7\textheight :options page=8
+#+ATTR_LaTeX: :height 0.6\textheight :options page=8
 #+NAME: fig:distStor:replicated_object_coordinator
 [[./figures/updateProtocols.pdf]]
 
@@ -941,7 +944,7 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 
 
 #+CAPTION: Check version before writing
-#+ATTR_LaTeX: :width 0.8\linewidth :options page=1
+#+ATTR_LaTeX: :width 0.6\linewidth :options page=1
 #+NAME: fig:distStor:check_before_update
 [[./figures/quorum.pdf]]
 
@@ -989,7 +992,7 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 *** Write at more than  half replicas? 
 
 #+CAPTION: Writing at more than half of all replicas ensures up-to-date values 
-#+ATTR_LaTeX: :height 0.75\textheight :options page=3
+#+ATTR_LaTeX: :height 0.6\textheight :options page=3
 #+NAME: fig:distStor:write_at_least_half 
 [[./figures/quorum.pdf]]
 
