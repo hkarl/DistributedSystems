@@ -1,5 +1,10 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
+
+
 * Distributed key-value store
 
 *** Key-value store so far
@@ -120,7 +125,7 @@ When a node looks for a key:
 
 
 #+CAPTION: A simple, ring-based DHT with one routing entry per node
-#+ATTR_LaTeX: :height 0.75\textheight :options page=1
+#+ATTR_LaTeX: :height 0.6\textheight :options page=1
 #+NAME: fig:strawman_dht_few_nodes
 [[./figures/dht.pdf]]
 
@@ -129,7 +134,7 @@ When a node looks for a key:
 
 
 #+CAPTION: A simple, ring-based DHT with one routing entry per node, more nodes 
-#+ATTR_LaTeX: :height 0.75\textheight :options page=3
+#+ATTR_LaTeX: :height 0.6\textheight :options page=3
 #+NAME: fig:strawman_dht_many_nodes
 [[./figures/dht.pdf]]
 
@@ -159,7 +164,7 @@ When a node looks for a key:
 For two example nodes, cross-cutting links are shown 
 
 #+CAPTION: More entries in forwarding table speed up forwarding
-#+ATTR_LaTeX: :height 0.75\textheight :options page=4
+#+ATTR_LaTeX: :height 0.6\textheight :options page=4
 #+NAME: fig:dht_cutting_across
 [[./figures/dht.pdf]]
 
@@ -289,7 +294,7 @@ Note: Variants exist
 
 
 #+CAPTION: Flow chart for Plaxton routing
-#+ATTR_LaTeX: :height 0.85\textheight
+#+ATTR_LaTeX: :height 0.6\textheight
 #+NAME: fig:flowchart_plaxton
 [[./figures/plaxton_fc.pdf]]
 
