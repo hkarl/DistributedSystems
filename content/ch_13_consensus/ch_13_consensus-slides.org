@@ -1,9 +1,10 @@
 #+TITLE: Dealing with failures: Consensus
 #+include: "../slidehead.org"
 
-\begin{frame}
-\titlepage
-\end{frame}
+#+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
+#+BEAMER_HEADER: \date{SS 22}
+
+\setcounter{chapter}{13}
 
 
 #+include: "./ch_13_consensus.org"

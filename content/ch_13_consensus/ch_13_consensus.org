@@ -1,5 +1,8 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
 
 * Modeling consensus
   :PROPERTIES:
@@ -359,7 +362,7 @@ Logs of new leader in new term might be inconsistent with follower
 logs; these are *uncommitted* entries  
 
 #+CAPTION: Logs when leader changes (Figure 7 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})
-#+ATTR_LaTeX: :width 0.6\textheight
+#+ATTR_LaTeX: :width 0.5\textheight
 #+ATTR_LaTeX: :caption \caption{Logs when leader changes (Figure 7 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version}) \label{fig:raft:log_leader_change}}
 #+NAME: fig:raft:log_leader_change
 [[./figures/raft_log_leader_change.pdf]]
@@ -472,7 +475,7 @@ Problem: Just because an entry is stored on majority of servers is
 
 
 #+CAPTION: Raft unable to commit across terms (Fig. 8 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})
-#+ATTR_LaTeX: :width 0.6\textheight
+#+ATTR_LaTeX: :width 0.5\textheight
 #+ATTR_LaTeX: :caption \caption{Raft unable to commit across terms (Fig. 8 from ) \cite{ongaro14:_in_searc_under_consen_algor_exten_version}) \label{fig:raft:no_commit}}
 #+NAME: fig:raft:no_commit
 [[./figures/raft_no_commit.pdf]]
@@ -599,7 +602,7 @@ too hard \cite[Section 5.4.3]{ongaro14:_in_searc_under_consen_algor_exten_versio
 Recall figure: 
 
 #+CAPTION: Primary with backup and blocking write operations
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=2
+#+ATTR_LaTeX: :width 0.8\linewidth :options page=2
 #+NAME: fig:consensus:primary_blocking_write
 [[./../ch_11_distStorage/figures/updateProtocols.pdf]]
 
@@ -644,7 +647,7 @@ information
 
 
 #+CAPTION: Primary/backup strawman: server crash 
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=2
+#+ATTR_LaTeX: :width 0.7\linewidth :options page=2
 #+NAME: fig:consensus:pb:server_crash 
 [[./figures/paxos.pdf]]
 
@@ -676,7 +679,7 @@ information
 
 
 #+CAPTION: Primary/backup strawman with network partition 
-#+ATTR_LaTeX: :width 0.85\linewidth :options page=3
+#+ATTR_LaTeX: :width 0.7\linewidth :options page=3
 #+NAME: fig:consensus:pb:partition
 [[./figures/paxos.pdf]]
 
@@ -770,7 +773,7 @@ information
 
 
 #+CAPTION: Server group with round numbers 
-#+ATTR_LaTeX: :width 0.75\linewidth :options page=6
+#+ATTR_LaTeX: :width 0.7\linewidth :options page=6
 #+NAME: fig:consensus:pb:mutlicast
 [[./figures/paxos.pdf]]
 
@@ -973,7 +976,7 @@ Learning:
 
 
 #+CAPTION: Paxos regular run 
-#+ATTR_LaTeX: :height 0.75\textheight :options page=7
+#+ATTR_LaTeX: :height 0.6\textheight :options page=7
 #+NAME: fig:consensus:paxos:normal
 [[./figures/paxos.pdf]]
 
@@ -984,7 +987,7 @@ Learning:
 *** Paxos: Proposer  fails MSC 
 
 #+CAPTION: Paxos proposer fails  
-#+ATTR_LaTeX: :height 0.75\textheight :options page=8
+#+ATTR_LaTeX: :height 0.6\textheight :options page=8
 #+NAME: fig:consensus:paxos:proposer_fails 
 [[./figures/paxos.pdf]]
 
@@ -992,7 +995,7 @@ Learning:
 *** Paxos: Battling  Proposers 
 
 #+CAPTION: Paxos proposer fails  
-#+ATTR_LaTeX: :height 0.75\textheight :options page=9
+#+ATTR_LaTeX: :height 0.6\textheight :options page=9
 #+NAME: fig:consensus:paxos:battling_proposer
 [[./figures/paxos.pdf]]
 
