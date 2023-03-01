@@ -1,5 +1,10 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
+
+
 * Big Data 
 
 
@@ -133,7 +138,7 @@ Naisbitt, 1982)
 
 
 #+CAPTION: High-level big data analysis pipeline
-#+ATTR_LATEX: :height 0.8\textheight
+#+ATTR_LATEX: :height 0.6\textheight
 #+NAME: fig:bd:analysis:pipeline
 [[./figures/bdAnalyticsFlowChart.pdf]]
 
@@ -172,7 +177,7 @@ Naisbitt, 1982)
 
 
 #+CAPTION: Straightforward clustering example
-#+ATTR_LATEX: :width 0.7\linewidth :options page=1
+#+ATTR_LATEX: :width 0.6\linewidth :options page=1
 #+NAME: fig:bd:clustering:straightforward
 [[./figures/kmeans.pdf]]
 
@@ -184,7 +189,7 @@ Naisbitt, 1982)
 
 
 #+CAPTION: Straightforward clustering with outlier
-#+ATTR_LATEX: :width 0.7\linewidth :options page=2
+#+ATTR_LATEX: :width 0.6\linewidth :options page=2
 #+NAME: fig:bd:clustering:outlier
 [[./figures/kmeans.pdf]]
 
@@ -193,7 +198,7 @@ Naisbitt, 1982)
 - Clusters overlap, answer not obvious based on parameters 
 
 #+CAPTION: Clustering with overlap
-#+ATTR_LATEX: :width 0.7\linewidth :options page=3
+#+ATTR_LATEX: :width 0.6\linewidth :options page=3
 #+NAME: fig:bd:clustering:outlier
 [[./figures/kmeans.pdf]]
 
@@ -203,7 +208,7 @@ Naisbitt, 1982)
 - Classes not linearly separated 
 
 #+CAPTION: Clustering for non-linear separable clusters 
-#+ATTR_LATEX: :width 0.7\linewidth :options page=4
+#+ATTR_LATEX: :width 0.6\linewidth :options page=4
 #+NAME: fig:bd:clustering:outlier
 [[./figures/kmeans.pdf]]
 
@@ -434,7 +439,7 @@ MR execution
 
 
 #+CAPTION: Structuring kMeans as an MR job
-#+ATTR_LaTeX: :width 0.9\linewidth
+#+ATTR_LaTeX: :width 0.7\linewidth
 #+NAME: fig:mr:kmeans:structure
 [[./figures/mr_kMeans.pdf]]
 
@@ -580,7 +585,7 @@ for i in range(numIters):
 
 
 #+CAPTION: MapReduce execution overview from a process perspective
-#+ATTR_LaTeX: :width 0.9\linewidth
+#+ATTR_LaTeX: :width 0.7\linewidth
 #+NAME: fig:mr:execution_overview
 [[./figures/mr_execution_overiew.pdf]]
 
@@ -602,7 +607,7 @@ for i in range(numIters):
 *** MapReduce code example: Count word frequencies 
 
 #+CAPTION: Word count -- from google code examples
-#+ATTR_LaTeX: :width 0.9\linewidth
+#+ATTR_LaTeX: :width 0.6\linewidth
 #+NAME: fig:mr:word_count:google
 [[./figures/mr_wordcount.pdf]]
 
@@ -926,7 +931,7 @@ for i in range(numIters):
 
 
 #+CAPTION: Hadoop cluster structure (Fig. 1 from \cite{shvachko10:_hadoop_distr_file_system})
-#+ATTR_LaTeX: :width 0.9\linewidth
+#+ATTR_LaTeX: :height 0.6\textheight
 #+NAME: fig:hadoop:structure
 [[./figures/hadoop_structure.pdf]]
 
@@ -963,7 +968,7 @@ for i in range(numIters):
 
 
 #+CAPTION: Hadoop Yarn
-#+ATTR_LaTeX: :width 0.95\linewidth
+#+ATTR_LaTeX: :width 0.8\linewidth
 #+NAME: fig:hadoop:yarn
 [[./figures/hadoop_yarn.pdf]]
 

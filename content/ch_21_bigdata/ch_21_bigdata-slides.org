@@ -1,9 +1,10 @@
 #+TITLE: Big data analytics and the Map/Reduce programming model
 #+include: "../slidehead.org"
 
-\begin{frame}
-\titlepage
-\end{frame}
+#+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
+#+BEAMER_HEADER: \date{SS 22}
+
+\setcounter{chapter}{21}
 
 
 #+include: "./ch_21_bigdata.org"

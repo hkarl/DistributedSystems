@@ -130,7 +130,7 @@
 
 \pause 
 **** Repairable system 
- - Key idea: \ac{MTTF}, \ac{MTTR}, \ac{MTBF} 
+ - Key idea: \ac{MTTF}, \acf{MTTR}, \acf{MTBF} 
    - Side discussion: how meaningful are MTTFs anyway? 
 
 *** Availability requirements

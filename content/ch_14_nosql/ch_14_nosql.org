@@ -1,5 +1,10 @@
 #+BIBLIOGRAPHY: ../bib plain
 
+\begin{frame}[title={bg=Hauptgebaeude_Tag}]
+  \maketitle
+\end{frame}
+
+
 * CAP and friends
 
 ** Distributed data store
@@ -51,7 +56,7 @@ Simple example:
 
 
 #+CAPTION: Simple distributed data store example, no faults
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=1
+#+ATTR_LaTeX: :width 0.7\linewidth :options page=1
 #+NAME: fig:nosql:store:simple
 [[./figures/cap.pdf]]
 
@@ -88,7 +93,7 @@ Simple example:
       :END:
 
 #+CAPTION: Partitioned  data store example
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=2
+#+ATTR_LaTeX: :width 0.7\linewidth :options page=2
 #+NAME: fig:nosql:store:partitioned
 [[./figures/cap.pdf]]
 
@@ -149,7 +154,7 @@ A more detailed interpretation:
 
 
 #+CAPTION: The CAP landscape
-#+ATTR_LaTeX: :height 0.8\textheight :options page=3
+#+ATTR_LaTeX: :height 0.6\textheight :options page=3
 #+NAME: fig:nosql:cap_landscape
 [[./figures/cap.pdf]]
 
@@ -678,7 +683,7 @@ distributed system   https://github.com/etcd-io/etcd
 
 
 #+CAPTION: DNS namespace structure
-#+ATTR_LaTeX: :height 0.7\textheight :options page=1
+#+ATTR_LaTeX: :height 0.6\textheight :options page=1
 #+NAME: fig:dns_namespace
 [[./figures/dns.pdf]]
 
@@ -696,7 +701,7 @@ distributed system   https://github.com/etcd-io/etcd
 *** DNS types of resource records 
 
 #+CAPTION: Types of DNS resource records
-#+ATTR_LaTeX: :width \linewidth :options page=4
+#+ATTR_LaTeX: :height 0.6\textheight :options page=4
 #+NAME: fig:dns_namespace
 [[./figures/dns.pdf]]
 
@@ -726,7 +731,7 @@ distributed system   https://github.com/etcd-io/etcd
 
 
 #+CAPTION: Name servers for different zones
-#+ATTR_LaTeX: :height 0.7\textheight :options page=5
+#+ATTR_LaTeX: :height 0.6\textheight :options page=5
 #+NAME: fig:dns:nameservers
 [[./figures/dns.pdf]]
 
@@ -862,7 +867,7 @@ distributed system   https://github.com/etcd-io/etcd
  - If so: lock log file, make private copy, spawn child process for each slave server to update, child process sends private copy to its slave 
 
 
-** Kerberos 
+** Kerberos                                                        :noexport:
 
 *** Kerberos in one slide 
 
@@ -885,7 +890,7 @@ distributed system   https://github.com/etcd-io/etcd
 
 
 
-** Active Directory 
+** Active Directory                                                :noexport:
 
 *** Active Directory in one slide 
 
@@ -900,7 +905,7 @@ distributed system   https://github.com/etcd-io/etcd
 
 * Conclusions 
 
-** Conclusions 
+*** Conclusions 
 
 - SQL semantics usually implies the database semantics, not
   necessarily the query language 

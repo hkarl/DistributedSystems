@@ -5,5 +5,8 @@
 
 
 
+\setcounter{chapter}{5}
+\refstepcounter{chapter}
+
 #+include: "./ch_06_p2p_ncs.org"
 #+include: "../references.org"

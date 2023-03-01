@@ -3,6 +3,7 @@
 #+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
 #+BEAMER_HEADER: \date{SS 22}
 
+\setcounter{chapter}{4}
 
 #+include: "./ch_04_improving_CS.org"
 #+include: "../references.org"

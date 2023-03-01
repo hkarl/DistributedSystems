@@ -202,11 +202,11 @@ Basic version only, details later:
 - A joining node selects a random GUID $n$ 
 - It needs to know at least one other node already part of the ring
 - To join:
-  - Use existing Chord routing to find in charge of GUID $n$
-    - (Very unlikely that a node with that idea already exists)
+  - Use existing Chord routing to find node currently  in charge of GUID $n$
+    - (Very unlikely that a node with that ID already exists)
   - Tell that node it can relinquish responsibility for GUIDs larger
     $n$ to the new node
-    - Copy those entires to new node
+    - Copy those entries to new node
   - Initialise new node's finger table (talk to neighbors, try to
     insert $n+ 2^i$, ...) 
 
@@ -250,7 +250,7 @@ Basic version only, details later:
 
 Content of cells? 
 
-- Let's look at a node $v$ with GUID $v_1 v_2 v_3 \ldots v_32$
+- Let's look at a node $v$ with GUID $v_1 v_2 v_3 \ldots v_{32}$
 - In row $r$ and column $c$, we store information about nodes whose
   GUID 
   - Is the same as $v$ 's in the first $r$ digits
@@ -381,7 +381,7 @@ Note: Variants exist
 
 *** Pastry 
 
-- Popular DHT implementation based on Plexton routing  
+- Popular DHT implementation based on Plaxton routing  
   - Uses Plaxton routing table
   - Plus leaf set for immediate neighbors
 - Details mechanisms like host integration, host failure, ... 
