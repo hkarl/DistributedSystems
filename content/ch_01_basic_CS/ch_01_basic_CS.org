@@ -333,7 +333,7 @@ are allowed to occur
      e.g. http://jan.newmarch.name/distjava/socket/lecture.html ;
      \url{https://www.tutorialspoint.com/unix_sockets/index.htm} 
    - Stevens, Unix Network Programming
-     \cite{Stevens:UnixNetworkProgramming}, \cite{9780131411555} -- old but still useful
+     \cite{Stevens:UnixNetworkProgramming}, \cite{9780131411555} \textendash{} old but still useful
 
 
 *** Plain socket example in C 
@@ -405,7 +405,7 @@ int main(int argc, char **argv)
 
 
 
-*** Plain sockets -- good? 
+*** Plain sockets \textendash{} good? 
 
 - Complex API, owing to its age 
 - But full control over all details 
@@ -498,11 +498,11 @@ int main (void)
 #+END_SRC
 
 
-*** Sockets in C -- good? 
+*** Sockets in C \textendash{} good? 
 
 - Even with 0mq (or similar), sockets stay cumbersome 
   - Advantage: Full, detailed control
-  - E.g., ~select()~ call -- see homework 
+  - E.g., ~select()~ call \textendash{} see homework 
 - Alternatives?
   - Change programming language? Wrap sockets in an object-oriented
     concept?
@@ -661,7 +661,7 @@ print("Received request: %s" % message)
   representation into a *neutral* representation 
   - Translating back and forth between internal and neutral
     representation 
-  - Only neutral representation is sent -- the so-called *wire format*
+  - Only neutral representation is sent \textendash{} the so-called *wire format*
 
 
 #+BEAMER: \pause
@@ -692,24 +692,24 @@ print("Received request: %s" % message)
 - Issues
   - Cumbersome, talkative, memory and CPU-intensive 
 
-*** Wire transfer approaches -- modern candidates 
+*** Wire transfer approaches \textendash{} modern candidates 
 
-- Google protobuf -- https://github.com/google/protobuf
+- Google protobuf \textendash{} https://github.com/google/protobuf
 
-- Apache Thrift -- http://thrift.apache.org 
+- Apache Thrift \textendash{} http://thrift.apache.org 
 
 - Fast Buffers --
   http://www.eprosima.com/index.php/products-all/eprosima-fast-buffers 
 
-- Message Pack -- https://msgpack.org
+- Message Pack \textendash{} https://msgpack.org
 
   - Lot's of language bindings; used by redis, Pinterest, ... 
 
-- Cap'n Proto -- https://capnproto.org
+- Cap'n Proto \textendash{} https://capnproto.org
 
   - From one of the developers of Google Protobuf 
 
-- FlatBuffers -- https://google.github.io/flatbuffers/ 
+- FlatBuffers \textendash{} https://google.github.io/flatbuffers/ 
 
 
 *** Core idea: Put type information into message 
@@ -873,7 +873,7 @@ b'\x97\x01\xc3\xc2\xce\xff\xff\xff\xff\x82\xa3foo\xc4\x03\x80\x01\
 - Typically, using library functions
 - Put type information into 
 
-*** Option 2.1: Explicit annotation -- C-Example (1)
+*** Option 2.1: Explicit annotation \textendash{} C-Example (1)
 
 
 #+BEGIN_SRC C
@@ -892,7 +892,7 @@ int main(void)
     // ... 
 #+END_SRC
 
-*** Option 2.1: Explicit annotation -- C-Example (2)
+*** Option 2.1: Explicit annotation \textendash{} C-Example (2)
 
 
 #+BEGIN_SRC C
@@ -910,7 +910,7 @@ int main(void)
     // ... 
 #+END_SRC
 
-*** Option 2.1: Explicit annotation -- C-Example (3)
+*** Option 2.1: Explicit annotation \textendash{} C-Example (3)
 
 
 #+BEGIN_SRC C
@@ -948,7 +948,7 @@ int main(void)
 
   - Format to describe data structures in ~.proto~ files
 
-  - Generate sender and receiver code from that -- a *compiler* for
+  - Generate sender and receiver code from that \textendash{} a *compiler* for
     ~.proto~ files 
 
   - For different target languages (Java, C++, Go, Python, C#) 
@@ -1442,7 +1442,7 @@ Issue 2: same request arrives multiple times
 
 Challenge: Execute operation *exactly once* per request 
 
-*** Multiple copies of a request -- Actions: 
+*** Multiple copies of a request \textendash{} Actions: 
 
 Actions: 
    - Discard the additional request (do not execute more than once)
