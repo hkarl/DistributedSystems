@@ -11,7 +11,7 @@
  Fachgebiet „Internet-Technologie und Softwarisierung“ (ITSW)
  - Prof. Dr. Holger Karl 
  - holger.karl@hpi.de 
- - A-E.8  
+ - K-1.15 
  - Office hours: on demand
  - Web page: https://hpi.de/karl/home.html
 
@@ -22,52 +22,15 @@ In general: architectures and protocols of communication systems
  - Structure, design, performance evaluation, implementation, …
  - For all types of communication: computer networks, voice communication, data & multimedia content
 
-*** Main research topics                                           :noexport:
- More specifically
- - Future mobile and wireless communication
- - What comes after GSM, UMTS, WLAN?
- - Future Internet
- - Data centre networks 
- - Clouds meet operator networks 
- - Buzzwords: Software-Defined Networking; 
- - Network Function Virtualization 
 
 *** Teaching FG ITSW                                               :noexport:
 
 
+#+caption: Teaching at ITWS group, HPI
+#+attr_latex: :width 0.95\textwidth :height 0.6\textheight :options keepaspectratio,page=1
+#+NAME: fig:teaching 
+[[./figures/teaching.pdf]]
 
-#+BEGIN_EXPORT latex
-\begin{figure}
-\adjustbox{width=0.9\textwidth}{
-\begin{tikzpicture}[auto, node distance=5cm, xscale=2.5,yscale=1.25,
-block/.style = {rectangle, draw=black, thick, align=center}]
-\node at (0,0) (s4)  {IV}; 
-\node at (0,1) (s5) {V}; 
-\node at (0,2)  (s6) {VI}; 
-\node at (0,3) (s7) {VII}; 
-\node at (0,4) (s8) {VIII}; 
-% 
-\node [block] at (3, 0) (kms) {KMS};
-\node [block,fill=blue!20] at (3,1)  (rnvs){Rechnernetze/\\Verteilte Systeme}; 
-\node [block,fill=green!20] at (1,3)  (mc) {Mobile\\communication}; 
-\node [block,fill=red!20] at (2,4) (fi) {Future\\Internet}; 
-\node [block,fill=yellow!20] at (3,4)  (epe) {Empiric\\Performance\\Evaluation}; 
-\node [block] at (4,4)  (seminar8) {Seminar}; 
-\node [block] at (4,3) (seminar7) {Seminar}; 
-\node [block] at (4,2)  (ps) {Proseminar}; 
-\node [block] at (5,3)  (pg1) {Project\\group}; 
-\node [block] at (5,4)  (pg1) {Project\\group}; 
-%
-\draw [->] (kms) -- (rnvs); 
-\draw [->] (rnvs) -- (mc); 
-\draw [->] (rnvs) -- (fi); 
-\draw [->] (rnvs) -- (ps); 
-\end{tikzpicture}
-}
-\caption{Classes offered by Computer Networks group}
-\label{fig:classes}
-\end{figure}
-#+END_EXPORT 
 
 
 
@@ -228,23 +191,22 @@ Some numbers
 
 *** Lecture 
 
-- Current plan: Classic in-person lectures + homework assignments 
+- Current plan: Classic in-person lectures + homework assignments
+  - Supported by recordings (video + screen), but *no guarantees*
   - Supported by pre-recorded screencasts (from an older instance):
     [[https://www.youtube.com/playlist?list=PLcVYkCRLcLtGHzfmkfYjdN8Ai9tkHaHvi][YouTube Playlist]]
   - Slides, handwritten notes, ... will all be provided via Moodle
-  - Recording is intended
-  - Live streaming is intended, but no guarantees 
+
 
 *** Time slots 
 
 - *Currently*:
-  - Tuesday, 15:15 - 16:45, HS 3
-  - Wednesday, 9:15 - 10:45, HS 2 
+  - ... ??? 
 - We can try to find better alternatives! 
 
 
 *** Homework assignments
- “Traditional” homework assignments 
+ “Conventional” homework assignments 
  - This lecture will also include some practical exercises 
  - Assignments will be discussed in “Tafelübung”; they will not be graded or used for bonus points, … 
 
@@ -254,21 +216,36 @@ We will do mini-projects!
 - Groups of 3-4 students
 - Build a three-tier web application, with some bells and whistles!
   - Front-end, middleware, backend, storage, distributed,
-    load-balancer, fault injection, ... 
+    load-balancer, fault injection, \dots 
+  - Deployment, CI/CD toolchains, \dots 
 - Work on it, present it to class 
 
 
+*** Work load 
+
+- This is an 6 LP, 3+1 SWS lecture 
+- 6 LP = 180 hours of total work
+- 3+1 SWS:
+  - 3 SWS lectures = 3 units / week * 45 minutes/unit * 15 weeks /
+    semester = 22,5 time slots / semester (at 90 minutes)
+  - 1 SWS homework = 1 units / week * 45 minutes/unit * 15 weeks /
+    semester = 7,5 time slots / semester (at 90 minutes)
+    - Roughly 3 of those for the mini projects
+    - About 4,5 for conventional assignment discussions -- scheduled
+      on demand  
+
 *** Exam
 
- - Probably: ORAL exam (depends on number of participants)
+- Oral or written exam
+- We need to see number of participants 
    - To be decided during the first few lectures 
    - If written exam, date and time unclear 
- - Material of both lecture and exercises is relevant for the exam
+ - Material of both lecture and assignments is relevant for the exam
 
 *** Material
 
  - There will be no script (only  PDFs for slides) 
- - Slides will be available on the class web page prior to lecture 
+ - Slides will be available on the class web page prior to lecture (hopefully)
  - It cannot hurt to look at at least one of the recommended textbooks 
 
 *** Textbooks
@@ -282,15 +259,9 @@ We will do mini-projects!
 - Lot's of material online 
 
 
- 
-
-
 *** Cancelled classes, compensate for missed classes
 
 - Future: Impossible to say at this point 
-- How to compensate for late start?
-  - Start a bit early every Wednesday, say 8:45?
-  - Look for some additional timeslots?
-    - Evenings? 
-
+- Likely, some classes will be cancelled
+- Plan an *additional* time slot right away? 
 
