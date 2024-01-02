@@ -176,7 +176,7 @@ m was previously transmitted by sender(m).
 
 - Sequence numbers
 - Acknowledgements and timeouts
-- Downside: Sender needs to know members of unicast group 
+- Downside: Sender needs to know members of multicast group 
   - Basically, replicated unicast
 
 
