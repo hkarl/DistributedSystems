@@ -87,7 +87,6 @@ slides169: $(slides169Pdf)
 %-slides.tex: %-slides.org %.org ../slidehead.org  ../references.org ../acronyms.tex
 	echo "building beamer tex file", $<, $@
 	${EMACS} $<  ${EMACSEXPORTPARAMS}
-	# grep -v "begin{LaTeX}" $@ | grep -v "end{LaTeX}" | sponge $@
 
 
 %-slides.pdf: %-slides.tex $(wildcard figures/*.pdf) ../bib.bib ../book/book.aux 
