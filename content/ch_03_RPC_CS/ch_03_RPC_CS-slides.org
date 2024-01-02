@@ -1,8 +1,10 @@
-#+TITLE: Remote Procedure Call
+#+TITLE: Ch. 3: Remote Procedure Call
 #+include: "../slidehead.org"
 #+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
-#+BEAMER_HEADER: \date{SS 22}
+#+BEAMER_HEADER: \date{SS 24}
 
+
+\setcounter{chapter}{3}
 
 #+include: "./ch_03_RPC_CS.org"
 #+include: "../references.org"

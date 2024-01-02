@@ -470,7 +470,7 @@ We will revisit *binding* and *service discovery* later
 *** RPC as middleware 
  RPCs present a more abstract view of a distributed system than a request/reply protocol directly realized with sockets 
  - New programming model! 
- - Collection of software realizing such a new programming model is a middleware 
+ - Collection of software realizing such a new programming model is a *middleware* 
  - Can achieve, e.g., transparency towards location, communication protocols, hardware, operating system, different programming languages, … 
 
 
@@ -808,9 +808,10 @@ It [Web Service] has an interface described in a machine-processable format (spe
 
 *** Comparison: Web services and distributed object model
 
- - At first glance: Very similar – Web service is but an interface to a remote 
+ - At first glance: Very similar -– Web service is but an interface to
+   a remote object 
  - But some subtle differences exist
-   - Web services are essentially a single remote object – they cannot
+   - Web services are essentially a single remote object –- they cannot
      be instantiated to form “new services”, no remote object
      references, no garbage collection, ... 
    - Transport protocols and syntax can be vastly different 
@@ -1222,7 +1223,7 @@ But:  No DELETE, PUT,  ... supported!
       :END:
 
 #+CAPTION: Scaling out a microservice
-#+ATTR_LaTeX: :height 0.6\textheight :options page=3
+#+ATTR_LaTeX: :width=0.8\textwidth :options keepaspectratio,page=3
 #+NAME: fig:ms_scaling
 [[./figures/orch_choreo.pdf]]
 
@@ -1317,11 +1318,15 @@ Interesting aspect: Typesafe built a platform to support such applications
 
 
 
+
 #+CAPTION: Typesafe components
 #+ATTR_LaTeX: :width 0.75\linewidth
 #+NAME: fig:typseafe
 [[./figures/typesafe.png]]
 
+
+\pause 
+Typesafe morphed into [[https://en.wikipedia.org/wiki/Lightbend][Lightbend]], but same basic ideas 
 
 
 *** Typesafe: Actors programming model 
