@@ -1,0 +1,36 @@
+% Created 2016-08-17 Wed 14:38
+\documentclass[tikz]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usetikzlibrary {matrix}
+
+\author{Holger Karl}
+\date{\today}
+\title{}
+\begin{document}
+
+\tikzset{
+  class/.style={draw, rounded corners},
+  project/.style={draw, rounded corners, fill=green!10},
+  thesis/.style={draw, rounded corners, fill=blue!10}
+}
+
+\begin{tikzpicture}
+  \matrix (teaching) [matrix of nodes] {
+    Master & every year &[1em] odd years &[1em] even years  &[1em] some years\\
+    4 / Summer & |[thesis]|Master thesis \\
+    3 / Winter &  & & & |[project]| Master project \\
+    2 / Summer & |[class]|Future Internet & & & |[project]| Master project   \\
+    1 / Winter &|[class]|Mobile communications & & & |[class]|Performance evaluation   \\
+    Bachelor \\
+    6 &  |[project]|Bachelor project \\
+    5 &  |[project]|Bachelor project \\
+    4 &  & |[class]|Rechnernetze & |[class]| Verteilte Systeme\\
+    3 \\
+    2 &  & |[class]|Rechnernetze & |[class]| Verteilte Systeme\\
+    1 &|[class]|  GdS \\ 
+  };  
+\end{tikzpicture}
+
+\end{document}
