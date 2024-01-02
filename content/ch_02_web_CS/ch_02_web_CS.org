@@ -6,7 +6,8 @@
 
 
 * Basic structure
-    
+
+
 *** Case study: World Wide Web – Basic architecture
 
  Basic architectures \ac{WWW} very simple
@@ -44,8 +45,8 @@ representation data
   - Content-Location, absolute or relative URI  
 
 
-
-** HTTP 
+ 
+** HTTP
 
 *** The request/reply protocol: HTTP
 
@@ -64,7 +65,7 @@ representation data
      use the returned URL instead
 
 
-*** Requests: Static and dynamic content
+*** Requests: Static and dynamic content   
 
 GET requests can refer to a static web page (simply delivered by the server) or to execution of a program 
  - Server might make simple modifications to a page during delivery,
@@ -73,12 +74,12 @@ GET requests can refer to a static web page (simply delivered by the server) or 
    parameters in the request
  - Typical: “?” to signal that, key=value pairs separated by “&”
  - Example GET: \url{http://somewhere.net/some/path/somewhere?key=somekey&param1=xyz&param2=abc}
- - Compare \url{https://tools.ietf.org/html/rfc7231#section-4.3.1}
+ - Compare \url{https://tools.ietf.org/html/rfc7231}, Section 4.3.1 
 
 *** Requests and state 
  - Convention: GET does not alter state of resource 
  - POST requests refer to a program execution
-   - Compare \url{https://tools.ietf.org/html/rfc7231#section-4.3.3}
+   - Compare \url{https://tools.ietf.org/html/rfc7231}, Section 4.3.3
    - POST provides parameters to the program
    - Parameters usually depend on user input 
    - Typically, POST will alter state 
@@ -113,7 +114,7 @@ GET requests can refer to a static web page (simply delivered by the server) or 
 
 #+BEAMER: \pause
 - Example simple servers
-  - Python's \href{https://docs.python.org/3.5/library/http.server.html#module-http.server}{http.server}
+  - Python's \href{https://docs.python.org/3.9/library/http.server.html}{http.server}
   - npm's \href{https://www.npmjs.com/package/http-server}{http-server}
 
 
@@ -757,17 +758,15 @@ By design, HTTP is stateless
 - Do not
   - Use competitor experience
   - Use prior experience (only with grain of salt) 
-  - Beware of team/personnel/private preferences
-    - But factor in lead time if training required
   - Obey checklists on the web, marketing hype 
-
-
+- Beware of team/personnel/private preferences
+  - But factor in lead time if training required
 
 
 
 * Client-side programmability
 
-** Code in browser: AJAX  
+** Code in browser: AJAX
 
 *** Latency for complex interactions 
 
@@ -781,14 +780,17 @@ By design, HTTP is stateless
     - In particular, for interactive applications 
 
 
-*** Applications in the WWW – AJAX 
 
 
+*** Applications in the WWW:  AJAX
 
-****                                                         :BMCOL:
+
+\vskip-2.5em
+
+***** 
       :PROPERTIES:
-      :BEAMER_opt: [t]
-      :BEAMER_col: 0.5
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
       :END:
 
 Interactive web applications easy in principle
@@ -797,11 +799,11 @@ Interactive web applications easy in principle
  - Approach: \ac{AJAX}
 
 
-****                                                         :BMCOL:
+***** 
       :PROPERTIES:
-      :BEAMER_opt: [t]
-      :BEAMER_col: 0.5
-      :END:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
 
 
 #+CAPTION: AJAX comparison 
@@ -809,9 +811,15 @@ Interactive web applications easy in principle
 [[./figures/ajax_vergleich_en.png]]
 
  \tiny 
- By DanielSHaischt, via Wikimedia Commons -
- https://commons.wikimedia.org/wiki/File%3AAjax-vergleich.svg, CC
- BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=29724785
+ By DanielSHaischt, via  [[https://commons.wikimedia.org/wiki/File%3AAjax-vergleich.svg][Wikimedia Commons]],  [[https://commons.wikimedia.org/w/index.php?curid=29724785][CC BY-SA 3.0]]
+
+
+*****                               :B_ignoreheading:
+      :PROPERTIES:
+      :BEAMER_env: ignoreheading
+      :END:
+
+
 
 *** AJAX: Basic ideas 
 
@@ -836,7 +844,7 @@ actions on the client side
 
 
 *** Document Object Model \cite{W3CDocum23:online}
-
+    
 Think of the HTML (or XML) document displayed by browser as a data
 structure 
 - With an API (language-independent)
@@ -846,6 +854,8 @@ structure
 - Nodes can
   - be given names for reference
   - have attributes (e.g., color) 
+
+
 
 *** Operations on the DOM 
 
@@ -1214,6 +1224,7 @@ only
 
 
 - Plus: Ember.JS, Mithril.JS, Meteor.JS, ...   
+  
 
 * Current developments
 
