@@ -1,7 +1,7 @@
-#+TITLE: Improving Client/Server systems: Latency, throughput, dependability, consistency
+#+TITLE: Ch. 4: Improving Client/Server systems: Latency, throughput, dependability, consistency
 #+include: "../slidehead.org"
 #+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
-#+BEAMER_HEADER: \date{SS 22}
+#+BEAMER_HEADER: \date{SS 24}
 
 \setcounter{chapter}{4}
 

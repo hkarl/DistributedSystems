@@ -1479,8 +1479,8 @@ Compare \url{https://linuxtechme.wordpress.com/2012/03/29/470/}
 *** Foreshadowing: Consistency 
 
 - What happens if the caches coordinate? 
-- See Redis (Section \sectionref{sec:redis}), see consistency chapter
-  (Section \sectionref{ch:distributed-storage}) later on  
+- See Redis (Section \ref{sec:redis}), see consistency chapter
+  (Section \ref{ch:distributed-storage}) later on  
 
 *** An aside: \acf{CDN}
 
