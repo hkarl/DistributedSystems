@@ -48,3 +48,4 @@
 #+LATEX_HEADER: \def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
 
 #+LATEX_HEADER: % \renewcommand{\thefigure}{3.\arabic{figure}}
+#+LATEX_HEADER: \input{../externaldocuments.tex}
