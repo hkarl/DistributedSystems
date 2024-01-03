@@ -5,6 +5,7 @@
 
 #+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
 #+BEAMER_HEADER: \date{SS 24}
+#+BEAMER_HEADER: \title[VS \thechapter: Basic C/S]{Ch. \thechapter: Basic client/server systems}
 
  
 
