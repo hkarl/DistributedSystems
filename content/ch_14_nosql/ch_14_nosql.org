@@ -372,8 +372,8 @@ consistent
 *** Already covered 
 
 - We have already covered from a usage perspective 
-  - Memcached (Section \sectionref{sec:memcached})
-  - Redis (Section \sectionref{sec:redis})
+  - Memcached (Section \ref{sec:memcached})
+  - Redis (Section \ref{sec:redis})
 - We briefly look at some more examples
 - And at architectural choices 
 
