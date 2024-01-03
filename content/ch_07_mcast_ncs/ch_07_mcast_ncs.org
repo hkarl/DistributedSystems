@@ -1331,7 +1331,7 @@ LamportTime transformation of a given distributed  algorithm A to L(A)
   
 *** Vector clocks and independence 
 
-Two events are independent concurrent if 
+Two events are *independent* or  *concurrent* if 
 - neither   $e \rightarrow e’$
 - nor $e’ \rightarrow e$ 
 
@@ -1437,7 +1437,9 @@ Update VT
     to talk to servers 
   - Evolved into VSync 
 
-*** Case study: \href{http://vsync.codeplex.com/}{Vsync}  
+*** Case study: \href{http://vsync.codeplex.com/}{Vsync}         
+
+\vskip-3ex
 
 - Library to build (cloud) applications using replicated data
   - Based on group communication and virtual synchrony 
@@ -1455,6 +1457,8 @@ Update VT
       object group happen concurrently  
     - E.g., reads are load-balanced across instances in a group  
   - Checkpointing 
+\pause 
+- But: *abandonded project* 
  
 *** Case study: Derecho 
 

@@ -5,5 +5,7 @@
 #+BEAMER_HEADER: \title[VS \thechapter: Deployment ]{Ch. \thechapter: Practical deployment tools: A remark in passing }
 
 
+\setcounter{chapter}{5}
+
 #+include: "./ch_05_practical.org"
 #+include: "../references.org"

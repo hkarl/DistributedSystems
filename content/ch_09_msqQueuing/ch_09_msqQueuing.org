@@ -502,7 +502,7 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
   - Needs /exchanges/: producers send to exchanges, wich forward to
     multiple queues 
 - Message routing: Subscribe only to some messages 
-- Filtering on topics
+- Filtering on topics 
   - Wildcards, on exactly one or zero or more words
 - Even RPC can be recreated
   - With a
@@ -520,8 +520,8 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
   - Needs highly dependable communication inside cluster; all brokers
     connect to all brokers in cluster 
   - Emphasises consistency and partition tolerance, sacrifices
-    availability (see CAP Theorem, Section  
-    \slideref{sec:CAPTheorem}[s:CAPTheorem]) 
+    availability (see CAP Theorem, Section 
+) 
 
 
 *** Distributed brokers:  Federation
@@ -608,7 +608,7 @@ connection.close()
   - *Getting* or *transforming* streams of data between distributed
     applications 
 - Presentation here mostly follows
-  \href{https://kafka.apache.org/documentation/#introduction}{Kafka introduction  documentation}
+  \href{https://kafka.apache.org/documentation/\#introduction}{Kafka introduction  documentation}
 
 *** Use cases 
   - *Real-time data feeds* (e.g., track user activity on a distributed
@@ -828,7 +828,7 @@ Topics are divided into 1 or more *partitions*
 *** Some hands-on impression 
 
 - Compare
-\href{https://kafka.apache.org/documentation/#quickstart}{Quick Start}
+\href{https://kafka.apache.org/documentation/\#quickstart}{Quick Start}
 guide 
 - These are \ac{CLI} examples;
   \href{https://cwiki.apache.org/confluence/display/KAFKA/Clients}{language bindings exist}, of course
@@ -907,7 +907,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 *** Kafka design 
 
 - Mostly follows
-  \href{https://kafka.apache.org/documentation/#design}{Design discussion} 
+  \href{https://kafka.apache.org/documentation/\#design}{Design discussion} 
 - Challenges to solve
   - How to persist massages?
   - How to get total order?

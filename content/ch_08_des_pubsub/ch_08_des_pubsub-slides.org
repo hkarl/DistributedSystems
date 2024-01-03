@@ -3,8 +3,11 @@
 #+include: "../slidehead.org"
 
 #+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
-#+BEAMER_HEADER: \date{SS 22}
+#+BEAMER_HEADER: \date{SS 24}
  
+#+BEAMER_HEADER: \title[VS \thechapter: DES \& PubSubS]{Ch. \thechapter: Distributed event systems and publish/subscribe }
+
+
 \setcounter{chapter}{8}
 #+include: "./ch_08_des_pubsub.org"
 #+include: "../references.org"

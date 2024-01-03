@@ -1,11 +1,12 @@
 #+TITLE: Message queueing
 #+include: "../slidehead.org"
 
-#+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
-#+BEAMER_HEADER: \date{SS 22}
 
 #+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
-#+BEAMER_HEADER: \date{SS 22}
+#+BEAMER_HEADER: \date{SS 24}
+#+BEAMER_HEADER: \title[VS \thechapter: MQ]{Ch. \thechapter: Message queueing }
+
+
 
 \setcounter{chapter}{9}
 
