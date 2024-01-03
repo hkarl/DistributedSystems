@@ -2,10 +2,14 @@
 #+include: "../slidehead.org"
 
 #+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
-#+BEAMER_HEADER: \date{SS 22}
+#+BEAMER_HEADER: \date{SS 24}
 
-\setcounter{chapter}{14}
+#+BEAMER_HEADER: \title[VS \thechapter: NoSQL]{Ch. \thechapter:  Limits of distributed data bases: NoSQL}
+ 
 
+
+\setcounter{chapter}{13}
+\refstepcounter{chapter}
 
 #+include: "./ch_14_nosql.org"
 #+include: "../references.org"
