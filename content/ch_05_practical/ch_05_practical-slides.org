@@ -1,7 +1,8 @@
 #+TITLE: Practical deployment tools: A remark in passing
 #+include: "../slidehead.org"
 #+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
-#+BEAMER_HEADER: \date{SS 22}
+#+BEAMER_HEADER: \date{SS 24}
+#+BEAMER_HEADER: \title[VS \thechapter: Deployment ]{Ch. \thechapter: Practical deployment tools: A remark in passing }
 
 
 #+include: "./ch_05_practical.org"
