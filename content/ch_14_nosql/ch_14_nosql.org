@@ -101,7 +101,13 @@ Simple example:
 
 
 ** Consequence 
+
+\label{sec:CAPTheorem}
+
 *** CAP theorem 
+\label{s:CAPTheorem}
+
+
 
 **** \ac{CAP}                                                     :B_theorem:
      :PROPERTIES:
