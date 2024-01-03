@@ -519,18 +519,16 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
     - Irrespective of where queue is, where client connects
   - Needs highly dependable communication inside cluster; all brokers
     connect to all brokers in cluster 
-  - Emphasises consistency and partition tolerance, sacrifices
-    availability (see CAP Theorem, Section 
-) 
+  - Emphasises consistency and partition tolerance, *sacrifices availability* (see CAP Theorem, Section  \slideref{sec:CAPTheorem}[s:CAPTheorem]) 
+
 
 
 *** Distributed brokers:  Federation
 
   - Individual or clustered brokers can connect in federation mode
   - Message exchange via AMQP; no need for highly dependable links 
-  - Emphasises availability and partition tolerance, sacrifices
-    consistency (see CAP Theorem, Section  
-    \slideref{sec:CAPTheorem}[s:CAPTheorem]) 
+  - Emphasises availability and partition tolerance, *sacrifices
+    consistency* (see CAP Theorem, Section \slideref{sec:CAPTheorem}[s:CAPTheorem]) 
 
 
 *** RabbitMq Performance 
