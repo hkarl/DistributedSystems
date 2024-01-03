@@ -148,7 +148,7 @@ process. \cite{Fischer:1985:IDC:3149.214121}
 **** Essence  
 
 - Combination of asynchrony and failure prevents consensus
-- In synchronous system, consensus is easy -- upper bound on message
+- In synchronous system, consensus is easy \textendash{} upper bound on message
   times allows to detect failing node with certainty 
 
 
@@ -168,7 +168,7 @@ process. \cite{Fischer:1985:IDC:3149.214121}
     consensus can be made arbitrarily small
     - I.e: $P (\text{some nodes decide 0, others 1}) < \epsilon$
     - $\epsilon$ determines round number 
-  - Practical algorithm --  RAFT -- up next (we skip PAXOS) 
+  - Practical algorithm \textendash{}  RAFT \textendash{} up next (we skip PAXOS) 
 
 
 *** Further consequences 
@@ -252,7 +252,7 @@ case!
 *** Components 
 
 - Leader election
-  - Already covered -- compare Section \ref{sec:raft_le}
+  - Already covered \textendash{} compare Section \ref{sec:raft_le}
 - Log replication 
 - Safety mechanisms 
 
@@ -730,7 +730,7 @@ information
       :END:
 
 - A partially healed partition can create additional confusion
-- Example: Server S1 -- deemed failed -- resends message to S3 
+- Example: Server S1 \textendash{} deemed failed \textendash{} resends message to S3 
 
 
 *****                                                                 :BMCOL:
@@ -1086,12 +1086,12 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
   - No append is lost
   - All replicas store appends in same order 
 
-*** Log aggregation protocol -- \href{https://ramcloud.stanford.edu/~ongaro/userstudy/paxos.pdf}{rough idea}  
+*** Log aggregation protocol \textendash{} \href{https://ramcloud.stanford.edu/~ongaro/userstudy/paxos.pdf}{rough idea}  
 
 - Client: send append command to leader, with unique IDs 
   - Clients can re-issue requests in case leader crashes 
 - Leader proposes order
-  - In normal operation, it just determines order -- proposals needed
+  - In normal operation, it just determines order \textendash{} proposals needed
     for fault tolerance
 - Keep track of which appends-IDs go into which position 
 
@@ -1107,7 +1107,7 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
 
 #+BEAMER: \pause
 
-- We have almost invented \ac{GFS} now -- see later for more details 
+- We have almost invented \ac{GFS} now \textendash{} see later for more details 
 
 
 *** Example log aggregation 
@@ -1357,7 +1357,7 @@ Round 2
 *** Taking stock: Decisions  
 
 \small 
-#+CAPTION: Taking stock of TMR -- decisions 
+#+CAPTION: Taking stock of TMR \textendash{} decisions 
 #+ATTR_LATEX: :align lllp{0.2\linewidth}
 | Case     | Round 1                                                              | Round 2                                                              | Observation             |
 |----------+----------------------------------------------------------------------+----------------------------------------------------------------------+-------------------------|
@@ -1371,7 +1371,7 @@ Round 2
 Right columns show which cases are indistinguishable for each node 
 
 \small 
-#+CAPTION: Taking stock of TMR -- indistinguishable cases 
+#+CAPTION: Taking stock of TMR \textendash{} indistinguishable cases 
 #+ATTR_LATEX: :align lllccc
 | Case     | Round 1                                                              | Round 2                                                              | A | B | C |
 |----------+----------------------------------------------------------------------+----------------------------------------------------------------------+---+---+---|

@@ -134,7 +134,7 @@ Naisbitt, 1982)
 #+NAME: fig:bd:decisions
 [[./figures/bigDataProcess.pdf]]
 
-*** Data analytics -- high-level view 
+*** Data analytics \textendash{} high-level view 
 
 
 #+CAPTION: High-level big data analysis pipeline
@@ -606,7 +606,7 @@ for i in range(numIters):
 
 *** MapReduce code example: Count word frequencies 
 
-#+CAPTION: Word count -- from google code examples
+#+CAPTION: Word count \textendash{} from google code examples
 #+ATTR_LaTeX: :width 0.6\linewidth
 #+NAME: fig:mr:word_count:google
 [[./figures/mr_wordcount.pdf]]

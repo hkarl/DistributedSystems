@@ -18,7 +18,7 @@
  - Pages formatted in \ac{HTML}
  - Web browsers request pages from servers
  - Server and browser communicate using \ac{HTTP} 
-   - HTTP/1.1: RFC 7230--7235
+   - HTTP/1.1: RFC 7230 \textendash{} 7235
 
 Compare \cite[Sect.\ 2.4]{Coulouris:DistributedSystems:2011}
 
@@ -256,7 +256,7 @@ Hence division of labor:
     dynamic responses (a *web application*) 
     - Examples: Django \url{https://www.djangoproject.com}, Tomcat \cite{ApacheTo2:online}, Ruby on Rails
       \url{http://rubyonrails.org}, Play \url{https://www.playframework.com}, ...
-    - Lot's of fanboyism -- but some good comparisons
+    - Lot's of fanboyism \textendash{} but some good comparisons
       (\href{https://en.wikipedia.org/wiki/Comparison_of_web_frameworks}{Ref1},
       \href{https://softwareengineering.stackexchange.com/questions/102090/why-isnt-java-used-for-modern-web-application-development}{Ref2})
 
@@ -828,7 +828,7 @@ actions on the client side
 - Javascript downloaded with web page from server 
 - Javascript @ browers operates on the \ac{DOM} of the HTML /\ac{XML} code
 - Data is moved between browser and server in various ways
-  - E.g., as a \ac{JSON} object, \ac{YAML} ... -- does not really matter
+  - E.g., as a \ac{JSON} object, \ac{YAML} ... \textendash{} does not really matter
 
 
 *** General idea: Event-based programming 
@@ -956,9 +956,9 @@ Core line of codes in previous example: Interact with the XMLHttpRequest API
 *** First: Callbacks 
 
 **** Event-based programming 
-- Arrange for an event to happen (later, at unknown time --
+- Arrange for an event to happen (later, at unknown time \textendash{}
   *asynchronously*)
-- Arrange for a particular function to process that event -- the
+- Arrange for a particular function to process that event \textendash{} the
   *callback*
 - Callback executed at unknown point in time, by event loop,  *not* in thread! 
 
@@ -1409,13 +1409,13 @@ Compare \url{http://caniuse.com/\#feat=http2}
 #+END_EXAMPLE
 
 
-*** WebSocket API -- Example 
+*** WebSocket API \textendash{} Example 
     :PROPERTIES:
     :CUSTOM_ID: sec:testlabel
     :END:
 
 From \cite{WebSocke71:online}: when message arrives, a function is
-called -- even without an explicit request! 
+called \textendash{} even without an explicit request! 
 - Generalizes callback concept (a bit...) 
 
 \footnotesize

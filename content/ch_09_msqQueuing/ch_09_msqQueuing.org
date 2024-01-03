@@ -56,7 +56,7 @@ loose coupling
 
 Often used to 
 - Build a complex application out of simpler ones (e.g., TypeSafe)
-- Integrate existing applications into a larger one -- so-called
+- Integrate existing applications into a larger one \textendash{} so-called
   Enterprise Integration 
 - Various formalisms exists (e.g., http://www.enterpriseintegrationpatterns.com/) 
 
@@ -138,7 +138,7 @@ Often used to
 
 - We use MQ to integrate legacy applications
   - Option 1: Each application needs to understand messages of each
-    other application -- unrealistic 
+    other application \textendash{} unrealistic 
 - Suppose we have a standardised protocol and API
   - Option 2: only have to translate from application-specific format
     into application problem
@@ -273,7 +273,7 @@ queuing context with stable storage.
 *** AMQP issues 
 
 Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
-- Pushed by few companies, yet claimed as open standard -- lacks
+- Pushed by few companies, yet claimed as open standard \textendash{} lacks
   competition 
 - Bridges a big semantic gap; disputable
 - Pretty complex protocol (KISS!) 
@@ -295,7 +295,7 @@ Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
 - \ac{MQTT}
   - \href{http://mqtt.org}{Website}: An extremely lightweight
     pub/sub protocol for machine-to-machine / Internet-of-Things
-    scenarios -- KISS 
+    scenarios \textendash{} KISS 
   - \href{https://github.com/mqtt/mqtt.github.io/wiki}{Community page}
     with examples   
 - Supported via plugins by several of the systems described in Sections
@@ -480,7 +480,7 @@ e-business and developing e-business applications.
   - Round-robin among them (as default)
   - Consumers push or pull 
 
-*** RabbitMQ messaging model -- Example 
+*** RabbitMQ messaging model \textendash{} Example 
 
 
 #+CAPTION: RabbitMQ messaging mode
@@ -496,7 +496,7 @@ e-business and developing e-business applications.
 Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}: 
 
 - Produce message to consumer
-- Work queues/competing consumers -- round-robin among queue
+- Work queues/competing consumers \textendash{} round-robin among queue
   subscribers 
 - Publish/subscribe-style; one message to many receivers
   - Needs /exchanges/: producers send to exchanges, wich forward to
@@ -993,11 +993,11 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
   - Option 1: Consumer writes its message count to log *before*
     consuming messages
     - Failure between writing and consuming might lead new consumer to
-      miss some messages -- /at most once/ 
+      miss some messages \textendash{} /at most once/ 
   - Option 2: Consumer writes its message count to log *after*
     consuming messages
     - Failure between consuming and writing might lead new consumer to
-      consume some messages twice -- /at least once/ 
+      consume some messages twice \textendash{} /at least once/ 
 
 *** Guarantees between consumers? (2) 
 
@@ -1071,7 +1071,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 - 
    \href{https://engineering.linkedin.com/kafka/benchmarking-apache-kafka-2-million-writes-second-three-cheap-machines}{Three cheap machines in 2014}: 2 million writes per second
 - In cloud scenarios,
-  \href{https://hackernoon.com/benchmarking-kafka-performance-part-1-write-throughput-7c7a76ab7db1}{slightly  different numbers} (50.000 -- 300.000 on three nodes)
+  \href{https://hackernoon.com/benchmarking-kafka-performance-part-1-write-throughput-7c7a76ab7db1}{slightly  different numbers} (50.000 \textendash{} 300.000 on three nodes)
 - Scales well when adding servers to cluster! 
 - New kid on the block: \href{https://pulsar.apache.org}{Pulsar}
   claims to

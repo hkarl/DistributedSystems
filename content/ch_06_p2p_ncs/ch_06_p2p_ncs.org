@@ -30,7 +30,7 @@ clients?
 - A *\ac{DHT}*
 - Possible advantages:
   - Scales better, less state at clients
-  - Perhaps more robust -- more difficult to take down all servers
+  - Perhaps more robust \textendash{} more difficult to take down all servers
     when not all known
 - Possible risks:
   - Overhead to map key to server in charge becomes bigger; must not
@@ -121,7 +121,7 @@ When a node looks for a key:
 - Forwarding hence trivial: desired key locally available, or send to
   next server 
 
-*** Strawman DHT -- Visualization 
+*** Strawman DHT \textendash{} Visualization 
 
 
 #+CAPTION: A simple, ring-based DHT with one routing entry per node
@@ -130,7 +130,7 @@ When a node looks for a key:
 [[./figures/dht.pdf]]
 
 
-*** Strawman DHT -- Visualization 
+*** Strawman DHT \textendash{} Visualization 
 
 
 #+CAPTION: A simple, ring-based DHT with one routing entry per node, more nodes 
@@ -453,13 +453,13 @@ Note: Variants exist
 - Failure?
   - Redundancy beforehand: each node stores its follower's part of ID
     space
-    - Or its two followers, ... -- depending on level of paranoia 
+    - Or its two followers, ... \textendash{} depending on level of paranoia 
 
 #+BEAMER: \pause
 
-- Can result in lots of copying to a single node -- spread out
+- Can result in lots of copying to a single node \textendash{} spread out
   workload?
-  - *Churn* -- when nodes join and leave often 
+  - *Churn* \textendash{} when nodes join and leave often 
 
 
 *** Consistent hashing in DHT? 

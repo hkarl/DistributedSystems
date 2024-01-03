@@ -149,7 +149,7 @@ At first
 
 
 
-*** Reliable multicast -- formally 
+*** Reliable multicast \textendash{} formally 
 
 **** VALIDITY
 
@@ -291,7 +291,7 @@ Remember: No group changes so far!
  - Total order = Atomic + FIFO
 
 
-*** Total order multicast -- formally 
+*** Total order multicast \textendash{} formally 
 
 **** VALIDITY
 
@@ -326,7 +326,7 @@ If processes p and q both TO-deliver messages m and m’, then p TO-delivers m b
     changes
 - We will revisit this approach in the replication chapter 
 
-*** Implementing TO -- ideas 
+*** Implementing TO \textendash{} ideas 
 
 - Central sequencer
   - Single point of failure, bottleneck
@@ -430,7 +430,7 @@ def Receive(m, seqnr):
   - At a third node, it would be confusing to see message r2 before r1
     - Causality apparently reversed 
 
-*** Preserve causality -- example 
+*** Preserve causality \textendash{} example 
 
 
 
@@ -459,7 +459,7 @@ def Receive(m, seqnr):
 [[./figures/mcast_ordering.pdf]]
 
 
-***  Preserving causality -- problems 
+***  Preserving causality \textendash{} problems 
 
 - Multicast protocol cannot *know* whether r1 really caused r2
   - The application might know, but it is unlikely to tell
@@ -473,7 +473,7 @@ def Receive(m, seqnr):
 - But maybe that is good enough for typical applications
 - We ere on the side of safety here (overestimate causality) 
 
-*** Preserving causality -- problems 
+*** Preserving causality \textendash{} problems 
 
 - From the perspective of a third node, we need to know whether such
   messages r1 and r2 are in such a cause/effect relationship
@@ -589,7 +589,7 @@ To summarise idea:
 
 *** Reliable multicast with failures? 
 
-- Always deliver a message -- but in presence of failing nodes?
+- Always deliver a message \textendash{} but in presence of failing nodes?
 - Cases:
   - Receiver fails *before* delivering
   - Receiver fails *after* delivering
@@ -604,12 +604,12 @@ To summarise idea:
     actors 
 - Requirement: if *one* process has delivered, all other processes
   must deliver
-  - But that's unrealistic -- they might crash as well? 
+  - But that's unrealistic \textendash{} they might crash as well? 
 - Better:  if *one* process has delivered, all other *correct*
   processes   must deliver
 
 
-*** Terminating reliable multicast -- formally 
+*** Terminating reliable multicast \textendash{} formally 
 
 **** VALIDITY
 
@@ -950,7 +950,7 @@ Timestamps are no option when thinking about causality
 *** Events in message-passing systems 
 
 *Events*: Anything that is happening inside a single process
-  - Computation, user interaction, ... -- not relevant 
+  - Computation, user interaction, ... \textendash{} not relevant 
   - Sending a message
   - Receiving a message 
 
@@ -1184,7 +1184,7 @@ ordered set T
       :BEAMER_col: 0.5
       :END:
 
-#+CAPTION: Events with logical time stamps -- rearranged
+#+CAPTION: Events with logical time stamps \textendash{} rearranged
 #+ATTR_LaTeX: :height 0.6\textheight :options page=5
 #+NAME: fig:time_not_causal
 [[./figures/logicalTime.pdf]]

@@ -215,7 +215,7 @@ Y.set(tmp)
   - Transactions *nested* inside transactions
 - Common example: Travel booking
   - Trip can only be booked if both airtrip and hotel and rental car
-    can be booked -- transactions in independent systems 
+    can be booked \textendash{} transactions in independent systems 
 
 
 
@@ -360,9 +360,9 @@ monitor*) or in a distributed fashion
 
 - ~Ready~: Vote ~ABORT~
 - ~Voted~:
-  - *Cannot* simply abort -- coordinator might already have sent
+  - *Cannot* simply abort \textendash{} coordinator might already have sent
     ~COMMIT~ to other nodes!
-  - *Cannot* simply commit -- vice versa
+  - *Cannot* simply commit \textendash{} vice versa
 
 
 
@@ -534,7 +534,7 @@ A commit protocol is called *blocking* when
   from the other nodes (alive, but unable to communicate)
 
 
-*** Run with partition -- Options? 
+*** Run with partition \textendash{} Options? 
 
 
 ***** 								      :BMCOL:
@@ -545,9 +545,9 @@ A commit protocol is called *blocking* when
 - Options for B, C, E?
   - Never received ~PRE_COMMIT~, so they abort 
 - Options for A?
-  - Timeout, then commit -- *majority* of *reachable* nodes in favour
+  - Timeout, then commit \textendash{} *majority* of *reachable* nodes in favour
     of commit!
-  - Timeout, then abort -- *majority* of total nodes not available for
+  - Timeout, then abort \textendash{} *majority* of total nodes not available for
     comment.
     - *But they might have committed! A does not know!*
 
@@ -1003,7 +1003,7 @@ things are said to be good for you in some abstract way. (Tanenbaum)
 
 - This cut due to incorrect synchronisation between processes
 - Now, both $S_3$ *and* $S_1$ reflect $m_2$
-  - And no easy way out -- /remove/ a message from state? inverse
+  - And no easy way out \textendash{} /remove/ a message from state? inverse
     functions? 
 - Such a cut is called *inconsistent*; avoid! 
 

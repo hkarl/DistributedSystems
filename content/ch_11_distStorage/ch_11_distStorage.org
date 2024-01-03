@@ -183,7 +183,7 @@ multicast library
 
 **** Things work 
 
-- No failures -- but still replicated 
+- No failures \textendash{} but still replicated 
 - Mostly concerned with tradeoff between convenience and efficiency of
   APIs/programming models 
 
@@ -698,7 +698,7 @@ fault tolerance*!
    not?  
 - Possibly supported by additional *backup replicas* 
   - With primary, a natural place for coordinating write operations
-    exists -- to ensure, e.g., sequential consistency  
+    exists \textendash{} to ensure, e.g., sequential consistency  
   - With primary copy: Is the primary copy fixed to one server, or can
     it be moved?  
   - Without primary copy: involve all or only some of the replicas?  
@@ -856,7 +856,7 @@ Role of primary is transferred from S2 to S4
    - Which in turn invoke on all replicas?
    - ...? 
 
-*** Active replication with replicated objects -- naive 
+*** Active replication with replicated objects \textendash{} naive 
 
 #+CAPTION: Naive active replication with with replicated objects
 #+ATTR_LaTeX: :width 0.9\linewidth :options page=7
@@ -985,7 +985,7 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
   make sense! 
 - Question: How can writer make sure it *is* in possession of latest
   facts?
-  - By asking everybody -- sure
+  - By asking everybody \textendash{} sure
   - By asking *more than half*! 
 
 
@@ -1270,7 +1270,7 @@ Nodes are replicated, access is:
 - Mechanisms so far described are fine as long as there is no failure 
 - What if things go wrong?
   - Nodes fail (and possibly reboot)
-  - Messages get lost -- possibly for a long time? Separating nodes
+  - Messages get lost \textendash{} possibly for a long time? Separating nodes
     from each other? 
 
 

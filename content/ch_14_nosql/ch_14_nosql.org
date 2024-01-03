@@ -32,7 +32,7 @@
       identical*
     - It should be *consistent* 
 
-*** Distributed data store -- example no faults 
+*** Distributed data store \textendash{} example no faults 
 ****                                                              :B_columns:
      :PROPERTIES:
      :BEAMER_env: columns
@@ -170,7 +170,7 @@ A more detailed interpretation:
 One design choice: give up consistency! 
 
 - Basically Available 
-- But only Soft state -- content might change at unpredictable times
+- But only Soft state \textendash{} content might change at unpredictable times
 - Because of Eventual consistency
   - In absence of updates, state will converge and system become
     consistent 
@@ -240,7 +240,7 @@ consistent
 
 - SQL is great, mature, familiar
 - Counterpart?
-  - Not much -- lot's of diversity
+  - Not much \textendash{} lot's of diversity
 - SparQL: query RDF / tuple data
   - But not generalised to other types
 
@@ -387,7 +387,7 @@ consistent
 - Highlights
   - Highly available, but sacrifices consistent (AP in the CAP
     triangle)
-  - Geared towards tens of thousands of servers -- at that scale,
+  - Geared towards tens of thousands of servers \textendash{} at that scale,
     things fail constantly 
   - Object versioning, application-assisted conflict resolution 
 
@@ -499,7 +499,7 @@ Reconciliation: What happens when different versions reconnect?
 
 *** Consistency with unavailable nodes? 
 
-- But: availability is paramount -- must not stall 
+- But: availability is paramount \textendash{} must not stall 
 - Hence: *sloppy quorum*
   - Preference list of servers, only some of which must participate in
     quorum
@@ -531,8 +531,8 @@ https://github.com/voldemort/voldemort
 - Data is automatically partitioned so each server contains only a subset of the total data
 - Provides tunable consistency (strict quorum or eventual consistency)
 - Server failure is handled transparently
-- Pluggable Storage Engines -- BDB-JE, MySQL, Read-Only
-- Pluggable serialization -- Protocol Buffers, Thrift, Avro and Java Serialization
+- Pluggable Storage Engines \textendash{} BDB-JE, MySQL, Read-Only
+- Pluggable serialization \textendash{} Protocol Buffers, Thrift, Avro and Java Serialization
 - Data items are versioned to maximize data integrity in failure scenarios without compromising availability of the system
 - Each node is independent of other nodes with no central point of failure or coordination
 - Good single node performance: you can expect 10-20k operations per second depending on the machines, the network, the disk system, and the data replication factor
@@ -660,7 +660,7 @@ distributed system   https://github.com/etcd-io/etcd
  - \acf{DNS} solves this need \cite{Mockapetris:1988:DDN:52325.52338}
    (plus lots of \ac{IETF} \acp{RFC}) 
 
-*** DNS --  Architecture 
+*** DNS \textendash{}  Architecture 
 ****                                                              :B_columns:
      :PROPERTIES:
      :BEAMER_env: columns

@@ -52,7 +52,7 @@ In general: architectures and protocols of communication systems
 #+BEGIN_QUOTE
  A distributed system is one in which the failure of a computer which
  you didn‘t even know existed can render your own computer
- unusable. -- Leslie Lamport
+ unusable. \textendash{} Leslie Lamport
 #+END_QUOTE
 
 *** Crucial aspects of a distributed system
@@ -231,7 +231,7 @@ We will do mini-projects!
   - 1 SWS homework = 1 units / week * 45 minutes/unit * 15 weeks /
     semester = 7,5 time slots / semester (at 90 minutes)
     - Roughly 3 of those for the mini projects
-    - About 4,5 for conventional assignment discussions -- scheduled
+    - About 4,5 for conventional assignment discussions \textendash{} scheduled
       on demand  
 
 *** Exam

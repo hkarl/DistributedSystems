@@ -366,7 +366,7 @@ What if things go wrong?
   - Messages never lost, but can be delayed arbitrarily 
 - Operation:
   - When packet expected sequence arrives, ACK it and use packet 
-  - Else, it is a retransmission -- resend ACK and drop packet 
+  - Else, it is a retransmission \textendash{} resend ACK and drop packet 
 - Does this work? 
 
 
@@ -1246,7 +1246,7 @@ But:  No DELETE, PUT,  ... supported!
 
 - Ok, so we have many fine-grained, scaled-out microservices 
 - All communicating via a big, central database??
-  - Needs a HAL9000 machine, again -- nothing gained 
+  - Needs a HAL9000 machine, again \textendash{} nothing gained 
 
 
 #+BEAMER: \pause
