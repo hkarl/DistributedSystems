@@ -372,7 +372,7 @@ Real-life devices often have a bathtub-style hazard rate:
 
 
 
-** Redundancy --  Standby 
+** Redundancy \textendash{}  Standby 
 
 *** Redundancy for high availability  
 
@@ -383,7 +383,7 @@ Real-life devices often have a bathtub-style hazard rate:
 - Dimensions
   - Time redundancy: time permitting, redo in case of failure  
   - Physical redundancy: provide spare resources 
-  - (Information redundancy -- extra bits, to protect against
+  - (Information redundancy \textendash{} extra bits, to protect against
     storage/transmission errors) 
 
 
@@ -492,7 +492,7 @@ Approach: *Stochastic multiplexing*
 *** Practical detectors: Scope 
 
 - Only to/with neighbors
-- Forward liveness information to all nodes -- *gossiping* 
+- Forward liveness information to all nodes \textendash{} *gossiping* 
 
 
 
@@ -709,7 +709,7 @@ Replication of a server can lead to consistency problems
 #+NAME: fig:proxy
 [[./figures/proxyServer.pdf]]
 
-*** Three-tier architecture -- summary 
+*** Three-tier architecture \textendash{} summary 
 
 
 
@@ -1028,12 +1028,12 @@ For $m > n \log n$, expected maximum load is
 
 $$ \frac{m}{n} + \Theta\left( \sqrt{\frac{m \log n}{n}} \right),  $$
 
-which is just (approximately) $\log n$ more than ideal case
+which is not even $\log n$ more than ideal case
 \cite{Raab1998:ballsinbins}! 
 
 *** Does polling help? 
 
-- Suppose we allow some limited checking of server load - does that help? 
+- Suppose we allow some limited checking of server load \textendash{} does that help? 
 - E.g., front end checks $d$ randomly selected servers and uses the
   least loaded one 
 
@@ -1091,7 +1091,7 @@ Improving on blind random choice already for $d=2$!
 
  - Location
    - At client side, in end system
-   - At local network (e.g., UPB)
+   - At local network (e.g., HPI)
    - In the Internet service provider
 
  - Obvious issue: Placement, size, freshness of cache
@@ -1177,7 +1177,7 @@ selected_server = hash(key) % number_of_servers
 
 *** Simple hashing, server added 
 
-Suppose we go from four to five servers -- which keys end up on
+Suppose we go from four to five servers \textendash{} which keys end up on
 different server? 
 
 
@@ -1446,7 +1446,7 @@ Compare \url{https://linuxtechme.wordpress.com/2012/03/29/470/}
 
    - How to deal with that in webserver section already? Probbably better
      here? Or because so simple, in webserver? Or under P2P??
-     - It actually makes a nice transition from c/s to P2P -- client
+     - It actually makes a nice transition from c/s to P2P \textendash{} client
        needs to know all servers vs. does not need to know... 
    - Discuss integration with e.g. django
    - 
@@ -1477,7 +1477,7 @@ Compare \url{https://linuxtechme.wordpress.com/2012/03/29/470/}
 
 
 *** Foreshadowing: Consistency 
-
+ 
 - What happens if the caches coordinate? 
 - See Redis (Section \ref{sec:redis}), see consistency chapter
   (Section \ref{ch:distributed-storage}) later on  
