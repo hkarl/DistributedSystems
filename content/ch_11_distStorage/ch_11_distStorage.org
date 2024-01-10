@@ -4,6 +4,9 @@
   \maketitle
 \end{frame}
 
+
+\label{ch:distStorage}
+
 * Replication vs. consistency
 
 *** The story so far 
@@ -76,11 +79,11 @@
 
 - But what does up-to-date really *mean*? 
 - Basically: which values are read, when which updates take place?
-- Formalised as a *consistency model* (see
+- Formalised as a *consistency model* (see Section 
   \slideref{sec:distStor:dataCentric}[s:distStor:consistency_model])
 - Needs *protocols* to realise it 
 
-- Challenge: \href{https://queue.acm.org/detail.cfm?id=2745385 }{There is no /now/} 
+- Challenge: \href{https://queue.acm.org/detail.cfm?id=2745385 }{There is no \emph{now}} 
 
 
 ** Object replication 
@@ -1148,6 +1151,7 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 
 
 ** Zookeeper 
+\label{sec:distStor:zookeeper}
 
 *** A case for a coordination service 
 
@@ -1236,7 +1240,7 @@ Nodes are replicated, access is:
 *** ZAB 
 
 - Leader-based mcast
-  (\href{https://zookeeper.apache.org/doc/r3.4.13/zookeeperInternals.html#sc_atomicBroadcast}{details}) 
+  (\href{https://zookeeper.apache.org/doc/r3.4.13/zookeeperInternals.html\#sc_atomicBroadcast}{details}) 
   - All others are *followers* 
 - Properties:
   - Reliable: if one server delivers message, all servers eventually
@@ -1246,7 +1250,7 @@ Nodes are replicated, access is:
     - Leader decides oder to apply updates
   - Causal order 
 - Atomic: Leader coordinates *transactions* for updates (see
-  \slideref{sec:transactions}) 
+  Chapter \ref{ch:transactions}) 
 
 
 *** Leader election and ordering  in ZK: Quorums 

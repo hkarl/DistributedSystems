@@ -4,6 +4,8 @@
   \maketitle
 \end{frame}
 
+\label{ch:transactions}
+ 
 * Reminder: Transactions, non-distributed
 
 *** All or nothing? 
@@ -54,7 +56,7 @@ transactions
     modified by transaction T2
 
 
-*** Transaction property: durability 
+*** Transaction property: Durability 
 
 
 - Once a transaction is successfully completed, its results must be
@@ -163,7 +165,7 @@ Y.set(tmp)
 #+END_SRC
 
 
-*** Main technique: locks
+*** Main technique: Locks
 
 - Option: delay one transaction trying to modify data being used by
   another
@@ -604,7 +606,7 @@ A commit protocol is called *blocking* when
 - We could probably fix this particular example by modifying protocol
   rules
   - But would that really help? Or sign of deeper problem?
-- Let's find out (Section \slideref{sec:distTrans:consensus}) 
+- Let's find out (Chapter \ref{ch:consensus}) 
 
 ** Practical 
 
