@@ -4,6 +4,9 @@
   \maketitle
 \end{frame}
 
+
+\label{ch:consensus}
+
 * Modeling consensus
   :PROPERTIES:
   :CUSTOM_ID: sec:consensus:consensus
@@ -1513,6 +1516,9 @@ def vote(id, initial_vote, num_proc, f):
   - Raft: Plenty of implementations available (\href{https://raft.github.io}{List})
 
 *** etcd 
+\label{sec:consensus_etcd}
+
+
 
 From the \href{https://github.com/etcd-io/etcd}{marketing brochure}: 
 

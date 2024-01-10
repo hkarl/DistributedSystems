@@ -4,6 +4,7 @@
   \maketitle
 \end{frame}
 
+\label{ch:nosql}
 
 * CAP and friends
 
@@ -240,7 +241,7 @@ consistent
 
 - SQL is great, mature, familiar
 - Counterpart?
-  - Not much \textendash{} lot's of diversity
+  - Not much standardized \textendash{} lot's of diversity
 - SparQL: query RDF / tuple data
   - But not generalised to other types
 
@@ -249,6 +250,7 @@ consistent
 - Actually, sometimes SQL is the query language used for an NoSQL
   database \Smiley 
 
+** Sharding 
 
 *** Distributing data 
 
