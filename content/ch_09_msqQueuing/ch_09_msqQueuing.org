@@ -1089,7 +1089,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
     example, dropping messages when no subscriber was alive was ok 
 - 
    \href{https://content.pivotal.io/rabbitmq/understanding-when-to-use-rabbitmq-or-apache-kafka}{RabbitMq  vs. Kafka}  \cite{Dobbelaere:2017:KVR:3093742.3093908}
-  - Probably, the two most popular choices today
+  - Probably the two most popular choices today
   - Hard-and-fast metrics difficult as guarantees differ 
 
 
@@ -1669,13 +1669,12 @@ Core building block of leader election
 
 *** Simple libraries? 
 
-- Are there simple libraries to provide leader election? 
-
-#+BEAMER: \pause
-- Some, e.g.,  \href{https://github.com/sile/evel}{evel} 
-- But we really should be doing this right
-  - ZooKeeper
-  - etcd 
+- Are there simple libraries to provide leader election?  \pause
+  - Some, e.g.,  \href{https://github.com/sile/evel}{evel} 
+- But we really should be doing this right: Integrate with Consensus
+  problem 
+  - ZooKeeper (Section \ref{sec:distStor:zookeeper})
+  - etcd (Section \ref{sec:consensus_etcd})
 
 * Summary 
 
