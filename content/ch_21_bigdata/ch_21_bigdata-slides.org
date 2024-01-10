@@ -4,7 +4,8 @@
 #+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
 #+BEAMER_HEADER: \date{SS 22}
 
-\setcounter{chapter}{21}
+\setcounter{chapter}{20}
+\refstepcounter{chapter}
 
 
 #+include: "./ch_21_bigdata.org"

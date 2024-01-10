@@ -872,6 +872,8 @@ for i in range(numIters):
  - Write sorted output to 2-way replicated GFS file (2 TB output) 
 
 
+- Compare \url{http://sortbenchmark.org}
+
 *****                                                                 :BMCOL:
       :PROPERTIES:
       :BEAMER_col: 0.4
