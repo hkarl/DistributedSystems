@@ -1226,7 +1226,8 @@ class Snapshot:
   \cite{Helland:2016:LBD:3012426.3025012}
   - Eg., scaling issues 
 - Up next: how to deal with failures more generally?
-  (Sec. \ref{ch:consensus})
+  (Ch. \ref{ch:consensus})
 - Then: alternative semantics for distributed databases?
-  (Sec. \ref{ch:nosql}) 
+  (Ch. \ref{ch:nosql}) 
 
+ 
