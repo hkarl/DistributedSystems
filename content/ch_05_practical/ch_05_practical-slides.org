@@ -4,8 +4,8 @@
 #+BEAMER_HEADER: \date{SS 24}
 #+BEAMER_HEADER: \title[VS \thechapter: Deployment ]{Ch. \thechapter: Practical deployment tools: A remark in passing }
 
-
-\setcounter{chapter}{5}
+\setcounter{chapter}{4}
+\refstepcounter{chapter}
 
 #+include: "./ch_05_practical.org"
 #+include: "../references.org"

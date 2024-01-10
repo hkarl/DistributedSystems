@@ -4,6 +4,8 @@
 #+BEAMER_HEADER: \date{SS 24}
 #+BEAMER_HEADER: \title[VS \thechapter: WWW as C/S]{Ch. \thechapter: World-Wide Web as Client/Server example}
 
+\setcounter{chapter}{1}
+\refstepcounter{chapter}
 
 #+include: "./ch_02_web_CS.org"
 #+include: "../references.org"

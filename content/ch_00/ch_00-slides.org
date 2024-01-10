@@ -4,6 +4,9 @@
 #+BEAMER_HEADER: \date{SS 24}
 #+BEAMER_HEADER: \title[VS \thechapter: Org]{Ch. \thechapter: Organizational matters }
 
-#+include: "./ch_00.org" 
+\setcounter{chapter}{-1}
+\refstepcounter{chapter}
 
+
+#+include: "./ch_00.org" 
 #+include: "../references.org"

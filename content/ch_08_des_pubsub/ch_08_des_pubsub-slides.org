@@ -7,7 +7,8 @@
  
 #+BEAMER_HEADER: \title[VS \thechapter: DES \& PubSubS]{Ch. \thechapter: Distributed event systems and publish/subscribe }
 
+\setcounter{chapter}{7}
+\refstepcounter{chapter}
 
-\setcounter{chapter}{8}
 #+include: "./ch_08_des_pubsub.org"
 #+include: "../references.org"

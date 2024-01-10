@@ -4,7 +4,11 @@
 #+BEAMER_HEADER: \date{SS 24} 
 #+BEAMER_HEADER: \title[VS \thechapter: Improvements]{Ch. \thechapter: Improving Client/Server systems: Latency, throughput, dependability, consistency}
    
-\setcounter{chapter}{4}
+
+\setcounter{chapter}{3}
+\refstepcounter{chapter}
+
+
 
 #+include: "./ch_04_improving_CS.org"
 #+include: "../references.org"

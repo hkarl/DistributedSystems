@@ -6,9 +6,9 @@
 #+BEAMER_HEADER: \date{SS 24}
 #+BEAMER_HEADER: \title[VS \thechapter: MQ]{Ch. \thechapter: Message queueing }
 
+\setcounter{chapter}{8}
+\refstepcounter{chapter}
 
-
-\setcounter{chapter}{9}
 
 
 #+include: "./ch_09_msqQueuing.org"

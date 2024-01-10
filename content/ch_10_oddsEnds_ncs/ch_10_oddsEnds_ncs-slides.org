@@ -5,6 +5,8 @@
 \titlepage
 \end{frame}
 
+\setcounter{chapter}{9}
+\refstepcounter{chapter}
 
 #+include: "./ch_10_oddsEnds_ncs.org"
 #+include: "../references.org"

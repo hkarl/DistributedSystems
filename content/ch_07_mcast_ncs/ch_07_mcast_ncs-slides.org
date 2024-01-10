@@ -5,7 +5,9 @@
 #+BEAMER_HEADER: \date{SS 24}
 #+BEAMER_HEADER: \title[VS \thechapter: Groups]{Ch. \thechapter:  Group communication}
 
-\setcounter{chapter}{7}
+
+\setcounter{chapter}{6}
+\refstepcounter{chapter}
 
 #+include: "./ch_07_mcast_ncs.org"
 #+include: "../references.org"

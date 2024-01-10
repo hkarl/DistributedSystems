@@ -4,7 +4,8 @@
 #+BEAMER_HEADER: \author[H.\ Karl]{Holger Karl}
 #+BEAMER_HEADER: \date{SS 22}
 
-\setcounter{chapter}{13}
+\setcounter{chapter}{12}
+\refstepcounter{chapter}
 
 
 #+include: "./ch_13_consensus.org"
