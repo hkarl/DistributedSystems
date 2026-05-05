@@ -1207,7 +1207,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 *** LCR example: Starting point  
 
 - Graph with nodes having unique IDs
-- We are interesting in having node with largest ID as leader 
+- We are interested in having node with largest ID as leader 
 
 
 #+CAPTION: LCR example ring

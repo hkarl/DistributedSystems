@@ -318,7 +318,7 @@ First read at B already has to deliver 42.
 
 *** Sequential consistency 
 
- Observation: Programmers are already used to pay attention to situations when order of events is important
+ Observation: Programmers are already used to paying attention to situations when order of events is important
  - Critical sections in concurrent programs, interleaving of threads, …
  - Use as justification to weaken the consistency model? 
 

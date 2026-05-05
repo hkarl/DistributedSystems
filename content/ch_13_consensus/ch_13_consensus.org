@@ -351,7 +351,7 @@ If two entries in different logs have the same index and term, then
   - Leads to update of commit counter 
 - Commit counter is distributed to followers
   - At least with heartbeats!
-- Hence, followers can find out which entires are committed and should
+- Hence, followers can find out which entries are committed and should
   be applied to state machine 
 
 
@@ -400,7 +400,7 @@ How do we know these are uncommitted entries at other nodes?
   - No specific actions needed! Normal replication will kick in after
     follower logs are shortened
 \pause 
-- Note: we only remove uncommitted entires
+- Note: we only remove uncommitted entries
   - I.e.: not yet applied to state machine, not yet sent back to
     client
   - Client would have to resend! 
@@ -427,7 +427,7 @@ How do we know these are uncommitted entries at other nodes?
   - That would lead to inconsistent FSM sequences!
 - Example scenario:
   - Follower A down for a term
-  - Other leader B commits entires (majority of nodes is still up!)
+  - Other leader B commits entries (majority of nodes is still up!)
   - A comes up, becomes leader in following term, and does lack the
     committed entries 
 \pause 
@@ -450,7 +450,7 @@ How do we know these are uncommitted entries at other nodes?
 - Possible issue:
   - Leader crashes, has uncommitted entries
   - New leader takes over in new term; it might have copy of those
-    entires 
+    entries 
   - New leader tries to replicate them 
   - Can new leader commit once majority has acknowledged? 
 
@@ -479,7 +479,7 @@ Problem: Just because an entry is stored on majority of servers is
 
 #+CAPTION: Raft unable to commit across terms (Fig. 8 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})
 #+ATTR_LaTeX: :width 0.5\textheight
-#+ATTR_LaTeX: :caption \caption{Raft unable to commit across terms (Fig. 8 from ) \cite{ongaro14:_in_searc_under_consen_algor_exten_version}) \label{fig:raft:no_commit}}
+#+ATTR_LaTeX: :caption \caption{Raft unable to commit across terms (Fig. 8 from  \cite{ongaro14:_in_searc_under_consen_algor_exten_version}) \label{fig:raft:no_commit}}
 #+NAME: fig:raft:no_commit
 [[./figures/raft_no_commit.pdf]]
 
