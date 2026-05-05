@@ -30,7 +30,7 @@
 #+LATEX_HEADER: \setbeamertemplate{section in toc}[sections numbered]
 #+LATEX_HEADER: \setbeamertemplate{subsection in toc}[subsections numbered]
 #+LATEX_HEADER: \setbeamertemplate{caption}[numbered]
-#+LATEX_HEADER: \usepackage{../templates/msc}
+
 #+LATEX_HEADER: \graphicspath{{./figures/}}
 #+LATEX_HEADER: \usepackage{amsmath,amssymb}
 #+LATEX_HEADER: \DeclareMathOperator{\E}{\mathbb{E}}
