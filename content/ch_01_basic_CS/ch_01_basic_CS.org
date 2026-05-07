@@ -167,7 +167,7 @@ We usually have some operations like:
 
 *** Shared memory: PRAM model 
 
-Common model: *Parallel* Random Access Machine \cite{Karp:1988:SPA:894803}
+Common model: *Parallel* Random Access Machine \cite{fortune78:_pram} \cite{Karp:1988:SPA:894803}
 
 - Generalizes ordinary Random Access Machine
 - Multiple processes issue ~LOAD~ and ~STORE~ operations
@@ -328,7 +328,6 @@ are allowed to occur
  - Can express all synchronicity combinations
  - Based on analogy: Communication with a remote partner is akin to reading from/writing to a file 
  - For details see 
-   - VL KMS/SSSP, VL Rechnernetze 
    - Many online resources on the topic,
      e.g. http://jan.newmarch.name/distjava/socket/lecture.html ;
      \url{https://www.tutorialspoint.com/unix_sockets/index.htm} 
@@ -420,8 +419,20 @@ int main(int argc, char **argv)
      :PROPERTIES:
      :BEAMER_env: quote
      :END:
-ØMQ (also known as ZeroMQ, 0MQ, or zmq) looks like an embeddable networking library but acts like a concurrency framework. It gives you sockets that carry atomic messages across various transports like in-process, inter-process, TCP, and multicast. You can connect sockets N-to-N with patterns like fan-out, pub-sub, task distribution, and request-reply. It's fast enough to be the fabric for clustered products. Its asynchronous I/O model gives you scalable multicore applications, built as asynchronous message-processing tasks. It has a score of language APIs and runs on most operating systems. ØMQ is from iMatix and is LGPLv3 open source.
 
+ZeroMQ (also known as ØMQ, 0MQ, or zmq) looks like an embeddable
+networking library but acts like a concurrency framework. It gives you
+sockets that carry atomic messages across various transports like
+in-process, inter-process, TCP, and multicast. You can connect sockets
+N-to-N with patterns like fan-out, pub-sub, task distribution, and
+request-reply. It's fast enough to be the fabric for clustered
+products. Its asynchronous I/O model gives you scalable multicore
+applications, built as asynchronous message-processing tasks. It has a
+score of language APIs and runs on most operating systems.
+
+**** Licence 
+
+The libzmq library is licensed under the Mozilla Public License 2.0. 
 
 
 *** Nicer API: 0mq (http://zeromq.org)  
@@ -684,7 +695,8 @@ print("Received request: %s" % message)
 *** Wire transfer approaches 
 
 - Some candidates 
-  - Abstract Syntax Notation.1 (ASN.1 )-- ISO/OSI layer 6;
+  - Abstract Syntax Notation.1 (ASN.1 )  @@latex: \textemdash{} @@
+    used in, e.g.,  ISO/OSI layer 6;
     self-descriptive \cite{itut:applic_asn.1}
   - XML \url{http://www.omg.org/cgi-bin/doc?formal/02-06-51}
   - OMG CDR
@@ -1164,7 +1176,7 @@ $\rightarrow$ *Client/server paradigm*
  - Depends on the task that is to be performed
 
 
-#+CAPTION: Roles are not fixed: One process' server is another process' server
+#+CAPTION: Roles are not fixed: One process' server is another process' client
 #+NAME: rolesNotFixed
 [[./figures/rolesNotFixed.pdf]]
 
@@ -1268,7 +1280,7 @@ When is server process/thread started?
 - Persistent server
   - In bootup process, e.g.: upstart, ~/etc/init.d/~, ... 
 - At first invocation, via a *super server daemon* 
-  - ~inet.d~ (deprecated), ~xinet.d~, ~launchd~, ...
+  - ~inetd~ (deprecated), ~xinetd~, ~launchd~, ...
   - Tying request to service: Typically via port number; no actual
     *service naming* scheme in Internet architecture as such 
 
