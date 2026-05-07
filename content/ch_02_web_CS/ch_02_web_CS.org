@@ -18,14 +18,16 @@
  - Pages formatted in \ac{HTML}
  - Web browsers request pages from servers
  - Server and browser communicate using \ac{HTTP} 
-   - HTTP/1.1: RFC 7230 \textendash{} 7235
+   - HTTP/1.1:
+     - Current: RFC 9110, RFC 9112 
+     - Superseded: RFC 7230 \textendash{} 7235
 
 Compare \cite[Sect.\ 2.4]{Coulouris:DistributedSystems:2011}
 
 *** Resources and representation 
 
 - Resource: could be anything; type not fixed 
-- Representation \cite[Sec.\ 3]{RFC7231}:
+- Representation \cite[Sec.\ 3.2]{RFC9110}:
 
 #+BEGIN_QUOTE
 a "representation" is information that is intended to reflect a past,
@@ -74,12 +76,12 @@ GET requests can refer to a static web page (simply delivered by the server) or 
    parameters in the request
  - Typical: “?” to signal that, key=value pairs separated by “&”
  - Example GET: \url{http://somewhere.net/some/path/somewhere?key=somekey&param1=xyz&param2=abc}
- - Compare \url{https://tools.ietf.org/html/rfc7231}, Section 4.3.1 
+ - Compare \url{https://www.rfc-editor.org/rfc/rfc9110#section-9.3.1}
 
 *** Requests and state 
  - Convention: GET does not alter state of resource 
  - POST requests refer to a program execution
-   - Compare \url{https://tools.ietf.org/html/rfc7231}, Section 4.3.3
+   - Compare \url{https://www.rfc-editor.org/rfc/rfc9110#section-9.3.3}
    - POST provides parameters to the program
    - Parameters usually depend on user input 
    - Typically, POST will alter state 
@@ -94,6 +96,22 @@ GET requests can refer to a static web page (simply delivered by the server) or 
   body
   - Again using key=value syntax
   - Usual content type: ~application/x-www-form-urlencoded~
+
+
+*** Header fields in HTTP 
+
+In addition to the metadata-describing header fields, protocol
+fields are defined: 
+- Request: 
+  - Host: Target domain
+  - Authorization: Which user?
+  - User agent: which browser, which OS? (and things like which
+    display resolution, \dots) 
+- Response:
+  - Set-Cookie
+- Both:
+  - Cache control 
+  - Security headers (see end of the chapter) 
 
 ** Web servers
    :PROPERTIES:
@@ -177,7 +195,7 @@ unresolvable request, ...
 *** Nginx 
 
 - Actually, more than a simple web server for static files
-  - Application platform, load balancer, mircoservices, content
+  - Application platform, load balancer, microservices, content
     caching
 - With open-source and commercial versions 
 - Structure: One master, multiple worker processes
@@ -256,7 +274,7 @@ Hence division of labor:
     dynamic responses (a *web application*) 
     - Examples: Django \url{https://www.djangoproject.com}, Tomcat \cite{ApacheTo2:online}, Ruby on Rails
       \url{http://rubyonrails.org}, Play \url{https://www.playframework.com}, ...
-    - Lot's of fanboyism \textendash{} but some good comparisons
+    - Lots of fanboyism \textendash{} but some good comparisons
       (\href{https://en.wikipedia.org/wiki/Comparison_of_web_frameworks}{Ref1},
       \href{https://softwareengineering.stackexchange.com/questions/102090/why-isnt-java-used-for-modern-web-application-development}{Ref2})
 
@@ -314,20 +332,28 @@ Good frameworks support:
 *** A short list of frameworks   
 
 - Python world: 
-  - \href{http://werkzeug.pocoo.org}{Werkzeug}
-  - \href{http://flask.pocoo.org}{Flask}
+  - \href{https://werkzeug.palletsprojects.com}{Werkzeug}
+  - \href{https://flask.palletsprojects.com}{Flask}
     - Based on werkzeug 
-  - \href{https://twistedmatrix.com/documents/17.5.0/core/howto/basics.html}{Twisted}
+  - \href{https://twisted.org}{Twisted}
   - \href{http://www.tornadoweb.org/en/stable/}{Tornado}
-- Javascript world (\href{https://nordicapis.com/13-node-js-frameworks-to-build-web-apis/}{compare}):
+- Javascript world:
   - \href{https://expressjs.com}{Express}
   - \href{https://github.com/fastify/fastify}{Fastify}
   - \href{https://www.meteor.com/developers}{Meteor}
 - Java (\href{https://zeroturnaround.com/webframeworksindex/}{compare}, \href{https://www.dailyrazor.com/blog/best-java-web-frameworks/}{comparison}) 
   - \href{https://spring.io}{Spring} 
   - \href{https://www.playframework.com}{Play}
+- Quickly moving landscape, cmp. e.g.,
+  \href{https://nordicapis.com/10-top-web-development-frameworks-for-2022/}{2022
+  comparison}
 
+
+
+  
 *** Werkzeug 
+
+Absolute minimum functionality 
 
 #+BEGIN_SRC python 
 from werkzeug.wrappers import Request, Response
@@ -344,13 +370,7 @@ if __name__ == '__main__':
 
 *** Flask 
 
-****                                                                :B_quote:
-     :PROPERTIES:
-     :BEAMER_env: quote
-     :END:
-
-Flask is a microframework for Python based on Werkzeug, Jinja 2 and good intentions. And before you ask: It's BSD licensed!
-
+Still simple, adds request routing and handles requests, responses 
 
 **** Code 
 \footnotesize 
@@ -372,7 +392,183 @@ $ FLASK_APP=hello.py flask run
  * Running on http://localhost:5000/
 #+END_SRC
 
-*** Tornado 
+
+*** FastAPI 
+
+Currently (May 2026), perhaps the go-to web framework for simple applications 
+
+**** Advertisement \url{https://fastapi.tiangolo.com}
+
+
+#+BEGIN_QUOTE
+- Fast: Very high performance, on par with NodeJS and Go (thanks to Starlette and Pydantic). One of the fastest Python frameworks available.
+- Fast to code: Increase the speed to develop features by about 200% to 300%. 
+- Fewer bugs: Reduce about 40% of human (developer) induced errors. 
+- Intuitive: Great editor support. Completion everywhere. Less time debugging.
+- Easy: Designed to be easy to use and learn. Less time reading docs.
+- Short: Minimize code duplication. Multiple features from each parameter declaration. Fewer bugs.
+- Robust: Get production-ready code. With automatic interactive documentation.
+- Standards-based: Based on (and fully compatible with) the open standards for APIs: OpenAPI (previously known as Swagger) and JSON Schema.
+#+END_QUOTE
+
+*** FastAPI example 
+
+From documentation https://fastapi.tiangolo.com/#example
+
+
+#+begin_src python 
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: str | None = None):
+    return {"item_id": item_id, "q": q}  
+#+end_src
+
+*** SQLModel (for FastAPI) 
+
+https://sqlmodel.tiangolo.com
+
+**** Advertisement 
+
+#+BEGIN_QUOTE
+SQLModel is designed to simplify interacting with SQL databases in FastAPI applications, it was created by the same author. 😁
+
+It combines SQLAlchemy and Pydantic and tries to simplify the code you write as much as possible, allowing you to reduce the code duplication to a minimum, but while getting the best developer experience possible.
+
+SQLModel is, in fact, a thin layer on top of Pydantic and SQLAlchemy,
+carefully designed to be compatible with both.
+#+END_QUOTE
+
+
+(SQLAlchemy: Object-Relationship Mapper) 
+
+*** SQLModel: Example 
+
+***** Create entries 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:
+
+      
+#+begin_src python 
+from sqlmodel import Field, SQLModel
+
+
+class Hero(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    name: str
+    secret_name: str
+    age: int | None = None  
+
+
+hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
+hero_2 = Hero(name="Spider-Boy", secret_name="Pedro Parqueador")
+hero_3 = Hero(name="Rusty-Man", secret_name="Tommy Sharp", age=48)
+
+
+engine = create_engine("sqlite:///database.db")
+
+
+SQLModel.metadata.create_all(engine)
+
+with Session(engine) as session:
+    session.add(hero_1)
+    session.add(hero_2)
+    session.add(hero_3)
+    session.commit()
+#+end_src
+
+
+***** Read from database 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
+
+
+#+begin_src python 
+from sqlmodel import Field, Session, SQLModel, create_engine, select
+
+
+class Hero(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    name: str
+    secret_name: str
+    age: int | None = None
+
+
+engine = create_engine("sqlite:///database.db")
+
+with Session(engine) as session:
+    statement = select(Hero).where(Hero.name == "Spider-Boy")
+    hero = session.exec(statement).first()
+    print(hero)  
+#+end_src
+
+
+
+*****                               :B_ignoreheading:
+      :PROPERTIES:
+      :BEAMER_env: ignoreheading
+      :END:
+
+
+*** OpenAPI: Machine-readable API descriptions
+(Claude slide) 
+
+- Standard for describing REST APIs in a language-independent way
+  - Formerly known as *Swagger*; renamed when donated to Linux Foundation
+  - Current version: OpenAPI 3.1 \cite{OpenAPI31:online}
+- API described in YAML or JSON: endpoints, methods, parameters,
+  request/response schemas, authentication
+- Tooling built on top of the spec:
+  - *Interactive documentation* (Swagger UI, Redoc): browse and call
+    endpoints directly from browser
+  - *Code generation*: client SDKs and server stubs in many languages
+  - *Validation*: request/response conformance checking
+  - *Mocking*: fake server from spec alone, before implementation
+
+
+*** OpenAI and FastAPI integration
+(Claude slide) 
+
+
+- FastAPI generates OpenAPI spec *automatically* from Python type
+  annotations  @@latex: \textemdash{} @@  no manual spec writing needed
+- Interactive docs available at ~/docs~ (Swagger UI) and ~/redoc~ out
+  of the box
+
+#+BEGIN_SRC python
+@app.get("/items/{item_id}", response_model=Item)
+async def read_item(item_id: int, q: str | None = None) -> Item:
+    ...
+#+END_SRC
+
+\to Parameter types, response schema, and endpoint description all
+derived from annotations; appear in ~/docs~ automatically
+
+
+
+*** Django 
+
+- Full-fledged, batteries-included framework 
+- Model-view-controller philosophy 
+- Integrated, automated object-relationship mapping (ORM)
+- Admin web interface automatically generated
+- Migrations of database schemas
+- Authentication system, form validation, \dots 
+
+
+*** Tornado                                                        :noexport:
 
 - Special feature: Not based on WSGI (see below) 
 
@@ -385,7 +581,7 @@ $ FLASK_APP=hello.py flask run
 Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed. By using non-blocking network I/O, Tornado can scale to tens of thousands of open connections, making it ideal for long polling, WebSockets, and other applications that require a long-lived connection to each user.
 
 
-*** Tornado Hello world                                           :B_example:
+*** COMMENT Tornado Hello world                                           :B_example:
      :PROPERTIES:
      :BEAMER_env: example
      :END:
@@ -413,6 +609,11 @@ if __name__ == "__main__":
 
 
 
+*** Express 
+
+- Roughly, Javascript counterpart to Flask
+- Very minimal 
+
 *** Fastify 
 
 #+BEGIN_SRC javascript 
@@ -432,7 +633,13 @@ fastify.listen(3000, '127.0.0.1', function (err)
 })
 #+END_SRC
 
-** Detailed  framework example: Django 
+*** Hono 
+
+- New kid in town?
+- Lightweight 
+
+
+** Detailed  framework example: Django                             :noexport:
 
 *** Web frameworks – Example: Django (python) 
 
@@ -457,7 +664,7 @@ Idea: Model/view/controller approach, tightly integrated with an SQL database
 - \ac{ORM} abstraction layer to hide SQL access behind Python classes
   and objects
 - Examples follow
-  \href{https://docs.djangoproject.com/en/2.0/topics/db/models/}{Django tutorial, v2}
+  \href{https://docs.djangoproject.com/en/stable/topics/db/models/}{Django tutorial, v2}
 
 #+BEGIN_SRC python 
 from django.db import models
@@ -490,7 +697,7 @@ class Album(models.Model):
   Duration, Email, file, Float, Image, Slug, Text, Time, URL, ... 
 - With plenty of options: null, blank, choices, primary\_key, unique,
   ... 
-- \href{https://docs.djangoproject.com/en/2.0/ref/models/fields/}{Django field types}
+- \href{https://docs.djangoproject.com/en/stable/ref/models/fields/}{Django field types}
 
 *** SQL storage 
 
@@ -510,7 +717,7 @@ class Album(models.Model):
 
 *** Example URL dispatching  
 
-See \href{https://docs.djangoproject.com/en/2.0/topics/http/urls/}{URLconf.py}
+See \href{https://docs.djangoproject.com/en/stable/topics/http/urls/}{URLconf.py}
 
 \footnotesize 
 #+BEGIN_SRC python
@@ -575,7 +782,7 @@ class article_detail(TemplateView):
 
 *** Example engine: Jinja2 
 
-- See \href{http://jinja.pocoo.org/docs/2.10/}{Jinja2 website}
+- See \href{https://jinja.palletsprojects.com/}{Jinja2 website}
 - Expands HTML template using data structures (here: Python) as input
   to substitute patterns 
 - With loops, if, ... 
@@ -627,7 +834,7 @@ class article_detail(TemplateView):
     frameworks 
   - Similar for other languages/frameworks, e.g., Servlet API for
     Java  
-- Devil is in the details, though – lot’s of configuration ... 
+- Devil is in the details, though – lots of configuration ... 
 
 *** WSGI approach 
 
@@ -739,7 +946,7 @@ By design, HTTP is stateless
 *** Applications in the WWW – Cookie 
 
  - Cookie: Text string, sent by server to client, stored by browser 
- - Main standards: RFC 2109, RFC 2965 
+ - Main standards: RFC 6265 (old: RFC 2109, RFC 2965) 
  - Returned by browser to server with any request to a server matching the domain stated in the cookie (and where the path matches as well)
  - Useful to identify users, store application state AT CLIENT, ... 
  - Can encode many different types of information 
@@ -795,8 +1002,8 @@ By design, HTTP is stateless
 
 Interactive web applications easy in principle
  - Changes result in POST messages, new Web page is returned
- - Problem: Latency, bandwidth to transmit entire new page (after each user interaction!) limits “interactive feel” 
- - Approach: \ac{AJAX}
+ - Problem: Latency, data rate to transmit entire new page (after each user interaction!) limits “interactive feel” 
+ - Approach: *\ac{AJAX}*
 
 
 ***** 
@@ -826,21 +1033,9 @@ Interactive web applications easy in principle
 Core idea: *Asynchronously* load (parts of) a Web page, triggered by
 actions on the client side
 - Javascript downloaded with web page from server 
-- Javascript @ browers operates on the \ac{DOM} of the HTML /\ac{XML} code
+- Javascript @ browsers operates on the \ac{DOM} of the HTML /\ac{XML} code
 - Data is moved between browser and server in various ways
-  - E.g., as a \ac{JSON} object, \ac{YAML} ... \textendash{} does not really matter
-
-
-*** General idea: Event-based programming 
-
-- Issue: Asynchronous requests! Asynchronous answers! 
-- Suitable model: Event-based programming 
-  - An *event loop* waits for events
-  - For an event, a callback function (plus parameters) is specified
-    to be invoked when event happens
-- Concrete expression of this model depends on programming
-  language/environment
-  - We will look at Javascript below 
+  - E.g., as XML, a \ac{JSON} object, (very rarely) \ac{YAML} ... \textendash{} does not really matter
 
 
 *** Document Object Model \cite{W3CDocum23:online}
@@ -859,11 +1054,24 @@ structure
 
 *** Operations on the DOM 
 
+
 - Data structure can be profoundly manipulated
   - Add, change, remove nodes, their names or their attributes
 - Code can be triggered when an element in the DOM changes (callback
   model for events) 
 - New events can be generated 
+
+
+*** General idea: Event-based programming 
+
+- Issue: Asynchronous requests! Asynchronous answers! 
+- Suitable model: Event-based programming 
+  - An *event loop* waits for events
+  - For an event, a callback function (plus parameters) is specified
+    to be invoked when event happens
+- Concrete expression of this model depends on programming
+  language/environment
+  - We will look at Javascript below 
 
 
 *** AJAX Pros and Cons 
@@ -872,86 +1080,10 @@ structure
   - Interaction with browser’s “Back” button/bookmarking often “surprising”  (improved by an explicit API in HTML5)
   - Interface design not trivial for good usability
   - Difficulties for search engines, deep link hard to do
-  - \href{http://code.google.com/web/ajaxcrawling/}{Some approaches}
-    officially 
-    \href{https://webmasters.googleblog.com/2015/10/deprecating-our-ajax-crawling-scheme.html}{deprecated}
-  - Google’s crawler does execute Javascript/CSS!
+    - E.g., Google’s crawler does execute Javascript/CSS!
 
 
-*** AJAX example
-\footnotesize
-#+BEGIN_SRC html
-<html>
-  <head>
-  <script type="text/javascript">
-  function loadXMLDoc()
-  {
-     xmlhttp=new XMLHttpRequest();
-     xmlhttp.onreadystatechange=function()
-    {
-    if (xmlhttp.readyState==4 &&
-        xmlhttp.status==200)
-      {
-        document.getElementById("myDiv").innerHTML=
-         xmlhttp.responseText;
-      }
-    }
-    xmlhttp.open("GET","ajax_info.txt",true);
-    xmlhttp.send();
-  }
-  </script>
-  </head>
-
-  <body>
-
-  <div id="myDiv"><h2>Let AJAX change this text</h2></div>
-  <button type="button" onclick="loadXMLDoc()">Change Content</button>
-
-  </body>
-  </html>
-#+END_SRC
-
-*** AJAX: XMLHttpRequest 
-
-Core line of codes in previous example: Interact with the XMLHttpRequest API
-- A class, instantiated into an object
-- On that object, method calls are available to
-  - Transfer data between server and client (=Javascript program running in browser’s runtime environment)
-  - Register callback functions, to be invoked when data arrives from server
-  - Callbacks: Non-trivial programming model!
-  - Protocols: not only HTTP; data formats: not only XML
-- But it is still called XMLHttpRequest 
-- Callbacks: Typically, modify the page’s DOM
-
-*** AJAX: Relevant libraries 
-**** Pure Javascript libraries, to run in browsers
-- jQuery / jQueryUI: basic JS library for AJAX applications in browsers; some animation/user interfaces plugins
-- AngularJS: Framework to develop single-page Web-browser based applications; client-side model/view/controller approach
-  - MEAN stack: Mongo.db database; Express.js web application server;
-    Angular.js; Node.js as server-side runtime environment 
-- React.JS: geared towards user-interface aspects in Browser 
-
-*** AJAX: Relevant libraries 
-
-**** Server-side frameworks with associated browser libraries
-- Node.js: server-side runtime environment; key feature: non-blocking,
-  event-driven (concurrency without threads!). Ecosystem for packages
-  (npm) 
-- Compilers to produce Javascript
-
-
-
-
-**  JS, Angular 
-
-*** From high-level idea to concrete framework 
-
-- AJAX as an idea all nice and well
-- But highly complex programming task
-- Simplify by introducing frameworks
-- But first: event-based programming in Javascript 
-
-
+** Callbacks and promises 
 
 *** First: Callbacks 
 
@@ -984,35 +1116,27 @@ while (True) {
 #+END_SRC
 
 
-*** Promises and callbacks                                         :noexport:
 
-**** Simple callback example 
+*** Simple callback example 
 
  Javascript examples mostly from \cite{Eloquent5:online}
 
  #+BEGIN_SRC javascript 
- function first(){
-   // Simulate a code delay
-   setTimeout( 
-   ?\tikzmark{callbackStart}?function(){
-     console.log(1);  }?\tikzmark{callbackEnd}?,
-     500 );
- }
+   function first(){
+     // Simulate a code delay
+     setTimeout( 
+         function(){ console.log(1);  },
+         500 );
+   }
  #+END_SRC
 
-  #+BEGIN_LaTeX
-  \begin{tikzpicture}[remember picture]
-    \draw[overlay, line width=1pt, red] ($(pic cs:callbackStart) + (-0.1, +0.4)$) rectangle ($ (pic cs:callbackEnd) + (0, -0.1)$);
-  \end{tikzpicture}
-  #+END_LaTeX
 
  Note: ~setTimeout~ calls first parameter after second parameter times
  in milliseconds has passed. 
 
-**** Callback in jQuery 
 
 
-***** Just one callback 
+*** Just one callback 
 
  (\href{https://www.w3schools.com/Jquery/jquery_callback.asp}{Example})) 
 
@@ -1023,7 +1147,7 @@ while (True) {
  });
  #+END_SRC
 
-***** Nested callbacks 
+*** Nested callbacks 
  Associate the clicking of a button with a particular callback
  function, which in turn has a callback associated
 
@@ -1038,7 +1162,7 @@ while (True) {
 
 
 
-**** Callback hell 
+*** Callback hell 
 
  \href{http://callbackhell.com}{Nice?}
 
@@ -1071,14 +1195,14 @@ while (True) {
  #+END_SRC
 
 
-**** JS Syntactic help: Arrow functions 
+*** JS Syntactic help: Arrow functions 
 
 
  Define functions more compactly: use ~=>~ 
  - ~(List of parameters) => {body}~ 
  - Anonymous function, compare \lambda-expressions in other languages 
 
-***** Examples 
+**** Examples 
 
  #+BEGIN_SRC javascript 
  const squareA = (y) => { return y*y;}
@@ -1086,16 +1210,16 @@ while (True) {
  #+END_SRC
 
 
-**** Callbacks as arrow functions 
+*** Callbacks as arrow functions 
 
-***** Simple 
+**** Simple 
 
  #+BEGIN_SRC javascript
  setTimeout( () => console.log("Hi!"), 500);
  #+END_SRC
 
 
-***** Look up storage                                              :noexport:
+**** Look up storage                                              :noexport:
 
  \cite[p.\ 182]{Eloquent5:online}
  #+BEGIN_SRC javascript 
@@ -1109,18 +1233,18 @@ while (True) {
  });
  #+END_SRC
 
-**** From callbacks to promises 
+*** From callbacks to promises 
 
  - So far: setting up a callback, to be called at an unspecified later
    time when event occurs 
  - How about: explicitly represent this *future* event, and the result
-   the handling of this event could lead to 
+   to which  handling  this event could lead 
  - Supported by notion of a *promise* 
    - Value might already be there, or only be there in the future
    - Value is called a *future* value 
 
 
-**** JS Promise example 
+*** JS Promise example 
 
  #+BEGIN_SRC javascript 
  let fifteen = Promise.resolve(15); 
@@ -1129,7 +1253,7 @@ while (True) {
  // → Got 15
  #+END_SRC
 
-**** JS Promise example 2 
+*** JS Promise example 2 
 
  #+BEGIN_SRC javascript 
  function storage(nest, name) {
@@ -1142,11 +1266,11 @@ while (True) {
  #+END_SRC
 
 
-**** Promises for the callback hell 
+*** Promises for the callback hell 
 
  \href{http://davidshariff.com/blog/futures-and-promises-in-javascript/}{Example}
 
-***** Hell 
+**** Hell 
 
  #+BEGIN_SRC javascript
  doA(function(aResult) {
@@ -1160,7 +1284,7 @@ while (True) {
  });
  #+END_SRC
 
-***** with promises 
+**** with promises 
 
  #+BEGIN_SRC javascript
  doA()
@@ -1168,6 +1292,187 @@ while (True) {
      .then(function() { return doC(); })
      .done(function() { /* do finished stuff here */ });
  #+END_SRC
+
+
+*** Background: event loops and OS sockets 
+
+How is that implemented? 
+- Making a promises adds an entry in the set of events that the
+  event loop watches out for
+  - And would call the callback function
+- Specifically for I/O: it means adding a socket to a blocking ~epoll~ call
+  where a list of sockets are given to the OS
+  - Call returns when *any one of these sockets* is ready to be read
+- Similarly for timeouts 
+
+** AJAX in practice
+
+*** AJAX example (outdated) 
+\footnotesize
+#+BEGIN_SRC html
+<html>
+  <head>
+  <script type="text/javascript">
+  function loadXMLDoc()
+  {
+     xmlhttp=new XMLHttpRequest();
+     xmlhttp.onreadystatechange=function()
+    {
+    if (xmlhttp.readyState==4 &&
+        xmlhttp.status==200)
+      {
+        document.getElementById("myDiv").innerHTML=
+         xmlhttp.responseText;
+      }
+    }
+    xmlhttp.open("GET","ajax_info.txt",true);
+    xmlhttp.send();
+  }
+  </script>
+  </head>
+
+  <body>
+
+  <div id="myDiv"><h2>Let AJAX change this text</h2></div>
+  <button type="button" onclick="loadXMLDoc()">Change Content</button>
+
+  </body>
+  </html>
+#+END_SRC
+
+
+
+
+*** AJAX: XMLHttpRequest (outdated) 
+
+Core line of codes in previous example: Interact with the XMLHttpRequest API
+- A class, instantiated into an object
+- On that object, method calls are available to
+  - Transfer data between server and client (=Javascript program running in browser’s runtime environment)
+  - Register callback functions, to be invoked when data arrives from server
+  - Callbacks: Non-trivial programming model!
+  - Protocols: not only HTTP; data formats: not only XML
+- But it is still called XMLHttpRequest 
+- Callbacks: Typically, modify the page’s DOM
+
+
+
+*** AJAX: fetch API
+
+~fetch()~ is the modern replacement for ~XMLHttpRequest~
+- Returns a ~Promise~; combine with ~async~ / ~await~ for readable code
+- Two-step response: first ~await fetch(url)~ resolves when headers
+  arrive; then ~await response.text()~ / ~.json()~ / ~.blob()~ resolves
+  when the body is read
+- Error handling: ~fetch()~ only rejects on *network failure*; HTTP
+  error codes (404, 500) still resolve — always check ~response.ok~
+- Protocols and formats: HTTP only (unlike XHR); data formats not
+  limited to XML despite the name of its predecessor
+
+
+*** AJAX: fetch API (2)
+\vskip-2ex
+\small
+
+***** Fetching JSON (common REST pattern)
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:
+
+#+BEGIN_SRC javascript
+async function loadData() {
+  const response = await fetch('/api/items/');
+  if (!response.ok) throw new Error(`Error: ${response.status}`);
+  const data = await response.json();
+  console.log(data);
+}
+#+END_SRC
+      
+
+***** POST request (submitting data to a REST endpoint)
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
+
+
+#+BEGIN_SRC javascript
+async function postData(payload) {
+  const response = await fetch('/api/items/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error(`Error: ${response.status}`);
+  return response.json();
+}
+#+END_SRC
+
+
+*****                               :B_ignoreheading:
+      :PROPERTIES:
+      :BEAMER_env: ignoreheading
+      :END:
+
+
+
+
+*** AJAX example: fetch API
+
+Core idea: ~fetch()~ returns a *Promise*  @@latex: \textemdash{} @@  no callback-nesting needed
+
+#+BEGIN_SRC javascript
+async function loadContent() {
+  const response = await fetch('ajax_info.txt');
+  if (!response.ok) {
+    throw new Error(`HTTP error: ${response.status}`);
+  }
+  const text = await response.text();
+  document.getElementById('myDiv').innerHTML = text;
+}
+#+END_SRC
+
+#+BEGIN_SRC html
+<div id="myDiv"><h2>Let AJAX change this text</h2></div>
+<button type="button" onclick="loadContent()">Change Content</button>
+#+END_SRC
+
+
+**  Example libraries  
+
+*** From high-level idea to concrete framework 
+
+- AJAX as an idea all nice and well
+- But highly complex programming task
+- Simplify by introducing frameworks
+- But first: event-based programming in Javascript 
+
+
+
+
+*** AJAX: Relevant libraries 
+**** Pure Javascript libraries, to run in browsers
+- React: geared towards user-interface aspects in Browser; maintained
+  by Meta 
+  - Perhaps currently dominant framework 
+  - Often combined with Next.js for server-side rendering, using
+    Node.js 
+- Angular: Typescript-based, for single-page applications
+- And many others, e.g., Vue.js 3, Svelte, SvelteKit, Astro, htmx
+  - Key distinction: Where / how is rendering a page organized?
+- Popular combinations:
+  - MEAN / MERN: MongoDB, Express.js, Angular / React, Node.js 
+
+*** AJAX: Relevant libraries 
+
+**** Server-side frameworks with associated browser libraries
+- Node.js: server-side runtime environment; key feature: non-blocking,
+  event-driven (concurrency without threads!). Ecosystem for packages
+  (npm) 
+- Compilers to produce Javascript
+
+
 
 
 *** Example Angular
@@ -1179,9 +1484,35 @@ while (True) {
   - Environment tightly coupled to NPM
   - Layout of files in directories prescribed 
 - Cross-platform
-- Actually, Typescript, non Javascript
+- Typescript, not Javascript
   - Gets translated 
-- Best thing: \href{https://angular.io/guide/quickstart}{look at tutorials} 
+- Best thing: \href{https://angular.dev/tutorials}{look at tutorials} 
+
+
+*** Comparison of frameworks 
+
+\footnotesize
+#+CAPTION: Frontend Framework Comparison by Claude, 2026-05-07
+\footnotesize
+| Feature         | React                          | Angular                 | Vue.js 3                    | Svelte                           | SvelteKit               | Astro                      | htmx                                 |
+|-----------------+--------------------------------+-------------------------+-----------------------------+----------------------------------+-------------------------+----------------------------+--------------------------------------|
+| Type            | UI library                     | Full framework          | UI framework                | Compiler / UI                    | Full framework          | Meta-framework             | HTML extension library               |
+| Language        | JS / TSX                       | TypeScript              | JS / TS + SFCs              | JS / TS + SFCs                   | JS / TS + SFCs          | JS / TS + .astro           | HTML attributes                      |
+| *Rendering*     | Virtual DOM                    | Virtual DOM             | Virtual DOM                 | Compiled / no vdom               | Compiled / no vdom      | Static / islands           | *Server-driven HTML*                 |
+| SSR / SSG       | Via Next.js / Remix            | Angular Universal       | Via Nuxt                    | Via SvelteKit                    | Built-in                | Built-in                   | Server-side only                     |
+| Bundle size     | ~45 KB                         | ~130 KB+                | ~22 KB                      | ~1–5 KB                          | ~1–5 KB                 | 0 KB default               | ~14 KB                               |
+| State mgmt      | Hooks, Redux, Zustand, Jotai … | Services + RxJS, NgRx   | Composition API, Pinia      | Built-in stores                  | Built-in stores         | Per-island / Nano Stores   | Minimal (server owns state)          |
+| Learning curve  | Medium                         | Steep                   | Gentle                      | Gentle                           | Medium                  | Gentle                     | Very gentle                          |
+| Paradigm        | Functional / declarative       | OOP / declarative       | Options or Composition API  | Reactive + compiled              | Reactive + file routing | Content-first + islands    | Hypermedia / HATEOAS                 |
+| Routing         | React Router / TanStack        | Built-in                | Vue Router                  | None (library only)              | File-based built-in     | File-based built-in        | Server-side                          |
+| Ecosystem       | Largest                        | Very large              | Large                       | Growing fast                     | Growing fast            | Growing fast               | Small / focused                      |
+| Backed by       | Meta                           | Google                  | Community / Evan You        | Community / Rich Harris (Vercel) | Community / Vercel      | Community / Astro team     | Community / Carson Gross             |
+| Best for        | Large SPAs, large teams        | Enterprise apps         | Mid-size SPAs, approachable | Lean, fast UIs                   | Full-stack apps         | Content sites, blogs, docs | Progressively enhanced server apps   |
+| Use with Django | Separate SPA or DRF API        | Separate SPA or DRF API | Separate SPA or DRF API     | Separate SPA                     | Separate full-stack     | Separate full-stack        | Pairs directly with Django templates |
+
+
+
+
 
 *** Angular components                                             :noexport:
 
@@ -1203,7 +1534,7 @@ processed, instantiated, and used at runtime.
 
 
 
-*** Other frontend frameworks
+*** Other frontend frameworks                                      :noexport:
 
 - \href{https://reactjs.org/}{React}: Declarative, component-based 
 
@@ -1226,9 +1557,9 @@ only
 - Plus: Ember.JS, Mithril.JS, Meteor.JS, ...   
   
 
-* Current developments
 
-** SPDY, HTTP2                                                     :noexport:
+
+** SPDY, HTTP2
 
 *** Perceived HTTP 1.1 shortcomings 
 
@@ -1244,17 +1575,16 @@ only
 - Only clients can initiate requests; no server push functionality
 
 
-*** Current developments: HTTP 2.0 / SPDY © Google
+*** Initial development: HTTP 2.0 / SPDY © Google
 Hence improvement goals: Efficiency, reduced user latency
 - Original proposal: SPDY protocol, (c) google
+  - Dropped by now 
 - Later picked up by IETF, HTTPbis working group
   - (https://datatracker.ietf.org/wg/httpbis/)
-- Main document: RFC 7540, Hypertext Transfer Protocol version 2.0
-  \cite{rfc7540} 
+- Main document: RFC 9113, Hypertext Transfer Protocol version 2.0
 
 
-
-*** SPDY design ideas \cite{SPDYAnex74:online}
+*** Original SPDY design ideas \cite{SPDYAnex74:online}, influenced HTTP/2
 Always (!) compress headers, always encrypt
 - Suitable for mobiles?
 - Design SPDY as an intermediate layer
@@ -1267,7 +1597,7 @@ Always (!) compress headers, always encrypt
 - Server push
 
 
-*** HTTP 2.0 
+*** HTTP/2
 
 Rules how to make sure both server and client are HTTP2-capable
 (connection upgrade mechanism) 
@@ -1296,7 +1626,7 @@ Rules how to make sure both server and client are HTTP2-capable
 
 
 
-*** HTTP 2.0 
+*** HTTP/2
 
 HTTP streams
 - Stream: independent, bi-directional sequence of HEADER and DATA
@@ -1312,10 +1642,19 @@ HTTP streams
 - Hop-by-hop, e.g., proxy!
 
 
-*** SPDY / HTTP 2.0 availability 
+*** HTTP/3 
+
+- HTTP-over-QUIC
+- Compare Computer Networks lecture for QUIC 
+- Roughly: combine ideas of TCP and UDP (and SCTP) into a
+  congestion-controlled, error-repairing datagram protocol, without
+  head-of-line-blocking problems 
 
 
-#+CAPTION: Adoption of HTTP2
+*** HTTP/2 availability 
+
+
+#+CAPTION: Adoption of HTTP2 (as of 2026-05-07)
 #+ATTR_LaTeX: :width 0.75\linewidth
 #+NAME: fig:http2_availability
 [[./figures/http2_adoption.png]]
@@ -1323,6 +1662,20 @@ HTTP streams
 Compare \url{http://caniuse.com/\#feat=http2}
 
 
+
+*** HTTP/3 availability 
+
+
+#+CAPTION: Adoption of HTTP/3 (as of 2026-05-07)
+#+ATTR_LaTeX: :width 0.75\linewidth
+#+NAME: fig:http3_availability
+[[./figures/http3_adoption.png]]
+
+Compare \url{http://caniuse.com/\#feat=http3}
+
+
+
+* Server initiative 
 
 ** WebSockets 
    :PROPERTIES:
@@ -1434,6 +1787,10 @@ socket.addEventListener('message', function (event) {
 });
 #+END_SRC
 
+
+
+
+** WebSocket in Django                                             :noexport:
 *** WebSocket Server end: Django  
 
 - Obviously, server application needs to support it 
@@ -1531,6 +1888,68 @@ Core aspect: Use received JSON in template
 {% endblock script %}
 #+END_SRC
 
+
+** Webtransport 
+
+*** Webtransport: Possible future of WebSockets? 
+
+- Basic idea similar, but runs over HTTP/3 and QUIC
+  - Avoids head-of-line blocking for independent  streams
+  - Datagrams can optionally be unreliable (drop rather than late)
+- But not widely supported yet
+  - Keep it in mind, might be mature around 2028, 2029 ? 
+- Compare: \url{https://websocket.org/comparisons/webtransport/}
+
+* Odds and Ends 
+
+*** HTTPS / TLS
+
+- HTTP: clear-text format 
+- HTTPS:
+  - HTTP still clear text, but wrapped inside TLS as transport
+    protocol
+- HTTP/2 practically mandates encryption 
+
+*** Authentication, sessions, cookies 
+
+- Authentication results in cookies representing session  information
+- Compare JSON Web Tokens 
+
+*** Same-Origin Policy (SOP)
+
+- Suppose client-site script included in a web page download from
+  server ~foo.com~ at URL ~foo.com/somedir/somepage.html~
+- Suppose script tries to access other URLs  @@latex: \textemdash{} @@
+  what is allowed?
+  - ~foo.com~ with other directory, pages: yes, as long as same port 
+  - ~foo.com~ with other port or protocol: no!
+  - other hosts: no! 
+
+\pause
+
+- Simple security policy, but relatively easy to attack (e.g.,
+  rebinding DNS)
+- Sometimes, too restrictive 
+
+*** Cross-Origin Resource Sharing (CORS) 
+
+- What to do when SOP is legitimately too tight?
+- Suppose script was downloaded from ~foo.com~ but wants to access ~bar.com~
+  - Normally, SOP prevents that
+- But ~bar.com~ might trust scripts from ~foo.com~ and allow them to
+  acess its local resources
+  - ~bar.com~ has to tell the browser that it agreed with the call
+    - Specified by ~Access-Control-Allow-Origin: http://foo.com~ in
+      the reply to an ~OPTIONS~ request by the browser  
+- (plus a couple of additional rules)
+
+\pause
+- Homework: draw a sequence diagram for a CORS handshake! 
+
+*** OAuth, OpenID 
+
+- Get/give access across web applications 
+- Compare security lectures 
 
 * Conclusion 
 
