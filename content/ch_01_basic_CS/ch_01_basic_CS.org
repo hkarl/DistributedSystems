@@ -401,7 +401,20 @@ int main(int argc, char **argv)
 
 #+END_SRC
 
+*** Handling multiple sockets? 
 
+- Reading from sockets can be blocking or non-blocking 
+- Multiple sockets from which to read?
+  - Non-blocking: simple, in busy loop, but wastes CPU cycles
+  - Blocking: simple for blocking on *one* socket, but multiple?
+- We need to tell the OS the *list of sockets* we want to block on
+  - And be informed when *any one* of them becomes ready to be read 
+\pause
+- Supported by all relevant OSes
+  - E.g., ~kqueue~ on MacOS, ~epoll~ on Linux, \dots
+\pause
+- We will need this ability later on for event loops in, e.g.,
+  JavaScript 
 
 
 *** Plain sockets \textendash{} good? 
