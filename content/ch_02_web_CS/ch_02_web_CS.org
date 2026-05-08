@@ -40,12 +40,13 @@ representation data
 *** Metadata
 
 - Header fields provide metadata about representation 
-- Relevant fields:
+- Example for relevant fields:
   - Content-Type \cite{RFC2046}, e.g., ~text/html;charset=utf-8~
   - Content-Encoding, e.g., compression information like ~gzip~
   - Content-Language, natural-language information \cite{RFC5646}
   - Content-Location, absolute or relative URI  
-
+  - Accept (request & response version): which content types are understood
+    - Opens venue for content negotiation between client and server 
 
  
 ** HTTP
