@@ -40,13 +40,13 @@ In general: architectures and protocols of communication systems
 *** Distributed system (DS)?
 
 #+BEGIN_QUOTE
- A distributed system is a collection of independent computers that appears to its users as a single coherent system. 			-- A. S. Tannenbaum
+ A distributed system is a collection of independent computers that appears to its users as a single coherent system. 			\textendash{} A. S. Tannenbaum
 #+END_QUOTE
 
 
 #+BEGIN_QUOTE
  A distributed computing system consists of multiple autonomous processors that do not share primary memory but cooperate by sending messages over a communication network.
-				-- Henri Bal
+				\textendash{} Henri Bal
 #+END_QUOTE
  
 #+BEGIN_QUOTE
@@ -256,7 +256,7 @@ We will do mini-projects!
     \cite{Steen:DistributedSystems:2017}
   - Coulouris, Distributed Systems
     \cite{Coulouris:DistributedSystems:2011}  
-- Lot's of material online 
+- Lots of material online 
 
 
 *** Cancelled classes, compensate for missed classes

@@ -471,7 +471,7 @@ def Receive(m, seqnr):
 #+BEAMER: \pause
 
 - But maybe that is good enough for typical applications
-- We ere on the side of safety here (overestimate causality) 
+- We err on the side of safety here (overestimate causality) 
 
 *** Preserving causality \textendash{} problems 
 
@@ -1017,10 +1017,10 @@ R_1 \vee \exists e: (e_1, e) \in R_1 \wedge (e, e_2) \in R$$
   - The happened-before relation represents only *potential* causality
     - All messages that *possibly* had influence on a given event
       contribute to this partial order
-  - It orders pairs of events that were not  cause/effect
+  - It orders pairs of events that were not cause/effect
     - But that is not decidable from perspective of a group
       communication protocol!
-  - So ere on the side of safety 
+  - So err on the side of safety 
 
 
 *** Happened-before relationship, concurrent events
@@ -1051,7 +1051,7 @@ R_1 \vee \exists e: (e_1, e) \in R_1 \wedge (e, e_2) \in R$$
 
 
  It holds:
- - a $\rightarrow$ f (via b, c, d)
+ - a $\rightarrow$ f (via c, d)
  - But: a and e are not ordered by $\rightarrow$; a and e are concurrent
 
 

@@ -189,7 +189,7 @@ What if things go wrong?
   - At least once?
   - At most once? 
 
-*** Source or failures
+*** Source of failures
 
 - Request message is lost
 - Reply message is lost
@@ -639,7 +639,7 @@ import zerorpc
 
 c = zerorpc.Client()
 c.connect("tcp://127.0.0.1:4242")
-print c.hello("RPC")
+print(c.hello("RPC"))
 #+END_SRC
 
 
@@ -663,7 +663,7 @@ import zerorpc
 class StreamingRPC(object):
     @zerorpc.stream
     def streaming_range(self, fr, to, step):
-        return xrange(fr, to, step)
+        return range(fr, to, step)
 
 s = zerorpc.Server(StreamingRPC())
 s.bind("tcp://0.0.0.0:4242")
@@ -682,7 +682,7 @@ c = zerorpc.Client()
 c.connect("tcp://127.0.0.1:4242")
 
 for item in c.streaming_range(10, 20, 2):
-    print item
+    print(item)
 #+END_SRC
 
 
@@ -963,14 +963,14 @@ From \cite{RESTRepresen19:online}
 \small 
 
 #+BEGIN_SRC  html
- <html>
+<html>
 <body>
-  <form action="form_handler.php" method=”POST">
+  <form action="form_handler.php" method="POST">
     User Name: <input name="user" type="text" />
-   <input type="submit"value="Submit" />
+    <input type="submit"value="Submit" />
   </form>
- </body>
- </html>
+</body>
+</html>
 #+END_SRC
 
 But:  No DELETE, PUT,  ... supported!
@@ -1004,27 +1004,27 @@ But:  No DELETE, PUT,  ... supported!
 
 
 *** Examples
- - Several popular sites provide Web services 
-   - Yahoo, google, ebay, Amazon, … 
- - Example: Access to Google’s Map api 
+ - Several popular sites provide Web services
+   - Yahoo, Google, Ebay, Amazon, … 
+ - Example: Access Google Maps’s API
    - You’ll need: 
      - a programming language that can curl a URL 
      - Interpret the resulting JSON
 
 
-**** Example: Google Map Service                             :B_exampleblock:
+**** Example: Google Maps Service                             :B_exampleblock:
      :PROPERTIES:
      :BEAMER_env: exampleblock
      :END:
 \small 
 
 #+BEGIN_SRC python
- import requests
- import json
- 
- r = requests.get("https://maps.googleapis.com/maps/api/geocode/json?address=Warbugrstr. 100, Paderborn") 
- 
- print json.dumps(r.json(), indent=4)
+import requests
+import json
+
+r = requests.get("https://maps.googleapis.com/maps/api/geocode/json?address=Warbugrstr. 100, Paderborn") 
+
+print(json.dumps(r.json(), indent=4))
 #+END_SRC
 
 

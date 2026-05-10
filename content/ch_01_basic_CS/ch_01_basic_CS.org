@@ -126,7 +126,7 @@ We usually have some operations like:
     - Possibly, of specified properties: desired originator, maximum
       length, \ldots
     - Often, no guarantee on minimum length!
-  - Nonblocking (~man fcntl~, ~O_NONBLOCK~): Check whether message is available
+  - Non-blocking (~man fcntl~, ~O_NONBLOCK~): Check whether message is available
     - Copy into process' buffer if yes
     - Corresponding return value if no
     - Does never block process for longer time 
@@ -307,7 +307,7 @@ are allowed to occur
     - If it did not arrive with $T$ time, consider it lost
       $\rightarrow$ Timeout! 
     
-** Faults models 
+** Fault models 
 
 *** Fault models 
 
@@ -728,7 +728,7 @@ print("Received request: %s" % message)
 
 - Message Pack \textendash{} https://msgpack.org
 
-  - Lot's of language bindings; used by redis, Pinterest, ... 
+  - Lots of language bindings; used by redis, Pinterest, ... 
 
 - Cap'n Proto \textendash{} https://capnproto.org
 

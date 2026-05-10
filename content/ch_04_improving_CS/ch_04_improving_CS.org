@@ -70,7 +70,7 @@
   - At runtime, errors are the manifestation of a fault in an
     unexpected state 
     - E.g.: memory cell was written with a 1, subsequent read returns a
-      0 owing to the bit flit fault  
+      0 owing to the bit flip fault  
   - Do not necessarily cause failure
 \pause 
 - *Failure*: System displays behavior contrary to specification 
@@ -1239,7 +1239,7 @@ Almost all!
 *** Towards better hashing: nodes and keys 
 
 - Keys and node identifiers: both chosen as \ac{GUID}
-- Node responsibility: from it's own GUID to the next bigger one by
+- Node responsibility: from its own GUID to the next bigger one by
   any node
 
 *** Distance  

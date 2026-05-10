@@ -462,7 +462,7 @@ e-business and developing e-business applications.
 - Supports multiple protocols; in particular, AMQP-0.9.1
 - Written in Erlang, runs on Erlang VM 
 - Cluster deployments for throughput and availability
-- Lot's of plugins
+- Lots of plugins
 - Open source plus commercial distribution (Pivotal) 
 
 
@@ -907,7 +907,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 - Mostly follows
   \href{https://kafka.apache.org/documentation/\#design}{Design discussion} 
 - Challenges to solve
-  - How to persist massages?
+  - How to persist messages?
   - How to get total order?
   - How to deal with failing servers? How to replicate? 
   - Efficiency! High throughput! 
@@ -1229,7 +1229,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 
 - Communicate anticlockwise
 
-#+CAPTION: LCR example ring: First two steps 
+#+CAPTION: LCR example ring: Eight steps 
 #+ATTR_LaTeX: :width 0.75\linewidth :options page=3
 #+NAME: fig:LCR_ring_complete
 [[./figures/leaderelect_ring.pdf]]
@@ -1248,7 +1248,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
   - Number of nodes globally known 
   - Processes can fail, recover at indeterminate times
   - Time to broadcast is much smaller than MTTF, MTTR
-  - In typical operation, nodes only talks to leader, but not to other
+  - In typical operation, nodes only talk to leader, but not to other
     nodes 
 
 *** Source 
@@ -1683,7 +1683,7 @@ Core building block of leader election
 - Powerful programming model 
 - Decoupling allows scaling up
 - Fault tolerance is a *real* challenge
-- Lot's of powerful tools available, with different tradeoffs
+- Lots of powerful tools available, with different tradeoffs
   (cp. \href{http://queues.io}{Queues IO website})  
 
 
@@ -1699,7 +1699,7 @@ Core building block of leader election
 
 *** Support machinery 
 
-- To build really correct MQ systems, lot's of support machinery,
+- To build really correct MQ systems, lots of support machinery,
   algorithms is necessary
 - We touched upon leader election as a first step
 - But:

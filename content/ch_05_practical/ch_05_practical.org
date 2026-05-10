@@ -72,7 +72,7 @@ We need to automate the following tasks:
   instructions
   - Example
     \href{https://aws.amazon.com/getting-started/tutorials/launch-a-virtual-machine/}{Amazon Elastic Cloud}
-  - Lot's of clicking through web pages
+  - Lots of clicking through web pages
   - Gives you at the end an IP address, key pair for ssh access 
 
 ** Vagrant 
@@ -625,7 +625,7 @@ real-time) guarantees.
 - First step: Aggregates logs on a single machine
   - Instead of each process writing a text file in some weird
     location
-- Buzzword: syslogd and friedns 
+- Buzzword: syslogd and friends
 
 *** Distributed example: GrayLog 
 

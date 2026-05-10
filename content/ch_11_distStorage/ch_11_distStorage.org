@@ -773,7 +773,7 @@ Writer may proceed even if data not written yet
 - Observation: Protocols above do not support *locality* of programs
   - After accessing a variable once, it is likely that this variable
     or nearby variables are accessed in near future 
-- Non-blocking remote-write protocols: Lot's of update traffic
+- Non-blocking remote-write protocols: Lots of update traffic
 - Idea: Move primary: *local write* protocols 
 
 *** Local-write protocol without backup 

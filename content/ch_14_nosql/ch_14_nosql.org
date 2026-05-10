@@ -212,7 +212,7 @@ consistent
   - Different query approaches
   - Different update semantics
     - Not uncommon: ACID locally, eventually consistent across cluster
-- But *very* hard to generalise; lot's of variability across products 
+- But *very* hard to generalise; lots of variability across products 
 *** Why? 
 
 - Making CAP tradeoffs explicit is a *very* good thing for developers
@@ -241,7 +241,7 @@ consistent
 
 - SQL is great, mature, familiar
 - Counterpart?
-  - Not much standardized \textendash{} lot's of diversity
+  - Not much standardized \textendash{} lots of diversity
 - SparQL: query RDF / tuple data
   - But not generalised to other types
 
