@@ -189,10 +189,13 @@ What if things go wrong?
   - At least once?
   - At most once? 
 
-*** Source or failures
+*** Source of failures
 
+Communication: 
 - Request message is lost
 - Reply message is lost
+
+Crashes: 
 - Server/callee  crashes (but client survives)
 - Client/caller  crashes (but server survives) 
 
@@ -227,7 +230,7 @@ What if things go wrong?
 
 #+CAPTION: Simplest case: request/reply without errors
 #+ATTR_LaTeX: :width \linewidth :page 1
-#+NAME: fig:rpc_rrp_noerrors
+#+NAME: fig:rpc_rrp_noerrors_1
 [[./figures/rpc_rrp.pdf]] 
 
 
@@ -274,7 +277,9 @@ What if things go wrong?
 - Resending request
 - Simple case: just recompute result 
 - Need *idempotent* function!
-  - $\forall x: f(f(x)) = f(x)$
+  - In a math sense: $\forall x: f(f(x)) = f(x)$ \pause
+  - In a protocol sense: doing an action twice leaves system in *same
+    state* as doing it once 
 
 *****                                                        :BMCOL:
       :PROPERTIES:
@@ -285,7 +290,7 @@ What if things go wrong?
 
 #+CAPTION: Request/reply with reply lost, recompute 
 #+ATTR_LaTeX: :height 0.6\textheight :options page=3
-#+NAME: fig:rpc_rrp_noerrors
+#+NAME: fig:rpc_rrp_noerrors_2
 [[./figures/rpc_rrp.pdf]] 
 
 
@@ -311,7 +316,7 @@ What if things go wrong?
 
 #+CAPTION: Request/reply, reply cache 
 #+ATTR_LaTeX: :height 0.5\textheight :options page=4
-#+NAME: fig:rpc_rrp_noerrors
+#+NAME: fig:rpc_rrp_noerrors_3
 [[./figures/rpc_rrp.pdf]] 
 
 
@@ -338,7 +343,7 @@ What if things go wrong?
 
 #+CAPTION: Request/reply, server restart
 #+ATTR_LaTeX: :height 0.5\textheight :options page=5
-#+NAME: fig:rpc_rrp_noerrors
+#+NAME: fig:rpc_rrp_noerrors_4
 [[./figures/rpc_rrp.pdf]] 
 
 
@@ -399,7 +404,7 @@ What if things go wrong?
       :END:
 
 
-#+CAPTION: Paket delay gets repaired
+#+CAPTION: Packet delay gets repaired
 #+ATTR_LaTeX: :height 0.6\textheight :options page=2,keepaspectratio
 #+NAME: fig:ack:paketdelay
 [[./figures/acks.pdf]]
@@ -441,7 +446,7 @@ increasing sequence number space.
 - In fact, it is *fundamentally impossible*!
   - We will revisit this in the context of consensus 
 
-*** Consequence of impossiblity? 
+*** Consequence of impossibility?   
 
 - *Exactly once* is unachievable
   - Do not believe marketing
@@ -586,7 +591,7 @@ Ingredients of a “normal” object model (think: Java, C++, …)
 ** Zerorpc 
 
 *** zerorpc 
-An example for a simple RPC/RMI libarary: zerorpc
+An example for a simple RPC/RMI library: zerorpc
 
 
 **** Zerorpc                                                        :B_quote:
@@ -639,7 +644,7 @@ import zerorpc
 
 c = zerorpc.Client()
 c.connect("tcp://127.0.0.1:4242")
-print c.hello("RPC")
+print (c.hello("RPC"))
 #+END_SRC
 
 
@@ -663,7 +668,7 @@ import zerorpc
 class StreamingRPC(object):
     @zerorpc.stream
     def streaming_range(self, fr, to, step):
-        return xrange(fr, to, step)
+        return range(fr, to, step)
 
 s = zerorpc.Server(StreamingRPC())
 s.bind("tcp://0.0.0.0:4242")
@@ -682,7 +687,7 @@ c = zerorpc.Client()
 c.connect("tcp://127.0.0.1:4242")
 
 for item in c.streaming_range(10, 20, 2):
-    print item
+    print (item)
 #+END_SRC
 
 
@@ -698,7 +703,71 @@ for item in c.streaming_range(10, 20, 2):
   - STREAM support: Server keeps sending responses 
 
 
-** Thrift 
+** gRPC 
+
+*** gRPC 
+
+- Possible today's main RPC framework
+- Compare
+  - https://grpc.io/docs/what-is-grpc/introduction/
+  - https://grpc.io/docs/what-is-grpc/core-concepts/
+  - https://grpc.io/docs/languages/python/quickstart/
+  - https://github.com/grpc-ecosystem/awesome-grpc
+
+*** gRPC main concepts 
+\small       
+\vskip-3ex
+***** 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:
+
+
+- Based on ProtoBuf as IDL (compare previous chapter)
+  - JSON also possible 
+- On top of ProtoBuf message definitions, also *service definitions* 
+- Allows *streams*, with ordering guaranteed  
+- Both synchronous and asynchronous
+  - With optional timeouts 
+- No specific termination guarantees; server / client might not agree 
+- Metadata as key/value pairs
+  - E.g., authentication data 
+- Debugging via ~grpcdebug~ ! 
+
+***** 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
+
+
+#+begin_src C
+// The greeter service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+}  
+#+end_src
+
+
+
+*** gRPC vs. zerorpc 
+
+- Zerorpc: simpler, smaller learning curve, non-standard 
+- gRPC: probably industry standard, ProtoBuf basis 
+
+** Thrift                                                          :noexport:
 
 *** Case study: Apache Thrift 
 
@@ -803,7 +872,7 @@ It [Web Service] has an interface described in a machine-processable format (spe
   - XML-based notation
   - Also defines bindings (no registry needed, but no late binding possible)
   - Relatively complicated, multi-stage definition 
-- We need to find WDSLs and binding 
+- We need to find WSDLs and binding 
   - Late Binding /through the backdoor/
 
 *** Comparison: Web services and distributed object model
@@ -820,8 +889,13 @@ It [Web Service] has an interface described in a machine-processable format (spe
 *** A look back 
 
 - WebServices (as XML/SOAP/WSDL/UDDI) was once considered the saviour
-  of complex IT systems 
-- But turned out way too complicated 
+  of complex IT systems  \pause
+- But turned out *way* too complicated
+  - Hampered by bad interoperability between different vendors' stacks
+  - And browsers happened at the wrong time: Javascript could deal
+    with JSON, not (easily) with XML
+  - And slow, company-politics-hampered standardization process
+- For history, compare 
 
 
 * Today's tale: REST
@@ -878,7 +952,7 @@ It [Web Service] has an interface described in a machine-processable format (spe
   - A root resource exists 
   - Possible to ask it for a list of further, comprised resources 
   - And each resource might provide again such a list of comprised
-    resources (resource tree")  
+    resources ("resource tree")  
 - Example: PAUL 
   - Root could tell: There are classes, room, students, lecturers,
     ... 
@@ -985,15 +1059,13 @@ But:  No DELETE, PUT,  ... supported!
 - Options? 
   - WSDL? – sure, but failed in practice
   - Google, Apache, ... examples – sure 
-  - SWAGGER (http://swagger.io) – currently extremely popular 
+  - SWAGGER (https://swagger.io) – currently extremely popular 
     - Foundation for OpenAPI specification 
     - Specification written as YAML file 
     - Tool chain + decent formalism + open source = success! 
     - Write API, get code and documentation automatically generated 
-  - See also:
-    http://apievangelist.com/2016/09/16/a-look-at-the-state-of-api-documentation-solutions/  
 
-*** Swagger examples 
+*** Swagger/OpenAPI examples 
 
 
 #+CAPTION: Screenshot of Swagger tutorial API example
@@ -1024,7 +1096,7 @@ But:  No DELETE, PUT,  ... supported!
  
  r = requests.get("https://maps.googleapis.com/maps/api/geocode/json?address=Warbugrstr. 100, Paderborn") 
  
- print json.dumps(r.json(), indent=4)
+ print (json.dumps(r.json(), indent=4))
 #+END_SRC
 
 
@@ -1107,7 +1179,7 @@ But:  No DELETE, PUT,  ... supported!
 #+NAME: fig:fad_hal
 [[./figures/fad_hal.pdf]]
 
-*** So far: coarse-grained functional particion 
+*** So far: coarse-grained functional partition 
 
 
 
@@ -1144,7 +1216,7 @@ But:  No DELETE, PUT,  ... supported!
 *** Microservices: Architecture pattern 
 
 - Alternative: *\ac{MS}* 
-  - Chop up big binary into independently runable instances, typically
+  - Chop up big binary into independently runnable instances, typically
     focused on a single functionality  
   - Link them together by *loose coupling*
   - Advantages: Simpler development, simpler scaling, better fault-tolerance 
@@ -1155,9 +1227,54 @@ But:  No DELETE, PUT,  ... supported!
 
 *** Chaining
 
+- Key feature: Multiple microservices can be chained together into a
+  new (micro-)service \pause
+- Different styles \cite{Peltz:2003:WSO}
+  - *Orchestration*: Central service controls how data flows from one
+    service to another, holds knowledge about MS dependencies 
+    - Often (though not necessarily) by making synchronous
+      request/reply calls; often thought of as *commands* 
+  - *Choreography*: MSs react to events and emit *events*, without
+    knowing who will pick their emitted events
+    - Usually, asynchronous event transport \pause
+    - We talk about *event routing* in later chapters 
+
+*** TODO Choreography: specifying event routing
+
+- Publisher declares *what happened* (event type + schema)
+  - No knowledge of consumers
+- Consumer declares *what it listens to* (subscription / filter rule)
+  - Configured at the broker (Kafka topic, RabbitMQ routing key, ...)
+- Formal specification: *AsyncAPI* \cite{AsyncAPI:online}
+  - Machine-readable contract per service: publishes / subscribes
+  - Analogous role to OpenAPI for REST
+  - Tooling: docs, validation, code generation
+- Schema compatibility enforced by a *Schema Registry*
+  - Ensures producers and consumers agree on event shape over time
 
 
-****                                                              :B_columns:
+*** Example pattern: API Gateway 
+
+- Suppose your application comprises many microservices
+  - \dots with different APIs, strutcures, level of detail
+  - \dots servers different types of clients (e.g., desktop vs. mobile,
+    local vs. WAN)
+- Hard for clients to make calls to all relevant microservices
+- Idea: Hide your actual microservices behind a common facade: the *API
+  gateway service*
+  - Proxies calls to other MSes, composes results 
+- Compare https://microservices.io/patterns/apigateway.html
+
+
+
+*** Consequence
+- Full process flow is *implicit* -- emerges from all subscriptions together
+- Advantage: loose coupling, independent deployability
+- Disadvantage: hard to see the whole picture
+  - Mitigated by distributed tracing (OpenTelemetry, Jaeger)
+
+
+****                                                              COMMENT :B_columns:
      :PROPERTIES:
      :BEAMER_env: columns
      :END:
@@ -1169,11 +1286,6 @@ But:  No DELETE, PUT,  ... supported!
 
 
 
-- Key feature: Multiple microservices can be chained together into a
-  new (micro-)service
-- Different styles
-  - *Orchestration*: Chaining done by one MS calling others
-  - *Choreography*: MS talks directly to the next one 
 
 
 *****                                                                 :BMCOL:
@@ -1215,7 +1327,7 @@ But:  No DELETE, PUT,  ... supported!
 - We need more computational power at middle service
   - *Scale up*: Get a faster machine
   - *Scale out*: Run multiple instance
-    - Challenge: *Splitting* and *merging* 
+    - Challenge: *Splitting* and *merging*, *discovery* 
 
 *****                                                                 :BMCOL:
       :PROPERTIES:
@@ -1228,13 +1340,39 @@ But:  No DELETE, PUT,  ... supported!
 [[./figures/orch_choreo.pdf]]
 
 
-*** Challenges 
+
+*** Discovering instances 
+
+- Suppose microservices are scaled out/in
+  - Changes set of running instances
+  - Changes set of IPs under which
+    an instance can be found; typically dynamically assigned 
+- How to find service instances?
+- Typical pattern: Service-side discovery via a service registry and
+  service router 
+  - Instances register with registry upon startup
+  - Service router polls registry (or pushed)
+    - Might nicely combine with additional patterns like Circuit
+      Breaker 
+
+*** Service registry, service router 
+
+#+caption: Putting a service router between microservices, assisted by a service registry (green: registration path, black: data paht)
+#+attr_latex: :width 0.95\textwidth :height 0.6\textheight :options keepaspectratio,page=4
+#+NAME: fig:service_router_registry
+[[./figures/orch_choreo.pdf]]
+
+
+
+
+*** Other challenges 
 
 
 - When to run how many instances of which service doing which work? 
   - Buzzword: Stateless, autoscaling, load balancing  
 - How to deal with crashing services? 
-  - Buzzword: Automatic restart, Circuit breaker, Database per Service
+  - Buzzword: Automatic restart, Circuit breaker, Database per
+    Service, CAP theorem (see later chapter)
 - How to organize dependable, efficient message exchange between
   individual services?  
   - Buzzword: Messages/Events and for data handling, \ac{CQRS} 
@@ -1264,7 +1402,7 @@ But:  No DELETE, PUT,  ... supported!
 
 - Observation: Simple model of CRUD data stores insufficient for
   complex scenarios 
-  - Read access: various aggressions, filters, ...
+  - Read access: various aggregations, filters, ...
   - Update access: validation necessary, ensure consistency, ... 
 - Might end up in different models to be used when querying or
   updating data
@@ -1284,9 +1422,13 @@ Analogy
   - Every Unix user wondered what the big deal about microservices is;
     that is how Unix works since the 1960s ... 
 
+Platforms 
+- Don't build products, build platforms (out of / for microservices)
+  - Cmp. e.g. https://courses.cs.washington.edu/courses/cse452/23wi/papers/yegge-platform-rant.html,
+    \cite{vinoski08:_restf_web_servic_devel_check}
 
 
-** Case study: Reactive 
+** Case study: Reactive                                            :noexport:
 *** Case study: Reactive Systems  
 
 Case Study: Reactive Systems design pattern for distributed applications 

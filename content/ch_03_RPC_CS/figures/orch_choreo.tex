@@ -3,6 +3,8 @@
 
 
 \input{../../templates/tikzFigureHeader}
+\usetikzlibrary {backgrounds}
+
 
 \begin{document}
 
@@ -98,6 +100,47 @@
   \fill [fill=red] (m3.west) circle [radius=0.15] {}; 
 
   \draw (x)  rectangle (y);
+\end{tikzpicture}
+
+
+% service router and registry 
+\begin{tikzpicture}
+
+  \node [fill=gray!20] (m1) at (0,0) {MS 1};
+  \node [fill=red!10,align=center] (sr) at (2,0) {Service\\router};
+  
+  \node [fill=gray!20] (m2a) at (4,0) {MS 2a}; 
+  \node [fill=gray!20] (m2b) at (4,-1) {MS 2b}; 
+  \node [fill=gray!20] (m2c) at (4,1) {MS 2c}; 
+  \node [fill=gray!20] (m3) at (6,0) {MS 3}; 
+
+  \node (y) at (6.75, 1.5)  {}; 
+  \node [right=0.5 of m3] (outnode) {}; 
+
+
+  
+  \draw [->] (m1.east) -- (sr); 
+  \draw [->] (sr) -- (m2a.west); 
+  \draw [->] (sr) -- (m2b.west); 
+  \draw [->] (sr) -- (m2c.west); 
+  \draw [->] (m2a.east) -- (m3.west); 
+  \draw [->] (m2b.east) -- (m3.west); 
+  \draw [->] (m2c.east) -- (m3.west); 
+  \draw [->] (innode) -- (m1.west); 
+  \draw [->] (m3.east) -- (outnode); 
+
+  \fill [fill=red] (m1.east) circle [radius=0.15] {}; 
+  \fill [fill=red] (m3.west) circle [radius=0.15] {}; 
+
+  \draw (x)  rectangle (y);
+
+  \node [fill=green!10, below =2 of sr, align=center] (registry) {Service\\registry}; 
+  \draw [->, thick, dashed, green] (registry) -- (sr); 
+  \begin{scope}[on background layer]
+  \foreach \k in {a,b,c} {
+    \draw [->, thick, dashed, green] (m2\k.south)  -- (registry.east); 
+  }
+\end{scope}
 \end{tikzpicture}
 
 
