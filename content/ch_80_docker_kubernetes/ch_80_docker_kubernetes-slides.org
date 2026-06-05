@@ -1,0 +1,15 @@
+#+TITLE: Docker and Kubernetes
+#+include: "../slidehead.org"
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+#+include: "./ch_80_docker_kubernetes.org"
+
+* References
+
+*** References
+
+\bibliography{../bib}
