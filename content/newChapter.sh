@@ -14,5 +14,5 @@ echo "** $2"
 echo " "
 echo "#+include: \"../$1/$1.org\"" 
 
-aquamacs $1/$1.org
+# aquamacs $1/$1.org
 
