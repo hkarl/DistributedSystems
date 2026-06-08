@@ -44,7 +44,7 @@
 
 
 *** Fault assumptions 
- - Everything is completely reliable (not realistic)
+ - Everything is completely dependable (not realistic)
 \pause 
  - Processes can fail
    - With or without warning
@@ -70,7 +70,7 @@
   - At runtime, errors are the manifestation of a fault in an
     unexpected state 
     - E.g.: memory cell was written with a 1, subsequent read returns a
-      0 owing to the bit flit fault  
+      0 owing to the bit flip fault  
   - Do not necessarily cause failure
 \pause 
 - *Failure*: System displays behavior contrary to specification 
@@ -79,7 +79,8 @@
   - E.g., incorrect memory value might cause observable misbehavior,
     or it might be correct (e.g., redundancy)  
 \pause 
-- Hence: proper terminology would be to talk about *error-tolerant* systems 
+- Hence: proper terminology would be to talk about *error-tolerant*
+  systems, but *fault-tolerant* is established practice  
 
 
 *** System metrics: dependability  
@@ -153,6 +154,22 @@
  - Maintenance performed in operational system
 
 
+**** Service level objectives in clouds 
+
+- Often: *five nines*  @@latex: \textemdash{} @@ availability of at least
+  99.999%
+  - Or max. 5 minutes of downtime per year 
+\pause
+
+***** Aside: SLA, SLO 
+
+- \gls{SLO}: Defines a target value for a measureable
+  quantity (e.g., availability, packet losses, percentiles of response
+  time, \dots), typically averaged over certain periods 
+- \gls{SLA}: Contract specifying SLOs, payments, penalties for failing
+  to meet SLOs 
+
+
 ** Determining metrics 
 
 
@@ -217,7 +234,7 @@ The expected lifetime is also called the *\acf{MTTF}*
 
 - Let $X_i, i=1\ldots, 10000$ be the lifetime RVs (time to failure) of
   each disk
-  - We know $X \sim \exp(\frac{1}{500.000\,\mathrm{h}} t)$
+  - We know $X \sim \exp(\frac{1}{500.000\,\mathrm{h}})$
 - The time of the first failure is the minimum of all the failure
   times: $Y = \min_{i=1,\ldots10000}{X_i}$ 
   - We want: $\E[Y]$
@@ -288,7 +305,9 @@ $$ P(\mathrm{works}) = \frac{\mu}{\mu + \lambda} =
 
 #+BEAMER: \pause
 - Challenge: Life gets complicated when survival probabilities are
-  heavy-tailed 
+  heavy-tailed
+  - Infinite variance of RV, tail probabilities drop slower than
+    exponentially 
 
 *** Realistic failure assumptions 
 
@@ -403,11 +422,11 @@ How to operate redundant resources?
   - Redundant resource installed and running, but does not process
     anything 
   - Necessary state is mirrored continuously (ideally, within fixed
-    deadlines) \pause 
+    deadlines) 
+  - Only one output is used (e.g., after voting) \pause
 - *Active/active*
   - Both actual and redundant resource are up and running, process all
-    requests
-  - Only output of actual system is acted upon  
+    requests, outputs of both systems are acted upon 
 
 *** Abstraction level? 
 
@@ -433,6 +452,7 @@ How to operate redundant resources?
 
 - Depends on dimension (time, physical), assumed error models, ...
 - Example: Triple modular redundancy
+  - Three subsystems propose result, voter picks majority result 
   - Assumes that voter is simpler/more reliable than actual execution 
 
 *** Stochastic multiplexing of redundant resources 
@@ -445,7 +465,10 @@ Problem: how many standby resources do we need?
 #+BEAMER: \pause
 
 Approach: *Stochastic multiplexing* 
-- Dimension for average need, not for peak need 
+- Dimension for *average* need, not for *peak* need
+- Exploits that the probability of rejecting a job drops when scaling
+  up both load and resources correspondingly
+- For details: Queueing theory, Erlang-B model 
 
 ** Failure  detection 
 
@@ -455,15 +478,30 @@ Approach: *Stochastic multiplexing*
   system of failure?  
 - Problem: Decide too late (false negatives) 
 - Problem: Decide too eagerly (false positives)
-- Introduce *failure detector*  supervising  a given system  \cite{birman12:_guide_reliab_distr_system}
+- Introduce *failure detector*  supervising  a given system  \cite{chandra96:_unrel_failur_detec_reliab_distr_system,birman12:_guide_reliab_distr_system}
  
+*** Failure detector
 
+- Has one of two opinions about a systems state
+  - *Trusted*
+  - *Suspect*
+- Used to solve, e.g., consensus problem or atomic broadcast problem
+  even if  the failure detector is imperfect itself 
 
-*** Failure detector 
+*** Expectations for failure detectors \cite{chandra96:_unrel_failur_detec_reliab_distr_system}
 
+- *Completeness*: After some time, every process that crashes is
+  permanently suspected by some correct process
+- *Accuracy*: After some time, a correct process is never suspected by
+  any correct process 
+
+\pause
+Challenge: Distinguish a failed from a slow process! 
+
+*** Failure detector, extended  
 
   - Has one of three opinions about system state:
-    - *Trust*
+    - *Trusted*
     - *Suspect*
     - *Permanently suspect*
   - Opinion change not generally at same time as system state change 
@@ -864,7 +902,7 @@ FE answers with a redirect to point to chosen server
 
 #+CAPTION: Load balancing: Redirect 
 #+ATTR_LaTeX: :width 0.65\linewidth :options page=3
-#+NAME: fig:lb_rewrite
+#+NAME: fig:lb_redirect
 [[./figures/LB.pdf]]
 
 
@@ -887,7 +925,7 @@ Idea: inform DNS about multiple IP addresses  for the same name
 
 #+CAPTION: Load balancing: DNS picks worker 
 #+ATTR_LaTeX: :width 0.75\linewidth :options page=5
-#+NAME: fig:lb_rewrite
+#+NAME: fig:lb_dns
 [[./figures/LB.pdf]]
 
 
@@ -904,6 +942,29 @@ R. Kern, H. Kumar, M. Zikos, H. Wu, C. Kim, and N. Karri. Ananta:
 Cloud scale load balancing. In SIGCOMM’13.
 
 
+*** Case study: Load balancer in Kubernetes 
+
+- Homework assignment: Figure out which load balancing approach is
+  used in Kubernetes to steer traffic to virtual IP addresses of a
+  service  @@latex: \textemdash{} @@ relate it to the mechanisms
+  discussed above 
+- Hints:
+  - Each pod has its own IP address, from a cluster-internal IP
+    network 
+  - Pods should be able to talk to pods directly
+  - Every node runs a ~kube-proxy~, programming a node's IP tables for
+    DNAT'ing (destination network address translation) to the pod 
+    - ~kube-proxy~ is triggered by the reconciliation loop!
+  - NAT tables can load balance over multiple rewrite targets!
+    - Nice summary: [[https://scalingo.com/blog/iptables][Turning IPTables into a TCP load balancer for fun and profit]]
+    - But only with simple worker-picking rules, like round-robin or random
+
+*** Case study: Load balancer in Kubernetes, reading hints 
+
+
+ - Also see: [[https://learnkube.com/kubernetes-network-packets][Tracing the path of network traffic in Kubernetes]]
+ - Look at ~netfilter~ and ~iptables~ for details
+ - Fancier setups: eBPF in Cilium, IPVS with O(1) hashtables 
 
 ** DNS: a little detour 
 
@@ -944,12 +1005,9 @@ web.bla.com IN CNAME  bla.com
 
 
 #+BEGIN_EXAMPLE
-worker1.bla.com     IN A      1.2.3.101  
-worker2.bla.com     IN A      1.2.3.102
-worker3.bla.com     IN A      1.2.3.103  
-web.bla.com         IN CNAME  worker1.bla.com 
-web.bla.com         IN CNAME  worker2.bla.com 
-web.bla.com         IN CNAME  worker3.bla.com 
+web.bla.com     IN A      1.2.3.101  
+web.bla.com     IN A      1.2.3.102
+web.bla.com     IN A      1.2.3.103  
 #+END_EXAMPLE
 
 
@@ -959,7 +1017,7 @@ web.bla.com         IN CNAME  worker3.bla.com
 
  Solution 1: Send the answer back via the front-end
  - (Solution 2: TCP handoff)
- - Solution 3: Redirects of URLs – frontend tells client to fetch the page from another server (HTTP response status 3xx)
+ - Solution 3: Redirects of URLs  @@latex: \textemdash{} @@  frontend tells client to fetch the page from another server (HTTP response status 3xx)
  - Solution 4: Rewrite URLs in replies, e.g., to access a local mirror of a URL (this is usually not done for server performance but to lower latencies)
  - Solution 5: Put entries for the servers into DNS, tell DNS that they are all an alias of the intended www server, tell DNS to do  round-robin among these aliases 
  www0 	IN A 1.2.3.1 
@@ -975,6 +1033,22 @@ web.bla.com         IN CNAME  worker3.bla.com
  - 	IN CNAME www4.foo.com. 
  - 	IN CNAME www5.foo.com. 
  - 	IN CNAME www6.foo.com. 
+
+
+*** Case study: DNS in Kubernetes
+
+- Every Service gets a DNS name automatically, managed by *CoreDNS*
+  - Format: ~<service>.<namespace>.svc.cluster.local~
+  - Resolves to the Service's ClusterIP -- not to individual pod IPs
+- Pods are configured to use CoreDNS as their resolver (~/etc/resolv.conf~)
+  - So ~curl http://itemstore.itemstore.svc.cluster.local~ just works inside
+    the cluster
+  - Try it: does it work from outside the cluster as well? E.g., when
+    using ~Minikube~? 
+- Recall: which load balancing mechanism from the lecture does this resemble?
+  - And what are its limitations compared to the iptables/kube-proxy approach?
+  - Hint: how does Kubernetes sidestep the classic DNS-LB problem?
+- Further reading:  [[https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/][DNS for Services and Pods]]
 
 
 ** LB policy 
@@ -1018,7 +1092,7 @@ For the case of $m=n$, with high probability, expected maximum load is
 
 $$ \frac{\log n}{\log \log n} \cdot (2 + o(1))$$ 
 
-I.e., it is logarithmic in $n$. Not good! 
+I.e., it is (slower than) logarithmic in $n$. Not good! 
 
 Note: with high probability means $1-o(1)$, i.e., approaching 1. 
 
@@ -1045,7 +1119,8 @@ For $m \geq n$, expected maximum load is
 $$  \frac{\log \log n}{\log d} + \frac{m}{n} + \Theta(1) $$ 
 
 Improving on blind random choice already for $d=2$!
-\cite{berenbrink2006:heavily_loaded_allocations} 
+\cite{DBLP:journals/siamcomp/AzarBKU99} in general,
+\cite{berenbrink2006:heavily_loaded_allocations} for heavy loads
 
 *** Online versions? 
 
@@ -1172,7 +1247,7 @@ selected_server = hash(key) % number_of_servers
 #+BEAMER: \pause
 
 - Great if nothing changes
-- What if servers are added/removed? Rebalancing overhead misses? 
+- What if servers are added/removed? Causes many cache misses! 
 
 
 *** Simple hashing, server added 
@@ -1239,7 +1314,7 @@ Almost all!
 *** Towards better hashing: nodes and keys 
 
 - Keys and node identifiers: both chosen as \ac{GUID}
-- Node responsibility: from it's own GUID to the next bigger one by
+- Node responsibility: from its own GUID to the next bigger one by
   any node
 
 *** Distance  
@@ -1431,7 +1506,7 @@ When adding a server, most values' keys stay with the same server
 
 *** Memcached: Other features 
 
-- Easily scales, minimal configuration to add a new node
+- Easily scales \cite{nishtala13:_scalin_memcac_faceb}, minimal configuration to add a new node 
 - Heterogeneous nodes can be integrated (e.g., different amount of
   memory) 
 - Node failures are gracefully dealt with
@@ -1440,7 +1515,6 @@ When adding a server, most values' keys stay with the same server
 - Multi-fetch (obtain values for multiple keys with one request,
   saving RTTs) 
 
-Compare \url{https://linuxtechme.wordpress.com/2012/03/29/470/}
 
 *** Memcached as example of shared-nothing distributed cache       :noexport:
 
@@ -1487,12 +1561,12 @@ Compare \url{https://linuxtechme.wordpress.com/2012/03/29/470/}
  - CDN \cite{Pallis:2006:CDN}: Originally, a set of coordinated caches
    (in a sense)
    - Remove load from large websites (e.g., news) or hide websites (governments) 
-   - Examples: Akamai, Digital Island 
+   - Examples: Akamai, Cloudflare, Fastly, AWS CloudFront 
    - Caches are complemented by redirectors, selecting most appropriate
      cache server for a given request 
  - Today: Evolved into *application-delivery networks* 
-   - From static web content to HD streaming, applications, Java J2EE
-     edge computing  
+   - From static web content to HD streaming & applications
+ - Also: TLS termination, DDoS mitigation 
  - One simple technique: Redirection
  - Based on combining DNS redirection and URL rewriting 
  - In a sense: redirectors should perform an *application-level routing decision*
