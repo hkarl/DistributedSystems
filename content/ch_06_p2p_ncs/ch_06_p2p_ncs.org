@@ -21,7 +21,7 @@ Recall memcached:
 #+BEAMER: \pause
 
 - Simple scheme, but does not scale well
-  - Lot's of state in clients 
+  - Lots of state in clients 
 
 *** Key-value stores, without explicit server list 
 
@@ -109,6 +109,13 @@ When a node looks for a key:
     to be (and in general are not) IP neighbors
 - The resulting graph *overlays* the IP graph 
 - Hence: *overlay routing/forwarding* in the *overlay graph* 
+
+
+*** How? 
+
+- How do we build a system that routes on keys, not (IP) addresses?
+- Next sections: work upwards from a basic idea about distributed hash
+  tables to functioning P2P systems 
 
 * A strawman DHT
 
@@ -218,7 +225,7 @@ Basic version only, details later:
 
 *** An alternative distance definition 
 
-- We still use GUIDs of, say 128 bits
+- We still use GUIDs of, say, 128 bits
 - We write them as hexadecimal numbers, e.g., 65A1FC... (32 digits)
 - When comparing two GUIDs, we go digit-by-digit in this hexadecimal
   representation 
@@ -251,7 +258,7 @@ Basic version only, details later:
 Content of cells? 
 
 - Let's look at a node $v$ with GUID $v_1 v_2 v_3 \ldots v_{32}$
-- In row $r$ and column $c$, we store information about nodes whose
+- In row $r$ and column $c$ of node $v$'s routing table, we store information about nodes whose
   GUID 
   - Is the same as $v$ 's in the first $r$ digits
   - But differs in digit $r+1$ 
@@ -264,7 +271,7 @@ Content of cells?
 |   |      0 |      1 |       2 |       3 |     4 |    5 |     6 |     7 |     8 |      9 | A  | B      | C      | D | E | F |
 |---+--------+--------+---------+---------+-------+------+-------+-------+-------+--------+----+--------+--------+---+---+---|
 | 0 |   0... |   1... |    2... |    3... |  4... | 5... |    -- |  7... |  8... |        |    |        |        |   |   |   |
-| 1 |  60... |  61... |   61... |   63... | 64... |   -- | 66... | 67... | 67... |        |    |        |        |   |   |   |
+| 1 |  60... |  61... |   62... |   63... | 64... |   -- | 66... | 67... | 68... |        |    |        |        |   |   |   |
 | 2 | 650... | 651... |  652... |  653... |   ... |      |       |       |       | 659... | -- | 65B... | 65C... |   |   |   |
 | 3 | 65A0.. |     -- | 65A2... | 65A3... |       |      |       |       |       |        |    |        |        |   |   |   |
 | 4 |        |        |         |         |       |      |       |       |       |        |    |        |        |   |   |   |
@@ -284,9 +291,14 @@ Forwarding based on this routing table towards a destination GUID $n$:
 1. Check whether $v$ is in charge of $n$
 2. If not, check whether any of the local neighbors is in charge;
    forward directly if so
-3. If not, find first row where $v$ and $n$ differ
-4. Use the entry in the largest column below $n$
+3. If not, find first row $r$  where $v$ and $n$ differ
+4. Use the entry in row $r$, column is the $(r+1)$st digit of $n$
 5. If none, backtrack to row with fewer coinciding digits
+
+\pause
+
+If no entry at all found, forward to some node in leaf set 
+\pause
 
 Note: Variants exist 
 
@@ -314,8 +326,8 @@ Note: Variants exist
     \cite{Rowstron:2001:PSD:646591.697650}, Tapestry
     \cite{Zhao2004:Tapestry}
 - Properties
-  - Number of nodes visited for search request $\log(N)$
-    - $N$ = #nodes in overlay graph
+  - Number of nodes visited for search request $\log_b(N)$
+    - $N$ = #nodes in overlay graph, $\log_2 b$ is number of bits per group
     - With a full routing table, each step corrects a fixed number of
       bits in GUID
   - Needed property: Keys and node GUIDs are uniformly distributed in
@@ -384,7 +396,7 @@ Note: Variants exist
 - Popular DHT implementation based on Plaxton routing  
   - Uses Plaxton routing table
   - Plus leaf set for immediate neighbors
-- Details mechanisms like host integration, host failure, ... 
+- Details on mechanisms like host integration, host failure, ... 
 
 *** Host integration
 
@@ -409,10 +421,12 @@ Note: Variants exist
 #+BEAMER: \pause
 - Options 
   - Manual configuration
-  - "Well-known" web page 
+  - "Well-known" web page / bootstrap servers 
   - Broadcast
   - Expanding ring multicast
-- None of them is nice or workable! 
+\pause
+- None of them are ideal; usually, bootstrapping via well-known
+  servers is used 
 
 *** Things to note about Pastry (and similar systems)
 
@@ -481,7 +495,7 @@ Note: Variants exist
     hierarchically structured and much of the space is pre-allocated
     according to administrative requirements.  
   - P2P: Peer-to-peer systems can address more objects. The GUID name
-    space is very large and flat ($>2^{128}$), allowing it to be much
+    space is very large and flat ($2^{128}$), allowing it to be much
     more fully occupied.
 - Load balancing
   - IP: Loads on routers are determined by network topology and
@@ -493,7 +507,7 @@ Note: Variants exist
 
 - Network dynamics (addition/deletion of objects/nodes)
   - IP routing tables are updated asynchronously on a best-efforts
-    basis with time constants on the order of 1 hour. (?) 
+    basis with time constants on the order of minutes, up to an  hour (rare BGP issues)
   - P2P: Routing tables can be updated synchronously or asynchronously
     with    fractions of a second delays.  
 - Fault tolerance
@@ -524,7 +538,7 @@ Note: Variants exist
   - Music, videos, ...
 - At some point, considered a vital threat to entire entertainment
   industry
-  - And had a lion share of Internet traffic (late 1990s to about  mid/late 2000s)
+  - And had a lion's share of Internet traffic (late 1990s to about  mid/late 2000s)
     - 40% to 70% of all Internet traffic in 2009 
 
 
@@ -533,36 +547,43 @@ Note: Variants exist
    - Domain Name System 
    - Netnews/Usenet (1986)
    - Xerox Grapevine name/mail delivery service (1982)
-   - Algorithms for distributed consensus (Lamport, 1989)
-   - Classless inter-domain IP routing
  - “Generations” afterwards
    - First: Napster (around 1998) – partly centralized 
    - Second: Freenet, Gnutella, Kazaa, BitTorrent, … (2000-2004)
      - Improved scalability, anonymity, fault tolerance, … 
-   - Third: P2P middleware, e.g., Pastry, Tapestry, CAN, Chord, Kadmelia, …  (2001-…) 
+   - Third: P2P middleware, e.g., Pastry, Tapestry, CAN, Chord, Kademlia, …  (2001-…) 
      - Application-independent management of distributed resources 
      - Main difference to 2G: bounded number of hops to target 
 
 *** Data rate asymmetry 
 
 - Apart from robustness, second reason for file sharing systems:
-  Convergecast!
+  swarming!
+  - Compare similar ideas of convergecasting 
   - Different parts of a file can be downloaded from multiple peers
 - Justified by typical asymmetric data rates in residential setups
-  - \ac{ADSL}: larger download than upload rate 
+  - \ac{ADSL}: larger download than upload rate (but gets less and
+    less relevant even for residential users)
 
+
+*** Practical challenge: NAT traversal 
+
+- In practice, not every node has a publicly visible IP address, but
+  sits behind a Network Address Translation (NAT) device
+- Techniques like hole punching, STUN, TURN, \dots necessary
+- But this is covered in the Computer Networks course 
 
 * Other examples  
 
 *** Bittorrent 
 
 - Perhaps the most alive of the remaining P2P systems
-- Emphasis splitting of big files into pieces
+- Emphasises splitting of big files into pieces
   - With cryptographic hashes for integrity 
   - Non-sequential downloads, random or rarest-first 
 - Deals well with transient peers (churn)
-- P2P aspect: value in key/value sense is list of locations for a
-  piece (so-called /trackerless mode/) 
+- P2P aspect: value in key/value sense is list of peers seeding that
+  torrent 
 
 
 
@@ -578,7 +599,8 @@ Note: Variants exist
 
 - Notion of “distance” between nodes different from Pastry’s
   - Distance: Compute XOR of two keys; interpret result as an integer 
-  - This is a metric (symmetric, triangle inequality) 
+  - This is a metric (*symmetric*, triangle inequality)
+  - Symmetry entails: routes can be learned while forwarding 
   - Works for distance between nodes as well as distance between node
     and data item (same key structure) – similar to Pastry 
 - Routing table 
@@ -601,7 +623,7 @@ node.run()
 
 # Join the network through any running node,
 # here using a known bootstrap node.
-node.bootstrap("bootstrap.ring.cx", "4222")
+node.bootstrap("bootstrap.jami.net", "4222")
 
 # blocking call (provide callback arguments to make the call non-blocking)
 node.put(dht.InfoHash.get("unique_key"), dht.Value(b'some binary data'))
@@ -621,6 +643,9 @@ for r in results:
 - While evolved in P2P context, they have outgrown that limited use
   case
 - P2P file sharing today more a niche application 
+- Modern use case, e.g., peer discovery in decentralised networks
+  (e.g., Ethereum, IPFS)
+  - Cmp. ~libp2p~ 
 
 * DONE graveyard                                                   :noexport:
   
