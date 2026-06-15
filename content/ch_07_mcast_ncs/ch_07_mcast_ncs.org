@@ -406,7 +406,7 @@ def Token_received(token):
     Send(token, neighboring node)  // reliable unicast 
 def Receive(m, seqnr):
     Insert (m, seqnr) in DeliverQueue, sorted by seqnr 
-    While seqnr == NextDeliver:
+    While DeliverQueue.head.seqnr == NextDeliver:
         Deliver(m)
         NextDeliver++
 #+END_SRC
@@ -599,7 +599,7 @@ To summarise idea:
 *** Reliable multicast with failures --- critical case 
 
 - Critical: receiver has delivered, then crashes 
-  - It have done something irreversible in between!
+  - It may have done something irreversible in between!
   - E.g., triggered some actor that has to be used together with other
     actors 
 - Requirement: if *one* process has delivered, all other processes
@@ -729,7 +729,7 @@ m before m’
       :END:
 
 - A's message reaches all *other* processes in the view 
-- But B and C deliver message when they both already where informed
+- But B and C deliver message when they both already were informed
   about A's death
 - A can communicate from the grave? "Message from the dead" 
 
@@ -845,6 +845,10 @@ future (*epochs*)
     could be detected
   - An implementation technique for such multicasts 
 - We need to think about sequences of events for that 
+\pause
+- In fact, the notion of *logical time* developed here pervades
+  distributed systems: versions in distributed databases, debugging,
+  consensus on events, \dots 
 
 
 *** Timestamps? 
@@ -1379,7 +1383,9 @@ Vector clocks represent the entire /cone/ of previous events
    communication?
  - \ac{CBCAST} protocol
    - Based on vector clocks 
-   - UDP/IP-based, IP multicast used if possible
+   - UDP/IP-based, IP multicast used if possible, but usually has to
+     fall back on repeated unicasts 
+
 *** CBCAST protocol  
 
 CBCAST algorithm
@@ -1435,9 +1441,9 @@ Update VT
   - Many small groups; possibly in hierarchies
   - Typically, server groups use ISIS; clients use conventional means
     to talk to servers 
-  - Evolved into VSync 
+  - Evolved into VSync (dead now),  thence Derecho 
 
-*** Case study: \href{http://vsync.codeplex.com/}{Vsync}         
+*** COMMENT Case study: \href{http://vsync.codeplex.com/}{Vsync}         
 
 \vskip-3ex
 
@@ -1460,15 +1466,86 @@ Update VT
 \pause 
 - But: *abandoned project*
  
-*** Case study: Derecho 
+
+
+*** Current case study: [[https://github.com/belaban/JGroups][JGroups]] 
+
+- Members join or leave a cluster
+- Members send messages to the other cluster members
+- Can obtain a list of other members
+- Register callbacks for message reception, membership change 
+- Message semantics: specified independently of the API call, in XML
+  files
+  - Stacking semantics on top of each other 
+
+*** JGroups example configuration 
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+***** Total order 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:
+
+      
+#+begin_src xml 
+<config>
+  <UDP mcast_port="45588"/>
+  <PING/>
+  <FD_ALL3/>
+  <pbcast.NAKACK2 xmit_interval="500"/>
+  <!-- routes all multicasts via coordinator -->
+  <SEQUENCER/>                     
+  <pbcast.STABLE desired_avg_gossip="50000"/>
+  <pbcast.GMS/>
+</config>  
+#+end_src
+
+
+
+***** Causal order 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
+
+#+begin_src xml
+<config>
+  <UDP mcast_port="45588"/>
+  <PING/>
+  <FD_ALL3/>
+  <pbcast.NAKACK2 xmit_interval="500"/>
+  <!-- vector-clock-based causal delivery -->
+  <CAUSAL/>                        
+  <pbcast.STABLE desired_avg_gossip="50000"/>
+  <pbcast.GMS/>
+</config>  
+#+end_src
+
+
+*****                               :B_ignoreheading:
+      :PROPERTIES:
+      :BEAMER_env: ignoreheading
+      :END:
+
+
+
+
+
+*** Fancy case study: Derecho 
 
 - Evolution/rewrite:
-  \href{https://github.com/Derecho-Project/derecho-unified}{Derecho}
-- How to speed up VSync? Circumvent network stack
+  \href{https://github.com/Derecho-Project/derecho}{Derecho}
+- How to speed up synchronization? Circumvent network stack
   - Built to leverage \ac{RDMA}
     - Directly access another machine's memory; high-throughput,
       low-latency networking; bypassing kernel buffers, ... by having
       network interface card directly access main memory
+    - Usually, a high-performance computing / data center technique 
   - Provides *replicated objects* as core building blocks
 
 
@@ -1483,7 +1560,7 @@ Update VT
 - Efficient implementations can be nontrivial and require concepts
   like vector clocks
 - Various frameworks exist to use this approach in own applications 
-
+- Further reading: Hybrid Logical clocks  \cite{Kulkarni:2014:HLC}
 
 *** Combination of multicast ordering semantics \cite{Hadzilacos:1993:MCastSemantics} 
 
