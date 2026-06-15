@@ -34,11 +34,11 @@
 - Suppose there are processes that want to learn about  some
   *events*
   - It is unknown when these events happen
-  - Not every processes cares about all events 
+  - Not every process cares about all events
 - Examples for events 
   - Failure, load changes, ... 
   - Stock price changes
-  - Tweet posted
+  - Social media post
   - ... 
 
 *** Describing events 
@@ -57,7 +57,7 @@
 
 - Interested process signals its interest in particular events
   - It *subscribes*
-- Process *publish* an event 
+- A process *publishes* an event
 - Expectation: Every process with a *matching* subscription is
   *notified* about the event
   - Ideally: *exactly once* 
@@ -133,7 +133,7 @@ Overview paper: \cite{eugster03:faces_pubsub}
 - Publications metadata: list of *typed* key/value pairs 
   - Values can have multiple types, e.g., string, boolean, int, ...
 - Subscriptions: predicates
-  - Conjunction of disjunction of *constraints* on key/value pairs
+  - Conjunction of disjunctions of *constraints* on key/value pairs
   - Constraint: which key, an operator, value
     - E.g., ~price < 100~; ~name = "UPB"~
   - Example predicate: ~[name="UPB" AND (class="Vorlesung" OR
@@ -259,7 +259,7 @@ Overview paper: \cite{eugster03:faces_pubsub}
 
 *** CBCB broadcast layer 
 
-- Construct a spanning tree among that comprises all $N$ servers
+- Construct a spanning tree that comprises all $N$ servers
   - Possibly using additional nodes as routers
 - Use this tree to forward messages between servers
 
@@ -307,7 +307,7 @@ We write $p_2 \prec p_1$
 - For each neighbour in the broadcast tree, routing function produced
   a covering predicate
 - Forward a message $m$ to all neighbours in the tree where the
-  predictate selects $m$ 
+  predicate selects $m$
 
 ** Gossiping 
 
@@ -364,7 +364,7 @@ We write $p_2 \prec p_1$
   - Data published with topic
   - Subscribers usually set filters on topics they are interested in
 - 
-   \href{http://learning-0mq-with-pyzmq.readthedocs.org/en/latest/pyzmq/patterns/pubsub.html}{Structure}
+   \href{https://pyzmq.readthedocs.io/en/latest/}{Structure}
 
 #+CAPTION: 0mq pub/sub structure
 #+ATTR_LaTeX: :width 0.75\linewidth
@@ -372,8 +372,8 @@ We write $p_2 \prec p_1$
 [[./figures/zeromq_pubsub.png]]
 
 
-*** 0mq –- Publisher 
- http://zguide.zeromq.org/py:wuserver
+*** 0mq –- Publisher
+ \url{https://zguide.zeromq.org/}
 
 \small 
 #+BEGIN_SRC python
@@ -393,8 +393,7 @@ while True:
                        (zipcode, temperature, relhumidity))
 #+END_SRC
 
-*** 0mq –- Subscriber 
- http://zguide.zeromq.org/py:wuclient
+*** 0mq –- Subscriber
 
 \footnotesize 
 #+BEGIN_SRC python
@@ -425,7 +424,7 @@ print("Average temperature for zipcode '%s' was %dF" % (
 - But: 
   - Filtering happens *at subscriber*! 
   - Hard to make this scale to truly distributed, large-scale setups
-  - \href{http://zguide.zeromq.org/php:chapter5}{Longer discussion} on
+  - \href{https://zguide.zeromq.org/}{Longer discussion} on
     how to scale up  and build advanced pub/sub patterns in 0mq 
 
 ** Redis 
@@ -473,9 +472,9 @@ redis> get foo
 
 **** Install python client
 
-#+BEGIN_SRC bash 
-$ mkvirtualenv redis -p python3
-$ pip install redis 
+#+BEGIN_SRC bash
+$ python3 -m venv redis-env && source redis-env/bin/activate
+$ pip install redis
 #+END_SRC
 
 **** Usage 
@@ -496,7 +495,7 @@ print(value)
   - Topics are called ~channels~
 - Subscribe on multiple channels ~SUBSCRIBE~
   - Blocks until notification arrives
-  - Subscribed client show only subscribe, unsubscribe, ping 
+  - Subscribed clients can only subscribe, unsubscribe, ping
 - Publish value on channel ~PUBLISH~
 - Plus ~UNSUBSCRIBE~ 
 
@@ -528,7 +527,7 @@ class Listener(threading.Thread):
                 
             if item['data'] == b"KILL":
                 self.pubsub.unsubscribe()
-                print (self.name, ": unsubscribed and finished")
+                print(f"{self.name}: unsubscribed and finished")
                 break
             else:
                 print("{} : channel {}, received: {}".format(
