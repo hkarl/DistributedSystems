@@ -70,7 +70,7 @@
 A publish/subscribe system provides subscribe, publish and notify (as
 upcall) interfaces and ensures that all notifications take place. 
 
-Earliest example perhaps \cite{Birman:1987:VirtualSync}
+Overview paper: \cite{eugster03:faces_pubsub}
 
 *** Key characteristics 
     :PROPERTIES:
@@ -84,9 +84,12 @@ Earliest example perhaps \cite{Birman:1987:VirtualSync}
 
 *** No memory 
 
-- Pub/sub systems do not keep memory!
+- Pub/sub systems, in their strict form, do not keep memory!
   - No notifications of publications that happened before a
     subscription  
+\pause
+- We cover systems that *do* keep memory in the next chapter: Message
+  queuing 
 
 
 ** Matching 
@@ -206,7 +209,7 @@ Earliest example perhaps \cite{Birman:1987:VirtualSync}
 
 - Simplest option:
   - Flood *either* subscriptions *or* notifications to
-    all server
+    all servers
   - The other type is sent to *exactly* one server
 - Issues:
   - Dependability
@@ -304,7 +307,7 @@ We write $p_2 \prec p_1$
 - For each neighbour in the broadcast tree, routing function produced
   a covering predicate
 - Forward a message $m$ to all neighbours in the tree where the
-  predict selects $m$ 
+  predictate selects $m$ 
 
 ** Gossiping 
 
@@ -325,7 +328,7 @@ We write $p_2 \prec p_1$
 * Case studies 
 
 
-** Amazon SNS 
+** COMMENT Amazon SNS 
 
 
 *** Amazon Simple Notification Service 
@@ -334,7 +337,8 @@ We write $p_2 \prec p_1$
   - https://aws.amazon.com/sns/
   - https://aws.amazon.com/blogs/compute/building-scalable-applications-and-microservices-adding-messaging-to-your-toolbox/
 - Integrated with other Amazon Web Services
-** Jini 
+
+** COMMENT Jini 
 
 *** Jini/River
 - Subscribers can subscribe to event notification from objects across
@@ -446,13 +450,7 @@ Redis has built-in replication, Lua scripting, LRU eviction, transactions and di
 
 **** Install 
 
-See \href{https://redis.io/download}{downloads}: 
-
-#+BEGIN_SRC bash
-$ wget ... 
-$ tar ... 
-$ make 
-#+END_SRC
+See \href{https://redis.io/download}{downloads}
  
 
 **** Startup 
@@ -491,7 +489,7 @@ print(value)
 #+END_SRC
 
 
-*** \href{https://redis.io/topics/pubsub}{Redis and Pub/sub} 
+*** \href{https://redis.io/docs/manual/pubsub/}{Redis and Pub/sub} 
 
 
 - Simple topic-based pub/sub
@@ -525,8 +523,7 @@ class Listener(threading.Thread):
     def run(self):
         for item in self.pubsub.listen():
             if item['type'] == "psubscribe":
-                print(self.name, ": someone subscribed on channel {}",
-                      item['channel'])
+                print(f"{self.name}: someone subscribed on channel {item['channel']}")
                 continue 
                 
             if item['data'] == b"KILL":
@@ -563,13 +560,13 @@ if __name__ == "__main__":
 \scriptsize 
 #+BEGIN_SRC bash
 $ python redis_ps.py
-A : someone subscribed on channel {} b'test.1'
-A : someone subscribed on channel {} b'control'
-B : someone subscribed on channel {} b'test.2'
-B : someone subscribed on channel {} b'control'
-C : someone subscribed on channel {} b'test.*'
-C : someone subscribed on channel {} b'*.'
-C : someone subscribed on channel {} b'control'
+A : someone subscribed on channel test.1
+A : someone subscribed on channel control
+B : someone subscribed on channel test.2
+B : someone subscribed on channel control
+C : someone subscribed on channel test.*
+C : someone subscribed on channel *.
+C : someone subscribed on channel control
 C : channel b'test.1', received: b'for 1'
 A : channel b'test.1', received: b'for 1'
 C : channel b'test.2', received: b'for 2 '
