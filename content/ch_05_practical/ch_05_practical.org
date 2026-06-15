@@ -4,20 +4,73 @@
   \maketitle
 \end{frame}
 
+#+begin_export latex
+\newcommand{\cattle}[0]{
+\includegraphics[height=2cm]{figures/cow.pdf}
+}
 
-* Deployment tools: Why and what for? 
-
-*** Introduction 
-
-- This chapter is a tiny detour into practical aspects
-- How to automatically deploy, manage, ... a large number of systems? 
-  - Manual ~ssh~ to many \acp{VM}, redoing same things  clearly not an
-    option  
-- How integrate deployment of software with a software development
-  cycle? 
+\newcommand{\pet}[0]{
+\includegraphics[height=2cm]{figures/pet.pdf}
+}
+#+end_export
 
 
-*** Tasks  
+* Practical: How to operate? 
+
+*** From development to operations 
+
+- Chapters so far: mostly concerned with development aspects
+  - How to structure programs, how design protocols, \dots
+- Little attention given to how to *run* these distributed programs in
+  a large scale
+  - We briefly touched on Docker and Kubernetes as preparation for the
+    homework assignments
+\pause
+- *Operations* question: how to deploy, start, stop, monitor, scale,
+  \dots large-scale distributed systems on large-scale
+  infrastructures?
+- How do development and operations nicely go hand in hand?
+  - How to structure programs so that they can be well deployed?
+
+
+*** Conventional approach: virtual machines 
+
+- Virtual machines, manually configured 
+  - Manual ~ssh~ to many \acp{VM}, careful attention to each individual
+    server
+    - *Snowflake servers* (Hodgson & Fowler): Each one looks different  \pause
+- Virtual machines, automatically configured
+  - Support tools for  *Infrastructure as Code* (IaC)
+  - Configuration by automated tools
+  - Infrastructure still can be changed: *Mutable infrastructure* 
+
+*** Cloud-native: no individuals 
+
+- Mutable infrastructure is risky: configuration drift, attention to
+  individuals
+- Alternative idea: just recreate from scratch, from description
+  - *Phoenix Servers*  (Hodgson & Fowler): Recreated from the ashes 
+
+
+*** Mental picture: Pet vs. cattle 
+
+- Pets: you love your individual server and care for it \includegraphics[height=2cm]{figures/pet.pdf}
+  - Think: Virtual machines 
+- Cattle: servers are interchangeable and have no individual identity \includegraphics[height=2cm]{figures/cow.pdf}
+  - Think: Containers, Pods, \dots
+  - Often summarized under the *cloud native* umbrella 
+
+*** Remaining chapter structure: Two worlds 
+
+- Introduce the key questions for operating a distributed system
+- With example approaches from both the *pets* and the *cattle* family
+  - More formally: *mutable infrastructure* vs. *cloud-native infrastructure*
+  - Roughly using CNCF as trail to follow
+  - Not a perfect match between the two families, but it should work
+    reasonably enough 
+- Details on techniques, *how* these tools work: later chapters 
+
+*** COMMENT Tasks  
 
 We need to automate the following tasks: 
 
@@ -39,7 +92,8 @@ We need to automate the following tasks:
 - Test new versions of an application (library, ...)
 - Deploy new versions
 
-*** Categories 
+
+*** COMMENT Categories 
 
 - Configuration management 
   - More precise: System administration automation
@@ -48,10 +102,102 @@ We need to automate the following tasks:
 - Continuous integration tools 
 - Monitoring systems 
 
-* Execution environment 
+
+*** Context: CNCF and its Landscape 
+ 
+Reference picture by \ac{CNCF} (project of Linux Foundation to drive
+cloud computing)
+- [[https://landscape.cncf.io/guide][Landscape guide]]
+
+#+caption: The Cloud native landscape 
+#+attr_latex: :width 0.95\textwidth :height 0.6\textheight :options keepaspectratio
+#+NAME: fig:cn:landscape
+Too large for Moodle! Look at \url{https://landscape.cncf.io}
 
 
-** Question? 
+*** CNCF project levels 
+
+- *Sandbox*: experimental, newly adopted; no claim about production-readiness
+- *Incubating*: some real-world adoption, reasonable community base
+  - Needs at least three independent production deployments,
+    governance, security disclosure process
+- *Graduated*: widely adopted, assumed to be long-term stable
+  - E.g., Kubernetes, Helm 
+
+*** Landscape of graduated projects
+
+#+caption: The Cloud native landscape of graduated, open-source projects  \url{https://landscape.cncf.io} (as of 2026-06-08)
+#+attr_latex: :width 0.95\textwidth :height 0.6\textheight :options keepaspectratio
+#+NAME: fig:cn:landscape-graduated
+[[./figures/landscape_graduated_20260608.png]]
+
+
+
+*** Deutschland-Stack 
+
+#+caption: The Cloud native landscape  @@latex: \textemdash{} @@ German version 
+#+attr_latex: :width 0.95\textwidth :height 0.6\textheight :options keepaspectratio
+#+NAME: fig:cn_deutschlandstack
+[[./figures/deutschland-stack.pdf]]
+
+
+
+
+*** Landscape categories  (following  [[https://landscape.cncf.io/guide][Landscape guide]])
+
+\vskip-7ex
+***** 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.38
+      :END:
+
+      
+- *Provisioning*
+  - Automation & Configuration
+  - Container Registry
+  - Security & Compliance
+  - Key Management
+- *Runtime* 
+  - Cloud-native storage
+  - Container runtime
+  - Cloud-native network 
+
+***** 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.58
+      :END:   
+
+- *Orchestration & Management*
+  - Scheduling & Orchestration
+  - Coordination & Service Discovery
+  - Remote Procedure Call
+  - Service Proxy
+  - API Gateway 
+  - Service Mesh
+- *App Definitions and Development*
+  - Database
+  - Streaming & Messaging
+  - Application Definition & Image Build
+  - Continuous Integration & Delivery
+- *Observability & Analysis*
+  - Observability
+  - Chaos Engineering 
+
+*** Landscape categories 
+
+#+caption: Landscape categories  (following  [[https://landscape.cncf.io/guide][Landscape guide]])
+#+attr_latex: :width 0.95\textwidth :height 0.6\textheight :options keepaspectratio,page=1
+#+NAME: fig:cncf_categories_mindmap
+[[./figures/cloudnative_mindmap.pdf]]
+
+\pause
+Next couple of slides: brief highlights for these categories; more details later 
+
+
+
+* Provisioning 
 
 *** Question 1: Get an execution environment 
 
@@ -61,10 +207,8 @@ We need to automate the following tasks:
   - Some hypervisors allow to request an empty VM
   - Install operating system
     - Talk to sys admin
-    - Use \href{https://www.vagrantup.com}{Vagrant}
-- A Docker container
+- A Docker container, or Kubernetes pods 
   - Talk to your sys admin
-  - Or Vagrant, similar to above 
 
 *** Example: Amazon Elastic Cloud 
 
@@ -72,83 +216,111 @@ We need to automate the following tasks:
   instructions
   - Example
     \href{https://aws.amazon.com/getting-started/tutorials/launch-a-virtual-machine/}{Amazon Elastic Cloud}
-  - Lot's of clicking through web pages
+  - Lots of clicking through web pages
   - Gives you at the end an IP address, key pair for ssh access 
 
-** Vagrant 
-
-*** Vagrant 
-
-- \href{https://www.vagrantup.com}{Vagrant} main purpose: Given a VM,
-  install an operating on it, configure it for ssh access
-- Can also talk to multiple *providers* to request a VM in the first
-  place
-  - Supported providers: VirtualBox, VMWareESX, Docker, AWS
-- Mostly intended for local environments, typically with a couple of VMs
-  - Mostly for development purposes 
 
 
-*** Simple example 
 
-#+BEGIN_SRC bash 
-$ vagrant init hashicorp/precise64
-$ vagrant up
-$ vagrant ssh 
-vagrant@precise64:~$ 
+
+*** Automation & configuration 
+
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=2]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+- Create and configure resources (VMs, networks, \dots)
+- Key idea: *Infrastructure as Code* (IaC)
+  - Configurations are declared, not implemented step-by-step
+
+*** Concept: Infrastructure as Code 
+
+- Common theme: We can describe infrastructure by configuration files
+  - Looks like "code"
+  - With all aspects of code management: versioning, testing,
+    repeatability, automation, ...
+  - *No* interactive configuration! 
+- Buzzword: *Infrastructure as Code*
+  \cite{Fowler2016:InfrastrAsCode:online} 
+  - Applies to computing, storage, networking
+  - Could be scripts, declarative descriptions (like above)
+  - Early examples
+    \href{https://aws.amazon.com/about-aws/whats-new/2011/02/25/introducing-aws-cloudformation/}{AWS    Cloud Formation}  (2011) 
+- Hoped-for benefits: cost, speed, risk 
+
+
+
+
+*** Example tools
+  - Terraform: obtain resources from different Cloud providers
+  - Ansible / Chef / Puppet: provision software, configuration files
+    on such resources  (typically, virtual machines)
+
+
+** Configuration without containers 
+
+*** Question to solve 
+
+- Goal: ensure the right software runs in the right version on the
+  right hosts 
+  - Nodes already run an operating system, have basic software, secret
+    keys installed, ...
+  - Example: how do I upgrade/downgrade all my webservers on
+    the US east coast to Apache 2.1? Without the monitoring system to
+    yell?   
+- Common setup: one controlling host, configuring controlled nodes
+- Same ideas as above: describe, make repeatable 
+
+*** Approaches 
+
+- Special software needed on hosts to be configured
+  - \href{https://www.chef.io/chef/}{Chef},
+    \href{https://puppet.com/}{Puppet},
+    \href{https://saltstack.com/}{SaltStack}   
+- Rely on ssh access alone
+  - Example: Ansible (RedHat) 
+
+*** Ansible 
+
+- \href{http://www.ansible.com/}{Ansible}: Apache 2.0 software for actual
+  configuration management  \pet
+- Basic concepts:
+  - Describe actions ("plays") to take place; YAML
+  - Host list   
+  - Playbooks -> plays -> tasks -> modules; handlers
+  - Modules do actual work, lots of those (> 250)
+    - E.g., module to drive Linux  package manager
+    - E.g., module to interact with version control (git pull!) -
+      continuous deployment! 
+
+*** Deployment tool example: Ansible Playbook with one play 
+
+\small 
+#+BEGIN_SRC yaml
+- hosts: webservers
+  vars:
+    http_port: 80
+  remote_user: root
+  tasks:
+    - name: ensure apache is at the latest version
+      ansible.builtin.package:
+        name: httpd
+        state: latest
+    - name: write the apache config file
+      ansible.builtin.template:
+        src: /srv/httpd.j2
+        dest: /etc/httpd.conf
+      notify: restart apache
+    - name: ensure apache is running
+      ansible.builtin.service:
+        name: httpd
+        state: started
 #+END_SRC
 
-*** Vagrant basic process 
 
-  - Describe required configuration in a  ~Vagrantfile~
-  - Describe required provider (and secret keys, accounts, ...) in
-    Vagrantfile
-  - Example:
-    \href{https://www.iheavy.com/2014/01/16/how-to-deploy-on-amazon-ec2-with-vagrant/}{Automatically install an Ubuntu VM on AWS} 
-
-*** Vagrant file 
-
-
-
-
-****                                                              :B_columns:
-     :PROPERTIES:
-     :BEAMER_env: columns
-     :END:
-
-*****                                                                 :BMCOL:
-      :PROPERTIES:
-      :BEAMER_col: 0.4
-      :END:
-
-- Automatically created by ~init~
-- Edit for more complex configuration 
-- Actually, a Ruby script 
-
-*****                                                                 :BMCOL:
-      :PROPERTIES:
-      :BEAMER_col: 0.6
-      :END:
-
-\footnotesize 
-
-#+BEGIN_SRC ruby
-VAGRANTFILE_API_VERSION = "2"
-
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "centos65"
-  config.vm.network :private_network, ip: "192.168.58.111"
-  config.vm.provider :virtualbox do |vb|
-    vb.customize [
-      "setextradata", :id,
-    ]
-    # SNIP 
-  end
-end
-#+END_SRC
 
 ** Terraform 
 
-*** Example: Terraform 
+*** Example: Terraform  \pet
 
 - Different cloud providers have different APIs
   - Annoying :-(
@@ -156,7 +328,10 @@ end
   different APIs behind a tool's common API
   - Can span an infrastructure across multiple cloud providers (e.g,
     AWS, Google, Azure, Alibaba)  
-  - Similar, but different purpose than Vagrant
+  - Open-source version: OpenTofu 
+- Alternatives: e.g., [[https://www.pulumi.com][Pulumi]]   @@latex: \textemdash{} @@ IaC inside a
+  programming language, not a Hashicorp-specific configuration
+  language 
 
 *** Terraform aspects 
 
@@ -168,21 +343,34 @@ end
 *** Terraform example 
 
 - Create a simple VM on AWS (from
-  \href{https://www.terraform.io/intro/getting-started/build.html}{tutorial})
+  \href{https://developer.hashicorp.com/terraform/tutorials/aws-get-started/aws-create}{tutorial})
 
 **** Configuration 
 
 
 #+BEGIN_EXAMPLE
 provider "aws" {
-  access_key = "ACCESS_KEY_HERE"
-  secret_key = "SECRET_KEY_HERE"
-  region     = "us-east-1"
+  region = "us-west-2"
 }
 
-resource "aws_instance" "example" {
-  ami           = "ami-2757f631"
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name = "name"
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
+
+resource "aws_instance" "app_server" {
+  ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
+
+  tags = {
+    Name = "learn-terraform"
+  }
 }
 #+END_EXAMPLE
 
@@ -212,119 +400,344 @@ $ terraform show
 #+END_SRC
 
 
-*** Alternatives to Terraform 
 
-- \href{https://medium.com/@anthonypjshaw/multi-cloud-what-are-the-options-part-1-low-level-abstraction-libraries-ce500f29120f}{Overview} 
-- \href{https://libcloud.apache.org}{Apache Libcloud}
-  - Simple Python library, supporting over 50 cloud providers
+** Transition to cloud-native 
 
-\tiny
-#+BEGIN_SRC python 
-from libcloud.compute.types import Provider
-from libcloud.compute.providers import get_driver
+*** From Ansible, Terraform to Cloud-Native infrastructures
 
-cls = get_driver(Provider.RACKSPACE)
-driver = cls('username', 'api key', region='iad')
+- This is all nice and well  @@latex: \textemdash{} @@ but typical
+  problems of mutable infrastructure
+  - Snowflakes, configuration drift, \dots
+- Instead: Make containers immutable; declare the result, not the way
+  towards it 
 
-sizes = driver.list_sizes()
-images = driver.list_images()
 
-size = [s for s in sizes if s.id == 'performance1-1'][0]
-image = [i for i in images if 'Ubuntu 12.04' in i.name][0]
+*** Container registry 
 
-node = driver.create_node(name='libcloud', size=size, image=image)
-print(node)
-#+END_SRC
-
-** IaC 
-
-*** Concept: Infrastructure as Code 
-
-- Common theme: We can describe infrastructure by configuration files
-  - Looks like "code"
-  - With all aspects of code management: versioning, testing,
-    repeatability, automation, ...
-  - *No* interactive configuration! 
-- Buzzword: *Infrastructure as Code*
-  \cite{Fowler2016:InfrastrAsCode:online} 
-  - Applies to computing, storage, networking
-  - Could be scripts, declarative descriptions (like above)
-  - Early examples
-    \href{https://aws.amazon.com/about-aws/whats-new/2011/02/25/introducing-aws-cloudformation/}{AWS    Cloud Formation}  (2011) 
-- Hoped-for benefits: cost, speed, risk 
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=2]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
 
 
 
-* Configuration management 
+- We already talked about registries in the Docker context 
+- More examples: Dragonfly, Harbor (OCI compliant!) 
 
-*** Question to solve 
+*** Security & compliance, key management 
 
-- Goal: ensure the right software runs in the right version on the
-  right hosts 
-  - Nodes already run an operating system, have basic software, secret
-    keys installed, ...
-  - Example: how do I upgrade/downgrade all my webservers on
-    the US east coast to Apache 2.1? Without the monitoring system to
-    yell?   
-- Common setup: one controlling host, configuring controlled nodes
-- Same ideas as above: describe, make repeatable 
-
-*** Approaches 
-
-- Special software needed on hosts to be configured
-  - \href{https://www.chef.io/chef/}{Chef},
-    \href{https://puppet.com/}{Puppet},
-    \href{https://saltstack.com/}{SaltStack}   
-- Rely on ssh access alone
-  - Example: Ansible (RedHat) 
-
-*** Ansible 
-
-- \href{http://www.ansible.com/}{Ansible}: GPL software for actual
-  configuration management 
-  - GUI for control is rather expensive
-- Basic concepts:
-  - Describe actions ("plays") to take place; YAML
-  - Host list   
-  - Playbooks -> plays -> tasks -> modules; handlers
-  - Modules do actual work, lots of those (> 250)
-    - E.g., module to drive Suse YUM package manager
-    - E.g., module to interact with version control (git pull!) -
-      continuous deployment! 
-
-*** Deployment tool example: Ansible Playbook with one play 
-
-\small 
-#+BEGIN_SRC yaml
-hosts: webservers  
-  vars:
-    http_port: 80
-    max_clients: 200
-  remote_user: root
-  tasks:
-    name: ensure apache is at the latest version
-      yum: pkg=httpd state=latest
-    name: write the apache config file
-      template: src=/srv/httpd.j2 dest=/etc/httpd.conf
-      notify: restart apache
-    name: ensure apache is running
-      service: name=httpd state=started
-    name: restart apache
-      service: name=httpd state=restarted 
-#+END_SRC
-
-*** Juju Charms 
-
-- \href{https://jujucharms.com}{Juju}: Canonical's multi-purpose tool
-  - Comprises execution environment tools as well
-  - Quote: /An application modelling tool/
-  - Higher level of abstraction than mere configuration management 
-- Juju Charms: Configuration management
-  - Charm: Set of scripts for deploying and operating software
-  - Event-based approach: What to do when some event happens? 
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=2]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
 
 
-* Build tools 
+- Harden, monitor, enforce platform and application security
+  - Set compliance policies
+  - Vulnerability insights, scanning 
+  - Catch misconfigurations (e.g., overly permissive access rights)
+  - Image signing 
+- Key management
+  - Create and distribute secrets/keys/authentication rules
+    /authorization rules 
+
+
+* Runtime 
+
+*** Cloud-native storage 
+
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=3]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+
+
+- Persistent storage for containers, to be used for  databases, messages, \dots
+  - Both the actual hardware as well as the interface to the storage
+    system
+  - Defines Container Storage Interface (CSI): file and block storage
+    access for containers 
+  - Automatically provisioned and scaled
+- Examples: CubeFS, Rook
+
+
+
+
+*** Containers and their orchestration
+
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=3]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+
+  - Container runtime (compare discussion in previous chapter)
+    - Low-level: ~runc~, talks to Linux kernel, handles namespaces,
+      cgroups, \dots
+    - High-level: ~containerd~ (key part of Docker), deals with image
+      pulling, volumes, networking across containers 
+
+*** Cloud-native network 
+
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=3]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+
+- Typically, multiple interacting containers in one application
+- Need to network internally and with external users, but usually not
+  across applications
+- Setup *overlay network* for such distributed applications, with
+  privacy and resource control (and firewalls, \dots)
+  - *Software-defined networking*
+  - Uses *Container Network Interface* (CNI)
+- Example tools: Cilium, Flannel, NSX-T 
+
+
+
+
+* Orchestration 
+
+*** Orchestration & management: Scheduling 
+
+
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=4]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+- How to run containers on a cluster of machines? Think *cluster OS* 
+- Scheduling & orchestration
+  - ~Kubernetes~
+    - Deploys, manages, scales, networks, \dots containers
+    - Compare previous chapter  \pause
+  - ~Knative~  on top of Kubernetes for serverless workloads, eventing
+    workloads
+    - Great for stateless workloads, less so for anything else 
+
+
+
+*** Orchestration & management: Coordination, service discovery 
+
+
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=4]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+- How to reach other containers that are part of your application?
+  - E.g., they might run on different nodes at different point in time 
+- *Service discovery*: Think logical database containing information
+  about all running services
+  - Consul, or parts of Kubernetes
+  - Behind the scene: *etcd* as dependable, distributed key/value
+    store 
+- *Name resolution*: given the name of (e.g.) a container, how to reach
+  it via (e.g.) an IP address?
+  - Example: CoreDNS (part of Kubernetes)
+
+
+*** Orchestration & management: RPC 
+
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=4]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+- Compare gRPC in previous chapter 
+
+*** Orchestration & management: Service proxy 
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=4]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+
+- Conventional starting point: Applications need to deal with network
+  traffic
+  - Steer traffic to instances (e.g., to balance load), deal with encryption, TLS, gather
+    statistics, \dots
+  - Lots of that is boilerplate code
+- Service proxies externalize that functionality from application
+  - Making it generally accessible to build functions like service
+    meshes on top 
+  - Example: Envoy 
+
+
+*** Orchestration & management: Application gateway  
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=4]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+- Application-level counterpart to service proxy:
+  - Analyse requests
+    made to an application's API
+  - Check authorization, record statistics, \dots
+- Removes boilerplate out of application code, centralizes it 
+  
+*** Orchestration & management:  Service mesh 
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=4]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+
+- Many services need to communicate with each other 
+- Ensure dependable, observable, secure behavior  
+  @@latex:   \textemdash{} @@ without touching app code
+  - E.g., how to deal with a service becoming slow? 
+- Example: Istio, Linkerd 
+
+
+
+* App definition 
+
+*** App definition: Database 
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=5]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+- Old school: SQL, MySQL, PostgreSQL
+- Not only SQL: Couchbase
+  - Compare later discussion about CAP theorem and how non-SQL DBs
+    locate themselves in that design spectrum 
+- Also: DBs that are Kubernetes-native 
+
+    
+*** App definition: Streaming & messaging 
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=5]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+
+- Assisting containers / apps to communicate, with simple interaction
+  patterns
+  - E.g., RabbitMQ, Kafka 
+- See separate chapters on P2P and message queuing
+- Also see: CloudEvents, NATS as example 
+
+
+
+*** App definition: Image building 
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=5]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+- How to use, deploy, customize third-party apps together with your
+  own app code?
+  - Compare Ansible/Chef/Puppet, but also package managers like pip 
+- Package manager: ~Helm~
+  - Define applications comprising more than one
+    container (/packaging/), YAML templates
+
+
+*** App development: CI/CD 
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=5]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+
+- Continuous integration (CI)  
+  \cite{Fowler2006:Continuo50:online} 
+  - Whenever a change in code happens, e.g., in a repository, build a
+    new version of an executable artefact
+    - Also, run test code
+    - (Buzzwords for software engineering: make, Makefile, test-driven
+      development   \cite{Beck2002:TestDrivenDevelopment}, \dots)
+  - Example from mutable infrastructure: ~Jenkins~ reacts to ~git push~, starts a pipeline to
+    build a new container image
+    - Often uses dedicated build servers
+
+
+#+CAPTION: Continuous integration main workflow
+#+ATTR_LaTeX: :width 0.95\linewidth
+#+NAME: fig:ci_workflow
+[[./figures/ci_workflow.pdf]]
+
+*** Continuous integration example: \href{http://jenkins-ci.org/}{Jenkins} 
+
+ - Continuous integration server written in Java, server-based
+ - Not hosted; you have to setup a server yourself 
+   - Hosting available as extra service  
+ - Integrates with common VC systems, tightly integrates with  Apache
+   Maven as build system  
+ - Various triggers for builds 
+ - Non-trivial setup (especially for non-Maven projects) 
+
+
+
+
+*** App development: CI/CD 
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=5]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+ 
+- Continuous delivery (CD) 
+  - On top of CI, deploy an executable to production systems
+  - Which version, coexistence of multiple versions, \dots
+  - How to decide when a version can/should be pushed at all 
+- CI/CD: push-based, pipeline triggers scripts, kubectl commands,
+  etc. 
+
+
+*** App development: GitOps 
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=5]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+- GitOps: Git is only source of truth for deployment
+  - Agent in Kubernetes cluster watches git repo, reacts to changes by
+    pulling them in
+  - *No other changes* to environment allowed, *only* via repo
+    - Manual changes to environment are automatically rolled back 
+\pause
+- Common combination:
+  - Push-based CI/CD for development and testing stages
+    - With dedicated testing clusters
+  - Pull-based for production 
+\pause
+- Typical example: GitHub Actions  @@latex: \textemdash{} @@  no server to maintain, pipelines as code (~.github/workflows/~)
+
+*** App development: GitOps, ArgoCD  
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=5]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+
+- Example: ~ArgoCD~: Uses Git as /single source of truth/,
+  - Synchronizes cluster with Git-based specification
+  - Observes Git repo, notices new image, calls ~Helm~ for the
+    template, deploys new version 
+  - Also heals changes made to a cluster by reverting back to what
+    is in Git, rollbacks to earlier configs, \dots 
+  - Multi-cluster-capable
+- Often: two repos, one for actual app (~Dockerfile~), one for
+  configuration  (~Helm~ charts, K8 clusters for development,
+  staging, production, \dots)
+
+
+* Observability  
+
+*** Observability 
+@@latex:   \begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=6]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
+
+- Metrics collection: ~Prometheus~
+  - Deals with time-series, triggers alerts, heart-beating, \dots
+  - Mostly numerical values,  pull-based
+- Visualization: ~Grafana~
+  - Build cute dashboards on top of ~Prometheus~ data 
+- Logging: ~Fluentd~
+  - Collect (text-based) logs from cluster, ships to central location,
+    push-based 
+- Tracing: ~Jaeger~
+  - Journey of a request through graph of microservices, debugging aid 
+
+\pause
+
+*Three pillars of observability* 
+- Metrics, logs, traces 
+- Realized by (e.g.) Prometheus, Fluentd, Jaeger
+- Grafana for pretty dashboards on top 
+
+ 
+
+*** Example from mutable infrastructure: Nagios 
+
+\href{https://www.nagios.org}{Nagios}   \pet
+
+- Open-source (collection of) software to monitor servers, networks,
+  applications
+- Flexible plugins
+- Flexible alerts and reports
+- Some support for capacity planning 
+- Structure: Nagios server tries to access supervised systems,
+  services 
+
+     
+
+
+* COMMENT OLD STUFF FOLLOWS 
+
+
+
+
+* COMMENT Build tools 
 
 *** Question to solve 
 
@@ -400,164 +813,12 @@ pdf:
   - \href{https://en.wikipedia.org/wiki/SCons}{SCons}
 
 
-* Continuous integration tools 
+* COMMENT Continuous integration tools 
 
 
-*** Question to solve 
+   
 
-- When to run build tools?
-- Where to run them?
-- What to do with the generated artefact?
-  - Under which conditions? 
-
-
-*** When to build? 
-
-- Suppose developer as made a change to source code
-- Obviously, this ends up in some \ac{VCS}
-  - \href{https://subversion.apache.org}{SVN},
-    \href{https://git-scm.com}{GIT},
-    \href{https://www.mercurial-scm.org}{Mercurial}, ...  
-- With build tools, translation into executable is automated
-- Hence: Trigger build upon every commit!
-
-
-*** Where to run these builds? 
-
-- On developer machine?
-  - Sure, for local testing
-- But once in VCS, need central instance
-- Build in central infrastructure, entire project
-  - Needs *build servers*
-
-*** Trust the executable? 
-
-- Do you trust the resulting project executable?
-  - Of course not!
-- Needs automated test suite!
-  - So run tests
-  - Many tests!
-  - Even more tests!
-- Run tests automatically, report results
-- Needs test execution suit 
-
-
-*** Test-driven development 
-
-- Buzzword: *Test-driven development*
-  \cite{Beck2002:TestDrivenDevelopment} 
-- Comes with additional guidelines (write tests first, ...)
-  - \ac{KISS}
-  - \ac{YAGNI}
-  - Fake it till you make it 
-  
-
-*** What if tests succeed? 
-
-- All tests succeeded!
-- Now: Deploy new version!
-  - Means: Integrate it into production system
-  - Do so continuously
-- Hence: *\ac{CI}* approach
-  \cite{Booch1991:OOD}
-  \cite{Fowler2006:Continuo50:online} 
-
-
-*** Continuous integration workflow 
-    
-
-
-#+CAPTION: Continuous integration main workflow
-#+ATTR_LaTeX: :width 0.95\linewidth
-#+NAME: fig:ci_workflow
-[[./figures/ci_workflow.pdf]]
-
-
-
-*** Continuous integration infrastructure 
-
-- A developer's local machine for development, local tests
-- Qualification infrastructure
-  - Builds, runs tests
-  - Possibly in multiple stages 
-- Production infrastructure 
-
-
-
-
-
-*** Continuous integration example: \href{http://jenkins-ci.org/}{Jenkins} 
-
- - Continuous integration server written in Java, server-based
- - Not hosted; you have to setup a server yourself 
-   - Hosting available as extra service  
- - Integrates with common VC systems, tightly integrates with  Apache
-   Maven as build system  
- - Various triggers for builds 
- - Non-trivial setup (especially for non-Maven sprojects) 
-
-
-*** CI example: Travis 
-
-- \href{https://travis-ci.org}{Travis}: hosted CI service 
-- Nicely integrates with Github 
-- Main configuration steps:
-  - Create an account on Travis (easier: use Github account to log in) 
-  - Add GitHub repositories to Travis 
-  - Add a configuration file to repository (.travis.yml) 
-  - Configure when to run a Travis run 
-    - E.g., when changes pushed, when pull request exists 
-
-*** CI example: Travis 
-
-Travis will,  upon trigger: 
-
-- Create a virtual machine for each run 
-- Install required software 
-- Checkout the respective version of your repository into the VM 
-- Build it (.yml-file gives various hooks when to trigger actions:
-  ~before_install~, ~install~, ~before_script~)  
-- Start a test script 
-- Report results
-- Can also automatically deploy new version to production system 
-
-
-*** Travis screenshots 
-
-
-
-****                                                              :B_columns:
-     :PROPERTIES:
-     :BEAMER_env: columns
-     :END:
-
-*****                                                                 :BMCOL:
-      :PROPERTIES:
-      :BEAMER_col: 0.5
-      :END:
-
-
-#+CAPTION: Travis screenshot, example 1
-#+ATTR_LaTeX: :width 0.85\linewidth
-#+NAME: fig:travis1
-[[./figures/travis1.png]]
-
-
-
-*****                                                                 :BMCOL:
-      :PROPERTIES:
-      :BEAMER_col: 0.5
-      :END:
-
-#+CAPTION: Travis screenshot, example 2
-#+ATTR_LaTeX: :width 0.85\linewidth
-#+NAME: fig:travis2
-[[./figures/travis2.png]]
-
-
-
- 
-* Monitoring systems 
+* COMMENT Monitoring systems 
 
 ** Categories 
 
@@ -625,7 +886,7 @@ real-time) guarantees.
 - First step: Aggregates logs on a single machine
   - Instead of each process writing a text file in some weird
     location
-- Buzzword: syslogd and friedns 
+- Buzzword: syslogd and friends 
 
 *** Distributed example: GrayLog 
 
@@ -642,7 +903,7 @@ real-time) guarantees.
 
 *** Summary 
 
-- Practical tool knowledge goes a long way to make for efficient
+- Practical tool knowledge goes a long way to  efficient
   deployments
 - Tools impact workflows for developers and operations 
 
@@ -650,19 +911,8 @@ real-time) guarantees.
 
 - Integrating both development and operations into a single process 
 - More an organisational than a technical aspect 
+  - Ties in technically with CI/CD: one team develops and deploys 
 
-*** Tools you should know for Web development 
+**** BizDevOps
 
-Know at least one example for each category
-
-- Web frameworks: Django, Ruby on Rails,
-- Web servers: Nginx, Apache
-- Version control: Git 
-- Build tools: make, Maven, SCons
-- Infrastructure management: Vagrant, Terraform 
-- Configuration management: Ansible, Chef, Puppet
-- CI: Jenkins, Travis-CI
-- Monitoring: Nagios
-- (Project management: Trello, Asana, Agilefant)
-- (Project communication: Slack, gitter) 
-
+- Also consider business aspects as part of the loop
