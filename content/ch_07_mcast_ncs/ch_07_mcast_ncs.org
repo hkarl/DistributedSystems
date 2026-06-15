@@ -729,7 +729,7 @@ m before m’
       :END:
 
 - A's message reaches all *other* processes in the view 
-- But B and C deliver message when they both already were informed
+- But B and C deliver message when they were both already informed
   about A's death
 - A can communicate from the grave? "Message from the dead" 
 
