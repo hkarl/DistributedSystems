@@ -245,7 +245,7 @@ Remember: No group changes so far!
 
 - FIFO example shows key technique: *holdback*
 - Multicast protocol must not deliver immediately upon reception, must
-  potential delay messages
+  potentially delay messages
   - Must buffer messages 
   
 
@@ -258,7 +258,7 @@ Remember: No group changes so far!
 
 *** Implementing FIFO 
 
-- Simple extension to reliable mutlicast
+- Simple extension to reliable multicast
 - When message is received out of order, hold back, do not deliver to
   application 
 
@@ -396,7 +396,7 @@ def Receive("order", q, j):
 #+BEGIN_SRC python
 def init(): 
     Sendqueue = []
-    DeliverQueue = [] // sorted (m, seqnr) pairs
+    DeliverQueue = [] # sorted (m, seqnr) pairs
     NextDeliver = 1  
 def Originate(m):
     Sendqueue += m
@@ -471,7 +471,7 @@ def Receive(m, seqnr):
 #+BEAMER: \pause
 
 - But maybe that is good enough for typical applications
-- We ere on the side of safety here (overestimate causality) 
+- We err on the side of safety here (overestimate causality)
 
 *** Preserving causality \textendash{} problems 
 
@@ -572,9 +572,9 @@ To summarise idea:
       :END:
 
 
-#+CAPTION: Dynamic group memberships 
+#+CAPTION: Dynamic group memberships
 #+ATTR_LaTeX: :width 0.8\linewidth :options page=6
-#+NAME: fig:mc:confusing_cause_effect
+#+NAME: fig:mc:dynamic_groups
 [[./figures/mcast_ordering.pdf]]
 
 
@@ -868,7 +868,7 @@ future (*epochs*)
       :BEAMER_col: 0.5
       :END:
 
-- Message $m_A$ from A sent before message $m_C$  C
+- Message $m_A$ from A sent before message $m_C$ from C
 - But sending of $m_A$ certainly did not cause sending of $m_C$
 - Hence there should be no reason for B to believe so, even though
   sending time of $m_A$ earlier than that of $m_C$  
@@ -1020,7 +1020,7 @@ R_1 \vee \exists e: (e_1, e) \in R_1 \wedge (e, e_2) \in R$$
   - It orders pairs of events that were not  cause/effect
     - But that is not decidable from perspective of a group
       communication protocol!
-  - So ere on the side of safety 
+  - So we err on the side of safety
 
 
 *** Happened-before relationship, concurrent events
@@ -1174,9 +1174,9 @@ ordered set T
       :BEAMER_col: 0.5
       :END:
 
-#+CAPTION: Events with logical time stamps 
+#+CAPTION: Events with logical time stamps
 #+ATTR_LaTeX: :height 0.6\textheight :options page=4
-#+NAME: fig:time_not_causal
+#+NAME: fig:logical_time_stamps
 [[./figures/logicalTime.pdf]]
 
 *****                                                                 :BMCOL:
@@ -1186,7 +1186,7 @@ ordered set T
 
 #+CAPTION: Events with logical time stamps \textendash{} rearranged
 #+ATTR_LaTeX: :height 0.6\textheight :options page=5
-#+NAME: fig:time_not_causal
+#+NAME: fig:logical_time_rubberband
 [[./figures/logicalTime.pdf]]
 
 
@@ -1242,9 +1242,9 @@ LamportTime transformation of a given distributed  algorithm A to L(A)
       :BEAMER_col: 0.5
       :END:
 
-#+CAPTION: Events with logical time stamps 
+#+CAPTION: Events with logical time stamps
 #+ATTR_LaTeX: :height 0.6\textheight :options page=4
-#+NAME: fig:time_not_causal
+#+NAME: fig:lamport_example_events
 [[./figures/logicalTime.pdf]]
 
 *****                                                                 :BMCOL:
@@ -1252,9 +1252,9 @@ LamportTime transformation of a given distributed  algorithm A to L(A)
       :BEAMER_col: 0.5
       :END:
 
-#+CAPTION: Events with LamportTime as timestamps 
+#+CAPTION: Events with LamportTime as timestamps
 #+ATTR_LaTeX: :height 0.6\textheight :options page=6
-#+NAME: fig:time_not_causal
+#+NAME: fig:lamport_example_timestamps
 [[./figures/logicalTime.pdf]]
 
 
@@ -1309,7 +1309,7 @@ LamportTime transformation of a given distributed  algorithm A to L(A)
 
 *** Vector clocks and causal structure 
 
-- Claim: Vector clocks allow to reconstruct the entire causal
+- Claim: Vector clocks allow us to reconstruct the entire causal
   structure of an execution (e.g. concurrency of events) 
 - Formally: 
   $$ VC(e) < VC (e‘) \text{ if and only if } e \rightarrow  e‘ $$ 
@@ -1376,7 +1376,7 @@ Vector clocks represent the entire /cone/ of previous events
 *** Realizing Causal Ordering: CBCAST protocol
 
  - Open question: How to implement causally ordered group
-   communication implemented?
+   communication?
  - \ac{CBCAST} protocol
    - Based on vector clocks 
    - UDP/IP-based, IP multicast used if possible
@@ -1458,7 +1458,7 @@ Update VT
     - E.g., reads are load-balanced across instances in a group  
   - Checkpointing 
 \pause 
-- But: *abandonded project* 
+- But: *abandoned project*
  
 *** Case study: Derecho 
 
@@ -1469,7 +1469,7 @@ Update VT
     - Directly access another machine's memory; high-throughput,
       low-latency networking; bypassing kernel buffers, ... by having
       network interface card directly access main memory
-  - Provides *replicated objets* as core building blocks 
+  - Provides *replicated objects* as core building blocks
 
 
    
