@@ -1560,7 +1560,7 @@ Update VT
 - Efficient implementations can be nontrivial and require concepts
   like vector clocks
 - Various frameworks exist to use this approach in own applications 
-- Further reading: Hybrid Logical clocks  \cite{Kulkarni:2014:HLC}
+- Further reading: Hybrid Logical clocks 
 
 *** Combination of multicast ordering semantics \cite{Hadzilacos:1993:MCastSemantics} 
 
