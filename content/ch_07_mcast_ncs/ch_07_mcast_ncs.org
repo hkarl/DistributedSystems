@@ -321,7 +321,7 @@ If processes p and q both TO-deliver messages m and m’, then p TO-delivers m b
 - Think of
   - Process group members as state machines
   - Messages as events
-- With atomic order, all state machines see same sequence of events
+- With atomic order, *all state machines see same sequence of events*
   - Deterministic state machines will then go through the same state
     changes
 - We will revisit this approach in the replication chapter 
@@ -335,6 +335,9 @@ If processes p and q both TO-deliver messages m and m’, then p TO-delivers m b
 - Distributed algorithms
   - Many options
   - Often, token-passing based 
+\pause
+- But what if things go wrong?? 
+
 
 *** Implementing TO with central sequencer 
     :PROPERTIES:
