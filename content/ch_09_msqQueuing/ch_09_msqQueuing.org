@@ -13,11 +13,13 @@
   - Messages go to *all* matching subscribers
   - As long as they *are* subscribed at publication time
   - If no matching subscriber during publication, message is dropped
-    - A feature, not a bug
+    - A feature, not a bug: simple, low overhead 
+\pause
 - Alternative model?
   - Ensure that a message is sent to *exactly one* subscriber,
     irrespective when that subscription happens?
-  - Entails: store a message! 
+  - Entails: store a message!
+    - At least until delivery, possibly longer 
 
 *** (Distributed) Message queuing 
 
@@ -51,11 +53,21 @@ loose coupling
  - *Load balancing* across receivers for same queue 
  - Detailed semantics often differ between different MQ realizations 
 
+*** Undeliverable messages? 
+
+- What if message cannot be delivered?
+  - E.g., too large, topic does not exist, TTL expired, message
+    rejected
+- Silently discard? Or predictable treatment?
+  - Often: *dead-letter queue*
+  - Sometimes: Differentiate further between application-level faults
+    and delivery failure
+
 
 *** Usage areas
 
 Often used to 
-- Build a complex application out of simpler ones (e.g., TypeSafe)
+- Build a complex application out of simpler ones (microservices)
 - Integrate existing applications into a larger one \textendash{} so-called
   Enterprise Integration 
 - Various formalisms exists (e.g., http://www.enterpriseintegrationpatterns.com/) 
@@ -141,7 +153,7 @@ Often used to
     other application \textendash{} unrealistic 
 - Suppose we have a standardised protocol and API
   - Option 2: only have to translate from application-specific format
-    into application problem
+    into a common message format 
   - Sometimes possible, but abstraction level makes this problematic
   - Specific translation modules can take on this job 
 
@@ -315,7 +327,7 @@ Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
     publication allows 
   - Claims /exactly once/ level \Innocey 
 - Clients can leave a *will* with broker or with
-  \href{http://mosquitto.org}{Mosquito}  
+  \href{http://mosquitto.org}{Mosquitto}
   - Sent to other subscribers when client disconnects unexpectedly 
 
 
@@ -333,12 +345,25 @@ Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
   :CUSTOM_ID: sec:mq:small_case_studies
   :END:
 
+** NATS 
+
+*** NATS 
+
+- [[https://nats.io][NATS]]
+  - Quote: /The Real-Time Communication Fabric for Distributed Agents
+    and Applications. NATS unifies messaging, streaming, and state
+    into one real-time system  @@latex: \textemdash{} @@  connecting services, devices, and AI
+    agents from cloud to edge./ 
+- Simpler, modern, lightweight alternative to MQ systems
+- Supports pub/sub, request/reply, streaming 
+- Persistence can be added via JetStreams 
+
 ** UNIX MQ 
 
 *** MQ built-in 
 
 - Simple message queueing functionality built into Unix 
-- Recall KMS discussion
+  - Should have been discussed in your operating system class already 
 - In SysV, in POSIX 
 - Check, e.g., ~man mq_overview~ 
 
@@ -373,48 +398,21 @@ once, in the exact order that they are sent.
 
 - Server-side encryption 
 - Reliably deliver messages
-  - /without loosing messages/ \Innocey 
+  - /without losing messages/ \Innocey 
 - Elastic scaling of the queuing service itself
 - Pay-per-use 
 
 
-** IBM WebSphere 
-
-*** IBM WebSphere 
-
-- Set of products to create and integrate applications 
-
-**** Quote from \href{https://www.ibm.com/developerworks/websphere/products/platformoverview.html}{webpage} :B_quotation:
-     :PROPERTIES:
-     :BEAMER_env: quotation
-     :END:
-
-
-The WebSphere software platform for e-business is a suite of stable,
-secure, and reliable software product offerings for conducting
-e-business and developing e-business applications. 
-
-*** \href{https://www.ibm.com/products/mq}{WebSphere MQ}  
-
-- Message Queuing component of WebSphere 
-- Available as appliance, in cloud, or on z/OS 
-
-**** Claims 
-
-- /\href{https://www.ibm.com/cloud/mq/faq}{Once and once only delivery}/ \Innocey 
-- Transactional
-- Asynchronous 
-
 ** ActiveMQ 
    
 
-*** Case study: ActiveMQ 
+*** Case study: ActiveMQ Classic, ActiveMQ Artemis 
 - \href{http://activemq.apache.org/}{ActiveMQ} project 
 - Open-source message broker, written in Java, Apache project   
 - Claimed to be /the most widely used messaging platform on the
   planet/
 - Fairly complex, > 1 millions lines of code 
-
+- Artemis: current version (as of 2026)
  
 *** Example aspect: Broker fault tolerance 
 
@@ -437,7 +435,7 @@ e-business and developing e-business applications.
   - Clustering necessary to circumvent single point of failure 
 
 
-*** ActiveMQ: \href{http://activemq.apache.org/-getting-started.html}{Practical aspects} 
+*** ActiveMQ: \href{https://activemq.apache.org/getting-started.html}{Practical aspects}
 
 
 - Fairly heavyweight installation 
@@ -462,8 +460,8 @@ e-business and developing e-business applications.
 - Supports multiple protocols; in particular, AMQP-0.9.1
 - Written in Erlang, runs on Erlang VM 
 - Cluster deployments for throughput and availability
-- Lot's of plugins
-- Open source plus commercial distribution (Pivotal) 
+- Lots of plugins
+- Open source plus commercial distribution (Broadcom) 
 
 
 *** RabbitMQ messaging model 
@@ -483,7 +481,7 @@ e-business and developing e-business applications.
 *** RabbitMQ messaging model \textendash{} Example 
 
 
-#+CAPTION: RabbitMQ messaging mode
+#+CAPTION: RabbitMQ messaging model
 #+ATTR_LaTeX: :width 0.85\linewidth
 #+NAME: fig:mq:model
 [[./figures/rabbit_mq.pdf]]
@@ -499,7 +497,7 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
 - Work queues/competing consumers \textendash{} round-robin among queue
   subscribers 
 - Publish/subscribe-style; one message to many receivers
-  - Needs /exchanges/: producers send to exchanges, wich forward to
+  - Needs /exchanges/: producers send to exchanges, which forward to
     multiple queues 
 - Message routing: Subscribe only to some messages 
 - Filtering on topics 
@@ -513,8 +511,7 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
 
 
   - Multiple machines forming one logical broker
-  - Queues can sit on one machine or be mirrored across machines in
-    broker 
+  - Ordinary (classic) queues  sit on one machine
   - All queues are visible to any client connected to any machine
     - Irrespective of where queue is, where client connects
   - Needs highly dependable communication inside cluster; all brokers
@@ -530,15 +527,32 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
   - Emphasises availability and partition tolerance, *sacrifices
     consistency* (see CAP Theorem, Section \slideref{sec:CAPTheorem}[s:CAPTheorem]) 
 
+*** Quorum queues 
 
-*** RabbitMq Performance 
+Cmp. [[https://www.rabbitmq.com/docs/quorum-queues][Quorum queues]]
+
+- What if some queues are long-lived, need to be highly available as
+  they are critical to application architecture?
+  - Maybe warrants investing additional effort?
+- Aspects:
+  - Publisher should ask & wait for confirmation
+  - Queue only confirms to publisher after message has been replicated
+    sufficiently often
+    - Realised via quorum 
+- Hint: Study documentation carefully! 
+
+
+
+
+*** RabbitMQ Performance
 
 - Easy to get 20kevents / second from one queue on typical hardware
 - Clustered scenarios often between 3 and 7 servers
-- Pushing RabbitMq to
-  \href{https://content.pivotal.io/blog/rabbitmq-hits-one-million-messages-per-second-on-google-compute-engine}{1  million events / second} possible but
-  non-trivial
-  - Context: Apple about 1/2 million iMessages per second 
+- Pushing RabbitMQ to
+  \href{https://blogs.vmware.com/tanzu/rabbitmq-hits-one-million-messages-per-second-on-google-compute-engine/}{1  million events / second} possible but
+  non-trivial (as of 2014) 
+  - Context: Apple about 1/2 million iMessages per second (2014); WhatsApp
+    about 1.6 million per second (2024)
 
 
 *** Clients, Python 
@@ -551,7 +565,7 @@ Compare \href{https://www.rabbitmq.com/getstarted.html}{Tutorial}:
 
 **** For projects 
 
-- \href{http://docs.celeryproject.org/en/latest/}{Celery}: distributed
+- \href{https://docs.celeryq.dev/en/stable/}{Celery}: distributed
   task queue (e.g., often used in Django apps)  
 
 *** Example pika 
@@ -591,6 +605,7 @@ print('Requeued %i messages' % requeued_messages)
 connection.close()
 #+END_SRC
 
+
 * Big case study: Kafka
   :PROPERTIES:
   :CUSTOM_ID: sec:mq:kafka
@@ -611,8 +626,8 @@ connection.close()
 *** Use cases 
   - *Real-time data feeds* (e.g., track user activity on a distributed
     web server farm)  
-    - Stream processing often with additional frameworks like Storm on
-      top 
+    - Stream processing with Kafka Streams or  with additional
+      framework like Apache Flink
   - Conventional messaging system (e.g., competes with ActiveMQ) 
   - Log aggregation (e.g., collect log files from server farm) 
   - Commit log for distributed data bases 
@@ -817,7 +832,6 @@ Topics are divided into 1 or more *partitions*
 **** Questions 
 - How to decide leader vs. follower? See Section
   \slideref{sec:leader_election}
-- How to *passively replicate*? See Section \slideref{sec:TODO}
 
 
 
@@ -835,14 +849,14 @@ guide
 **** Create topic 
 
 #+BEGIN_SRC bash
-$ bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+$ bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic test
 #+END_SRC
 
 
 **** Send message 
 
 #+BEGIN_SRC bash
-$ bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+$ bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic test
 This is a message
 This is another message
 ^C
@@ -868,14 +882,14 @@ This is another message
 
 #+BEGIN_SRC bash 
 $ bin/kafka-server-start.sh config/server-1.properties &
-$ bin/kafka-server-start.sh config/server-1.properties &
+$ bin/kafka-server-start.sh config/server-2.properties &
 #+END_SRC
 
 **** Replicated topic 
 
 
 #+BEGIN_SRC bash
-$ bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 1 --topic my-replicated-topic
+$ bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 3 --partitions 1 --topic my-replicated-topic
 #+END_SRC
 
 
@@ -885,7 +899,7 @@ $ bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3
 
 
 #+BEGIN_SRC bash 
-$ bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic my-replicated-topic
+$ bin/kafka-topics.sh --describe --bootstrap-server localhost:9092 --topic my-replicated-topic
 Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
     Topic: my-replicated-topic  Partition: 0    Leader: 1   Replicas: 1,2,0 Isr: 1,2,0
 #+END_SRC
@@ -897,7 +911,6 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 **** What's happening here? 
 
 - What happens when we add servers? 
-- What is this zookeeper?
 
 
 ** Design 
@@ -907,7 +920,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 - Mostly follows
   \href{https://kafka.apache.org/documentation/\#design}{Design discussion} 
 - Challenges to solve
-  - How to persist massages?
+  - How to persist messages?
   - How to get total order?
   - How to deal with failing servers? How to replicate? 
   - Efficiency! High throughput! 
@@ -958,7 +971,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
       headers 
   - Consistent message layout so that no reformatting is necessary 
   - Zero copy system calls
-    - From pagefile to socket: \href{sendfile system call}{sendfile}
+    - From pagefile to socket: \href{https://man7.org/linux/man-pages/man2/sendfile.2.html}{sendfile}
       in Linux, e.g.
     - Send data from pagecache directly to network card without
       needless copying 
@@ -1006,7 +1019,11 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
     transactions)
   - Sometimes feasible if output of consumed messages can also store
     how much has been consumed
-    - But that is just pushing the problem elsewhere 
+    - But that is just pushing the problem elsewhere: application
+      needs to take responsibility 
+\pause
+- We will see later: *guaranteeing* exactly once in general is impossible, only
+  (very) high probability can be promised 
 
 
 *** Replication 
@@ -1037,7 +1054,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 
 *** Failing leader 
 
-- Follows protect against failing leader
+- Followers protect against failing leader
   - Idea: detect, choose new leader, switch to that 
 - Suppose leader fails and it has promised that message $m$ has been
   committed
@@ -1058,7 +1075,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 - Log compaction
 - Quotas
   - For network, request rate, ... 
-
+- (Some of it covered in Consensus chapter when we go in detail about Raft)
 
 
 
@@ -1072,10 +1089,13 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
    \href{https://engineering.linkedin.com/kafka/benchmarking-apache-kafka-2-million-writes-second-three-cheap-machines}{Three cheap machines in 2014}: 2 million writes per second
 - In cloud scenarios,
   \href{https://hackernoon.com/benchmarking-kafka-performance-part-1-write-throughput-7c7a76ab7db1}{slightly  different numbers} (50.000 \textendash{} 300.000 on three nodes)
-- Scales well when adding servers to cluster! 
-- New kid on the block: \href{https://pulsar.apache.org}{Pulsar}
-  claims to
-  \href{https://streaml.io/about/newsreleases/apache-pulsar-outperforms-apache-kafka-on-openmessaging-benchmark}{outpace  Kafka}   
+- [[https://developer.confluent.io/learn/kafka-performance/][Confluent numbers]] (3-node cluster on AWS): about 600 kmsg/s, 5\,ms
+  p99 latency at 200 MB/s 
+- Scales well when adding servers to cluster!
+- But performance *highly* depends on work load (message size,
+  replication level, \dots)
+- Alternative: \href{https://pulsar.apache.org}{Pulsar}
+  claims to outpace  Kafka 
 
 *** Comparison  
 
@@ -1087,13 +1107,28 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
   - E.g.,
     \href{http://tomasz.janczuk.org/2015/09/from-kafka-to-zeromq-for-log-aggregation.html}{log aggregation via 0mq might be superior to Kafka}  -- in this
     example, dropping messages when no subscriber was alive was ok 
-- 
-   \href{https://content.pivotal.io/rabbitmq/understanding-when-to-use-rabbitmq-or-apache-kafka}{RabbitMq  vs. Kafka}  \cite{Dobbelaere:2017:KVR:3093742.3093908}
+- RabbitMQ vs. Kafka? 
   - Probably the two most popular choices today
   - Hard-and-fast metrics difficult as guarantees differ 
+  - Academic paper \cite{Dobbelaere:2017:KVR:3093742.3093908} 
+  - [[https://www.cloudamqp.com/blog/when-to-use-rabbitmq-or-apache-kafka.html][Comparison from company with interest in RabbitMQ]]
 
 
+*** Comparison table 
 
+#+ATTR_LATEX: :align lp{0.38\textwidth}p{0.38\textwidth} :booktabs :center
+#+CAPTION: RabbitMQ vs.\ Kafka comparison (based on \cite{Dobbelaere:2017:KVR:3093742.3093908} and \href{https://www.cloudamqp.com/blog/when-to-use-rabbitmq-or-apache-kafka.html}{CloudAMQP, 2025})
+#+NAME: tab:mq:rabbitmq_kafka
+|                   | RabbitMQ                                          | Kafka                                          |
+|-------------------+---------------------------------------------------+------------------------------------------------|
+| Primary role      | General-purpose MQ; streaming via Streams (v3.9+) | Streaming platform; MQ as secondary use case   |
+| Routing           | Flexible: direct, fanout, topic, header exchanges | None built-in; use separate topics             |
+| Message replay    | Yes, via Streams                                  | Yes, native                                    |
+| Message priority  | Supported                                         | Not supported                                  |
+| Scaling           | Vertical primarily                                | Horizontal natively (partitions, nodes)        |
+| Consumer model    | Push (pull possible but discouraged)              | Pull                                           |
+| Persistence       | Until ACK (classic); configurable (Streams)       | Configurable retention period                  |
+| Complexity        | Lower; easier initial setup                       | Higher; more concepts (partitions, offsets, …) |
 
 
 *** Pulsar                                                         :noexport:
@@ -1111,7 +1146,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 - Groups  of microservices can choose their own instance of MQ system  
 
 - Choice may depend on
-  \href{https://content.pivotal.io/blog/messaging-patterns-for-event-driven-microservices}{microservice  pattern} 
+  \href{https://blogs.vmware.com/tanzu/messaging-patterns-for-event-driven-microservices/}{microservice  pattern} 
 
 
 
@@ -1183,7 +1218,7 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
    - Processes can be identical or different (by \ac{UID})
    - Possible with identical processes?
 
-*** LCR Leader-Election-Algorithmus
+*** LCR Leader Election Algorithm
  Simple algorithm by \ac{LCR} (cp. e.g. \cite[ch. 15]{Lynch:1996:DA:525656})
  - Assumptions: G unidirectional, $n$ *unknown*, only leader performs
    output, nodes know their UID 
@@ -1229,14 +1264,14 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 
 - Communicate anticlockwise
 
-#+CAPTION: LCR example ring: First two steps 
+#+CAPTION: LCR example ring: Complete process
 #+ATTR_LaTeX: :width 0.75\linewidth :options page=3
 #+NAME: fig:LCR_ring_complete
 [[./figures/leaderelect_ring.pdf]]
 
 
 
-** Randomized timeout 
+** Randomized timeout: Raft 
    :PROPERTIES:
    :CUSTOM_ID: sec:raft_le
    :END:
@@ -1345,7 +1380,39 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 [[./figures/raft_performance.pdf]]
 
 
+*** Raft vs. KRaft 
+   :PROPERTIES:
+   :CUSTOM_ID: sec:kraft
+   :END:
 
+- Raft forms the basis of coordination, leader election in Kafka as
+  well 
+- Specific version: [[https://kafka.apache.org/41/operations/kraft/][KRaft]]
+  - Switches from Raft's push-based to a pull-based model (better
+    match with Kafka consumers' behavior)
+
+\pause
+\vfill 
+
+- Historic note: Older Kafka versions used separate system
+  (~zookeeper~) for coordination; integrating it simplified
+  architecture
+  - Key difference: is metadata about messages external or internal? 
+
+**** COMMENT Notes 
+- Explain difference Raft push-based, KRaft pull-based 
+
+Claude: 
+
+KRaft is genuine Raft at its core — same leader election (randomized timeouts, term numbers, majority vote), same safety properties (at most one leader per term, committed entries never lost), same log-based state machine replication. A student who understands the Raft section already in ch_09 understands KRaft's foundations.
+The main difference is how log entries are replicated. Standard Raft is push-based: the leader sends AppendEntries RPCs to followers. KRaft is pull-based: followers fetch entries from the leader, exactly like Kafka consumers fetch from a partition. This is a deliberate architectural choice — Kafka already has a highly optimized pull-based log fetch path, so KRaft reuses it. The metadata log is literally stored as a special internal Kafka topic (@metadata).
+Other adaptations:
+
+Quorum size is small (typically 3 or 5 controller nodes), separate from the broker pool. Brokers outside the quorum observe the metadata log passively but don't vote.
+Snapshots work like Raft log compaction — periodic snapshots bound log growth, so a new broker joining doesn't have to replay the full history.
+Leader transfer is supported (a clean handoff), which plain Raft doesn't specify.
+
+For your course: the relationship is a nice pedagogical bridge. KRaft is a good example of "here is a real production system that takes a textbook algorithm and adapts it to an existing architectural constraint (pull-based log)" — the invariants are preserved, the mechanism is adjusted. Since ch_09 already introduces Raft leader election and forward-references the full consensus treatment, a single sentence noting "Kafka uses a variant of Raft called KRaft for this" is enough here, with the depth deferred to wherever you cover consensus properly.
 
 
 ** Bully                                                           :noexport:
@@ -1673,8 +1740,34 @@ Core building block of leader election
   - Some, e.g.,  \href{https://github.com/sile/evel}{evel} 
 - But we really should be doing this right: Integrate with Consensus
   problem 
-  - ZooKeeper (Section \ref{sec:distStor:zookeeper})
   - etcd (Section \ref{sec:consensus_etcd})
+
+
+** Consensus 
+
+*** Broader perspective: Consensus 
+
+- In leader election, all nodes had to agree on a single property:
+  which node is the leader? 
+- Broader perspective: How to agree on any, arbitrary property?
+
+
+*** Expectation on consensus? 
+
+- Everybody agrees on same value
+- Only plausible values can be result of consensus
+  - Values participants are interested in? 
+- Consensus terminates 
+
+
+
+*** Needs for consensus 
+
+In addition to leader election, consensus has been or will be used implicitly for: 
+- Message ordering in atomic delivery
+- Transaction commit in distributed transactions
+- Cluster membership changes (everybody needs to have the same
+  perspective) 
 
 * Summary 
 
@@ -1683,7 +1776,7 @@ Core building block of leader election
 - Powerful programming model 
 - Decoupling allows scaling up
 - Fault tolerance is a *real* challenge
-- Lot's of powerful tools available, with different tradeoffs
+- Lots of powerful tools available, with different tradeoffs
   (cp. \href{http://queues.io}{Queues IO website})  
 
 
