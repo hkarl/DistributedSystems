@@ -162,7 +162,7 @@ multicast library
 
 
 #+CAPTION: Replication handled by underlying library 
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=4
+#+ATTR_LaTeX: :width 0.75\linewidth :options page=4
 #+NAME: fig:distStor:replication_library
 [[./figures/scenarios.pdf]]
 
@@ -610,7 +610,7 @@ Necessary Condition:
    - Only after critical section has been left need other processes be
      informed  
 
-*** Weak consistency – Idea: synchronization variable
+*** Weak consistency  @@latex: \textemdash{} @@  Idea: synchronization variable
 
  - Idea: Tell data store about such synchronization aspects
    - To relieve from needlessly attempting strong consistency 
@@ -909,7 +909,7 @@ Role of primary is transferred from S2 to S4
 *** Local-write protocol with backup, example  
 
 #+CAPTION: Local write: migrate server plus backup 
-#+ATTR_LaTeX: :height 0.75\textheight :options page=5
+#+ATTR_LaTeX: :height 0.65\textheight :options page=5
 #+NAME: fig:distStor:migrate_with_backup
 [[./figures/updateProtocols.pdf]]
 
@@ -1254,7 +1254,7 @@ messages, not 48.
 
 *** Monotonic read violation 
 #+CAPTION: Monotonic-read violation: value decreases after replica switch
-#+ATTR_LaTeX: :width 0.5\linewidth :options page=1
+#+ATTR_LaTeX: :width 0.4\linewidth :options page=1
 #+NAME: fig:cc:monread
 [[./figures/clientcentric_mscs.pdf]]
 
@@ -1457,7 +1457,7 @@ confusing orphan reply.
 #+NAME: fig:cc:wfr
 [[./figures/clientcentric_mscs.pdf]]
 
-** Session guarantees in practice
+*** Session guarantees in practice
 
 The four properties are *independent*; practical systems offer various
 subsets:
