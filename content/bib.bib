@@ -1740,3 +1740,69 @@ pages = {114–131},
 numpages = 18,
 keywords = {publish/subscribe, interaction, Distribution}
 }
+
+
+@article{Herlihy:1990:LCC:78969.78972,
+  author    = {Maurice P. Herlihy and Jeannette M. Wing},
+  title     = {Linearizability: {A} Correctness Condition for Concurrent Objects},
+  journal   = {ACM Transactions on Programming Languages and Systems},
+  volume    = {12},
+  number    = {3},
+  pages     = {463--492},
+  year      = {1990},
+  doi       = {10.1145/78969.78972},
+}
+
+
+@inproceedings{terry94:_session_guaran_weakl_consis_replic_data,
+  author       = {Douglas B. Terry and
+                  Alan J. Demers and
+                  Karin Petersen and
+                  Mike Spreitzer and
+                  Marvin Theimer and
+                  Brent B. Welch},
+  title        = {Session Guarantees for Weakly Consistent Replicated Data},
+  booktitle    = {Proceedings of the Third International Conference on Parallel and
+                  Distributed Information Systems {(PDIS} 94), Austin, Texas, USA, September
+                  28-30, 1994},
+  pages        = {140--149},
+  publisher    = {{IEEE} Computer Society},
+  year         = 1994,
+  url          = {https://doi.org/10.1109/PDIS.1994.331722},
+  doi          = {10.1109/PDIS.1994.331722},
+  timestamp    = {Fri, 24 Mar 2023 00:04:37 +0100},
+  biburl       = {https://dblp.org/rec/conf/pdis/TerryDPSTW94.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+@InProceedings{shapiro11:_confl_free_replic_data_types,
+author="Shapiro, Marc
+and Pregui{\c{c}}a, Nuno
+and Baquero, Carlos
+and Zawirski, Marek",
+editor="D{\'e}fago, Xavier
+and Petit, Franck
+and Villain, Vincent",
+title="Conflict-Free Replicated Data Types",
+booktitle="Stabilization, Safety, and Security of Distributed Systems",
+year=2011,
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="386--400",
+abstract="Replicating data under Eventual Consistency (EC) allows any replica to accept updates without remote synchronisation. This ensures performance and scalability in large-scale distributed systems (e.g., clouds). However, published EC approaches are ad-hoc and error-prone. Under a formal Strong Eventual Consistency (SEC) model, we study sufficient conditions for convergence. A data type that satisfies these conditions is called a Conflict-free Replicated Data Type (CRDT). Replicas of any CRDT are guaranteed to converge in a self-stabilising manner, despite any number of failures. This paper formalises two popular approaches (state- and operation-based) and their relevant sufficient conditions. We study a number of useful CRDTs, such as sets with clean semantics, supporting both add and remove operations, and consider in depth the more complex Graph data type. CRDT types can be composed to develop large-scale distributed applications, and have interesting theoretical properties.",
+isbn="978-3-642-24550-3"
+}
+
+@inproceedings{Bailis:2012:Bolton,
+  author    = {Peter Bailis and
+               Alan Fekete and
+               Ali Ghodsi and
+               Joseph M. Hellerstein and
+               Ion Stoica},
+  title     = {The Potential Dangers of Causal Consistency and an Explicit Solution},
+  booktitle = {Proceedings of the 3rd {ACM} Symposium on Cloud Computing ({SoCC})},
+  year      = {2012},
+  doi       = {10.1145/2391229.2391251},
+  url       = {https://doi.org/10.1145/2391229.2391251},
+}
+

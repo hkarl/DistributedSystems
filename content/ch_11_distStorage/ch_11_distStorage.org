@@ -94,7 +94,7 @@
 
 - Consider data and their operations jointly in the replication discussion
 
-- Operations: RMI calls 
+- Operations: gRPC, RMI, \dots calls 
 
 - Question: What happens when replicated objects have concurrent
   invocations?
@@ -114,7 +114,7 @@
       :BEAMER_col: 0.5
       :END:
 
-Object itself or RMI skeleton deals with  replication
+Object itself or  skeleton deals with  replication
 - Need to implement coordination functionality
 - Can be specific to class or object 
 
@@ -124,7 +124,7 @@ Object itself or RMI skeleton deals with  replication
       :END:
 
 
-#+CAPTION: Replication handled by 
+#+CAPTION: Replication handled by object 
 #+ATTR_LaTeX: :width 0.8\linewidth :options page=3
 #+NAME: fig:distStor:replication_object
 [[./figures/scenarios.pdf]]
@@ -133,13 +133,13 @@ Object itself or RMI skeleton deals with  replication
 *** Option a: resulting coordination relationship 
 
 
-#+CAPTION: Replication handled by object or RMI skeleton: Coordination relationship 
+#+CAPTION: Replication handled by object or  skeleton: Coordination relationship 
 #+ATTR_LaTeX: :width 0.95\linewidth :options page=5
 #+NAME: fig:distStor:skeleton_relation
 [[./figures/scenarios.pdf]]
 
 
-*** Option b: Additional support outside of RMI library 
+*** Option b: Additional support outside of  library 
 ****                                                              :B_columns:
      :PROPERTIES:
      :BEAMER_env: columns
@@ -150,7 +150,7 @@ Object itself or RMI skeleton deals with  replication
       :BEAMER_col: 0.5
       :END:
 
-Object/RMI  stays  unaware of replication; responsibility e.g. in
+Object  stays  unaware of replication; responsibility e.g. in
 multicast library 
 - More common approach 
 
@@ -162,7 +162,7 @@ multicast library
 
 
 #+CAPTION: Replication handled by underlying library 
-#+ATTR_LaTeX: :height 0.95\linewidth :options page=4
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=4
 #+NAME: fig:distStor:replication_library
 [[./figures/scenarios.pdf]]
 
@@ -242,6 +242,7 @@ of the /most recent/ write on x
  - As this model is common to uniprocessors, most programmers (more or
    less consciously) expect  a system to behave like this 
 
+  
 *** Problems of strict consistency 
 
 
@@ -258,10 +259,16 @@ of the /most recent/ write on x
 
 
 Obvious problems in replicated storage
- - No global time 
+ - No global time, no instantaneous propagation 
  - What happens when read takes place before write, but read *arrives*
    at write location afterwards?
  - Which value to return? 
+
+\onslide<2->
+*Strict consistency is IMPOSSIBLE to implement!* 
+
+\onslide<1->
+
 
 *****                                                                 :BMCOL:
       :PROPERTIES:
@@ -274,6 +281,12 @@ Obvious problems in replicated storage
 [[./figures/consistency_mscs.pdf]]
 
 
+
+
+*****                               :B_ignoreheading:
+      :PROPERTIES:
+      :BEAMER_env: ignoreheading
+      :END:
 
 
 *** Examples for strict consistency 
@@ -313,14 +326,96 @@ First read at B already has to deliver 42.
 
 #+CAPTION: Not strictly consistent example
 #+ATTR_LaTeX: :width 0.85\linewidth :options page=3
-#+NAME: fig:distStor:strictly
+#+NAME: fig:distStor:not_strictly
 [[./figures/consistency_mscs.pdf]]
+
+
+*** Linearizability 
+
+
+
+
+- Operations (reads or writes) have an *invocation* ~inv~ and a
+  *resolution* ~res~ (or *completion*)
+- Ordering for operations:  $o_1 < o_2$ iff  $\mathrm{res}(o_1)$ < $\mathrm{inv}(o_2)$
+  - I.e., $o_1$ completes before $o_2$ started; they do not overlap 
+  - If neither $o_1 < o_2$ nor $o_2 < o_1$, they are concurrent   
+
+\pause
+
+**** Linearizability    \cite{Herlihy:1990:LCC:78969.78972}                           :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+
+- If $o_1 < o_2$, the resolution of $o_1$ must be visible to $o_2$
+  - In particular: $o_2$ reads result of $o_1$ 
+- There is *no requirement* for concurrent operations!
+  - No immediate visibility for these operations required 
+
+\pause
+
+**** Relevance 
+
+- High! Realised by systems like Raft, etcd, \dots 
+- *Not* implemented via clocks, but by sequence numbers assigned at a
+  serializer
+
+*** Example 
+
+***** 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:
+
+      
+
+
+
+Example needs primary and replica storage to make the difference views
+on the same object clear 
+
+
+
+\vfill
+\onslide<2->
+
+Note: This example reads at replica; this is allowed in some systems
+(for read throughput) but not all (e.g., etcd mandates reading at
+primary; this example would not work there) 
+
+
+\onslide<1->
+
+
+***** 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
+
+
+
+
+#+CAPTION: Linearizable example, but not strictly consistent
+#+ATTR_LaTeX: :height 0.5\textheight :options page=10
+#+NAME: fig:distStor:linear
+[[./figures/consistency_mscs.pdf]]
+
+
+*****                               :B_ignoreheading:
+      :PROPERTIES:
+      :BEAMER_env: ignoreheading
+      :END:
+
 
 *** Sequential consistency 
 
  Observation: Programmers are already used to paying attention to situations when order of events is important
- - Critical sections in concurrent programs, interleaving of threads, …
- - Use as justification to weaken the consistency model? 
+ - Critical sections in concurrent programs, interleaving of threads,
+   \dots 
+ - Use as justification to weaken the consistency model beyond linearizability? 
 
 
 ****  Sequential consistency                                   :B_definition:
@@ -335,11 +430,17 @@ appear in this sequence in the order specified by its program.
  - Meaning: *Any* interleaving of reads and writes is acceptable, but
    all processes see the *same* interleaving!
 
+
+\pause
+**** Difference to linearizable? 
+
+Sequential consistency allows reorder with respect to real time 
+
 *** Sequential consistency, example 
 
 
 
-#+CAPTION: Sequentially consistent example
+#+CAPTION: Sequentially consistent example, but not linearizable 
 #+ATTR_LaTeX: :width 0.95\linewidth :options page=4
 #+NAME: fig:distStor:sequential
 [[./figures/consistency_mscs.pdf]]
@@ -440,7 +541,7 @@ Necessary condition:
 
 
  
- - Allowed with  causally consistency, but not
+ - Allowed with  causal consistency, but not
    with sequential  or strict consistency 
    - Note: w(X,17) at B  and w(X,99) at A  are concurrent, need not be
      ordered! 
@@ -563,7 +664,7 @@ Weak consistency does not distinguish between
 
 
 
-*** Release consistency – Definition 
+*** Release consistency  @@latex: \textemdash{} @@  Definition 
 
 **** Release consistency                                       :B_definition:
      :PROPERTIES:
@@ -759,7 +860,7 @@ Assumptions for graphs:
 
 Writer may proceed even if data not written yet 
 
-#+CAPTION: Primary with backup and blocking write operations
+#+CAPTION: Primary with backup and *non*-blocking write operations
 #+ATTR_LaTeX: :height 0.45\textheight :options page=3
 #+NAME: fig:distStor:primary_non_blocking_write
 [[./figures/updateProtocols.pdf]]
@@ -773,7 +874,7 @@ Writer may proceed even if data not written yet
 - Observation: Protocols above do not support *locality* of programs
   - After accessing a variable once, it is likely that this variable
     or nearby variables are accessed in near future 
-- Non-blocking remote-write protocols: Lot's of update traffic
+- Non-blocking remote-write protocols: Lots of update traffic
 - Idea: Move primary: *local write* protocols 
 
 *** Local-write protocol without backup 
@@ -861,7 +962,7 @@ Role of primary is transferred from S2 to S4
 
 *** Active replication with replicated objects \textendash{} naive 
 
-#+CAPTION: Naive active replication with with replicated objects
+#+CAPTION: Naive active replication with replicated objects
 #+ATTR_LaTeX: :width 0.9\linewidth :options page=7
 #+NAME: fig:distStor:naive_objects
 [[./figures/updateProtocols.pdf]]
@@ -872,7 +973,7 @@ Role of primary is transferred from S2 to S4
 
 Possible approach: 
 
-- Each object elects a *cordinator* among its replicas  
+- Each object elects a *coordinator* among its replicas  
 - Only coordinator replica of invoking object actually sends out the
   invocation, to all replicas of the invoked object 
 - Reply is sent back by the invoked object's coordinator to all
@@ -901,7 +1002,7 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 - Rationale:
   - Updates have to be distributed
   - Put effort into writing rather than reading; reads much more
-    frequent than reads
+    frequent than writes
   - Each site can easily keep track of sequence of updates 
 - Alternatives? 
 
@@ -934,7 +1035,7 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 
 - *Additional rule*: Before updating, writer should check whether
   an older update already exists
-  - Ask yourself: Am I possession of all the facts?
+  - Ask yourself: Am I in possession of all the facts?
     - Reconsider write if told about updated facts
 - *Version  number* 
   - Successful update increments version number 
@@ -1023,7 +1124,7 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 
 #+BEAMER: \pause
 
- - Note: Many different ways of forum quorums exist (e.g., along
+ - Note: Many different ways of forming quorums exist (e.g., along
    trees) 
 
 *** Quorum examples 
@@ -1039,7 +1140,7 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 
 #+CAPTION: Failed quorum 
 #+ATTR_LaTeX: :width 0.95\linewidth :options page=6
-#+NAME: fig:distStor:check_before_update
+#+NAME: fig:distStor:failed_quorum
 [[./figures/quorum.pdf]]
 
 
@@ -1050,7 +1151,7 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 
 #+CAPTION: Read once, write all scheme 
 #+ATTR_LaTeX: :width 0.95\linewidth :options page=5
-#+NAME: fig:distStor:check_before_update
+#+NAME: fig:distStor:quorum_ROWA
 [[./figures/quorum.pdf]]
 
 
@@ -1062,7 +1163,7 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 
 #+CAPTION: Overlapping read/write quora 
 #+ATTR_LaTeX: :width 0.95\linewidth :options page=4
-#+NAME: fig:distStor:check_before_update
+#+NAME: fig:distStor:quorum_overlapping
 [[./figures/quorum.pdf]]
 
 
@@ -1070,87 +1171,464 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
 
 
 
-* Client-centric consistency models                                :noexport:
+* Client-centric consistency models                            
+  
 
 *** Eventual consistency
- Typical situation 
- - Replicated data store; many users read, few users write
- - Only very few users allowed to write to specific data
- - Examples: DNS, WWW, many database applications 
- - 
- - Insight: in many such systems, it is acceptable to read out-of-date data (favor availability over consistency) 
- - Access to inconsistent data 
- - Trying to cast, e.g., WWW in the previous consistency models is pointless 
- - 
- - Reasonable goal: eventual consistency
- - 	In the absence of updates, all replicas converge 
- - toward identical copies of each other 
-*** Eventual consistency
+ - Typical situation: *Replicated data store*; many users read, few
+  users write
+   - Clients that may *roam between replicas*
+   - Examples: DNS, WWW, geographically distributed databases, content
+     distribution networks, mobile networks, changing network conditions, \dots 
+   - Only very few users allowed to write to specific data
+\pause
+ - Insight: in many such systems, it may be  acceptable to read out-of-date
+   data: *favor availability over consistency* 
+   - Access to inconsistent data 
+   - Trying to cast, e.g., WWW in the previous consistency models is
+     pointless 
+\pause
+
+ - Minimal goal: *eventual consistency*
+   - *In the absence of updates, all replicas converge  toward
+     identical copies of each other*
+   - But that might be a bit *too* weak?? 
+
+*** From eventual to client-centric consistency 
  Consider a mobile user accessing an eventually consistent replicated data store 
- - Write performed in one replica; move happens; reads data back from other replica ! Not what was written!
- - This client observes strange behavior! 
- Desirable: one client should see a consistent behavior
- - But behavior of different clients with respect to each other is ignored!
- -  ! Client-centric consistency 
- - Notation 
- - xi[t] : value of (replica of) x as stored at location Li at time t 
- - Write sequence WS (xi[t]) : series of writes by client resulting in xi[t]
- - If operations in WS (xi[t1]) have also happened at Lj at time t2, denote this as WS (xi[t1], xj[t2]) 
+ - Write performed in one replica; move happens; reads data back from other replica $\leadsto$ Not what was written!
+ - This client observes strange behavior! \pause
+ *Actual point*: At consecutive accesses, clients see different
+   latencies to different replica locations
+\pause
 
 
+ Insight:  *one* client at least should see a consistent behavior
+ - But behavior of different clients with respect to each other *can be
+   ignored!*
+   - Unlike data-centric models treated above: they talked about the
+     *shared observations of multiple clients* 
+ - $\leadsto$: Client-centric consistency \cite{terry94:_session_guaran_weakl_consis_replic_data}
+
+
+*** COMMENT Client-centric consistency: Notation 
+
+Notation 
+   - xi[t] : value of (replica of) x as stored at location Li at time t 
+   - Write sequence WS (xi[t]) : series of writes by client resulting in xi[t]
+   - If operations in WS (xi[t1]) have also happened at Lj at time t2, denote this as WS (xi[t1], xj[t2]) 
+
+
+*** Client-centric consistency: the four guarantees \cite{terry94:_session_guaran_weakl_consis_replic_data}
+
+#+ATTR_LaTeX: :booktabs t :align lp{12cm}
+| Guarantee           | Violated when \dots{}                          |
+|---------------------+------------------------------------------------|
+| Monotonic reads     | \dots{} a later read returns an older value    |
+| Read your writes    | \dots{} the client's own write is invisible    |
+| Monotonic writes    | \dots{} the client's writes are applied out of order |
+| Writes follow reads | \dots{} a write is stored without its read dependency |
+
+
+Note: These guarantees are *orthogonal* to the data-centric
+guarantees; different perspectives 
 
 *** Monotonic reads
- Monotonic-read consistency 
- - 	If a process reads the value of a data item x, any successive read operation on x by that process will always return that same value or a more recent value
+****  Monotonic-read consistency                               :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+ - If a process reads the value of a data item x, any successive read operation on x by that process will always return *that same value or a more recent value*
+   - Implicitly: there is a notion of *version* of a value 
+\pause
  - Irrespective of the replicas where these reads happen
- - Note that “more recent” is well defined, since there is only a single process involved 
- - Example: email mailbox, accessed by a mobile user 
- Monotonic-read
- - consistent
- Not monotonic-read
- - consistent
+ - Note that "more recent" is well defined, since there is only a single process involved 
+
+\pause
+
+**** Example
+
+Mobile email client opens on server A, sees 50 messages.
+Switches to WiFi and hits server B --- must still see $\geq 50$
+messages, not 48.
+
+*** Monotonic read violation 
+#+CAPTION: Monotonic-read violation: value decreases after replica switch
+#+ATTR_LaTeX: :width 0.5\linewidth :options page=1
+#+NAME: fig:cc:monread
+[[./figures/clientcentric_mscs.pdf]]
+
+
+
+
+***** COMMENT Monotonic read 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:
+
+| Loc1: | WS(x_1) |               | R(x_1) |       |
+|-------+---------+---------------+--------+-------|
+| Loc2: |         | WS (x_1, x_2) |        | R(x_2) |
+      
+
+***** COMMENT Inconsistent with monotonic read 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
+
+
+| Loc1: | WS(x_1) |          | R(x_1) |        |               |
+|-------+---------+----------+--------+--------+---------------|
+| Loc2: |         | WS (x_2) |        | R(x_2) | WS (x_1, x_2) |
+
+
+
+
 *** Monotonic writes 
- Monotonic-write consistency
- - 	A write operation by a process on a data item x 
- - is completed before any successive write operation 
- - on x by the same process
- - Irrespective of location where writes are issued
- - “Complete” refers to all involved replicas
- - “Successive” is well defined 
- - A write on a given copy is performed only if that copy has been brought up to date already with other writes (possibly issued at other locations) 
- - Example: Partial updates to a software library
- - Note: relationship to FIFO consistency! 
-*** Monotonic writes 
- Monotonic-write consistent (W(x1) issued at L1, has to happen at L2 before W(x2) may take place)
- Not monotonic-write consistent (W(x1) is missing at L2 
- - before W(x2) happens)
+****  Monotonic-write consistency                              :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+A write operation by a process on a data item x  is completed before any successive write operation on x by the same process
+ - Irrespective of location from where writes are issued, replica
+   to where the write happens 
+ - A write on a given copy is performed only if that copy has been
+   brought up to date already with other writes (possibly issued at
+   other locations) 
+
+**** Example 
+
+Push a library update ($W_1$), then a patch that depends on
+it ($W_2$).  A build server that applies the patch before the library
+update compiles against the wrong version.
+
+
+
+*** COMMENT Monotonic writes: Examples 
+
+**** Monotonic-write consistent 
+
+Monotonic-write consistent (W(x1) issued at L1, has to happen at L2 before W(x2) may take place)
+
+
+| Loc1: | W(x_1) |        |        |
+|-------+--------+--------+--------|
+| Loc2: |        | W(x_1) | W(x_2) |
+
+
+
+
+**** Monotonic-write inconsistent 
+
+
+ Not monotonic-write consistent: W(x1) is missing at L2   before W(x2) happens
+
+
+| Loc1: | W(x_1) |        |        |
+|-------+--------+--------+--------|
+| Loc2: |        |        | W(x_2) |
+
+
+*** Monotonic write violation 
+
+#+CAPTION: Monotonic-writes violation: late-arriving first write overwrites the second
+#+ATTR_LaTeX: :width 0.5\linewidth :options page=3
+#+NAME: fig:cc:mw
+[[./figures/clientcentric_mscs.pdf]]
+
+
 *** Read your writes
- Read-your-writes consistency 
- - 	The effect of a write operation by a process on 
- - data item x will always be seen by a successive 
- - read operation on x by the same process 
- - Example: updating web page, web browser afterwards loads old version from local replica 
- - 
- Read your writes observed
- No read your writes behavior; 
- - updates W(x1) not reflected at L2
+
+****  Read-your-writes consistency                             :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+     The effect of a write operation by a process on 
+ data item x will always be seen by a successive 
+ read operation on x by the same process
+ 
+- Client may write to one replica and read from another
+- The reading replica must have received the client's write
+  (or the system must block the read until it has)
+- Other clients are /not/ covered: they may still see the old value
+
+
+**** Example 
+
+You update your DNS record; you immediately query a
+different resolver and get the old IP address.  Your own change
+is invisible to you.
+
+
+*** Read-your-writes violation
+
+#+CAPTION: Read-your-writes violation: own write invisible after replica switch
+#+ATTR_LaTeX: :width 0.5\linewidth :options page=2
+#+NAME: fig:cc:ryw
+[[./figures/clientcentric_mscs.pdf]]
+
+
+
+
+
+***** COMMENT Read-your-writes consistent 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:
+
+| Loc1: | W(x_1) |              |        |
+|-------+--------+--------------+--------|
+|       |        | WS(x_1, x_2) | R(x_2) |
+
+      
+
+***** COMMENT Read-your-writes inconsistent 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
+
+| Loc1: | W(x_1) |              |        |
+|-------+--------+--------------+--------|
+|       |        | WS(x_2)      | R(x_2) |
+
+
+ No read your writes behavior;  updates W(x1) not reflected at L2
+
+*****                               COMMENT :B_ignoreheading:
+      :PROPERTIES:
+      :BEAMER_env: ignoreheading
+      :END:
+
+
+
+
 *** Writes follow reads
- Writes-follow-reads consistency 
- - 	A write operation by a process on a data item x following a previous read operation on x by the same process is guaranteed to take place on the same or a more recent value of x that was read. 
- - Writes are performed on versions of data item that is up to date at least with the value most recently read by the process 
- - Example: Newsgroup posting 
- Write-follows-reads consistent
- Not write-follows-reads consistent
-*** Implementing client-centric consistency – Naïve version
- 35
-*** Implementing client-centric consistency – Improvements
- 36
+****  Writes-follow-reads consistency                          :B_definition:
+     :PROPERTIES:
+     :BEAMER_env: definition
+     :END:
+ 	A write operation by a process on a data item x following a previous read operation on x by the same process is guaranteed to take place on the same or a more recent value of x that was read. 
 
 
-* Case study
+- The client's write carries a causal dependency on the preceding read
+- Strongest of the four properties; implies a form of causal ordering
+  for single-client sessions
 
 
-** Zookeeper 
+****  Example: Newsgroup posting 
+
+You read a forum post ($x$), write a reply ($y = f(x)$).  A
+replica that stores your reply but not the original post shows readers a
+confusing orphan reply.
+
+
+***** COMMENT Writes follows reads  consistent 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:
+
+| Loc1: | W(x_1) |              | R(x_1) |        |
+|-------+--------+--------------+--------+--------|
+|       |        | WS(x_1, x_2) |        | W(x_2) |
+
+      
+
+***** COMMENT Writes follows reads  inconsistent 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
+
+| Loc1: | W(x_1) |              | R(x_1) |        |
+|-------+--------+--------------+--------+--------|
+|       |        | WS(x_2)      |        | W(x_2) |
+
+
+
+*** Writes-follow-reads violation
+
+#+CAPTION: Writes-follow-reads violation: write stored without its read dependency
+#+ATTR_LaTeX: :width 0.4\linewidth :options page=4
+#+NAME: fig:cc:wfr
+[[./figures/clientcentric_mscs.pdf]]
+
+** Session guarantees in practice
+
+The four properties are *independent*; practical systems offer various
+subsets:
+
+- *Eventual consistency alone*: none of the four guaranteed
+- *Session consistency* (Cassandra, DynamoDB default): read-your-writes
+  + monotonic reads, enforced via a per-session token (log position
+  or write timestamp carried by the client)
+- *Causal consistency* (COPS, Bolt-on causal \cite{Bailis:2012:Bolton}):
+  implies writes-follow-reads + monotonic reads + read-your-writes,
+  tracked via vector clocks per key
+- *Linearizability*: implies all four (and much more)
+
+
+*** Implementation by vector clocks 
+
+Basic implementation idea: 
+
+- Client carries a *session token*:  a vector of replica log positions
+  last seen
+  - Possibly split into read set and write set (depending on desired
+    guarantees)
+    - Read set for monotonic read, writes follows reads
+    - Write set for monotonic write, reads your writes 
+- Token is sent along with each request to any replica 
+- Replica compares token with local information about its log position
+  - Executes request or defers response
+  - With *lots* of variations possible what to do when deferring:
+    actively looking for missing versions, simply waiting, \dots 
+
+
+
+*** COMMENT Implementing client-centric consistency  @@latex: \textemdash{} @@  Naïve version
+- Each write is assigned a globally unique identifier
+  - Contains (at least) a “responsible” server and a client sequence number
+- For each client, keep track of two sets of identifiers
+  - Read set: Identifiers that are relevant for the client’s read operations
+  - Write set: Identifiers of all the writes performed by the client 
+- Implementing monotonic read (e.g.): 
+  - When reading, client hands its read set to server 
+    - Server can check whether all those identifiers are known locally 
+    - If not, fetch those writes before (potentially, recursively)
+    - Add any additional identifiers to the client’s read set 
+- Other client centric models implemented similarly 
+
+*** COMMENT Implementing client-centric consistency  @@latex: \textemdash{} @@  Improvements
+
+- Problem with naïve implementation: Size of read/write sets
+- Idea: Instead of representing them individually, use vector timestamps! 
+  - Allows servers to check freshness of information available to client, decide which/from where information has to be fetched
+
+
+- Additional option: Group operations into sessions, clear out identifiers when applications exit
+
+
+* CRDT
+
+*** Replication without coordination? 
+
+- So far: coordination necessary to make sure that updates produce
+  useful results
+  - Updating replicas in arbitrary order will in general damage the
+    semantics of the stored data 
+\pause
+- But what if it didn't? 
+  - What if there were data structures and update operations that did
+    not require coordination to ensure correctness? 
+
+*** Simple example: Event occurred 
+
+- Single Boolean variable: ~SomeEventOccurred~
+  - Initially, false 
+  - Single write operation: ~SetEvent~
+  - Not possible, meaningful to un-set an event occurrence 
+
+*** Generalization: CRDT
+
+- Idea: Be *optimistic* about updates, hoping that conflicts can be
+  uniquely resolved at each replica, eventually 
+\pause
+- Conflict-Free Replicated Data Types (CRDT)
+  \cite{shapiro11:_confl_free_replic_data_types}
+- Two types: 
+  - State-based
+  - Operation-based 
+
+*** State-based CRDTs 
+
+Defined by: 
+- A type for local state (as simple as a Boolean, or quite complex)
+- A type for actions on state
+- Three functions:
+  - ~Initialize~: Produce an empty state (at a replica)
+  - ~Update~: Apply an action to a state, producing a new state
+  - ~Merge~: Take two states and produce a merged state, comprising
+    the updates of both
+    - Must be *commutative*, *associative* and *idempotent* 
+
+\pause
+Operational idea: 
+- Updates only happen at a single replica
+- Replicas exchange states (/gossiping/) and merge them
+- Leads to *eventual convergence* 
+  
+
+*** Operation-based CRDTs 
+
+- Similar to above, but without a merge function
+- Replicas exchange operations, not states
+
+\pause
+- Theoretically equivalent, with different tradeoffs for
+  implementation 
+
+
+*** Examples for CRDTs 
+
+- Grow-only Counter 
+- Positive-Negative Counter
+  - Composed of two grow-only counters
+- Grow-only Set
+- Two-phase set
+  - Similarly to PN-Counter, with a /tombstone/ set; no element can
+    every be removed from the tombstone set 
+- Last-Write-Wins-Element Set
+  - Add and remove set, both with timestamps
+- Observed-Removed Set
+  - For each element, a list of unique add tags and remove tags
+  - Tag newly generated for each add operation
+  - Removal: put all tags from add set into remove set 
+
+*** [[https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type#Industry_use][Usage of CRDTs]] 
+  
+Some examples: 
+- Redis, in-memory database 
+- Riak, distributed NoSQL key-Value store 
+  - Used by League of Legends in-game chat, with approx. 10.000 chat
+    messages per second
+- TomTom navigation data
+- Facebook databases
+- Apple Notes
+
+
+* Case studies
+
+
+** Chubby  lock service 
+
+*** A case for a coordination service 
+
+- So ensuring consistency is hard
+  - Especially at high throughput, low latency
+  - Or even in presence of failures
+- Provide a service that provides such functionality to distributed
+  applications
+  - Has to be distributed itself 
+- Early example: distributed locking as in Chubby     
+
+*** Auxiliary service: Chubby lock service  
+- Chubby \cite{Burrows:2006:CLS:1298455.1298487}, Google-internal project
+- Based on Paxos consensus (cp.  Section
+  \slideref{sec:consensus:paxos})  
+- Goals: Provide distributed locking for
+  - Moderately large number of clients (around 10.000)
+  - High dependability
+  - File-system like interface
+  - Advisory locks, event notification 
+
+
+
+** COMMENT Zookeeper 
 \label{sec:distStor:zookeeper}
 
 *** A case for a coordination service 
@@ -1247,7 +1725,7 @@ Nodes are replicated, access is:
     will deliver it 
   - Total (atomic+FIFO)  bcast, coordinated by a *leader*
     server 
-    - Leader decides oder to apply updates
+    - Leader decides order in which to apply updates
   - Causal order 
 - Atomic: Leader coordinates *transactions* for updates (see
   Chapter \ref{ch:transactions}) 
@@ -1257,7 +1735,7 @@ Nodes are replicated, access is:
 
 - Leaders are elected via a quorum
 - Leaders make ordering proposals to their followers
-  - If majority ($> n/2+1$) agrees, this ordering is committed and
+  - If majority ($> n/2$) agrees, this ordering is committed and
     messages in the proposal can be delivered (put into memory and
     made visible to clients) 
 
@@ -1280,19 +1758,155 @@ Nodes are replicated, access is:
 
 
 
-** Chubby  lock service 
+** Zookeeper 
 
-*** Auxiliary service: Chubby lock service  
-- Chubby \cite{Burrows:2006:CLS:1298455.1298487}
-- Precursor to Zookeeper, Google-internal project
-- Based on Paxos consensus (cp.  Section
-  \slideref{sec:consensus:paxos})  
-- Goals: Provide distributed locking for
-  - Moderately large number of clients (around 10.000)
-  - High dependability
-  - File-system like interface
-  - Advisory locks, event notification 
-- Architecture: similar to Zookeeper (which evolved out of Chubby) 
+*** Zookeeper 
+
+- Started as an OSS implementation of Chubby
+- Hierarchical model of nodes that could be locked, queried, \dots
+- Geared towards high read/write ratios for high performance, at small
+  data sizes 
+- Built on its own Zookeeper atomic broadcast protocol (ZAB) based on Paxos 
+- Used to be important, e.g., in Hadoop, Kafka, but more and more replaced by
+  Raft-based alternatives 
+  - Specifically, etcd 
+
+** etcd 
+
+
+*** etcd 
+\label{sec:consensus_etcd}
+
+
+
+From the \href{https://github.com/etcd-io/etcd}{marketing brochure}: 
+
+#+BEGIN_QUOTE
+etcd is a distributed reliable key-value store for the most critical data of a distributed system, with a focus on being:
+
+- *Simple*: well-defined, user-facing API (gRPC)
+- *Secure*: automatic TLS with optional client cert authentication
+- *Fast*: benchmarked 10,000 writes/sec
+- *Reliable*: properly distributed using Raft
+
+etcd is written in Go and uses the Raft consensus algorithm to manage a *highly-available replicated log.*
+#+END_QUOTE
+
+- Usage: e.g., in Kubernetes 
+
+*** etcd data model 
+
+- Designed for small amounts of key/value data, able to fit in memory
+  - Think: configuration of a cluster, which node is leader,
+    membership leases, \dots 
+- Flat namespace for strings as  keys; values are just bytes
+  - Keys often written as paths, but no semantics of a hierarchical
+    namespace (unlike ZooKeeper)
+- Keys have:
+  - *Revisions*: cluster-wide, monotonically growing
+  - *Version*: per-key write count
+  - *mod revision*
+- Accesses to keys follow the *linearization model* 
+
+
+
+*** etcd usage:  [[https://etcd.io/docs/v3.6/dev-guide/api_reference_v3/][API]]  , [[https://godocs.io/go.etcd.io/etcd/api/v3][Go API docs]]
+
+- ~put~, ~get~, ~delete~ 
+\pause
+- ~lease~: cluster grants  leases with time-to-live to clients; build
+  leader election on top of that
+  - Expiration of lease deletes all associated keys! 
+\pause
+- ~watch~: Tell etcd you want an event when the given key is created, changed
+  or deleted (along with version number) 
+  - Watching many keys can be aggregated into a watch stream 
+\pause
+- ~txn~: Transaction, essentially atomic if/then/else 
+  - Small exercise: build an atomic compare-and-swap operation out of ~txn~
+
+
+
+
+*** MSC for etcd usage 
+
+***** 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:
+
+
+#+caption: Writing to an etcd cluster
+#+attr_latex: :width 0.95\textwidth :height 0.6\textheight :options keepaspectratio,page=1
+#+NAME: fig:etcd:writing
+[[./figures/etcd.pdf]]
+      
+
+***** 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
+
+
+#+caption: Forming a write quorum 
+#+attr_latex: :width 0.95\textwidth :height 0.6\textheight :options keepaspectratio,page=3
+#+NAME: fig:etcd:quorum
+[[./figures/etcd.pdf]]
+
+
+*****                               :B_ignoreheading:
+      :PROPERTIES:
+      :BEAMER_env: ignoreheading
+      :END:
+
+
+
+
+
+*** Integrations: Access options, tools 
+
+***** Integrations 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:
+
+- Compare [[https://etcd.io/docs/v3.6/integrations/][Integrations]]
+  - Bindings for all relevant languages 
+  - \href{https://godocs.io/go.etcd.io/etcd/etcdctl/v3}{Command-line client} 
+  - Various terminal and Web UIs to interact with the database 
+      
+
+*****  CLI example [[https://github.com/etcd-io/etcd/tree/main/etcdctl][etcd github]]
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
+
+\footnotesize
+
+#+begin_src bash
+./etcdctl put foo bar --lease=1234abcd
+# OK
+./etcdctl get foo
+# foo
+# bar
+./etcdctl put foo bar1 --prev-kv
+# OK
+# foo
+# bar
+./etcdctl get foo
+# foo
+# bar1
+./etcdctl put foo --ignore-value 
+# OK  
+#+end_src
+
+
+ 
+
 
 *  Summary 
 
@@ -1303,7 +1917,7 @@ Nodes are replicated, access is:
 - Consistency *protocols* realise such promises 
 - Even if nothing goes wrong, still a challenge to build efficient
   solutions
-- Practical approaches like ZooKeeper have become a building block of
+- Practical approaches like ZooKeeper, etcd have become a building block of
   distributed systems 
 
 *** What's next? 

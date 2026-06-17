@@ -1,0 +1,160 @@
+# -*- mode: org -*-
+# Draft replacement for the client-centric consistency section of ch_11.
+# Drop this content into ch_11_distStorage.org in place of the existing
+# *** slides that use Tanenbaum's WS() notation.
+#
+# Figures required: figures/clientcentric_mscs.pdf  (4 pages)
+# BibTeX entry required: Terry:1994:SGW (see bottom of this file)
+
+*** Client-centric consistency: motivation
+
+Data-centric consistency models describe what /all/ clients collectively
+observe from a replicated store.
+
+But many practical systems offer only *eventual consistency*:
+- Replicas may temporarily diverge
+- Reads may return stale values
+- Different clients may see different orderings
+
+Still desirable: each client's own experience should be *internally
+consistent*, even if clients disagree with each other.
+
+Four *session guarantees* \cite{Terry:1994:SGW} characterise the most
+useful per-client properties.  They are independent: a system may
+implement any subset.
+
+*** Monotonic reads
+
+*Definition:* If a client reads value $v$ of $x$, any subsequent
+read of $x$ returns $v$ or a more recent value --- regardless of
+which replica is queried.
+
+- Read values must never go backwards within one session
+- System tracks the highest version seen per client and routes
+  (or delays) future reads to replicas that are at least that current
+
+*Example:* Mobile email client opens on server A, sees 50 messages.
+Switches to WiFi and hits server B --- must still see $\geq 50$
+messages, not 48.
+
+#+CAPTION: Monotonic-read violation: value decreases after replica switch
+#+ATTR_LaTeX: :width 0.5\linewidth :options page=1
+#+NAME: fig:cc:monread
+[[./figures/clientcentric_mscs.pdf]]
+
+*** Read your writes
+
+*Definition:* The effect of a client's write is always visible to
+that client's own subsequent reads.
+
+- Client may write to one replica and read from another
+- The reading replica must have received the client's write
+  (or the system must block the read until it has)
+- Other clients are /not/ covered: they may still see the old value
+
+*Example:* You update your DNS record; you immediately query a
+different resolver and get the old IP address.  Your own change
+is invisible to you.
+
+#+CAPTION: Read-your-writes violation: own write invisible after replica switch
+#+ATTR_LaTeX: :width 0.5\linewidth :options page=2
+#+NAME: fig:cc:ryw
+[[./figures/clientcentric_mscs.pdf]]
+
+*** Monotonic writes
+
+*Definition:* A client's write operations are applied at every replica
+in the order in which they were issued.
+
+- Client may issue successive writes to different replicas (roaming)
+- If $W_1$ precedes $W_2$ in the client's session, every replica
+  must apply $W_1$ before $W_2$
+- Without this, the first write can ``catch up'' and overwrite the
+  second: the client silently loses its most recent update
+
+*Example:* Push a library update ($W_1$), then a patch that depends on
+it ($W_2$).  A build server that applies the patch before the library
+update compiles against the wrong version.
+
+#+CAPTION: Monotonic-writes violation: late-arriving first write overwrites the second
+#+ATTR_LaTeX: :width 0.5\linewidth :options page=3
+#+NAME: fig:cc:mw
+[[./figures/clientcentric_mscs.pdf]]
+
+*** Writes follow reads
+
+*Definition:* If a client reads $x$ and then writes $y$, the write of
+$y$ is applied only at replicas that already contain the version of
+$x$ the client read.
+
+- The client's write carries a causal dependency on the preceding read
+- Strongest of the four properties; implies a form of causal ordering
+  for single-client sessions
+
+*Example:* You read a forum post ($x$), write a reply ($y = f(x)$).  A
+replica that stores your reply but not the original post shows readers a
+confusing orphan reply.
+
+#+CAPTION: Writes-follow-reads violation: write stored without its read dependency
+#+ATTR_LaTeX: :width 0.5\linewidth :options page=4
+#+NAME: fig:cc:wfr
+[[./figures/clientcentric_mscs.pdf]]
+
+*** Client-centric consistency: the four guarantees
+
+#+ATTR_LaTeX: :booktabs t :align lp{7cm}
+| Guarantee           | Violated when \dots{}                          |
+|---------------------+------------------------------------------------|
+| Monotonic reads     | \dots{} a later read returns an older value    |
+| Read your writes    | \dots{} the client's own write is invisible    |
+| Monotonic writes    | \dots{} the client's writes are applied out of order |
+| Writes follow reads | \dots{} a write is stored without its read dependency |
+
+All four assume a client that may *roam between replicas* (mobile
+user, CDN edge nodes, geographically distributed database).
+
+*** Session guarantees in practice
+
+The four properties are *independent*; practical systems offer various
+subsets:
+
+- *Eventual consistency alone*: none of the four guaranteed
+- *Session consistency* (Cassandra, DynamoDB default): read-your-writes
+  + monotonic reads, enforced via a per-session token (log position
+  or write timestamp carried by the client)
+- *Causal consistency* (COPS, Bolt-on causal \cite{Bailis:2012:Bolton}):
+  implies writes-follow-reads + monotonic reads + read-your-writes,
+  tracked via vector clocks per key
+- *Linearizability*: implies all four (and much more)
+
+*Implementation pattern:* the client carries a *session token* --- a
+vector of replica log positions last seen.  On each request the token is
+sent to the replica; the replica defers its response until it has applied
+all writes in the token.
+
+# ---------------------------------------------------------------
+# BibTeX entries needed (add to bib.bib):
+#
+# @inproceedings{Terry:1994:SGW,
+#   author    = {Douglas B. Terry and Alan J. Demers and Karin Petersen
+#                and Mike J. Spreitzer and Marvin M. Theimer
+#                and Brent B. Welch},
+#   title     = {Session Guarantees for Weakly Consistent Replicated Data},
+#   booktitle = {Proceedings of the 3rd International Conference on
+#                Parallel and Distributed Information Systems (PDIS)},
+#   pages     = {140--149},
+#   year      = {1994},
+#   doi       = {10.1109/PDIS.1994.331722},
+# }
+#
+# @inproceedings{Bailis:2012:Bolton,
+#   author    = {Peter Bailis and Alan Fekete and Ali Ghodsi
+#                and Joseph M. Hellerstein and Ion Stoica},
+#   title     = {The Potential Dangers of Causal Consistency and an
+#                Explicit Solution},
+#   booktitle = {Proceedings of the 3rd ACM Symposium on Cloud Computing
+#                (SoCC)},
+#   year      = {2012},
+#   doi       = {10.1145/2391229.2391251},
+# }
+# ---------------------------------------------------------------

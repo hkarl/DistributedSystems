@@ -1,0 +1,177 @@
+% Created 2026-06-17
+% MSC violation examples for client-centric (session) consistency
+%
+% Four diagrams, one per page:
+%   1. Not monotonic-read consistent
+%   2. Not read-your-writes consistent
+%   3. Not monotonic-writes consistent
+%   4. Not writes-follow-reads consistent
+%
+% All scenarios: client switches between two eventually-consistent
+% replicas R1 and R2 that are not yet fully synchronised.
+% "Late propagation" arrows show WHY the violation occurs.
+
+\documentclass[tikz]{standalone}
+
+\input{../../templates/tikzFigureHeader}
+\usetikzlibrary{arrows.meta, positioning, backgrounds}
+
+% Aliases matching consistency_mscs.tex
+\newcommand{\mscwrite}[2]{\found{}{#1}{#2}}
+\newcommand{\mscread}[2]{\lost[side=right]{}{#1}{#2}}
+
+\begin{document}
+
+% ============================================================
+% Figure 1: Not monotonic-read consistent
+%
+% W(x,5) arrived at R1 but not yet at R2.
+% Client reads R1 → 5, then roams to R2 and reads → 0.
+% Value went backwards: monotonic-read guarantee violated.
+% The late propagation arrow shows R2 eventually catching up,
+% but too late for the client's read.
+% ============================================================
+
+\begin{msc}{Not monotonic-read consistent}
+  \declinst{c}{}{Client}
+  \declinst{r1}{}{Replica 1}
+  \declinst{r2}{}{Replica 2}
+
+  % Some earlier process wrote x=5; only R1 has it
+  \mscwrite{W(x,5)}{r1}
+  \nextlevel[2]
+
+  % Client reads from R1 and gets the current value
+  \mess{R(x)}{c}{r1}[1]
+  \nextlevel[2]
+  \mess{R(x) = 5}{r1}{c}[1]
+  \nextlevel[2]
+
+  % Client roams to R2 -- W(x,5) not there yet
+  \mess{R(x)}{c}{r2}[1]
+  \nextlevel[2]
+
+  % Violation: value decreased from 5 to 0
+  \mess{R(x) = 0  [was 5 -- violation]}{r2}{c}[1]
+  \nextlevel[2]
+
+  % W(x,5) finally propagates -- too late for this read
+  \mess{W(x,5)}{r1}{r2}[1]
+  \nextlevel[1]
+
+\end{msc}
+
+
+% ============================================================
+% Figure 2: Not read-your-writes consistent
+%
+% Client writes W(x,5) to R1 and gets an ACK.
+% Client then reads from R2, which has not yet received W(x,5).
+% Client sees its own write vanish: guarantee violated.
+% ============================================================
+
+\begin{msc}{Not read-your-writes consistent}
+  \declinst{c}{}{Client}
+  \declinst{r1}{}{Replica 1}
+  \declinst{r2}{}{Replica 2}
+
+  % Client writes to R1; receives acknowledgement
+  \mess{W(x,5)}{c}{r1}[1]
+  \nextlevel[2]
+  \mess{OK}{r1}{c}[1]
+  \nextlevel[2]
+
+  % Client reads from R2 -- W(x,5) not propagated yet
+  \mess{R(x)}{c}{r2}[1]
+  \nextlevel[2]
+
+  % Violation: client wrote 5, reads back 0
+  \mess{R(x) = 0  [wrote 5 -- violation]}{r2}{c}[1]
+  \nextlevel[2]
+
+  % Propagation arrives -- too late
+  \mess{W(x,5)}{r1}{r2}[1]
+  \nextlevel[1]
+
+\end{msc}
+
+
+% ============================================================
+% Figure 3: Not monotonic-writes consistent
+%
+% Client writes W1(x=1) to R1, then roams and writes W2(x=2)
+% to R2.  W1 has not yet propagated to R2.  When W1 arrives
+% later, R2 applies it AFTER W2, leaving x=1 as the final
+% value -- the earlier write overwrote the later one.
+% ============================================================
+
+\begin{msc}{Not monotonic-writes consistent}
+  \declinst{c}{}{Client}
+  \declinst{r1}{}{Replica 1}
+  \declinst{r2}{}{Replica 2}
+
+  % W1: first write, issued to R1
+  \mess{W(x,1)  [1st write]}{c}{r1}[1]
+  \nextlevel[2]
+  \mess{OK}{r1}{c}[1]
+  \nextlevel[2]
+
+  % Client roams to R2; W1 not yet propagated there
+  % W2: second write, intended to follow W1
+  \mess{W(x,2)  [2nd write]}{c}{r2}[1]
+  \nextlevel[2]
+  \mess{OK}{r2}{c}[1]
+  \nextlevel[2]
+
+  % W1 propagates from R1 to R2 -- AFTER W2 was applied
+  % R2 now applies W1 last: final state x=1 (should be x=2)
+  \mess{W(x,1)  [late: overwrites W2 -- violation]}{r1}{r2}[1]
+  \nextlevel[1]
+
+\end{msc}
+
+
+% ============================================================
+% Figure 4: Not writes-follow-reads consistent
+%
+% W(x,5) is at R1 but not R2.  Client reads x=5 from R1,
+% then writes W(y, x+1 = 6) to R2.  R2 accepts the write
+% without having the prerequisite W(x,5).
+% Result: R2 has y=6 but x=0 -- causally inconsistent state.
+% Any client reading R2 sees a write (y=6) whose dependency
+% (x=5) is invisible.
+% ============================================================
+
+\begin{msc}{Not writes-follow-reads consistent}
+  \declinst{c}{}{Client}
+  \declinst{r1}{}{Replica 1}
+  \declinst{r2}{}{Replica 2}
+
+  % Prior write at R1 only; R2 still has x=0
+  \mscwrite{W(x,5)}{r1}
+  \nextlevel[2]
+
+  % Client reads x from R1 and gets 5
+  \mess{R(x)}{c}{r1}[1]
+  \nextlevel[2]
+  \mess{R(x) = 5}{r1}{c}[1]
+  \nextlevel[2]
+
+  % Client writes to R2 using the value just read
+  % R2 does NOT yet have W(x,5)
+  \mess{W(y, x+1 = 6)}{c}{r2}[1]
+  \nextlevel[2]
+  \mess{OK}{r2}{c}[1]
+  \nextlevel[2]
+
+  % R2 state: y=6 but x=0 -- causally inconsistent
+  \mscwrite{state: x=0, y=6  [violation: missing W(x,5)]}{r2}
+  \nextlevel[2]
+
+  % W(x,5) finally arrives -- too late
+  \mess{W(x,5)}{r1}{r2}[1]
+  \nextlevel[1]
+
+\end{msc}
+
+\end{document}

@@ -221,4 +221,49 @@
 
 
 
+%------------------------------------------------------------
+% Linearizable but not strictly consistent
+%
+% Key: Primary commits x=1 internally (t=2).
+%      C2's read starts AFTER the internal commit (strict violation)
+%      but BEFORE C1 receives the ACK (W-interval still open).
+%      Since the write interval [W-request .. ACK] overlaps C2's read
+%      interval [R(x) .. r(x):0], we can place linearization points as
+%      R before W -- returning x=0 is valid. Linearizable!
+
+\begin{msc}{Linearizable but not strictly consistent}
+  \declinst{c1}{}{C1}
+  \declinst{pr}{}{Primary}
+  \declinst{re}{}{Replica}
+  \declinst{c2}{}{C2}
+
+  % C1 issues write; W-interval opens
+  \mess{w(x,1)}{c1}{pr}[2]
+  \nextlevel[2]
+
+  % Primary commits internally.
+  % Strict consistency: every read from this point MUST return x=1.
+  \mscwrite{commit: x=1}{pr}
+  \nextlevel[2]
+
+  % C2's read starts AFTER internal commit -- strict consistency violated.
+  % W-interval is still open (C1 has not yet received ACK) -- linearizable OK.
+  \mess{r(x)}{c2}{re}[1]
+  \nextlevel[2]
+
+  % Replica has not yet received the update; returns stale value x=0.
+  \mess{r(x): 0}{re}{c2}[1]
+  \nextlevel[2]
+
+  % Propagation arrives at Replica -- too late for C2's read.
+  \mess{w(x,1)}{pr}{re}[1]
+  \nextlevel[2]
+
+  % ACK to C1: W-interval closes AFTER C2's entire read interval.
+  % => W-interval [w(x,1)..ack] and R-interval [r(x)..r(x):0] overlap.
+  \mess{ack}{pr}{c1}[2]
+  \nextlevel[1]
+
+\end{msc}
+
 \end{document}
