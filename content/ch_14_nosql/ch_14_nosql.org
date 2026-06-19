@@ -29,7 +29,7 @@
     - ie., it should be *available*
   - When you ask the same question at different places, it should give
     the *same answer*
-    - Slightly looser requirement then *all copies should be
+    - Slightly looser requirement than *all copies should be
       identical*
     - It should be *consistent* 
 
@@ -67,7 +67,7 @@ Simple example:
 *** Distributed data store and network partitions? 
 
 - But what happens when the network between replicas does not work?
-  - The distribute storage is *partitioned*
+  - The distributed storage is *partitioned*
 - What to do in partitioned case? 
 
 *** Partitioned example
@@ -127,7 +127,7 @@ Sources: \cite{fox99:_harves_yield_scalab_toler_system}, \cite{brewer12:_cap} \h
 
 A more detailed interpretation: 
 
-**** Pacelec                                                      :B_theorem:
+**** Pacelec \cite{abadi12:_consis_tradeof_moder_distr_datab_system_desig}                                              :B_theorem:
      :PROPERTIES:
      :BEAMER_env: theorem
      :END:
@@ -149,7 +149,7 @@ A more detailed interpretation:
 
 - Let's admit that partitions do happen
   - Inside and between data centers
-- We then see different tradoffs:
+- We then see different tradeoffs:
   - Available and consistent (but ignore partitions): conventional
     SQL/ACID databases 
   - Available, tolerate partitions: gives occasional inconsistent
@@ -170,8 +170,8 @@ A more detailed interpretation:
 
 One design choice: give up consistency! 
 
-- Basically Available 
-- But only Soft state \textendash{} content might change at unpredictable times
+- Basically Available, Soft state, Eventually consistent 
+- Only Soft state \textendash{} content might change at unpredictable times
 - Because of Eventual consistency
   - In absence of updates, state will converge and system become
     consistent 
@@ -190,7 +190,7 @@ In absence of updates, state will converge and system become
 consistent 
 
 - System will eventually become consistent
-  - Careful, false friend: schliesslich, not eventuell 
+  - Careful, false friend: schließlich, not eventuell 
 
 *** Rumour spreading  
 
@@ -205,14 +205,19 @@ consistent
 ** Overview 
 *** From SQL to NoSql 
 
+
+*** CAP tradeoffs 
+
 - CAP: Limits on traditional data base model, typical promises
-- Development: Not only SQL
-  - Database with different, explicit CAP tradeoffs
+  - Made explicit by NoSQL systems
+- Development: 
   - Different data models (instead of tables?)
   - Different query approaches
   - Different update semantics
     - Not uncommon: ACID locally, eventually consistent across cluster
-- But *very* hard to generalise; lot's of variability across products 
+- But *very* hard to generalise; lots of variability across products 
+
+
 *** Why? 
 
 - Making CAP tradeoffs explicit is a *very* good thing for developers
@@ -232,7 +237,7 @@ consistent
 - Column-oriented
   - Google BigTable, Cassandra (with multiple masters) 
 - Graph-based 
-  - Redis 
+  - Neo4j, Neptune, TigerGraph  
 - Compare
   \href{https://www.thoughtworks.com/de/insights/blog/nosql-no-problem-intro-nosql-databases}{blog  post} for nice application examples  
 
@@ -241,7 +246,7 @@ consistent
 
 - SQL is great, mature, familiar
 - Counterpart?
-  - Not much standardized \textendash{} lot's of diversity
+  - Not much standardized \textendash{} lots of diversity
 - SparQL: query RDF / tuple data
   - But not generalised to other types
 
@@ -328,6 +333,34 @@ consistent
 - CAP: Typically, available and partition-tolerant
   - But you might get inconsistent answers 
 
+*** Key-value: Dynamo 
+- Dynamo \cite{DeCandia:2007:DAH:1323293.1294281}, probably one of the
+  first large-scale, high-performance key-value stores 
+- \href{https://aws.amazon.com/dynamodb/}{Product at Amazon}
+- Highlights
+  - Highly available, but sacrifices consistency (AP in the CAP
+    triangle)
+  - Geared towards tens of thousands of servers \textendash{} at that scale,
+    things fail constantly 
+  - Object versioning, application-assisted conflict resolution 
+
+*** Dynamo architecture
+
+- *Partitioning & replication*: consistent hashing
+  - Key space mapped to a ring; each key stored on next $N$ nodes
+- *Versioning*: vector clocks track causality of updates
+  - Concurrent, conflicting versions possible under partition
+  - Dynamo returns all conflicting versions to client; application
+    must reconcile (e.g., union of shopping-cart adds)
+- *Quorum*: explicit $(N, R, W)$ parameters, requiring $R + W > N$
+  for strong consistency; relax for higher availability
+  - *Sloppy quorum*: if preferred nodes unavailable, write to any
+    $W$ reachable nodes (\emph{hinted handoff}); re-sync on recovery
+    via *Merkle trees* (detect diverged replicas efficiently)
+- *Membership*: gossip-based failure detection and ring view
+- No multi-key transactions (no ACID isolation)
+
+
 *** Column-oriented databases 
 
 - Still notion of table, but works on columns rather than rows
@@ -344,284 +377,66 @@ consistent
     arbitrary nesting of documents
   - Often represented as JSON or similar
   - Can be grouped into document collections 
-- No scheme imposed
+- No schema imposed
   - E.g., not all documents in a collection must have the same keys or
     types of values
 - Often, versioning support  
 - Complex model can make queries slow 
 
+*** Document-oriented databases: MongoDB \cite{Banker:2011:MongoDB}
 
-*** Graph databases 
+- *Model*: Documents are JSON-like objects (stored as BSON internally)
+  - Flexible schema: no two documents in a collection need the same fields
+  - Documents can be arbitrarily nested
+  - Grouped into *collections* (analogous to tables, but schema-free)
+- *Query language*: Rich, JSON-based query API; supports indexes,
+  aggregation pipelines, geospatial queries
+  - Also accepts SQL-like syntax via MongoDB Atlas SQL interface
+- *CAP position*: CP by default
+  - All writes go to the primary; secondaries replicate asynchronously
+  - Tunable: *write concern* (how many replicas must ACK) and *read
+    concern* (how fresh a read must be) allow shifting towards AP
+- *Good for*: catalogs, user profiles, content management \textendash{}
+  any domain where schema varies across records
 
-- Store graphs \Smiley
-  - Set of ordered pairs of entities
-  - Nodes and edges have unique identifiers
-  - Constant cost for local operations (only involving a node and its
-    neighbors) irrespective of size of graph
+
+*** Column-oriented databases: Cassandra \cite{Lakshman:2010:Cassandra}
+
+- *Model*: Rows identified by a *partition key*; within a row, columns
+  ordered by a *clustering key*
+  - Wide rows: a single row can hold millions of columns
+  - Inspired by both Dynamo (replication, AP) and BigTable (data model)
+- *Architecture*: Masterless ring, consistent hashing \textendash{} like Dynamo,
+  but for a richer data model
+  - Every node is equal; no single point of failure
+- *CAP position*: AP by default; *tunable consistency* per operation
+  - Consistency levels: \texttt{ONE}, \texttt{QUORUM}, \texttt{ALL}
+  - \texttt{QUORUM} reads + \texttt{QUORUM} writes $\Rightarrow$ strong consistency
+    (analogous to $R + W > N$ in Dynamo) 
+- *Good for*: time-series data, event logs, IoT telemetry \textendash{}
+  append-heavy, high-throughput workloads
 
 
 
+*** Graph databases
 
-
-
-
+- *Model*: nodes (entities) and edges (relationships), both with
+  arbitrary properties and labels
+  - Relationships are first-class citizens  @@latex: \textemdash{} @@  stored explicitly,
+    not computed via joins
+- *Key property*: local traversal in $O(1)$ per hop, independent
+  of total graph size (\emph{index-free adjacency})
+  - Contrast: SQL join cost scales with table size
+- *Query languages*: Cypher (Neo4j), Gremlin (Apache TinkerPop),
+  SPARQL (RDF graphs)
+- *Use cases*: social networks, fraud detection, knowledge graphs,
+  recommendation engines, network topology
+- *Examples*: Neo4j, Amazon Neptune, TigerGraph
+- *CAP*: typically CP (Neo4j: single-master + Raft replication;
+  Neptune: multi-AZ with strong consistency)
   
-* Key-value database
-  :PROPERTIES:
-  :CUSTOM_ID:       sec:keyvalue_stores
-  :END:
 
-*** Already covered 
-
-- We have already covered from a usage perspective 
-  - Memcached (Section \ref{sec:memcached})
-  - Redis (Section \ref{sec:redis})
-- We briefly look at some more examples
-- And at architectural choices 
-
-
-** Dynamo 
-
-*** Dynamo 
-- Dynamo \cite{DeCandia:2007:DAH:1323293.1294281}, probably one of the
-  first large-scale, high-performance key-value stores 
-- \href{https://aws.amazon.com/dynamodb/}{Product at Amazon}
-- Highlights
-  - Highly available, but sacrifices consistent (AP in the CAP
-    triangle)
-  - Geared towards tens of thousands of servers \textendash{} at that scale,
-    things fail constantly 
-  - Object versioning, application-assisted conflict resolution 
-
-*** Use cases 
-
-- Quote: /best seller lists, shopping carts, customer preferences,
-  session management, sales rank, and product catalog/
-  \cite{DeCandia:2007:DAH:1323293.1294281}
-  - Tens of millions of requests per day (thousands per second) 
-- Key/value store is natural pattern
-
-*** Architecture 
-
-- Consistent hashing for partitioning, replication
-- Object versioning
-- Consistency during update: Quorum
-  - Eventually consistent storage 
-- Membership protocol based on gossiping 
-- Operations only on individual keys, no isolation (in ACID sense)
-
-
-*** \ac{SLA}
-
-- What to optimise, what to promise?
-  - Service and Dynamo enter in an SLA   
-- Multiple quntifications
-  - E.g., mean and variance of response time
-    - Considered too lenient 
-  - E.g., 99.9% percentile response time at given load
-    - Typical goal! 
-
-
-#+BEAMER: \pause
-
-**** SLA vs. SLO 
-
-- Strictly speaking, this is an \ac{SLO}
-- But terminology often sloppy her 
-
-
-
-
-*** Principles 
-
-- Incremental scalability: Add single hosts at a time
-- Symmetry among nodes
-  - Decentralization, trusted,  but heterogeneity
-- Always writable: no update rejected because of partition
-- Zero-hop approach: Every node knows about every other
-  - No P2P-style routing
-
-*** Partition and replication 
-
-
-
-****                                                              :B_columns:
-     :PROPERTIES:
-     :BEAMER_env: columns
-     :END:
-
-*****                                                                 :BMCOL:
-      :PROPERTIES:
-      :BEAMER_col: 0.5
-      :END:
-
-- Partition and replication: consistent hashing, storing a data item
-  on next three nodes 
-
-*****                                                                 :BMCOL:
-      :PROPERTIES:
-      :BEAMER_col: 0.5
-      :END:
-
-#+CAPTION: Dynamo: Store data at multiple servers 
-#+ATTR_LaTeX: :width 0.9\linewidth :options page=5
-#+NAME: fig:nosql:dynamo
-[[./figures/nosql.pdf]]
-
-
-*** Versioning  
-
-- With network partitions and unavailability, inconsistencies can
-  happen
-- *Eventual consistency*: over time, replicas converge
-- Handled by *versions* of data, which can only be appended to
-  - Think shopping cart, with *add* or *delete* operations appended to
-    best known state
-- Version expressed as vector clock 
-  - Updates must present vector clock of version they want to update 
-
-*** Versioning and reconciliation 
-
-Reconciliation: What happens when different versions reconnect? 
-  - Syntax reconciliation: Sometimes, authoritative version can be
-    automatically determined (changes in one subsume changes in other)
-  - Semantic reconciliation: Sometimes, application has to decide
-    - Multiple versions with concurrent vector clocks!
-    - Dynamo will return all versions to application
-    - Update should reconcile, collapses versions 
-    - Example shopping cart: keep the adds, may drop some of the deletes
-
-*** Consistency 
-
-- Where does an update happen?
-- Use a quorum! (typical $N$, $W$ relations)
-  - A coordinator for an operation locally generates new vector clock
-  - Talks to $N$ or $W$ other nodes
-  - If confirmed, proceed; else, reconcile versions
-
-*** Consistency with unavailable nodes? 
-
-- But: availability is paramount \textendash{} must not stall 
-- Hence: *sloppy quorum*
-  - Preference list of servers, only some of which must participate in
-    quorum
-- Means replicas need to get synchronized after failure recovery
-  - Uses Merkle trees to speed up detection of unsynchronized branches 
-
-
-
-
-
-** Smaller examples 
-
-
-
-*** Voldemort 
-
-Linkedin dyanmo clone http://www.project-voldemort.com/voldemort/ ,
-https://github.com/voldemort/voldemort 
-
-**** From the commercial                                        :B_quotation:
-     :PROPERTIES:
-     :BEAMER_env: quotation
-     :END:
-
-
-\small 
-
-- Data is automatically replicated over multiple servers.
-- Data is automatically partitioned so each server contains only a subset of the total data
-- Provides tunable consistency (strict quorum or eventual consistency)
-- Server failure is handled transparently
-- Pluggable Storage Engines \textendash{} BDB-JE, MySQL, Read-Only
-- Pluggable serialization \textendash{} Protocol Buffers, Thrift, Avro and Java Serialization
-- Data items are versioned to maximize data integrity in failure scenarios without compromising availability of the system
-- Each node is independent of other nodes with no central point of failure or coordination
-- Good single node performance: you can expect 10-20k operations per second depending on the machines, the network, the disk system, and the data replication factor
-- Support for pluggable data placement strategies to support things like distribution across data centers that are geographically far apart.
-
-*** Redis architecture 
-
-Not much concrete information available \Sadey 
-
-   - Redis vs. Memcached
-     - persistent by default
-     - cluster support: https://redis.io/topics/cluster-tutorial
-     - high availability tools: https://redis.io/topics/sentinel
-   - Redis vs. CAP: CP?
-     - Compare: https://aphyr.com/posts/283-jepsen-redis
-     - http://blog.nahurst.com/visual-guide-to-nosql-systems
-
-*** Riak 
-   - RiakKV http://basho.com/products/riak-kv/ 
-     - http://basho.com/posts/technical/vector-clocks-revisited/
-   - Features: Everything that is great under the sun 
-
-*** Spanner 
-
- - Google scalable, multi-version, globally-distributed, and synchronously-replicated database
- - https://research.google.com/archive/spanner.html 
-
-
-
-**** Paper abstract                                             :B_quotation:
-     :PROPERTIES:
-     :BEAMER_env: quotation
-     :END:
-
-\small 
-
-Spanner is Google’s scalable, multi-version, globally- distributed,
-and synchronously-replicated database. It is the first system to
-distribute data at global scale and sup- port externally-consistent
-distributed transactions. This paper describes how Spanner is
-structured, its feature set, the rationale underlying various design
-decisions, and a novel time API that exposes clock uncertainty. This
-API and its implementation are critical to supporting exter- nal
-consistency and a variety of powerful features: non- blocking reads in
-the past, lock-free read-only transac- tions, and atomic schema
-changes, across all of Spanner. 
-
-*** etcd 
-
-Distributed reliable key-value store for the most critical data of a
-distributed system   https://github.com/etcd-io/etcd 
-
-- Simple, secure, fast, reliable 
-- Uses Raft consensus 
-
-
-* TODO Column-oriented databases                                   :noexport:
-
-** Google BigTable 
-
-** Hypertable, Hbase 
-
-** Cassandra 
-
-
-
-* TODO Document-oriented databases                                 :noexport:
-
-** CouchDB 
-
-** MongoDB 
-
-
-
-* TODO Graph databases                                             :noexport:
-
-* TODO Hybrids                                                     :noexport:
-
-** Cassandra 
-
-- Both key/value aspects like Dynamo 
-- and bigtable aspects 
-
-
-
-
-* Directory services 
+** Directory services 
 
 *** Special case: Directories 
 
@@ -645,14 +460,8 @@ distributed system   https://github.com/etcd-io/etcd
      - Sometimes, both functionalities present in one service 
 
 
-*** Directory services: Examples
- - DNS
- - X.500, LDAP
 
-** DNS 
-
-
-*** Domain Name System (DNS) – Motivation 
+*** Example: Domain Name System (DNS) – Motivation 
  - Addressing in the Internet uses 4 bytes (IPv4), commonly
    represented in dotted decimal notation 
    - Nice for machines, impractical for human beings
@@ -705,12 +514,12 @@ distributed system   https://github.com/etcd-io/etcd
  - Class: For Internet, always “IN” (anything else rarely seen)
  - Type: See next page 
  - Value: Actual value 
- Check: http://www.dnsstuff.com/
+
 *** DNS types of resource records 
 
 #+CAPTION: Types of DNS resource records
 #+ATTR_LaTeX: :height 0.6\textheight :options page=4
-#+NAME: fig:dns_namespace
+#+NAME: fig:dns:resource_records
 [[./figures/dns.pdf]]
 
 
@@ -779,7 +588,7 @@ distributed system   https://github.com/etcd-io/etcd
 
 #+CAPTION: Recursive DNS resolution 
 #+ATTR_LaTeX: :width 0.9\linewidth :options page=3
-#+NAME: fig:dns:iterative
+#+NAME: fig:dns:recursive
 [[./figures/dns.pdf]]
 
 
@@ -811,7 +620,265 @@ distributed system   https://github.com/etcd-io/etcd
    - Relatively low time-to-live entries, since values change 
  - Practically: Most “home office” switches support registration of
    devices at one/several dynamic DNS providers 
-   - E.g., www.dyndns.com 
+
+  
+* COMMENT Key-value database
+  :PROPERTIES:
+  :CUSTOM_ID:       sec:keyvalue_stores
+  :END:
+
+*** Already covered 
+
+- We have already covered from a usage perspective 
+  - Memcached (Section \ref{sec:memcached})
+  - Redis (Section \ref{sec:redis})
+- We briefly look at some more examples
+- And at architectural choices 
+
+
+** Dynamo 
+
+*** Dynamo 
+- Dynamo \cite{DeCandia:2007:DAH:1323293.1294281}, probably one of the
+  first large-scale, high-performance key-value stores 
+- \href{https://aws.amazon.com/dynamodb/}{Product at Amazon}
+- Highlights
+  - Highly available, but sacrifices consistency (AP in the CAP
+    triangle)
+  - Geared towards tens of thousands of servers \textendash{} at that scale,
+    things fail constantly 
+  - Object versioning, application-assisted conflict resolution 
+
+*** Use cases 
+
+- Quote: /best seller lists, shopping carts, customer preferences,
+  session management, sales rank, and product catalog/
+  \cite{DeCandia:2007:DAH:1323293.1294281}
+  - Tens of millions of requests per day (thousands per second) 
+- Key/value store is natural pattern
+
+*** Architecture 
+
+- Consistent hashing for partitioning, replication
+- Object versioning
+- Consistency during update: Quorum
+  - Eventually consistent storage 
+- Membership protocol based on gossiping 
+- Operations only on individual keys, no isolation (in ACID sense)
+
+
+*** \ac{SLA}
+
+- What to optimise, what to promise?
+  - Service and Dynamo enter in an SLA   
+- Multiple quantifications
+  - E.g., mean and variance of response time
+    - Considered too lenient 
+  - E.g., 99.9% percentile response time at given load
+    - Typical goal! 
+
+
+#+BEAMER: \pause
+
+**** SLA vs. SLO 
+
+- Strictly speaking, this is an \ac{SLO}
+- But terminology often sloppy here 
+
+
+
+
+*** Principles 
+
+- Incremental scalability: Add single hosts at a time
+- Symmetry among nodes
+  - Decentralization, trusted,  but heterogeneity
+- Always writable: no update rejected because of partition
+- Zero-hop approach: Every node knows about every other
+  - No P2P-style routing
+
+*** Partition and replication 
+
+
+
+****                                                              :B_columns:
+     :PROPERTIES:
+     :BEAMER_env: columns
+     :END:
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+- Partition and replication: consistent hashing, storing a data item
+  on next three nodes 
+
+*****                                                                 :BMCOL:
+      :PROPERTIES:
+      :BEAMER_col: 0.5
+      :END:
+
+#+CAPTION: Dynamo: Store data at multiple servers 
+#+ATTR_LaTeX: :width 0.9\linewidth :options page=5
+#+NAME: fig:nosql:dynamo
+[[./figures/nosql.pdf]]
+
+
+*** Versioning  
+
+- With network partitions and unavailability, inconsistencies can
+  happen
+- *Eventual consistency*: over time, replicas converge
+- Handled by *versions* of data, which can only be appended to
+  - Think shopping cart, with *add* or *delete* operations appended to
+    best known state
+- Version expressed as vector clock 
+  - Updates must present vector clock of version they want to update 
+
+*** Versioning and reconciliation 
+
+Reconciliation: What happens when different versions reconnect? 
+  - Syntax reconciliation: Sometimes, authoritative version can be
+    automatically determined (changes in one subsume changes in other)
+  - Semantic reconciliation: Sometimes, application has to decide
+    - Multiple versions with concurrent vector clocks!
+    - Dynamo will return all versions to application
+    - Update should reconcile, collapses versions 
+    - Example shopping cart: keep the adds, may drop some of the deletes
+
+*** Consistency 
+
+- Where does an update happen?
+- Use a quorum! (typical $N$, $W$ relations, but makes $R$ explicit as
+  well)
+  - Consistency condition: $R + W > N$ for explicit read/write
+    tradeoffs 
+  - A coordinator for an operation locally generates new vector clock
+  - Talks to $N$ or $W$ other nodes
+  - If confirmed, proceed; else, reconcile versions
+
+*** Consistency with unavailable nodes? 
+
+- But: availability is paramount \textendash{} must not stall 
+- Hence: *sloppy quorum*
+  - Preference list of servers, only some of which must participate in
+    quorum
+- Means replicas need to get synchronized after failure recovery
+  - Uses Merkle trees to speed up detection of unsynchronized branches 
+
+
+
+
+
+** Smaller examples 
+
+
+
+*** Voldemort 
+
+LinkedIn Dynamo clone http://www.project-voldemort.com/voldemort/ ,
+https://github.com/voldemort/voldemort 
+
+**** From the commercial                                        :B_quotation:
+     :PROPERTIES:
+     :BEAMER_env: quotation
+     :END:
+
+
+\small 
+
+- Data is automatically replicated over multiple servers.
+- Data is automatically partitioned so each server contains only a subset of the total data
+- Provides tunable consistency (strict quorum or eventual consistency)
+- Server failure is handled transparently
+- Pluggable Storage Engines \textendash{} BDB-JE, MySQL, Read-Only
+- Pluggable serialization \textendash{} Protocol Buffers, Thrift, Avro and Java Serialization
+- Data items are versioned to maximize data integrity in failure scenarios without compromising availability of the system
+- Each node is independent of other nodes with no central point of failure or coordination
+- Good single node performance: you can expect 10-20k operations per second depending on the machines, the network, the disk system, and the data replication factor
+- Support for pluggable data placement strategies to support things like distribution across data centers that are geographically far apart.
+
+*** COMMENT Redis architecture 
+
+Not much concrete information available \Sadey 
+
+   - Redis vs. Memcached
+     - persistent by default
+     - cluster support: https://redis.io/topics/cluster-tutorial
+     - high availability tools: https://redis.io/topics/sentinel
+   - Redis vs. CAP: CP?
+     - Compare: https://aphyr.com/posts/283-jepsen-redis
+     - http://blog.nahurst.com/visual-guide-to-nosql-systems
+
+*** COMMENT Riak 
+   - RiakKV http://basho.com/products/riak-kv/ 
+     - http://basho.com/posts/technical/vector-clocks-revisited/
+   - Features: Everything that is great under the sun 
+
+*** Spanner 
+
+ - Google scalable, multi-version, globally-distributed, and synchronously-replicated database
+ - https://research.google.com/archive/spanner.html , \cite{corbett13:_spanner}
+
+
+
+**** Paper abstract                                             :B_quotation:
+     :PROPERTIES:
+     :BEAMER_env: quotation
+     :END:
+
+\small 
+
+Spanner is Google’s scalable, multi-version, globally-distributed,
+and synchronously-replicated database. It is the first system to
+distribute data at global scale and support externally-consistent
+distributed transactions. This paper describes how Spanner is
+structured, its feature set, the rationale underlying various design
+decisions, and a novel time API that exposes clock uncertainty. This
+API and its implementation are critical to supporting external
+consistency and a variety of powerful features: non-blocking reads in
+the past, lock-free read-only transac- tions, and atomic schema
+changes, across all of Spanner. 
+
+*** COMMENT etcd 
+
+Distributed reliable key-value store for the most critical data of a
+distributed system   https://github.com/etcd-io/etcd 
+
+- Simple, secure, fast, reliable 
+- Uses Raft consensus 
+
+
+* TODO Column-oriented databases                                   :noexport:
+
+** Google BigTable 
+
+** Hypertable, Hbase 
+
+** Cassandra 
+
+
+
+* TODO Document-oriented databases                                 :noexport:
+
+** CouchDB 
+
+** MongoDB 
+
+
+
+* TODO Graph databases                                             :noexport:
+
+* TODO Hybrids                                                     :noexport:
+
+** Cassandra 
+
+- Both key/value aspects like Dynamo 
+- and bigtable aspects 
+
+
+
 
 ** LDAP                                                            :noexport:
 
@@ -915,11 +982,13 @@ distributed system   https://github.com/etcd-io/etcd
 
 *** Conclusions 
 
-- SQL semantics usually implies the database semantics, not
-  necessarily the query language 
-- NoSQL looks at alternative models for distributed databases and
-  their many shapes 
-- Key insight is CAP theorem / PACELEC interpretation 
+- SQL semantics usually implies
+  - the query language, 
+  - ACID database semantics
+- NoSQL emphasizes  alternative models for distributed databases and
+  their consistency models 
+  - Driven by key insight of CAP theorem / PACELEC interpretation
+  - Query language not the point 
 - Even systems like DNS can be seen as very specific design choices on
   that spectrum 
 
