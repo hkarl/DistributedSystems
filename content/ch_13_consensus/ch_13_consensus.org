@@ -32,7 +32,7 @@
   mountains
 - Mountain army has to agree when to attack
 - But can only use messengers, which are prone to be intercepted
-- Note: equivalent to *terminating reliable broadcast*! 
+- Note: illustrating the  *terminating reliable broadcast*! 
 
 
 #+CAPTION: Two-army problem
@@ -85,7 +85,7 @@
 *** FloodSet algorithm 
 
 - Each process stores a subset W out of the valid values V 
-- Initially: W is the value that the respective process proposes 
+- Initially: W is the single value that the respective process proposes 
 - After every round each process broadcasts W to all participants 
 - All received elements are added to W
 - After f +1 rounds each process decides
@@ -112,7 +112,7 @@
 *** Nodes are traitors, all messages arrive in bounded time 
 
 - So-called *Byzantine agreement*  \cite{Lamport:1982:BGP:357172.357176}
-- Solvable provided there are at least $n = 3f+1$ node available when
+- Solvable provided there are at least $n = 3f+1$ nodes available when
   there are $f$ traitors 
 - Algorithm: see below
   \slideref{sec:consensus:byzt_alg}[s:consensus:byzt_alg] 
@@ -204,13 +204,14 @@ process. \cite{Fischer:1985:IDC:3149.214121}
   - Combining asynchrony with fault tolerance in a meaningful way 
 - Two main candidates
   - PAXOS: provably correct consensus protocol 
-    - E.g., used in Zookeeper, Kafka, Google's Chubby,  ...
+    - E.g., used in Zookeeper (in modified form), Kafka (in old versions), Google's Chubby,  ...
     - Original publication considered difficult to read
       \cite{Lamport:1998:PP:279227.279229}; followup paper tried to
       simplify exposition \cite{paxos-made-simple}; tutorial
       \cite{Meling2013}
     - Notorious for being  difficult to understand and to implement
-  - Raft \cite{10.5555/2643634.2643666}: Simpler structure, same guarantees
+  - Raft \cite{Ongaro:2014:SUC:2643634.2643666}: Simpler structure, same guarantees
+    - Seems more popular nowadays
 
 
 *** Raft goal: Log replication  
@@ -223,10 +224,11 @@ process. \cite{Fischer:1985:IDC:3149.214121}
   - Commands are stored in a *command log*, hence the name 
   - Consensus on order! 
   - Recall total order multicast!!
-- Formally:
-  - *Safety*: Never return an incorrect result
-  - *Available*: As long as any majority of servers is operational and
-    can communicate, progress is made
+- Formal requirements:
+  - *Safety*: Never return an incorrect result \pause
+  - *Available*: As long as *any majority* of servers is operational and
+    can communicate, progress is made \pause
+    - Hence: Prioritizes safety over liveness 
   - *Timing-independent*: Specific, precise choice of timer values
     does not matter 
 
@@ -234,6 +236,7 @@ process. \cite{Fischer:1985:IDC:3149.214121}
 
   - Machines can fail and recover
   - Message lost, arbitrarily delayed
+    - Also implies: network partition possible 
   - Membership changes (nodes added, dropped) 
 
 We *finally* build a really fault-tolerant protocol for the general
@@ -254,6 +257,8 @@ case!
 
 *** Components 
 
+- Cluster with nodes, each one having an instance of a replicated
+  finite state machine 
 - Leader election
   - Already covered \textendash{} compare Section \ref{sec:raft_le}
 - Log replication 
@@ -265,7 +270,8 @@ case!
 
 **** Terms and leaders 
 
-- Leaders are elected and responsible for terms of varying duration 
+- Leaders are elected and responsible for terms of varying duration
+  - All other nodes become followers of that leader 
 - Term numbers are monotonically increasing
 - Term numbers are a *logical clock*
   - Whenever a term number larger than a machine's own term is seen,
@@ -279,15 +285,22 @@ case!
 **** Clients and leaders 
 
 - Clients issue events/actions to replicated FSM 
-- Clients only talk to leaders 
-  - Non-leaders redirect clients to current leader 
+- Clients *only talk* to leaders 
+  - Non-leaders redirect clients to current leader
+- Clients are expected to wait for ACK from leader and retry if
+  timeout 
 
+\pause
 
 **** Leaders and log 
 
 - Only leader appends to log to ensure order 
 - Leader only confirms to client once it has confirmation from
   majority of servers 
+  - And only then can a command actually be applied to the
+    (replicated) FSM 
+\pause
+
 - Challenge: what happens when leader election and log updates
   overlap? 
 
@@ -305,12 +318,12 @@ The log:
     all its predecessors; identified by *commit counter* 
     - This highest index is included in all leader messages 
   - *Committed*: Safe to apply command to FSM 
-  - *Uncommitted*: Still not sufficiently confirmed from other
-    replicas 
+  - *Uncommitted*: Still not confirmed  from sufficiently many other
+    followers 
 
 *** Log example 
 
-#+CAPTION: Example Raft log; colors and numbers show terms (Figure 6 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})
+#+CAPTION: Example Raft log; colors and numbers show terms (Figure 6 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version}); color and top number in boxes show term
 #+ATTR_LaTeX: :width 0.6\textheight
 #+ATTR_LaTeX: :caption \caption{Example Raft log (Figure 6 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version}) \label{fig:raft:log}}
 #+NAME: fig:raft:log
@@ -320,19 +333,44 @@ Note that not all followers are up to date with the committed index of
 the current leader 
 
 *** Basic operation for log replication 
+\vskip-4ex 
+\small 
+
+***** 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:
+
+      
+
 
 - Client sends command to leader 
 - Leader appends command to its log (as uncommitted entry)
-- Sends command to all followers to replicate it
+- Leader sends command to all followers to replicate it
   - Waits for ACKs from majority (condition for commit)
     - Watch out for subtleties with leader changes (see below)
   - Retries indefinitely! 
 - Followers only accept and ACK command if no gap in index sequence!
+
+
+***** 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.48
+      :END:   
+
+
+\pause
 - With enough ACKs, leader
   - commits entry,
   - applies it to its FSM 
   - sends result of FSM action back to client 
-
+\pause
+- Commit index is piggybacked on other messages
+  - So followers learn which messages have been committed and can then
+    apply them to their own FSM instances as well
+  - But followers do not reply to clients 
 
 
 *** Properties 
@@ -346,6 +384,8 @@ If two entries in different logs have the same index and term, then
 
 
 *** Committing on followers 
+
+To emphasis again: All nodes apply to their FSM eventually! 
 
 - Leader decides when a log entry can be committed
   - Leads to update of commit counter 
@@ -361,14 +401,46 @@ If two entries in different logs have the same index and term, then
 
 *** Problem: Leader crash 
 
-Logs of new leader in new term might be inconsistent with follower
-logs; these are *uncommitted* entries  
+\vskip-3ex
+
+
+***** 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.38
+      :END:
+
+
+- Leader crash triggers leader election 
+- Logs of new leader in new term might be inconsistent with follower
+  logs; these are *uncommitted* entries   
+- (New)  followers might:
+  - Miss entries (a, b)
+  - Have extra uncommitted entries (c, d)
+  - Both (e, f)
+
+***** 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.58
+      :END:   
+
+
+
 
 #+CAPTION: Logs when leader changes (Figure 7 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})
-#+ATTR_LaTeX: :width 0.5\textheight
+#+ATTR_LaTeX: :height 0.6\textheight
 #+ATTR_LaTeX: :caption \caption{Logs when leader changes (Figure 7 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version}) \label{fig:raft:log_leader_change}}
 #+NAME: fig:raft:log_leader_change
 [[./figures/raft_log_leader_change.pdf]]
+
+
+*****                               :B_ignoreheading:
+      :PROPERTIES:
+      :BEAMER_env: ignoreheading
+      :END:
+
+
 
 *** Possible options 
 
@@ -377,14 +449,14 @@ logs; these are *uncommitted* entries
 
 - Case a, b: Unproblematic; new leader has superset
 - Case c, d: Leader misses entries from previous terms
-  - Could happen if those nodes where leader in previous terms, but
+  - Could happen if those nodes were leader in previous terms, but
     did not manage to commit them 
 - Case e, f: Combination 
 
 \pause 
 **** Uncommitted? 
 
-How do we know these are uncommitted entries at other nodes? 
+How do we know there are uncommitted entries at other nodes? 
 - Leader election needs to assure that!
 - Need an additional condition there (see below!) 
 
@@ -401,7 +473,7 @@ How do we know these are uncommitted entries at other nodes?
     follower logs are shortened
 \pause 
 - Note: we only remove uncommitted entries
-  - I.e.: not yet applied to state machine, not yet sent back to
+  - I.e.: not yet applied to state machine, not yet acknowledged to
     client
   - Client would have to resend! 
 
@@ -411,7 +483,7 @@ How do we know these are uncommitted entries at other nodes?
 
 *Leader Only Appends* Property: 
 
-- A leader only appends to its own log 
+- A leader *only appends* to its own log 
 - It never deletes, inserts, reorders, ... anything in its log 
 
 
@@ -428,7 +500,7 @@ How do we know these are uncommitted entries at other nodes?
 - Example scenario:
   - Follower A down for a term
   - Other leader B commits entries (majority of nodes is still up!)
-  - A comes up, becomes leader in following term, and does lack the
+  - A comes up, becomes leader in following term, and lacks the
     committed entries 
 \pause 
 - Hence: We need a restriction on leader election to avoid such cases! 
@@ -500,9 +572,44 @@ too hard \cite[Section 5.4.3]{ongaro14:_in_searc_under_consen_algor_exten_versio
 
 ** Other mechanisms 
 
+*** Network partition 
+
+- What happens when the network partitions and subgroups of nodes can
+  no longer talk to each other?
+- Case 1: Leaders is in a partition with majority of all nodes
+  - Nothing really happens; proceeds as usual
+- Case 2: Leader in minority partition
+  - Nodes in majority partition no longer receiver leader heartbeats
+    and will successfully elect a new leader
+  - Updates to the new leader succeed; to the older leader fail (owing
+    to lack of quorum)
+\pause
+
+- No split brain because it takes a majority of nodes to become leader
+  / get quorum for commits  @@latex: \textemdash{} @@ this can only be
+  the case in *at most one* partition 
+
+\pause
+- Homework: what happens if *no* partition has majority of nodes? 
+
+*** Healing network partition 
+
+- Partition with the newest term wins
+  - Old leader in minority partition steps down and discards its
+    uncommitted log entries 
+- Lower terms can only have uncommitted entries; they are discarded 
+
+*** Partitions cost liveness 
+
+- *Consistency cost*: In presence of partitions, Raft prioritizes
+  consistency over availability (cmp CAP discussion in following chapter)
+  - Clients connected to (old) leader in minority partition will not get
+    an ACK, will be blocked 
+
 *** Log compaction 
 
-  - Deal with log that grows above bounds 
+How to deal with log that grows above bounds? 
+
   - Take a snapshot (compare Section \ref{sec:snapshot}) of entire state (logs on
     all participants) to stable storage 
   - Delete logs up to that point 
@@ -1164,7 +1271,7 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
 
 - Possibly natural expectation: each faulty node has to be outvoted by
   two correct nodes
-  - Hence: for $f$ faulty nodes, $3f$ nodes in total suffices
+  - Hence: for $f$ faulty nodes, $3f$ nodes in total suffice
   - So-called *\ac{TMR}*
 
 #+BEAMER: \pause
@@ -1462,7 +1569,7 @@ def vote(id, initial_vote, num_proc, f):
 |          | Vote          |     7 | #       |     3 |     3 |     2 |
 | Round    | Preferences   | 7---- | #       | --3-- | ---3- | ----2 |
 |----------+---------------+-------+---------+-------+-------+-------|
-| 1a       | Preferences   | 77332 | #       | 72332 |  7332 | 72332 |
+| 1a       | Preferences   | 77332 | #       | 72332 | 7?332 | 72332 |
 |          | Majority      |     7 | #       |     2 |     3 |     2 |
 |          | Multiplicity  |     2 | #       |     2 |     3 |     2 |
 |----------+---------------+-------+---------+-------+-------+-------|
@@ -1501,7 +1608,12 @@ def vote(id, initial_vote, num_proc, f):
 - Also works for $n> 3f$, weak synchrony needed for liveness
   - I.e., with arbitrary message delays, algorithm can get stuck
   - But it is safe, will never make a wrong decision 
-
+\pause
+- Distributed ledgers, bitcoins, Nakamoto consensus 
+  - Basically an implementation of Byzantine agreement in a network
+    with open memberhship (so the $n>3f$ argument fails)
+  - But it still only solves probabilisitic agreement with only
+    probabilistic termination
    
 
  
@@ -1509,13 +1621,14 @@ def vote(id, initial_vote, num_proc, f):
 
 *** Systems so far 
 
-- Zookeeper, Chubby: Use Paxos to ensure consistent states
+- Zookeeper, Chubby: Use Paxos (or variants thereof) to ensure consistent states
 - Filesystems (Ceph, XtreemFS) use Paxos-based approach 
 - \href{https://github.com/etcd-io/etcd}{etcd} (distributed, reliable
-  key/value-store) uses RAFT   
-  - Raft: Plenty of implementations available (\href{https://raft.github.io}{List})
+  key/value-store) uses RAFT
+  - Already covered extensively in Section \ref{sec:consensus_etcd}
+- Raft: Plenty of implementations available (\href{https://raft.github.io}{List})
 
-*** etcd 
+*** COMMENT etcd 
 \label{sec:consensus_etcd}
 
 
@@ -1535,7 +1648,7 @@ etcd is written in Go and uses the Raft consensus algorithm to manage a highly-a
 
 - Usage: e.g., in Kubernetes 
 
-*** etcd Architecture 
+*** COMMENT etcd Architecture 
 
 - Designed for small amounts of key/value data, able to fit in memory 
 - With
@@ -1558,5 +1671,6 @@ etcd is written in Go and uses the Raft consensus algorithm to manage a highly-a
   - Leading to algorithms like Paxos and RAFT
 - The complexity of solving it is the reason for the existence of
   systems like Chubby, Zookeeper, and others 
-
+- Byznathine agreement is a significantly harder problem, requiring
+  substantial overheads to solve 
 
