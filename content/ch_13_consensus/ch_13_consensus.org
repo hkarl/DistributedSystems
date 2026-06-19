@@ -55,9 +55,9 @@
   - *Agreement*: All processes decide on the same value
   - *Termination*: All  processes eventually decide
   - *Validity*
-    - If all processes start with 0, both must decide for 0
+    - If all processes start with 0, all must decide for 0
     - If all processes start with 1 *and* all messages are delivered,
-      then both must decide for 1
+      then all must decide for 1
     - (Validity just rules out trivial algorithms; variations exist) 
 
 
@@ -312,7 +312,7 @@ The log:
 
 #+CAPTION: Example Raft log; colors and numbers show terms (Figure 6 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version})
 #+ATTR_LaTeX: :width 0.6\textheight
-#+ATTR_LaTeX: :caption \caption{Example Raft log (Figure 6 from \cite{}) \label{fig:raft:log}}
+#+ATTR_LaTeX: :caption \caption{Example Raft log (Figure 6 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version}) \label{fig:raft:log}}
 #+NAME: fig:raft:log
 [[./figures/raft_log.pdf]]
 
@@ -526,7 +526,7 @@ too hard \cite[Section 5.4.3]{ongaro14:_in_searc_under_consen_algor_exten_versio
 #+ATTR_LaTeX: :width 0.6\textheight
 #+ATTR_LaTeX: :caption \caption{Two leaders during configuration change (Fig. 10 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version}) }
 #+NAME: fig:raft:reconfig_two_leaders
-[[./figures/raft_no_commit.pdf]]
+[[./figures/raft_two_leaders.pdf]]
 
 
 
@@ -575,7 +575,7 @@ too hard \cite[Section 5.4.3]{ongaro14:_in_searc_under_consen_algor_exten_versio
   - Only a *single* value is chosen as result 
   - Only a *proposed* value is chosen 
   - Only a chosen value is made public
-- Lifeness   (make progress) :
+- Liveness   (make progress) :
   - FLP result still holds
   - So Paxos sacrifices liveness (blocks on decisions) if necessary 
 
@@ -585,7 +585,7 @@ too hard \cite[Section 5.4.3]{ongaro14:_in_searc_under_consen_algor_exten_versio
 
 *** Some initial thoughts 
 
-- We saw how safety and lifeness have to be balanced
+- We saw how safety and liveness have to be balanced
   - Timeouts vs. network partition problem
 - We saw how a primary/backup approach tackles some of these issues
 - Let's start from that as a strawman and see what we have to change
@@ -639,7 +639,7 @@ information
 
 
 - What if the primary crashes?
-- Use a leader elect protocol to a elect a new primary
+- Use a leader elect protocol to elect a new primary
 - Have new primary send replies to clients 
 
 
@@ -744,7 +744,7 @@ information
 
 #+CAPTION: Server group with partially healed partition 
 #+ATTR_LaTeX: :width 0.85\linewidth :options page=5
-#+NAME: fig:consensus:pb:group_partial_parition 
+#+NAME: fig:consensus:pb:group_partial_partition 
 [[./figures/paxos.pdf]]
 
 
@@ -777,7 +777,7 @@ information
 
 #+CAPTION: Server group with round numbers 
 #+ATTR_LaTeX: :width 0.7\linewidth :options page=6
-#+NAME: fig:consensus:pb:mutlicast
+#+NAME: fig:consensus:pb:round_numbers
 [[./figures/paxos.pdf]]
 
 
@@ -885,7 +885,7 @@ See \cite{paxos-made-simple}:
 
 - Let’s give unique, ordered sequence numbers to proposals
   - Proposal is hence (value, sequence number) 
-  - Uniqueness follows if, once a value $v$ for a a proposal with number
+  - Uniqueness follows if, once a value $v$ for a proposal with number
     $N$ has been chosen, all proposals with $N^\prime > N$ choose the
     same value $v$ (P2)  
 
@@ -997,7 +997,7 @@ Learning:
 
 *** Paxos: Battling  Proposers 
 
-#+CAPTION: Paxos proposer fails  
+#+CAPTION: Paxos: battling proposers
 #+ATTR_LaTeX: :height 0.6\textheight :options page=9
 #+NAME: fig:consensus:paxos:battling_proposer
 [[./figures/paxos.pdf]]
@@ -1043,7 +1043,7 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
       practically oriented, 
       \href{https://raft.github.io}{plenty of implementations} 
       available   
-    - Eg., proscribes that only most up-to-date server can become new
+    - E.g., prescribes that only most up-to-date server can become new
       leader
     - But does not address leader bottleneck issue
     - Material 
@@ -1162,7 +1162,7 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
 
 *** Triple modular redundancy 
 
-- Possibly natural expectation: each faulty node has to outvoted by
+- Possibly natural expectation: each faulty node has to be outvoted by
   two correct nodes
   - Hence: for $f$ faulty nodes, $3f$ nodes in total suffices
   - So-called *\ac{TMR}*
@@ -1348,7 +1348,7 @@ Round 1
 Round 2
 
 #+CAPTION: TMR counterexample: B faulty , step 2
-#+ATTR_LaTeX: :width 0.95\linewidth :options page=8
+#+ATTR_LaTeX: :width 0.95\linewidth :options page=9
 #+NAME: fig:consensus:tmr:Bfaulty2
 [[./figures/byzantine.pdf]]
 
@@ -1401,7 +1401,7 @@ Right columns show which cases are indistinguishable for each node
 
 *** n=3, f=1 does not solve Byzantine Agreement
 
-- So: A decides 1 if and only if decides 0 
+- So: A decides 1 if and only if C decides 0 
 - *Contradiction* 
   - Not a formal proof, but the core idea
   - We made no assumptions about communication structure, algorithm,
@@ -1426,12 +1426,12 @@ def vote(id, initial_vote, num_proc, f):
 
     for k in range(f+1):
         # odd phase:
-        broadcast (preference[id])
-        preference[j] = receive_from(j) for j <> id
-        majority_pref = most often value in perference
-        multiplicity = number of occurences of majority_preference
+        broadcast(preference[id])
+        preference[j] = receive_from(j) for j != id
+        majority_pref = most often value in preference
+        multiplicity = number of occurrences of majority_pref
 
-	# even phase - next slide
+        # even phase - next slide
 #+END_SRC
 
 
@@ -1439,14 +1439,14 @@ def vote(id, initial_vote, num_proc, f):
         
 #+BEGIN_SRC python
     for k in range(f+1): 
-        # odd phase: see previous slie
+        # odd phase: see previous slide
         # even phase: 
         if id == k:
-            broadcast majority_preference
+            broadcast majority_pref
         king_majority = receive from process k
             # possibly from yourself
 
-        if mulitplicity > num_proc/2 + f:
+        if multiplicity > num_proc/2 + f:
             preference[id] = majority_pref
         else:
             preference[id] = king_majority
@@ -1539,7 +1539,7 @@ etcd is written in Go and uses the Raft consensus algorithm to manage a highly-a
 
 - Designed for small amounts of key/value data, able to fit in memory 
 - With
-\href{https://github.com/etcd-io/etcd/tree/master/etcdctl}{command-lineclient} (in particular, ~put~, ~get~, ~del~ operations) 
+\href{https://github.com/etcd-io/etcd/tree/master/etcdctl}{command-line client} (in particular, ~put~, ~get~, ~del~ operations) 
 
 
 
@@ -1552,7 +1552,7 @@ etcd is written in Go and uses the Raft consensus algorithm to manage a highly-a
   systems
   - Essential building block for many design approaches, like state
     machine replication, atomic multicast, ... 
-- Its impossibility in general settings in unavoidable
+- Its impossibility in general settings is unavoidable
   - Intricacies: node failures, delayed messages, network partition 
 - Even in restricted settings, it is a complicated algorithmic problem
   - Leading to algorithms like Paxos and RAFT
