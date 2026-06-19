@@ -532,7 +532,7 @@ too hard \cite[Section 5.4.3]{ongaro14:_in_searc_under_consen_algor_exten_versio
 
 
 
-* PAXOS
+* COMMENT PAXOS
   :PROPERTIES:
   :CUSTOM_ID: sec:consensus:paxos
   :END:
