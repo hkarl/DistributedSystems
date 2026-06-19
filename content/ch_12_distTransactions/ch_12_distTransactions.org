@@ -10,8 +10,10 @@
 
 *** All or nothing? 
 
-- Previous chapter: \ac{ZK} delivers messages all-or-nothing to
-  servers
+- Previous chapter:
+  - ~etcd~ provides atomic operations on individual keys
+  - But what about atomicity across multiple keys or services?
+    servers \pause
 - Generalises:
   - A *set of operations* should be executed *either all or
     none* of them
@@ -455,6 +457,8 @@ A commit protocol is called *blocking* when
 
 *** 3PC FSM 
 
+\vskip-3ex
+
 ****                                                              :B_columns:
      :PROPERTIES:
      :BEAMER_env: columns
@@ -483,7 +487,7 @@ A commit protocol is called *blocking* when
 ****** Participant 
 
 #+CAPTION: 3PC participant finite state machine
-#+ATTR_LaTeX: :width 0.75\linewidth :options page=2
+#+ATTR_LaTeX: :width 0.65\linewidth :options page=2
 #+NAME: fig:dT:3pc:fsm:participant
 [[./figures/3pc.pdf]]
 
@@ -493,22 +497,59 @@ A commit protocol is called *blocking* when
 
 
 
-*** Why does 3PC help? 
+*** Why does 3PC help for node crashes/recoveries? 
+
+(Note: No network partition assumed just yet)
 
 - Apparently, not much difference?
   - Cannot the same thing happen in ~PreCommit~ as did above?
-- Critical cases:
+
+*** Critical cases for 3PC 
+
+\vskip-3ex
+
+
+***** Coordinator times out 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.28
+      :END:
+
+  - Coordinator times out in ~Collect~: Simple to abort 
   - Coordinator  times out in ~PreCommit~: All have voted for commit;
     commit is safe
-  - Participant times out in ~Voted~ or in  ~PreCommit~: contact others
-    - If any other in ~Ready~, ~Abort~: Abort; if any in ~Commit~,
-      ~Commit~ as well 
-    - If *majority* of  other nodes  in ~Ready~, abort is safe --
-      because  a recovering node might have voted for abort
-    - If *majority* of others nodes  in ~PreCommit~ as well, commit is
-      safe (because coordinator *also* agreed!) 
-  - Note: Recovering participant could at worst recover to
-    ~PreCommit~ but *not* to ~Commit~ as in 2PC! 
+
+      
+\pause
+
+***** Participant times out 
+      :PROPERTIES:
+      :BEAMER_env: block
+      :BEAMER_col: 0.68
+      :END:   
+
+
+
+  - Participant times out in ~Voted~
+    - Because coordinator has crashed
+    - Contact others:
+      - No other node can be in ~Commit~  (convince yourself why)
+      - Some other node in ~Abort~: Abort as well
+      - If *any* of the other participants  in ~PreCommit~, commit is
+        safe (because coordinator *also* agreed and did send the ~PREPARE_COMMIT~!) 
+      - If all other nodes are still in ~Voted~: Ok to abort 
+  - Participant times out in  ~PreCommit~: broadcast to other
+    nodes, tell them to commit  
+
+\pause
+
+*****                               :B_ignoreheading:
+      :PROPERTIES:
+      :BEAMER_env: ignoreheading
+      :END:
+
+    *Note*: If any node in ~PreCommit~, no other node can be in
+      ~Abort~  @@latex: \textemdash{} @@ key property of 3PC 
 
 
 *** Example unblocking run
@@ -522,17 +563,21 @@ A commit protocol is called *blocking* when
 
 *** 3PC: Liveness
 
+
+- Insight so far: As long as there are *only crashes*, 3PC is *both
+  live and safe* \pause  
 - To be *live*, 3PC needs to make progress even if messages are
-  missing
-  - Basic technique: timeout
+  missing, even if the nodes are *partitioned into two groups* (or
+  more)?  \pause
   - *Danger*: Still has to be safe 
-- Meaning: How to behave if no *majority* of other nodes can be
+- Basic technique: timeout
+- Question: How to behave if *no majority* of other nodes can be
   reached? 
 
 *** Run with partition 
 
 - Similar scenario to Section \slideref{sec:distTrans:2pc}[s:distTrans:2pc:twocrashes]
-- Difference: Coordinator crashes, but node A is *partitioned* off
+- Difference: Coordinator crashes, *and* node A is *partitioned* off
   from the other nodes (alive, but unable to communicate)
 
 
@@ -545,12 +590,12 @@ A commit protocol is called *blocking* when
       :END:
 
 - Options for B, C, E?
-  - Never received ~PRE_COMMIT~, so they abort 
-- Options for A?
-  - Timeout, then commit \textendash{} *majority* of *reachable* nodes in favour
-    of commit!
-  - Timeout, then abort \textendash{} *majority* of total nodes not available for
-    comment.
+  - Never received ~PREPARE_COMMIT~, so they abort 
+- Options for A? \pause
+  - Timeout, then commit \textendash{} because *majority* of *reachable* nodes in favour
+    of commit! \pause
+  - Timeout, then abort \textendash{} because *majority* of *total*
+    nodes not available for   commit.
     - *But they might have committed! A does not know!*
 
 ***** 								      :BMCOL:
@@ -568,6 +613,8 @@ A commit protocol is called *blocking* when
 
 - These two cases are indistinguishable for A
 - But A should behave differently! 
+
+\vskip-2ex 
 
 **** 								  :B_columns:
      :PROPERTIES:
@@ -593,9 +640,8 @@ A commit protocol is called *blocking* when
 
 #+CAPTION: 3PC coordinator works; node A is partitioned, A should commit
 #+ATTR_LaTeX: :width 0.75\linewidth :options page=6
-#+NAME: fig:dT:3pc:partition_Aabort
+#+NAME: fig:dT:3pc:partition_Acommit
 [[./figures/3pc.pdf]]
-
 
 *** Consequence? 
 
@@ -608,11 +654,33 @@ A commit protocol is called *blocking* when
   - But would that really help? Or sign of deeper problem?
 - Let's find out (Chapter \ref{ch:consensus}) 
 
+
+
+*** Indistinguishability is the rub
+
+- In the end, all distributed systems problems boil down to this core
+  issue: 
+  - Sometimes, a node cannot distinguish, based on local observation,
+    what happened in the rest of the system
+  - But it should behave differently, depending on what other nodes
+    did (but it cannot know that)
+\pause
+
+- In such a case, a node has to decide between: 
+  - *Safety*: I better not do anything, lest I do something wrong
+  - *Liveness*: I better do something, lest I stop working 
+
+\pause
+- Your system *cannot have both*
+  - If *partitions* can happen
+  - We circle back to this as the FLP theorem in the next chapter 
+
+
 ** Practical 
 
 *** In practical systems?  
 
- - 2PC widely used in \ac{RDMS}
+ - 2PC widely used in \ac{RDBMS}
    - Examples: MySQL, Postgres, MariaDB
    - Danger of blocking often considered negligible in practice
    - But that jeopardises ACID guarantee (cp. 
@@ -718,7 +786,7 @@ A commit protocol is called *blocking* when
 
 ****** Pros 
  - Mutual exclusion is achieved
- - Fair -– requests are served in order 
+ - Fair  @@latex: \textemdash{} @@  requests are served in order 
  - Easy to implement
  - Per access to critical region, only three messages are required  
 
@@ -767,7 +835,7 @@ A commit protocol is called *blocking* when
 
 #+BEGIN_SRC python 
 class MuTex:
-    def init(self):
+    def __init__(self):
         self.state = RELEASED
         self.seqNumber = 0
         self.id = get_process_id()
@@ -776,7 +844,7 @@ class MuTex:
     def enter(self):
         self.state = WANTED
         self.replies_received = 0
-        self.seqNumber++
+        self.seqNumber += 1
         multicast(WANT, self.seqNumber, self.id)
 
     def leave(self):
@@ -792,22 +860,21 @@ class MuTex:
 
 
 #+BEGIN_SRC python 
-    def receive_reply(self):
-        self.replies_received++
-        if self.replies_received == N-1:
-            state = HELD
-            # enter critical, e.g., release thread
+  def receive_reply(self):
+      self.replies_received += 1 
+      if self.replies_received == N-1:
+          self.state = HELD
+          # enter critical, e.g., release thread
 
-    def receive_request(self, (request_seqNr, request_id)):
-        if ( (self.state == HELD) or
-             (self.state == WANTED and
-                  (self.seqNr, self.id) < (request_seqNr, request_id))):
-            self.queue.append( (request_seqNr, request_id))
-        else:
-            send(request_seqNr, CLEAR) 
-
-            
-
+  def receive_request(self, request):
+      request_seqNr, request_id = request
+      if ( (self.state == HELD) or
+           (self.state == WANTED and
+                ((self.seqNumber, self.id) 
+                 < (request_seqNr, request_id)))):
+          self.queue.append(request_id)
+      else:
+          send(request_id, CLEAR) 
 #+END_SRC
 
 
@@ -860,7 +927,7 @@ things are said to be good for you in some abstract way. (Tanenbaum)
    :END:
 
 
-*** Deadlock detection 
+*** Example problem: Deadlock detection 
 
 - Recall deadlocks: A cycle in a wait-for graph 
 - With locks in databases: Possible
@@ -895,7 +962,7 @@ things are said to be good for you in some abstract way. (Tanenbaum)
 - Termination detection
   - Can we terminate a process, when jobs for it might be in transit?
 
-**** State collection (snapshot) 
+**** Generalization: State collection (snapshot) 
   - More generally: Compute a function on process states, where state
     changes are potentially in transit?
   - Example:
@@ -1059,20 +1126,21 @@ things are said to be good for you in some abstract way. (Tanenbaum)
 *** Distributed snapshot algorithm: Pseudo code 
 
 #+BEGIN_SRC python 
-class Snapshot:
-    inchannels = [ [] ] * numInchannels
-    inchannels_Done = [ False ] * numInchannels
-    outchannel = [outCh1, ... outChm]
-    stateRecord = None
-    recordingOn = False
+  class Snapshot:
+      def __init__(self, numInChannels, outChannels): 
+          self.inchannels = [ [] ] * numInchannels
+          self.inchannels_Done = [ False ] * numInchannels
+          self.outchannel = outChannels
+          self.stateRecord = None
+          self.recordingOn = False
 
-    def on_marker (self, marker_channel):
-        if not self.stateRecord:
-            self.stateRecord = self.my_state()
-            inchannel_Done[marker_channel] = True
-            for oc in outchannels: oc.send("M") 
-        else:
-            inchannel_Done[marker_channel] = True 
+      def on_marker (self, marker_channel):
+          if not self.stateRecord:
+              self.stateRecord = self.my_state()
+              self.inchannel_Done[marker_channel] = True
+              for oc in self.outchannels: oc.send("M") 
+          else:
+              self.inchannel_Done[marker_channel] = True 
 #+END_SRC
 
 *** Distributed snapshot algorithm: Pseudo code 
@@ -1205,6 +1273,15 @@ class Snapshot:
 #+NAME: fig:distTrans:snapshot:run12
 [[./figures/snapshot.pdf]]
 
+*** So what about distributed deadlock now? 
+
+- With distributed snapshot algorithm in place, how to solve the
+  original problem?
+  - E.g., distributed deadlock detection, garbage collection, etc.? 
+- For deadlocks:
+  - Use snapshot to collect the local wait-for graphs
+  - Merge them
+  - Detect cycles and act on them (e.g., break locks)
 
 * Summary
 
@@ -1218,7 +1295,7 @@ class Snapshot:
   - Different tradeoffs between safety and liveness
 - In context of distributed transactions, several other algorithmic
   problems occur
-  - Locking/mutex; distributed snapshot 
+  - Locking/mutex; deadlocks/garbage collection/distributed snapshot 
 
 *** What's next? 
 
