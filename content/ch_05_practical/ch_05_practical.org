@@ -565,10 +565,15 @@ $ terraform show
 
 - Many services need to communicate with each other 
 - Ensure dependable, observable, secure behavior  
-  @@latex:   \textemdash{} @@ without touching app code
-  - E.g., how to deal with a service becoming slow? 
+  @@latex:   \textemdash{} @@ *without touching app code*
+  - E.g., how to deal with a service becoming slow?
+- Meshing at platform, not application level!
+  - Should add: dependability/performance, observability, security by implementing
+    in service proxies 
 - Example: Istio, Linkerd 
-
+- Also read [[https://www.buoyant.io/what-is-a-service-mesh][this blog]]
+  - Explain that service meshes might solve organization problems
+    (ownership, business vs. platform) rather than technical problems 
 
 
 * App definition 
@@ -729,7 +734,20 @@ $ terraform show
 - Structure: Nagios server tries to access supervised systems,
   services 
 
-     
+* Further reading      
+
+*** Kubernetes: Custom resources and operators 
+
+- Kubernetes is *not* a fixed system
+- Think of it as an extensible framework 
+- Important concept: Custom resources and their descriptors
+  - *Custom Resource Descriptors* (CRDs)
+- Along with *operators* that observe changes to a custom resource in
+  reconciliation loop
+  - Have algorithms  to bring reality towards desired state
+\pause
+- Example: ~Database~ CR, with operators that spin up replicas in new
+  pods, sync between them, backup data, \dots 
 
 
 * COMMENT OLD STUFF FOLLOWS 
