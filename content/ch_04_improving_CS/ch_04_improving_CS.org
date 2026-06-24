@@ -1136,8 +1136,9 @@ Improving on blind random choice already for $d=2$!
   - Plausible: logarithmic in server number worse than optimal 
   - But that is a plausible requirement
 - Limited checking gives substantial improvement 
-
-
+- Even checking just two options already improves result dramatically
+  (*power of two choices*)
+  - We will see that again in the Linkerd homework!
 
 * Improving  latency
 
