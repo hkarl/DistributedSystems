@@ -60,6 +60,13 @@
   - Think: Containers, Pods, \dots
   - Often summarized under the *cloud native* umbrella 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Pet vs. cattle: which property best describes 'cattle' servers? A) Individually maintained and repaired. B) Interchangeable, recreated from a description when broken.
 *** Remaining chapter structure: Two worlds 
 
 - Introduce the key questions for operating a distributed system
@@ -250,6 +257,13 @@ Next couple of slides: brief highlights for these categories; more details later
 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Infrastructure as Code explicitly FORBIDS one practice. Which? A) Storing config in version control. B) Interactive/manual configuration. C) Using declarative descriptions.
 *** Example tools
   - Terraform: obtain resources from different Cloud providers
   - Ansible / Chef / Puppet: provision software, configuration files
@@ -292,6 +306,13 @@ Next couple of slides: brief highlights for these categories; more details later
     - E.g., module to interact with version control (git pull!) -
       continuous deployment! 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Ansible playbooks describe tasks in which format?
 *** Deployment tool example: Ansible Playbook with one play 
 
 \small 
@@ -490,6 +511,13 @@ $ terraform show
 
 * Orchestration 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+The Container Network Interface (CNI) is responsible for: A) Persistent storage. B) Overlay networks with isolation. C) Scheduling containers. D) Image building.
 *** Orchestration & management: Scheduling 
 
 
@@ -507,6 +535,13 @@ $ terraform show
 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Kubernetes vs. Knative: for which workload type is Knative explicitly LESS suitable?
 *** Orchestration & management: Coordination, service discovery 
 
 
@@ -578,6 +613,13 @@ $ terraform show
 
 * App definition 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What distinguishes a service mesh from a service proxy? Think: where is the functionality implemented — in the app, or at the platform level?
 *** App definition: Database 
 @@latex:   \begin{tikzpicture}[remember picture, overlay]
 \node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=5]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
@@ -636,6 +678,13 @@ $ terraform show
 #+NAME: fig:ci_workflow
 [[./figures/ci_workflow.pdf]]
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In Continuous Integration, what happens AUTOMATICALLY when a developer pushes code?
 *** Continuous integration example: \href{http://jenkins-ci.org/}{Jenkins} 
 
  - Continuous integration server written in Java, server-based
@@ -679,6 +728,13 @@ $ terraform show
 \pause
 - Typical example: GitHub Actions  @@latex: \textemdash{} @@  no server to maintain, pipelines as code (~.github/workflows/~)
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In GitOps, someone manually scales the cluster with kubectl. What does the GitOps agent do?
 *** App development: GitOps, ArgoCD  
 @@latex:   \begin{tikzpicture}[remember picture, overlay]
 \node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=5]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
@@ -722,6 +778,13 @@ $ terraform show
 
  
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+The three pillars of observability: what are they?
 *** Example from mutable infrastructure: Nagios 
 
 \href{https://www.nagios.org}{Nagios}   \pet
@@ -750,6 +813,13 @@ $ terraform show
   pods, sync between them, backup data, \dots 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In Kubernetes, what does an Operator implement? A) A web UI. B) A reconciliation loop. C) A replacement for etcd. D) Auto-scaling on CPU only.
 * COMMENT OLD STUFF FOLLOWS 
 
 

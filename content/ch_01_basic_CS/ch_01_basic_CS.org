@@ -117,6 +117,14 @@ We usually have some operations like:
     - Unusual  
 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: send(buf, dest) returns immediately without waiting for the receiver. What has the OS guaranteed at this point?
 *** Synchronicity of operations 
 
 
@@ -131,6 +139,14 @@ We usually have some operations like:
     - Corresponding return value if no
     - Does never block process for longer time 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: A client uses non-blocking receive and busy-polls for a reply. What is the main cost compared to blocking receive?
 *** Synchronicity of operations: combinations 
 
 - All combinations possible
@@ -309,6 +325,14 @@ are allowed to occur
     
 ** Faults models 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: A designer assumes all messages arrive within 100 ms. Which timing model does this describe?
 *** Fault models 
 
 - Things go wrong!
@@ -697,6 +721,14 @@ print("Received request: %s" % message)
 #+BEAMER: \pause
 - Different names: serialization, pack/unpack, marshalling 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: Without a neutral wire format, how many pairwise translators are needed between n programming languages?
 *** 0mq: Exchanging data across languages 
 
 - Uses a simple and very efficient wire format 
@@ -967,6 +999,14 @@ int main(void)
 [[./figures/idl.pdf]]
 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: What does Protocol Buffers (.proto + protoc) give you that Python msgpack does NOT? (Select all that apply.)
 *** Option 2.2: Example google Protocol Buffers 
 
 - Protocol Buffers provides
@@ -1334,6 +1374,14 @@ A series of requests might be related to each other
      - E.g., Network File System
  - Remote editing (like Google docs or similar) 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: A server remembers the file offset between successive read calls from the same client. Is this stateful or stateless? What happens if the server crashes?
 *** How to find server? 
 
 - Open issue: How does client know which server to talk to? 
@@ -1385,6 +1433,14 @@ A series of requests might be related to each other
 
 ** Request/reply  
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: Name one advantage and one disadvantage of the two-tier client/server architecture.
 *** Request/reply protocol in more detail
 
 Request/reply is seemingly trivial
@@ -1481,6 +1537,14 @@ Actions:
 
 ** Summary 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: A client retransmits a bank-transfer request after a timeout. What risk arises if the server does not track processed message IDs?
 *** Summary: A simple two-tier model 
 
 - Client/server is a simple model to structure distributed applications

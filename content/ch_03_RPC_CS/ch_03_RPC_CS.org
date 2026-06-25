@@ -90,6 +90,14 @@ Allow procedure calls across address spaces
   - Often, in infinite loop
 - Stub and skeleton together realize data transport 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: In RPC, what does the client-side stub do? Who does it pretend to be?
 *** RPC by proxy 
 
 
@@ -146,6 +154,14 @@ void f(int *x, int *y) {
 f(&a, &a);
 #+END_SRC
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: RPC uses copy-and-restore for reference parameters. Is this always equivalent to call-by-reference? Think of f(&a, &a).
 *** RPC Interface Definition Languages 
 
 - Need: describe interface of functions to be called more explicitly
@@ -189,6 +205,14 @@ What if things go wrong?
   - At least once?
   - At most once? 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: Local calls execute exactly once. Why can RPC not guarantee exactly-once semantics?
 *** Source of failures
 
 Communication: 
@@ -294,6 +318,14 @@ Crashes:
 [[./figures/rpc_rrp.pdf]] 
 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: When a lost RPC reply triggers a retransmission, under what condition can the server just recompute the result instead of using a reply cache?
 *** RPC request/reply: reply lost
 
 ****                                                              :B_columns:
@@ -762,6 +794,14 @@ message HelloReply {
 
 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: gRPC uses .proto files and protoc. What does the compiler generate from those files?
 *** gRPC vs. zerorpc 
 
 - Zerorpc: simpler, smaller learning curve, non-standard 
@@ -945,6 +985,14 @@ It [Web Service] has an interface described in a machine-processable format (spe
 
 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: What is the KEY architectural property that distinguishes REST from generic web services?
 *** Representations contain information to discover resources??
 
 - What does that mean? 
@@ -1019,6 +1067,14 @@ From \cite{RESTRepresen19:online}
 
 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: Which URL and method pattern is most RESTful: /books/list + /books/add, or GET /books/ + POST /books/ + DELETE /books/42/?
 *** RESTful: URL patterns practically 
 
 - In principle, nice idea 
@@ -1239,6 +1295,14 @@ But:  No DELETE, PUT,  ... supported!
     - Usually, asynchronous event transport \pause
     - We talk about *event routing* in later chapters 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: What is the difference between orchestration and choreography in microservices?
 *** TODO Choreography: specifying event routing
 
 - Publisher declares *what happened* (event type + schema)
@@ -1341,6 +1405,14 @@ But:  No DELETE, PUT,  ... supported!
 
 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: A slow microservice is struggling. What does 'scale out' mean, and what new challenge does it introduce?
 *** Discovering instances 
 
 - Suppose microservices are scaled out/in
@@ -1398,6 +1470,14 @@ But:  No DELETE, PUT,  ... supported!
   (Chapter \ref{ch:pubsub}) or Message Queuing (Chapter \ref{ch:mq})
 
 
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+\pause
+     Quiz: Ten microservices share one central SQL database. What problem does this create, and what is the recommended remedy?
 *** CQRS 
 
 - Observation: Simple model of CRUD data stores insufficient for

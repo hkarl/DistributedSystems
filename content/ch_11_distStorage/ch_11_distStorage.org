@@ -48,6 +48,13 @@
  - Overhead, costs \cite{Sheehy:2015:NoNow}
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Which consistency model requires that a write is instantaneously visible to all processes?
 *** Consistency challenge: Non-commutative updates 
 
 **** $t=1$: Updates reach nearby storage 
@@ -243,6 +250,13 @@ of the /most recent/ write on x
    less consciously) expect  a system to behave like this 
 
   
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Strict consistency is impossible to implement in a distributed system. Why?
 *** Problems of strict consistency 
 
 
@@ -361,6 +375,13 @@ First read at B already has to deliver 42.
 - *Not* implemented via clocks, but by sequence numbers assigned at a
   serializer
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In linearizability, if o1 completes before o2 starts, what must be true?
 *** Example 
 
 ***** 
@@ -436,6 +457,13 @@ appear in this sequence in the order specified by its program.
 
 Sequential consistency allows reorder with respect to real time 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Two processes each perform a write; a third process observes them in opposite orders from a fourth. Which consistency model is violated?
 *** Sequential consistency, example 
 
 
@@ -532,6 +560,13 @@ Necessary condition:
 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Causal consistency allows concurrent writes to be seen in different order on different machines. TRUE or FALSE?
 *** Causal consistency: Example
 
 #+CAPTION: Causally consistent example
@@ -578,6 +613,13 @@ Necessary Condition:
  - Writes done by a *single process* are seen by *all* other processes in the *order* in which they were issued,
  - but writes *from different* processes may be seen in a *different order* by different processes.
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+FIFO consistency guarantees order of writes from a single process. Does it also guarantee order across different processes?
 *** FIFO consistency: Example 
 
 #+CAPTION: FIFO consistent example
@@ -1006,6 +1048,13 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
   - Each site can easily keep track of sequence of updates 
 - Alternatives? 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+With the write-everywhere protocol, why is each site easily able to keep track of the sequence of updates?
 *** Thought experiment: Write only once? 
 
 - Possible alternative: Write only locally? 
@@ -1127,6 +1176,13 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
  - Note: Many different ways of forming quorums exist (e.g., along
    trees) 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+With N=5 replicas, N_W=3, N_R=3: does this satisfy the quorum overlap condition N_R + N_W > N?
 *** Quorum examples 
 ****                                                              :B_columns:
      :PROPERTIES:
@@ -1194,6 +1250,13 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
      identical copies of each other*
    - But that might be a bit *too* weak?? 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Give an everyday example of a system that provides eventual consistency.
 *** From eventual to client-centric consistency 
  Consider a mobile user accessing an eventually consistent replicated data store 
  - Write performed in one replica; move happens; reads data back from other replica $\leadsto$ Not what was written!
@@ -1515,6 +1578,13 @@ Basic implementation idea:
 
 * CRDT
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+A client writes at replica L1, then reads from replica L2 and sees the old value. Which client-centric guarantee is violated?
 *** Replication without coordination? 
 
 - So far: coordination necessary to make sure that updates produce

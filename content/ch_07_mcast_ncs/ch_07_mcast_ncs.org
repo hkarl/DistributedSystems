@@ -66,6 +66,14 @@
   - Much cheaper than multiple unicasts (e.g., Ethernet, wireless) 
   - But: Likely imperfect 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Compared to replicated unicast, IP multicast saves bandwidth mainly on which part of the network?
+
 *** Imperfections in multicast 
 
 - Delays might vary strongly between receivers
@@ -148,6 +156,14 @@ At first
 
 
 
+
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+UNIFORM AGREEMENT in reliable multicast means: if one process delivers m, what must happen?
 
 *** Reliable multicast \textendash{} formally 
 
@@ -241,6 +257,14 @@ Remember: No group changes so far!
 [[./figures/mcast_ordering.pdf]]
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+FIFO multicast guarantees ordering per sender. What does it say about messages from DIFFERENT senders?
+
 *** Holdback 
 
 - FIFO example shows key technique: *holdback*
@@ -274,6 +298,14 @@ Remember: No group changes so far!
  - Example: Deposit to a replicated bank account from one site, add interest from another site
  - Quite expensive in larger systems
  - Not necessarily FIFO
+
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Two senders deposit and add interest to a replicated bank account. Which ordering prevents inconsistency?
 
 *** Atomic order 
 
@@ -315,6 +347,14 @@ If processes p and q both TO-deliver messages m and m’, then p TO-delivers m b
 
 \cite{Defago:2004:McastSurvey}
 
+
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Total order multicast formally adds which property on top of reliable multicast?
 
 *** Usage: State machine replication \cite{Schneider:1990:StateMachines} 
 
@@ -432,6 +472,14 @@ def Receive(m, seqnr):
   - Suppose delivery of message r1 causes message r2 to be originated
   - At a third node, it would be confusing to see message r2 before r1
     - Causality apparently reversed 
+
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Why can physical timestamps NOT be used to determine causal ordering in a distributed system?
 
 *** Preserve causality \textendash{} example 
 
@@ -1018,6 +1066,14 @@ R_1 \vee \exists e: (e_1, e) \in R_1 \wedge (e, e_2) \in R$$
 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+If L(e) < L(e') using Lamport timestamps, what can we conclude about the relationship between e and e'?
+
 *** Happened-before equals causality? 
 
 
@@ -1314,6 +1370,14 @@ LamportTime transformation of a given distributed  algorithm A to L(A)
      - VC[i] := VC[i]+1
  
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+A process receives a message with vector timestamp vt. It sets VC := max(VC, vt) then increments VC[i]. What does VC[j] represent after this update?
+
 *** Vector clocks and causal structure 
 
 - Claim: Vector clocks allow us to reconstruct the entire causal
@@ -1388,6 +1452,14 @@ Vector clocks represent the entire /cone/ of previous events
    - Based on vector clocks 
    - UDP/IP-based, IP multicast used if possible, but usually has to
      fall back on repeated unicasts 
+
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In CBCAST, a message from sender i with timestamp vt is held back at receiver j when which condition is violated?
 
 *** CBCAST protocol  
 
@@ -1480,6 +1552,14 @@ Update VT
 - Message semantics: specified independently of the API call, in XML
   files
   - Stacking semantics on top of each other 
+
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In JGroups, which XML protocol element enables total-order multicast by routing all messages via a coordinator?
 
 *** JGroups example configuration 
 

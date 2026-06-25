@@ -83,6 +83,13 @@
   systems, but *fault-tolerant* is established practice  
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Fault, error, failure: An alpha particle flips a bit; a subsequent read returns the wrong value; a watchdog reboots the server unnecessarily. Which event is the fault, which the error, which the failure?
 *** System metrics: dependability  
 
 **** Dependability, Zuverlässigkeit                            :B_definition:
@@ -230,6 +237,13 @@ The expected lifetime is also called the *\acf{MTTF}*
   of independent exponentially distributed RVs? 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+A data center has 10,000 disks, each with MTTF = 500,000 hours. What is the expected time to the first disk failure?
 *** Example: Disks in a data center (2) 
 
 - Let $X_i, i=1\ldots, 10000$ be the lifetime RVs (time to failure) of
@@ -290,6 +304,13 @@ $$ P(\mathrm{works}) = \frac{\mu}{\mu + \lambda} =
 \frac{\frac{1}{\lambda}}{\frac{1}{\lambda} + \frac{1}{\mu} } =
 \frac{\mathrm{MTTF}}{\mathrm{MTTF} + \mathrm{MTTR}} $$ 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+A system has MTTF = 900 h and MTTR = 100 h. What is its steady-state availability?
 *** Measuring dependability metrics 
 
 - What if you do not trust your assumptions, want to validate them? 
@@ -428,6 +449,13 @@ How to operate redundant resources?
   - Both actual and redundant resource are up and running, process all
     requests, outputs of both systems are acted upon 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Which standby category requires the redundant resource to be powered OFF and only activated (booted) when the primary fails?
 *** Abstraction level? 
 
 - Previous slide talked about /systems/
@@ -498,6 +526,13 @@ Approach: *Stochastic multiplexing*
 \pause
 Challenge: Distinguish a failed from a slow process! 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Failure detector property: after some time, a correct process is NEVER suspected by any other correct process. Is this accuracy or completeness?
 *** Failure detector, extended  
 
   - Has one of three opinions about system state:
@@ -872,6 +907,13 @@ To improve performance, use multiple servers (server farm)
   work? 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Naive LB: frontend forwards request to worker; worker replies directly to client. Why does this fail?
 *** LB solution 1: Reply via front end 
 
 - Simple solution: Worker sends back reply via front end
@@ -1122,6 +1164,13 @@ Improving on blind random choice already for $d=2$!
 \cite{DBLP:journals/siamcomp/AzarBKU99} in general,
 \cite{berenbrink2006:heavily_loaded_allocations} for heavy loads
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+For m >= n and n servers, checking d random servers and picking the least loaded gives expected max load O(log log n / log d) above optimal. Already much better for d=?
 *** Online versions? 
 
 - Scenarios so far: static
@@ -1188,6 +1237,13 @@ Improving on blind random choice already for $d=2$!
     - But how would server know that? Know about timeouts
 - Read/write ratios 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+A cache has three consistency options: (1) fixed TTL, (2) conditional GET to origin on every request, (3) server pushes updates to all caches. Which option requires the ORIGIN SERVER to take the initiative when content changes?
 *** HTTP proxy 
 
 HTTP proxies use specific terminology: 
@@ -1251,6 +1307,13 @@ selected_server = hash(key) % number_of_servers
 - What if servers are added/removed? Causes many cache misses! 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Simple hashing: server = hash(key) % N. When a 5th server is added (N: 4 -> 5), roughly what fraction of existing cached keys must migrate?
 *** Simple hashing, server added 
 
 Suppose we go from four to five servers \textendash{} which keys end up on
@@ -1444,6 +1507,13 @@ Color indicates responsible server
 [[./figures/consistentHashing/hashing.pdf]]
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In consistent hashing with N servers, when one new server is added, approximately what fraction of keys must migrate?
 *** Consistent hashing, adding server 
 
 When adding a server, most values' keys stay with the same server 

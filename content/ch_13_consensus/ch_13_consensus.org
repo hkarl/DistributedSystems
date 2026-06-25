@@ -64,6 +64,13 @@
 
 * Feasible  cases
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Which three properties must every consensus algorithm satisfy?
 *** No failures at all 
 
 - No node failures, no messages lost, all messages arrive in bounded
@@ -82,6 +89,13 @@
 - Idea: broadcast in $f+1$ rounds; there must be one round where
   everybody gets every message 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In the FloodSet algorithm: why are exactly f+1 rounds needed to tolerate f crash failures?
 *** FloodSet algorithm 
 
 - Each process stores a subset W out of the valid values V 
@@ -155,6 +169,13 @@ process. \cite{Fischer:1985:IDC:3149.214121}
   times allows to detect failing node with certainty 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What exactly does the FLP impossibility result forbid?
 *** FLP proof 
 
 - Omitted. Too complicated. \Smiley 
@@ -174,6 +195,13 @@ process. \cite{Fischer:1985:IDC:3149.214121}
   - Practical algorithm \textendash{}  RAFT \textendash{} up next (we skip PAXOS) 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Name one practical technique that allows real protocols like Raft to make progress despite the FLP result.
 *** Further consequences 
 
 - Far-reaching implication
@@ -279,6 +307,13 @@ case!
 - Any term has *at most* one leader
   - It might have none if leader election fails 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In Raft: what is a 'term', and what is its role as a logical clock?
 *** Raft basics (2)
 
 
@@ -321,6 +356,13 @@ The log:
   - *Uncommitted*: Still not confirmed  from sufficiently many other
     followers 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In Raft log replication: when is a log entry considered 'committed'?
 *** Log example 
 
 #+CAPTION: Example Raft log; colors and numbers show terms (Figure 6 from \cite{ongaro14:_in_searc_under_consen_algor_exten_version}); color and top number in boxes show term
@@ -383,6 +425,13 @@ If two entries in different logs have the same index and term, then
 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+State the Raft Log-Matching property: what two things are guaranteed if two log entries share the same (index, term)?
 *** Committing on followers 
 
 To emphasis again: All nodes apply to their FSM eventually! 
@@ -514,6 +563,13 @@ How do we know there are uncommitted entries at other nodes?
   to date as a majority of all nodes
   - Hence, it cannot miss committed (!) entries 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Why can't Raft commit entries from previous terms the moment they are stored on a majority of servers?
 *** Committing entries from previous terms 
 
 - Recall: Entries from *current* term: leader can commit once ack'ed by
@@ -592,6 +648,13 @@ too hard \cite[Section 5.4.3]{ongaro14:_in_searc_under_consen_algor_exten_versio
 \pause
 - Homework: what happens if *no* partition has majority of nodes? 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In a 5-node Raft cluster, the network partitions into groups of 3 and 2. Which group can still make progress, and why?
 *** Healing network partition 
 
 - Partition with the newest term wins
@@ -1253,6 +1316,13 @@ RAFT \cite{Ongaro:2014:SUC:2643634.2643666} (and
   - Surely no consensus with arbitrary number of compromised nodes
   - No expectations towards compromised nodes plausible 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+How many nodes are required to solve Byzantine agreement with f traitors, and why is 3f not enough?
 *** Formally 
 
 - *Agreement*: No two *nonfaulty* processes decide on different values  

@@ -123,6 +123,14 @@ properties:
 
 Sources: \cite{fox99:_harves_yield_scalab_toler_system}, \cite{brewer12:_cap} \href{https://people.eecs.berkeley.edu/~brewer/cs262b-2004/PODC-keynote.pdf}{E. Brewer, PODC keynote} 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+According to the CAP theorem, which combination is impossible in a partitioned distributed system?
+A) Available + Consistent   B) Available + Partition-tolerant   C) All three simultaneously   D) Consistent + Partition-tolerant
 *** Pacelec 
 
 A more detailed interpretation: 
@@ -137,6 +145,14 @@ A more detailed interpretation:
 - Else, there is a tradeoff between latency (L) and consistency (C)
   - Non-consistent answers can be given faster 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+PACELEC says: when there is NO partition, the trade-off is between…?
+A) Availability and Durability   B) Latency and Consistency   C) Throughput and Fault-tolerance   D) Sharding and Replication
 *** SQL/ACID  data bases? 
 
 - Conventional data bases: SQL as query language, ACID as transaction
@@ -184,6 +200,14 @@ One design choice: give up consistency!
 
 ** Eventual consistency 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What does the 'S' in BASE stand for?
+A) Scalable   B) Synchronised   C) Soft state   D) Structured
 *** Eventual consistency 
 
 In absence of updates, state will converge and system become
@@ -228,6 +252,14 @@ consistent
 - Sometimes, ACID guarantees just not necessary (think: shopping cart) 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Which of the following is NOT a typical motivation for choosing a NoSQL database over SQL?
+A) Better horizontal scalability   B) Stronger ACID guarantees   C) Schema flexibility   D) High write throughput
 *** NoSql data models: Diverse 
 
 - Key-value 
@@ -333,6 +365,14 @@ consistent
 - CAP: Typically, available and partition-tolerant
   - But you might get inconsistent answers 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Key-value stores are best described as…?
+A) A table with fixed columns and rows   B) A big hash table with no enforced schema   C) A tree of nested documents   D) A graph of nodes and edges
 *** Key-value: Dynamo 
 - Dynamo \cite{DeCandia:2007:DAH:1323293.1294281}, probably one of the
   first large-scale, high-performance key-value stores 
@@ -361,6 +401,14 @@ consistent
 - No multi-key transactions (no ACID isolation)
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In Amazon Dynamo, when a preferred replica node is unavailable, writes are sent to another node and a 'hint' is stored. This mechanism is called…?
+A) Merkle recovery   B) Hinted handoff   C) Sloppy quorum read   D) Vector clock merge
 *** Column-oriented databases 
 
 - Still notion of table, but works on columns rather than rows
@@ -400,6 +448,14 @@ consistent
   any domain where schema varies across records
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+MongoDB's default CAP position is CP. What does this mean in practice when the primary fails?
+A) Reads and writes continue without interruption   B) Writes are temporarily unavailable until a new primary is elected   C) The database switches to AP mode automatically   D) Data is lost
 *** Column-oriented databases: Cassandra \cite{Lakshman:2010:Cassandra}
 
 - *Model*: Rows identified by a *partition key*; within a row, columns
@@ -418,6 +474,14 @@ consistent
 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In Cassandra, which condition guarantees strong (linearisable) consistency?
+A) Write concern = 1   B) Read level ONE + Write level ONE   C) Read QUORUM + Write QUORUM (R + W > N)   D) ALL reads only
 *** Graph databases
 
 - *Model*: nodes (entities) and edges (relationships), both with
@@ -438,6 +502,14 @@ consistent
 
 ** Directory services 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Index-free adjacency in graph databases means…?
+A) There are no indexes at all   B) Each node directly stores pointers to its neighbours, enabling O(1) per-hop traversal   C) The graph has no edges   D) Joins are computed via a global index
 *** Special case: Directories 
 
 - Let's look at very specific data bases: directory services 
@@ -609,6 +681,14 @@ consistent
  - Usually complemented by local naming-like services 
    - E.g., to store user passwords (NIS, yellow pages, …) – see later 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+DNS uses eventual consistency. Which mechanism limits how long a resolver may cache a record?
+A) Merkle tree synchronisation   B) Time-To-Live (TTL) field in resource records   C) Gossip protocol   D) Vector clock expiry
 *** Dynamic DNS
  - Problem: More hosts than IP addresses; only temporarily assigned IP addresses 
    - How to find such hosts in DNS? Not possible to put a permanent

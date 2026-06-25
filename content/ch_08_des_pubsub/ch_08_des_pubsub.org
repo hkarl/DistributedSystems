@@ -29,6 +29,13 @@
 - But how to know whom to tell?? 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Which API style does publish/subscribe add to the basic send/receive API?
 *** Events in focus? 
 
 - Suppose there are processes that want to learn about  some
@@ -53,6 +60,13 @@
   - *Subject-based*: events with key/value-pairs as metadata
   - *Content-based*: directly look at content 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Name the THREE types of event descriptions covered in this lecture.
 *** Subscribe, publish, notify 
 
 - Interested process signals its interest in particular events
@@ -82,6 +96,13 @@ Overview paper: \cite{eugster03:faces_pubsub}
    - *Decoupling in space*: Where the matching of subscriptions and publications takes place is irrelevant 
  - Heterogeneous 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Which decoupling dimension means publishers and subscribers need not know each other's identity?
 *** No memory 
 
 - Pub/sub systems, in their strict form, do not keep memory!
@@ -92,6 +113,13 @@ Overview paper: \cite{eugster03:faces_pubsub}
   queuing 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What happens in a strict P/S system to publications that occurred BEFORE a subscription was registered?
 ** Matching 
    :PROPERTIES:
    :CUSTOM_ID: sec:ps:matching
@@ -105,6 +133,13 @@ Overview paper: \cite{eugster03:faces_pubsub}
 - Match: If the intersection of subscription and publication list of
   topics is not empty 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In topic-based P/S, a publication matches a subscription when their topic lists do what?
 *** Matching in subject-based P/S 
     :PROPERTIES:
     :CUSTOM_ID: s:ps:subject-based
@@ -154,6 +189,13 @@ Overview paper: \cite{eugster03:faces_pubsub}
   - By an arbitrary function (mapping content to True/False) 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Content-based subscriptions match on what part of a publication?
 *** Matching 
 
 - Many more variants exist
@@ -205,6 +247,13 @@ Overview paper: \cite{eugster03:faces_pubsub}
 - Scales up, but still does not deal with failures 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In the GROUP of centralised servers approach, what problem does flooding solve — and what problem does it NOT solve?
 *** Flooding 
 
 - Simplest option:
@@ -248,6 +297,13 @@ Overview paper: \cite{eugster03:faces_pubsub}
 
   - Scheme can be generalised 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+CBCB stands for — and it is an example of what broader concept?
 *** CBCB setup 
 
 - $N$ matching servers
@@ -302,6 +358,13 @@ We write $p_2 \prec p_1$
   general idea 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In CBCB, what does each routing-table entry at a node store for each neighbour?
 *** CBCB forwarding 
 
 - For each neighbour in the broadcast tree, routing function produced
@@ -427,6 +490,13 @@ print("Average temperature for zipcode '%s' was %dF" % (
   - \href{https://zguide.zeromq.org/}{Longer discussion} on
     how to scale up  and build advanced pub/sub patterns in 0mq 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+0mq pub/sub: filtering happens WHERE — and why does this matter for scalability?
 ** Redis 
    :PROPERTIES:
    :CUSTOM_ID: sec:redis

@@ -50,6 +50,13 @@ transactions
 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Which ACID property ensures a transaction's result is never rolled back once committed?
 *** Transaction properties: Isolation 
 
 - Transactions operate without effects from concurrently executing
@@ -76,6 +83,13 @@ transactions
   - Executing transactions concurrently has the same effects as /some/ serial execution of
     transactions would have 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Serializability guarantees that a concurrent execution is equivalent to WHAT?
 *** Example problem: Lost update 
 
 - Account X with initial balance 100€ 
@@ -122,6 +136,13 @@ X.set(tmp)
 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In the Lost Update example: what is the correct final balance after both transactions complete correctly?
 *** Example problem: Inconsistent retrieval  
 
 - Bank with many accounts X, Y, Z ...  -- sum of all balances?
@@ -192,6 +213,13 @@ Y.set(tmp)
 * Transactions in distributed storage
 
 ** Requirements 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Which ACID property is primarily the responsibility of the application programmer, not the database?
 *** Transaction with replicated storage
 
 - Scenario: 
@@ -268,6 +296,13 @@ monitor*) or in a distributed fashion
   - Participants wait for command from coordinator 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In 2PC, what message does the coordinator send to start the voting phase?
 *** 2PC FSM 
 
 ****                                                              :B_columns:
@@ -354,6 +389,13 @@ monitor*) or in a distributed fashion
   - Ensure that all participants behave equally 
 - Which states are critical?
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In 2PC, which participant state is CRITICAL (cannot simply abort or commit on timeout)?
 *** 2PC critical states 
 
 **** Critical coordinator states 
@@ -455,6 +497,13 @@ A commit protocol is called *blocking* when
 - Introduce additional states to delay decision making while
   collecting information 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What extra state does 3PC add between voting and commit to avoid blocking?
 *** 3PC FSM 
 
 \vskip-3ex
@@ -504,6 +553,13 @@ A commit protocol is called *blocking* when
 - Apparently, not much difference?
   - Cannot the same thing happen in ~PreCommit~ as did above?
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In 3PC, if a participant times out in PreCommit, what should it do?
 *** Critical cases for 3PC 
 
 \vskip-3ex
@@ -696,6 +752,13 @@ A commit protocol is called *blocking* when
 
 * Auxiliary algorithms 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Which commit protocol is widely used in relational databases despite its blocking risk?
 *** In addition to commit? 
 
 - A commit protocol clearly necessary for distributed transactions 
@@ -989,6 +1052,13 @@ things are said to be good for you in some abstract way. (Tanenbaum)
   - Think of a line connecting the red dots
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+A consistent cut requires that if a message's RECEIVE is in the cut, its SEND must also be in the cut. True or false?
 *** Cut without messages 
 ****                                                              :B_columns:
      :PROPERTIES:

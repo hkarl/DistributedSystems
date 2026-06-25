@@ -23,6 +23,13 @@ Recall memcached:
 - Simple scheme, but does not scale well
   - Lots of state in clients 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What is the main weakness of memcached's approach to mapping keys to servers?
 *** Key-value stores, without explicit server list 
 
 Can we build such a key-value store without explicit server list at
@@ -54,6 +61,13 @@ clients?
   of the GUID space
   - These subset may overlap, making more than one node responsible  
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In a DHT, what kind of identifier do both nodes AND stored objects share?
 *** API for DHT 
 
 **** Main API 
@@ -128,6 +142,13 @@ When a node looks for a key:
 - Forwarding hence trivial: desired key locally available, or send to
   next server 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What is the average number of forwarding hops in the strawman ring DHT with N nodes?
 *** Strawman DHT \textendash{} Visualization 
 
 
@@ -166,6 +187,13 @@ When a node looks for a key:
 - We need to make *big* progress towards the right server 
 - Idea: Cut across the ring? 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What technique does Chord use to reduce search hops below O(N)?
 *** Cutting across the ring? 
 
 For two example nodes, cross-cutting links are shown 
@@ -195,6 +223,13 @@ For two example nodes, cross-cutting links are shown
 #+BEAMER: \pause
 - In addition: keep track of local neighbors in routing table 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+For a node with GUID n using m-bit IDs, what GUID does the i-th finger entry point to?
 *** Chord property: logarithmic search 
 
 - With high probability, Chord contacts $\log N$  nodes to find node
@@ -230,6 +265,13 @@ Basic version only, details later:
 - When comparing two GUIDs, we go digit-by-digit in this hexadecimal
   representation 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In Plaxton routing, what determines which ROW of the routing table is used for forwarding?
 *** An alternative routing table 
 
 - Based on hexadecimal GUIDs, we organise the routing table in rows
@@ -428,6 +470,13 @@ Note: Variants exist
 - None of them are ideal; usually, bootstrapping via well-known
   servers is used 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What is the main practical problem with broadcast-based bootstrapping in large P2P networks?
 *** Things to note about Pastry (and similar systems)
 
  - “Closeness” between nodes only refers to the distance defined on the GUID space 
@@ -555,6 +604,13 @@ Note: Variants exist
      - Application-independent management of distributed resources 
      - Main difference to 2G: bounded number of hops to target 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Which generation of P2P systems first achieved a bounded (O(log N)) number of hops to any target?
 *** Data rate asymmetry 
 
 - Apart from robustness, second reason for file sharing systems:
@@ -587,6 +643,13 @@ Note: Variants exist
 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What piece-selection strategy does BitTorrent use to prevent pieces from becoming unavailable?
 *** Mainline DHT  
 
 - DHT as used in (many clients for) Bittorrent 
@@ -610,6 +673,13 @@ Note: Variants exist
   - List length typically limited by globally known constant 
 - Extension: don’t do XOR on individual bits, but on groups of bits 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What key property does the XOR metric in Kademlia have that the Chord clockwise metric does NOT?
 *** \href{https://github.com/savoirfairelinux/opendht}{OpenDHT} 
 
 Kademlia-based , nice interface 

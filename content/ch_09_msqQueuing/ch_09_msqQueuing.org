@@ -47,6 +47,13 @@ loose coupling
 - *In identity*: Same 
 - *In space*: Same 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Which dimension of loose coupling does message queuing improve most over pub/sub?
 *** Multiple receivers for one queue? 
 
  - Messages typically go to exactly one receiver (out of those subscribing to topic)!
@@ -64,6 +71,13 @@ loose coupling
     and delivery failure
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What is a dead-letter queue used for?
 *** Usage areas
 
 Often used to 
@@ -170,6 +184,13 @@ Often used to
   - Similar between broker and receiver 
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+When should a broker send an ACK to achieve exactly-once delivery without failures?
 *** Exactly-once, with failures? 
 
 - When can broker send ACK? Assuming it could fail?
@@ -205,6 +226,13 @@ queuing context with stable storage.
 
 ** Protocol: AMQP 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What does 'five nines' reliability mean in practice for exactly-once delivery?
 *** A standardized protocol between brokers 
 
 - \ac{AMQP}  (http://www.amqp.org/)
@@ -282,6 +310,13 @@ queuing context with stable storage.
     ACID properties)  
 - Security layer 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What delivery guarantees does AMQP's transport layer support between nodes?
 *** AMQP issues 
 
 Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
@@ -781,6 +816,13 @@ Topics are divided into 1 or more *partitions*
 [[./figures/kafka.pdf]]
 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In Kafka, a record in a topic is delivered to how many consumers in each consumer group?
 *** Consumer groups:  Spectrum 
 
 - Nicely gives spectrum between broadcasting and load balancing
@@ -817,6 +859,13 @@ Topics are divided into 1 or more *partitions*
 #+BEAMER: \pause
 - What does that mean for consumer groups? 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+Within which scope does Kafka guarantee total message order?
 *** Partitions and fault tolerance
 
 - A partition can be *replicated* across multiple servers to provide
@@ -1012,6 +1061,13 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
     - Failure between consuming and writing might lead new consumer to
       consume some messages twice \textendash{} /at least once/ 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+If a Kafka consumer writes its offset AFTER consuming a message and then crashes, what delivery semantic results?
 *** Guarantees between consumers? (2) 
 
 - Exactly once?
@@ -1097,6 +1153,13 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
 - Alternative: \href{https://pulsar.apache.org}{Pulsar}
   claims to outpace  Kafka 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+What is a typical single-node Kafka throughput on commodity server hardware?
 *** Comparison  
 
 - Message queueing systems abound, but differ in detailed semantics
@@ -1303,6 +1366,13 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
   - Wait for votes 
 - Confirmed leader if majority of other nodes agrees 
 
+
+**** PINGO!                                                       :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+\pause
+In Raft leader election, what happens when no candidate wins a majority of votes?
 *** Dealing with conflicts 
 
 - Each leader has a *term number*

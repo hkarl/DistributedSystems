@@ -79,6 +79,18 @@ GET requests can refer to a static web page (simply delivered by the server) or 
  - Example GET: \url{http://somewhere.net/some/path/somewhere?key=somekey&param1=xyz&param2=abc}
  - Compare \url{https://www.rfc-editor.org/rfc/rfc9110#section-9.3.1}
 
+\pause
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+     Quiz: A user requests a URL like /news?id=42 and the server
+     queries a database to build the page. Is this static or dynamic
+     content?
+
+
 *** Requests and state 
  - Convention: GET does not alter state of resource 
  - POST requests refer to a program execution
@@ -87,6 +99,16 @@ GET requests can refer to a static web page (simply delivered by the server) or 
    - Parameters usually depend on user input 
    - Typically, POST will alter state 
    - Output of the program is delivered back to the client and rendered as the page
+
+
+\pause
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+     Quiz: By HTTP convention — does GET alter server state? Does POST?
 
 *** POST and parameters 
 
@@ -851,6 +873,16 @@ class article_detail(TemplateView):
     - Generalizes to other languages as well
     - Include management for many instances (so-called Emperor) 
 
+
+\pause
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+     Quiz: What problem does WSGI solve between a web server (Nginx) and a Python web framework (Django/Flask)?
+
 *** Example setup: django, nginx, uwsgi  
 
 Ingredients 
@@ -956,8 +988,20 @@ By design, HTTP is stateless
  - Malicious cookie theft, inconsistencies between server/browser,
    ... 
 
-** Outlook 
 
+
+
+\pause
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+     Quiz: HTTP is stateless. How does a server remember a logged-in user across multiple requests?
+
+
+** Outlook 
 
 *** How to pick the right stack 
 
@@ -1117,6 +1161,15 @@ while (True) {
 #+END_SRC
 
 
+
+\pause
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+     Quiz: In the JavaScript event loop, can a running callback be interrupted by a higher-priority event?
 
 *** Simple callback example 
 
@@ -1295,6 +1348,15 @@ while (True) {
  #+END_SRC
 
 
+\pause
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+     Quiz: What is the primary advantage of chaining Promises with .then() over plain nested callbacks?
+
 *** Background: event loops and OS sockets 
 
 How is that implemented? 
@@ -1419,6 +1481,14 @@ async function postData(payload) {
 
 
 
+\pause
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+     Quiz: A developer calls fetch('/api/data') and expects the Promise to reject on HTTP 404. Is this correct?
 *** AJAX example: fetch API
 
 Core idea: ~fetch()~ returns a *Promise*  @@latex: \textemdash{} @@  no callback-nesting needed
@@ -1576,6 +1646,15 @@ only
 - Only clients can initiate requests; no server push functionality
 
 
+\pause
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+     Quiz: HTTP/1.1 opens multiple TCP connections to avoid head-of-line blocking. How does HTTP/2 solve this instead?
+
 *** Initial development: HTTP 2.0 / SPDY © Google
 Hence improvement goals: Efficiency, reduced user latency
 - Original proposal: SPDY protocol, (c) google
@@ -1704,6 +1783,14 @@ Compare \url{http://caniuse.com/\#feat=http3}
 - Problems: many HTTP connections, high overhead of HTTP, client needs
   to map requests to connections, polling is yucky in general 
 
+\pause
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+     Quiz: An instant-messaging app needs to push new messages to the browser immediately. Why is WebSocket preferable to HTTP polling?
 *** Alternative: One connection to deal with updates  
 
 - Enabled by WebSocket \cite{RFC6455} and accompanying
@@ -1947,6 +2034,14 @@ Core aspect: Use received JSON in template
 \pause
 - Homework: draw a sequence diagram for a CORS handshake! 
 
+\pause
+
+**** PINGO!                                                      :B_alertblock:
+     :PROPERTIES:
+     :BEAMER_env: alertblock
+     :END:
+
+     Quiz: A script from foo.com wants to call an API on bar.com. What must bar.com do to allow this cross-origin request?
 *** OAuth, OpenID 
 
 - Get/give access across web applications 
