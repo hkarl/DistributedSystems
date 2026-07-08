@@ -59,14 +59,14 @@
 - Cattle: servers are interchangeable and have no individual identity \includegraphics[height=2cm]{figures/cow.pdf}
   - Think: Containers, Pods, \dots
   - Often summarized under the *cloud native* umbrella 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Pet vs. cattle: which property best describes 'cattle' servers? A) Individually maintained and repaired. B) Interchangeable, recreated from a description when broken.
+[[pingo://pingo.coactum.de/711130/6a3d1360487dc200089886e3][The 'pet vs. cattle' metaphor for servers: which property best describes 'cattle' servers?]]
 *** Remaining chapter structure: Two worlds 
 
 - Introduce the key questions for operating a distributed system
@@ -253,6 +253,7 @@ Next couple of slides: brief highlights for these categories; more details later
   - Early examples
     \href{https://aws.amazon.com/about-aws/whats-new/2011/02/25/introducing-aws-cloudformation/}{AWS    Cloud Formation}  (2011) 
 - Hoped-for benefits: cost, speed, risk 
+\pause
 
 
 
@@ -262,8 +263,7 @@ Next couple of slides: brief highlights for these categories; more details later
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Infrastructure as Code explicitly FORBIDS one practice. Which? A) Storing config in version control. B) Interactive/manual configuration. C) Using declarative descriptions.
+[[pingo://pingo.coactum.de/711130/6a3d1360487dc200089886e8][Infrastructure as Code (IaC) explicitly FORBIDS one practice. Which one?]]
 *** Example tools
   - Terraform: obtain resources from different Cloud providers
   - Ansible / Chef / Puppet: provision software, configuration files
@@ -305,14 +305,14 @@ Infrastructure as Code explicitly FORBIDS one practice. Which? A) Storing config
     - E.g., module to drive Linux  package manager
     - E.g., module to interact with version control (git pull!) -
       continuous deployment! 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Ansible playbooks describe tasks in which format?
+[[pingo://pingo.coactum.de/711130/6a3d1360487dc200089886ed][Ansible playbooks use which format to describe tasks?]]
 *** Deployment tool example: Ansible Playbook with one play 
 
 \small 
@@ -510,14 +510,14 @@ $ terraform show
 
 
 * Orchestration 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-The Container Network Interface (CNI) is responsible for: A) Persistent storage. B) Overlay networks with isolation. C) Scheduling containers. D) Image building.
+[[pingo://pingo.coactum.de/711130/6a3d1360487dc200089886f2][The cloud-native network layer uses the Container Network Interface (CNI). What does a CNI plugin primarily do?]]
 *** Orchestration & management: Scheduling 
 
 
@@ -532,6 +532,7 @@ The Container Network Interface (CNI) is responsible for: A) Persistent storage.
   - ~Knative~  on top of Kubernetes for serverless workloads, eventing
     workloads
     - Great for stateless workloads, less so for anything else 
+\pause
 
 
 
@@ -540,8 +541,7 @@ The Container Network Interface (CNI) is responsible for: A) Persistent storage.
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Kubernetes vs. Knative: for which workload type is Knative explicitly LESS suitable?
+[[pingo://pingo.coactum.de/711130/6a3d1360487dc200089886f7][Kubernetes and Knative are both scheduling/orchestration options. For which workload type is Knative explicitly described as LESS suitable?]]
 *** Orchestration & management: Coordination, service discovery 
 
 
@@ -612,14 +612,14 @@ Kubernetes vs. Knative: for which workload type is Knative explicitly LESS suita
 
 
 * App definition 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-What distinguishes a service mesh from a service proxy? Think: where is the functionality implemented — in the app, or at the platform level?
+[[pingo://pingo.coactum.de/711130/6a3d1360487dc200089886fc][What distinguishes a service mesh from a single service proxy?]]
 *** App definition: Database 
 @@latex:   \begin{tikzpicture}[remember picture, overlay]
 \node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=5]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
@@ -677,14 +677,14 @@ What distinguishes a service mesh from a service proxy? Think: where is the func
 #+ATTR_LaTeX: :width 0.95\linewidth
 #+NAME: fig:ci_workflow
 [[./figures/ci_workflow.pdf]]
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In Continuous Integration, what happens AUTOMATICALLY when a developer pushes code?
+[[pingo://pingo.coactum.de/711130/6a3d1360487dc20008988701][In Continuous Integration (CI), what happens AUTOMATICALLY when a developer pushes code to the repository?]]
 *** Continuous integration example: \href{http://jenkins-ci.org/}{Jenkins} 
 
  - Continuous integration server written in Java, server-based
@@ -727,14 +727,14 @@ In Continuous Integration, what happens AUTOMATICALLY when a developer pushes co
   - Pull-based for production 
 \pause
 - Typical example: GitHub Actions  @@latex: \textemdash{} @@  no server to maintain, pipelines as code (~.github/workflows/~)
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In GitOps, someone manually scales the cluster with kubectl. What does the GitOps agent do?
+[[pingo://pingo.coactum.de/711130/6a3d1360487dc20008988706][In GitOps, what happens if someone manually modifies the running Kubernetes cluster (outside of Git)?]]
 *** App development: GitOps, ArgoCD  
 @@latex:   \begin{tikzpicture}[remember picture, overlay]
 \node[anchor=north east, inner sep=4pt, xshift=-5cm,yshift=-0.25cm]  at (current page.north east)  {\includegraphics[height=2.5cm, page=5]{figures/cloudnative_mindmap.pdf}};\end{tikzpicture}@@ 
@@ -775,6 +775,7 @@ In GitOps, someone manually scales the cluster with kubectl. What does the GitOp
 - Metrics, logs, traces 
 - Realized by (e.g.) Prometheus, Fluentd, Jaeger
 - Grafana for pretty dashboards on top 
+\pause
 
  
 
@@ -783,8 +784,7 @@ In GitOps, someone manually scales the cluster with kubectl. What does the GitOp
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-The three pillars of observability: what are they?
+[[pingo://pingo.coactum.de/711130/6a3d1360487dc2000898870b][What are the THREE pillars of observability as described in the CNCF landscape?]]
 *** Example from mutable infrastructure: Nagios 
 
 \href{https://www.nagios.org}{Nagios}   \pet
@@ -811,6 +811,7 @@ The three pillars of observability: what are they?
 \pause
 - Example: ~Database~ CR, with operators that spin up replicas in new
   pods, sync between them, backup data, \dots 
+\pause
 
 
 
@@ -818,8 +819,7 @@ The three pillars of observability: what are they?
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In Kubernetes, what does an Operator implement? A) A web UI. B) A reconciliation loop. C) A replacement for etcd. D) Auto-scaling on CPU only.
+[[pingo://pingo.coactum.de/711130/6a3d1360487dc20008988710][In Kubernetes, what does an Operator do?]]
 * COMMENT OLD STUFF FOLLOWS 
 
 

@@ -48,12 +48,13 @@ loose coupling
 - *In space*: Same 
 
 
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Which dimension of loose coupling does message queuing improve most over pub/sub?
+
+[[pingo://pingo.coactum.de/711130/6a3d13bc487dc20008988751][Which coupling dimension does message queuing loosen compared to pub/sub by storing messages persistently?]]
 *** Multiple receivers for one queue? 
 
  - Messages typically go to exactly one receiver (out of those subscribing to topic)!
@@ -71,13 +72,13 @@ Which dimension of loose coupling does message queuing improve most over pub/sub
     and delivery failure
 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-What is a dead-letter queue used for?
+
+[[pingo://pingo.coactum.de/711130/6a3d13bc487dc2000898875b][What is the purpose of a dead-letter queue?]]
 *** Usage areas
 
 Often used to 
@@ -185,12 +186,13 @@ Often used to
 
 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
 \pause
 When should a broker send an ACK to achieve exactly-once delivery without failures?
+
 *** Exactly-once, with failures? 
 
 - When can broker send ACK? Assuming it could fail?
@@ -227,12 +229,13 @@ queuing context with stable storage.
 ** Protocol: AMQP 
 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
 \pause
 What does 'five nines' reliability mean in practice for exactly-once delivery?
+
 *** A standardized protocol between brokers 
 
 - \ac{AMQP}  (http://www.amqp.org/)
@@ -310,13 +313,14 @@ What does 'five nines' reliability mean in practice for exactly-once delivery?
     ACID properties)  
 - Security layer 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-What delivery guarantees does AMQP's transport layer support between nodes?
+
+[[pingo://pingo.coactum.de/711130/6a3d13bc487dc20008988760][AMQP 1.0 is best characterised as:]]
+
 *** AMQP issues 
 
 Compare, e.g., \cite{Hintjens:2008:WhatiswrongwithAMQP}
@@ -816,13 +820,13 @@ Topics are divided into 1 or more *partitions*
 [[./figures/kafka.pdf]]
 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In Kafka, a record in a topic is delivered to how many consumers in each consumer group?
+
+[[pingo://pingo.coactum.de/711130/6a3d13bc487dc2000898876f][Kafka consumer groups allow which two extremes of a delivery spectrum?]]
 *** Consumer groups:  Spectrum 
 
 - Nicely gives spectrum between broadcasting and load balancing
@@ -860,7 +864,7 @@ In Kafka, a record in a topic is delivered to how many consumers in each consume
 - What does that mean for consumer groups? 
 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
@@ -1061,13 +1065,13 @@ Topic:my-replicated-topic   PartitionCount:1    ReplicationFactor:3 Configs:
     - Failure between consuming and writing might lead new consumer to
       consume some messages twice \textendash{} /at least once/ 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-If a Kafka consumer writes its offset AFTER consuming a message and then crashes, what delivery semantic results?
+
+[[pingo://pingo.coactum.de/711130/6a3d13bc487dc20008988765][In the at-most-once delivery strategy, the consumer writes its offset to the log BEFORE consuming the message. What is the consequence of a consumer crash between writing the offset and consuming?]]
 *** Guarantees between consumers? (2) 
 
 - Exactly once?
@@ -1154,7 +1158,7 @@ If a Kafka consumer writes its offset AFTER consuming a message and then crashes
   claims to outpace  Kafka 
 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
@@ -1367,7 +1371,7 @@ What is a typical single-node Kafka throughput on commodity server hardware?
 - Confirmed leader if majority of other nodes agrees 
 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:

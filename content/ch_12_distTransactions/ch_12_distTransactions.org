@@ -51,7 +51,7 @@ transactions
 
 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
@@ -83,13 +83,13 @@ Which ACID property ensures a transaction's result is never rolled back once com
   - Executing transactions concurrently has the same effects as /some/ serial execution of
     transactions would have 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Serializability guarantees that a concurrent execution is equivalent to WHAT?
+
+[[pingo://pingo.coactum.de/711130/6a3d13e9c45be900088a06d3][Serializability means that the concurrent execution of transactions produces the same result as:]]
 *** Example problem: Lost update 
 
 - Account X with initial balance 100€ 
@@ -137,7 +137,7 @@ X.set(tmp)
 
 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
@@ -214,12 +214,13 @@ Y.set(tmp)
 
 ** Requirements 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
 \pause
 Which ACID property is primarily the responsibility of the application programmer, not the database?
+
 *** Transaction with replicated storage
 
 - Scenario: 
@@ -296,13 +297,13 @@ monitor*) or in a distributed fashion
   - Participants wait for command from coordinator 
 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In 2PC, what message does the coordinator send to start the voting phase?
+
+[[pingo://pingo.coactum.de/711130/6a3d13e9c45be900088a06dd][In 2PC, what happens when the coordinator crashes after sending VOTE-REQUEST but before receiving all votes?]]
 *** 2PC FSM 
 
 ****                                                              :B_columns:
@@ -389,13 +390,13 @@ In 2PC, what message does the coordinator send to start the voting phase?
   - Ensure that all participants behave equally 
 - Which states are critical?
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In 2PC, which participant state is CRITICAL (cannot simply abort or commit on timeout)?
+
+[[pingo://pingo.coactum.de/711130/6a3d13e9c45be900088a06e2][In 2PC, a participant that has voted VOTE-COMMIT but not yet received a decision is in which state?]]
 *** 2PC critical states 
 
 **** Critical coordinator states 
@@ -497,13 +498,13 @@ A commit protocol is called *blocking* when
 - Introduce additional states to delay decision making while
   collecting information 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-What extra state does 3PC add between voting and commit to avoid blocking?
+
+[[pingo://pingo.coactum.de/711130/6a3d13e9c45be900088a06ec][Which additional message phase does 3PC introduce compared to 2PC to avoid blocking?]]
 *** 3PC FSM 
 
 \vskip-3ex
@@ -553,13 +554,13 @@ What extra state does 3PC add between voting and commit to avoid blocking?
 - Apparently, not much difference?
   - Cannot the same thing happen in ~PreCommit~ as did above?
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In 3PC, if a participant times out in PreCommit, what should it do?
+
+[[pingo://pingo.coactum.de/711130/6a3d13e9c45be900088a06f1][In 3PC, if a participant times out while in the PreCommit state, it should:]]
 *** Critical cases for 3PC 
 
 \vskip-3ex
@@ -750,15 +751,17 @@ In 3PC, if a participant times out in PreCommit, what should it do?
 
 
 
-* Auxiliary algorithms 
-
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Which commit protocol is widely used in relational databases despite its blocking risk?
+
+[[pingo://pingo.coactum.de/711130/6a3d13e9c45be900088a06e7][Why is 2PC called a 'blocking' protocol?]]
+
+
+* Auxiliary algorithms 
+
 *** In addition to commit? 
 
 - A commit protocol clearly necessary for distributed transactions 
@@ -1050,6 +1053,7 @@ things are said to be good for you in some abstract way. (Tanenbaum)
   - Red dots in following  figures 
 - A so-called *cut*
   - Think of a line connecting the red dots
+\pause
 
 
 
@@ -1057,8 +1061,7 @@ things are said to be good for you in some abstract way. (Tanenbaum)
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-A consistent cut requires that if a message's RECEIVE is in the cut, its SEND must also be in the cut. True or false?
+[[pingo://pingo.coactum.de/711130/6a3d13e9c45be900088a06fb][The Chandy-Lamport distributed snapshot algorithm uses 'marker' messages primarily to:]]
 *** Cut without messages 
 ****                                                              :B_columns:
      :PROPERTIES:

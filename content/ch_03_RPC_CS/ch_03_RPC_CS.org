@@ -89,6 +89,7 @@ Allow procedure calls across address spaces
   - Pretends to be calling function
   - Often, in infinite loop
 - Stub and skeleton together realize data transport 
+\pause
 
 
 **** PINGO!                                                      :B_alertblock:
@@ -96,8 +97,7 @@ Allow procedure calls across address spaces
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: In RPC, what does the client-side stub do? Who does it pretend to be?
+     [[pingo://pingo.coactum.de/711130/6a3cde84b7fc6d00079cd785][In RPC, what is the role of the client-side *stub*?]]
 *** RPC by proxy 
 
 
@@ -153,6 +153,7 @@ void f(int *x, int *y) {
 
 f(&a, &a);
 #+END_SRC
+\pause
 
 
 **** PINGO!                                                      :B_alertblock:
@@ -160,8 +161,7 @@ f(&a, &a);
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: RPC uses copy-and-restore for reference parameters. Is this always equivalent to call-by-reference? Think of f(&a, &a).
+     [[pingo://pingo.coactum.de/711130/6a3cde84b7fc6d00079cd78a][RPC uses copy-and-restore semantics for reference parameters. Is this equivalent to call-by-reference?]]
 *** RPC Interface Definition Languages 
 
 - Need: describe interface of functions to be called more explicitly
@@ -204,6 +204,7 @@ What if things go wrong?
   - Maybe executed?
   - At least once?
   - At most once? 
+\pause
 
 
 **** PINGO!                                                      :B_alertblock:
@@ -211,8 +212,7 @@ What if things go wrong?
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: Local calls execute exactly once. Why can RPC not guarantee exactly-once semantics?
+     [[pingo://pingo.coactum.de/711130/6a3cde84b7fc6d00079cd78f][A local procedure call executes exactly once. Why can RPC not guarantee exactly-once semantics?]]
 *** Source of failures
 
 Communication: 
@@ -316,6 +316,7 @@ Crashes:
 #+ATTR_LaTeX: :height 0.6\textheight :options page=3
 #+NAME: fig:rpc_rrp_noerrors_2
 [[./figures/rpc_rrp.pdf]] 
+\pause
 
 
 
@@ -324,8 +325,7 @@ Crashes:
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: When a lost RPC reply triggers a retransmission, under what condition can the server just recompute the result instead of using a reply cache?
+     [[pingo://pingo.coactum.de/711130/6a3cde84b7fc6d00079cd794][A lost RPC reply looks identical to a lost request, so the client retransmits. When can the server simply recompute and resend the result without keeping a reply cache?]]
 *** RPC request/reply: reply lost
 
 ****                                                              :B_columns:
@@ -791,6 +791,7 @@ message HelloReply {
   string message = 1;
 }  
 #+end_src
+\pause
 
 
 
@@ -800,8 +801,7 @@ message HelloReply {
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: gRPC uses .proto files and protoc. What does the compiler generate from those files?
+     [[pingo://pingo.coactum.de/711130/6a3cde84b7fc6d00079cd7ad][gRPC defines services and messages in .proto files. What does the protoc compiler generate from these files?]]
 *** gRPC vs. zerorpc 
 
 - Zerorpc: simpler, smaller learning curve, non-standard 
@@ -982,6 +982,7 @@ It [Web Service] has an interface described in a machine-processable format (spe
   - Resource representations contain enough information to discover
     further resources  
   - Client has no hard-coded information about structure or dynamics of the REST service 
+\pause
 
 
 
@@ -991,8 +992,7 @@ It [Web Service] has an interface described in a machine-processable format (spe
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: What is the KEY architectural property that distinguishes REST from generic web services?
+     [[pingo://pingo.coactum.de/711130/6a3cde84b7fc6d00079cd799][Which architectural property is the KEY distinguishing constraint of REST compared to generic web services?]]
 *** Representations contain information to discover resources??
 
 - What does that mean? 
@@ -1063,6 +1063,7 @@ From \cite{RESTRepresen19:online}
     individual in this collection (POST)  
   - http://paul.upb.de/classes/175/  : gives details on class 175
     (GET), creates new one or update existing one (PUT)  
+\pause
 
 
 
@@ -1073,8 +1074,7 @@ From \cite{RESTRepresen19:online}
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: Which URL and method pattern is most RESTful: /books/list + /books/add, or GET /books/ + POST /books/ + DELETE /books/42/?
+     [[pingo://pingo.coactum.de/711130/6a3cde84b7fc6d00079cd79e][Which URL and method pattern is most RESTful for a book collection API?]]
 *** RESTful: URL patterns practically 
 
 - In principle, nice idea 
@@ -1294,6 +1294,7 @@ But:  No DELETE, PUT,  ... supported!
     knowing who will pick their emitted events
     - Usually, asynchronous event transport \pause
     - We talk about *event routing* in later chapters 
+\pause
 
 
 **** PINGO!                                                      :B_alertblock:
@@ -1301,8 +1302,7 @@ But:  No DELETE, PUT,  ... supported!
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: What is the difference between orchestration and choreography in microservices?
+     [[pingo://pingo.coactum.de/711130/6a3cde84b7fc6d00079cd7a3][In a microservices architecture, what is the key difference between orchestration and choreography?]]
 *** TODO Choreography: specifying event routing
 
 - Publisher declares *what happened* (event type + schema)
@@ -1402,6 +1402,7 @@ But:  No DELETE, PUT,  ... supported!
 #+ATTR_LaTeX: :width=0.8\textwidth :options keepaspectratio,page=3
 #+NAME: fig:ms_scaling
 [[./figures/orch_choreo.pdf]]
+\pause
 
 
 
@@ -1411,8 +1412,7 @@ But:  No DELETE, PUT,  ... supported!
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: A slow microservice is struggling. What does 'scale out' mean, and what new challenge does it introduce?
+     [[pingo://pingo.coactum.de/711130/6a3cde84b7fc6d00079cd7a8][An image-processing microservice is overwhelmed with requests. You choose to scale out rather than scale up. What does this mean and what challenge does it introduce?]]
 *** Discovering instances 
 
 - Suppose microservices are scaled out/in
@@ -1468,6 +1468,7 @@ But:  No DELETE, PUT,  ... supported!
 #+BEAMER: \pause
 - Coupling of these services/systems happens typically via \ac{DES}
   (Chapter \ref{ch:pubsub}) or Message Queuing (Chapter \ref{ch:mq})
+\pause
 
 
 
@@ -1476,8 +1477,7 @@ But:  No DELETE, PUT,  ... supported!
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: Ten microservices share one central SQL database. What problem does this create, and what is the recommended remedy?
+     [[pingo://pingo.coactum.de/711130/6a3cde84b7fc6d00079cd7b2][Ten microservices all share one central SQL database. What architectural problem does this cause, and what is the recommended remedy?]]
 *** CQRS 
 
 - Observation: Simple model of CRUD data stores insufficient for

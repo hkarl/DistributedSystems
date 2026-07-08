@@ -23,13 +23,15 @@ Recall memcached:
 - Simple scheme, but does not scale well
   - Lots of state in clients 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-What is the main weakness of memcached's approach to mapping keys to servers?
+[[pingo://pingo.coactum.de/711130/6a3d1386487dc20008988716][What is the main advantage of a Distributed Hash Table (DHT) over a memcached-style key-value store with an explicit server list?]]
+
+
+
 *** Key-value stores, without explicit server list 
 
 Can we build such a key-value store without explicit server list at
@@ -62,12 +64,13 @@ clients?
   - These subset may overlap, making more than one node responsible  
 
 
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In a DHT, what kind of identifier do both nodes AND stored objects share?
+
+[[pingo://pingo.coactum.de/711130/6a3d1386487dc2000898874c][Which of the following best describes an overlay network in the context of P2P DHT systems?]]
 *** API for DHT 
 
 **** Main API 
@@ -142,13 +145,13 @@ When a node looks for a key:
 - Forwarding hence trivial: desired key locally available, or send to
   next server 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-What is the average number of forwarding hops in the strawman ring DHT with N nodes?
+
+[[pingo://pingo.coactum.de/711130/6a3d1386487dc20008988722][How many nodes does Chord contact on average to find the node responsible for a random GUID in a ring of N nodes?]]
 *** Strawman DHT \textendash{} Visualization 
 
 
@@ -188,12 +191,14 @@ What is the average number of forwarding hops in the strawman ring DHT with N no
 - Idea: Cut across the ring? 
 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
 \pause
 What technique does Chord use to reduce search hops below O(N)?
+
+
 *** Cutting across the ring? 
 
 For two example nodes, cross-cutting links are shown 
@@ -223,13 +228,13 @@ For two example nodes, cross-cutting links are shown
 #+BEAMER: \pause
 - In addition: keep track of local neighbors in routing table 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-For a node with GUID n using m-bit IDs, what GUID does the i-th finger entry point to?
+
+[[pingo://pingo.coactum.de/711130/6a3d1386487dc2000898871c][In Chord's finger table for a node with GUID n using m-bit identifiers what is the i-th finger entry pointing to?]]
 *** Chord property: logarithmic search 
 
 - With high probability, Chord contacts $\log N$  nodes to find node
@@ -266,12 +271,13 @@ Basic version only, details later:
   representation 
 
 
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In Plaxton routing, what determines which ROW of the routing table is used for forwarding?
+
+[[pingo://pingo.coactum.de/711130/6a3d1386487dc2000898872e][In Plaxton routing what determines which row of the routing table is used when forwarding a request towards destination GUID n from node v?]]
 *** An alternative routing table 
 
 - Based on hexadecimal GUIDs, we organise the routing table in rows
@@ -471,12 +477,14 @@ Note: Variants exist
   servers is used 
 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
 \pause
 What is the main practical problem with broadcast-based bootstrapping in large P2P networks?
+
+
 *** Things to note about Pastry (and similar systems)
 
  - “Closeness” between nodes only refers to the distance defined on the GUID space 
@@ -605,12 +613,14 @@ What is the main practical problem with broadcast-based bootstrapping in large P
      - Main difference to 2G: bounded number of hops to target 
 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
 \pause
 Which generation of P2P systems first achieved a bounded (O(log N)) number of hops to any target?
+
+
 *** Data rate asymmetry 
 
 - Apart from robustness, second reason for file sharing systems:
@@ -643,13 +653,13 @@ Which generation of P2P systems first achieved a bounded (O(log N)) number of ho
 
 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-What piece-selection strategy does BitTorrent use to prevent pieces from becoming unavailable?
+
+[[pingo://pingo.coactum.de/711130/6a3d1386487dc2000898873a][In BitTorrent, what strategy for selecting which piece to download next improves overall swarm availability?]]
 *** Mainline DHT  
 
 - DHT as used in (many clients for) Bittorrent 
@@ -673,13 +683,14 @@ What piece-selection strategy does BitTorrent use to prevent pieces from becomin
   - List length typically limited by globally known constant 
 - Extension: don’t do XOR on individual bits, but on groups of bits 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-What key property does the XOR metric in Kademlia have that the Chord clockwise metric does NOT?
+
+[[pingo://pingo.coactum.de/711130/6a3d1386487dc20008988746][What problem does consistent hashing with multiple virtual node IDs (tokens) solve in a DHT?]]
+
 *** \href{https://github.com/savoirfairelinux/opendht}{OpenDHT} 
 
 Kademlia-based , nice interface 

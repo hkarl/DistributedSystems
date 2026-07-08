@@ -86,7 +86,7 @@ GET requests can refer to a static web page (simply delivered by the server) or 
      :BEAMER_env: alertblock
      :END:
 
-     Quiz: A user requests a URL like /news?id=42 and the server
+     [[pingo://pingo.coactum.de/711130/6a3cd860b7fc6d00079cd73d][A user requests http://example.com/news?id=42 and the server computes the page from a database. Which statement is correct?]]
      queries a database to build the page. Is this static or dynamic
      content?
 
@@ -108,7 +108,7 @@ GET requests can refer to a static web page (simply delivered by the server) or 
      :BEAMER_env: alertblock
      :END:
 
-     Quiz: By HTTP convention — does GET alter server state? Does POST?
+     [[pingo://pingo.coactum.de/711130/6a3cd860b7fc6d00079cd738][By HTTP convention, which statement correctly describes GET vs. POST?]]
 
 *** POST and parameters 
 
@@ -881,7 +881,7 @@ class article_detail(TemplateView):
      :BEAMER_env: alertblock
      :END:
 
-     Quiz: What problem does WSGI solve between a web server (Nginx) and a Python web framework (Django/Flask)?
+     [[pingo://pingo.coactum.de/711130/6a3cd860b7fc6d00079cd742][What problem does WSGI (Web Server Gateway Interface) solve?]]
 
 *** Example setup: django, nginx, uwsgi  
 
@@ -998,7 +998,7 @@ By design, HTTP is stateless
      :BEAMER_env: alertblock
      :END:
 
-     Quiz: HTTP is stateless. How does a server remember a logged-in user across multiple requests?
+     [[pingo://pingo.coactum.de/711130/6a3cd860b7fc6d00079cd747][HTTP is stateless. What must a web application do to remember a logged-in user across multiple requests?]]
 
 
 ** Outlook 
@@ -1169,7 +1169,7 @@ while (True) {
      :BEAMER_env: alertblock
      :END:
 
-     Quiz: In the JavaScript event loop, can a running callback be interrupted by a higher-priority event?
+     [[pingo://pingo.coactum.de/711130/6a3cd860b7fc6d00079cd74c][In the JavaScript event loop model, what happens while a callback function is executing?]]
 
 *** Simple callback example 
 
@@ -1355,7 +1355,7 @@ while (True) {
      :BEAMER_env: alertblock
      :END:
 
-     Quiz: What is the primary advantage of chaining Promises with .then() over plain nested callbacks?
+     [[pingo://pingo.coactum.de/711130/6a3cd860b7fc6d00079cd756][What is the primary motivation for using JavaScript Promises instead of plain nested callbacks?]]
 
 *** Background: event loops and OS sockets 
 
@@ -1488,7 +1488,7 @@ async function postData(payload) {
      :BEAMER_env: alertblock
      :END:
 
-     Quiz: A developer calls fetch('/api/data') and expects the Promise to reject on HTTP 404. Is this correct?
+     [[pingo://pingo.coactum.de/711130/6a3cd860b7fc6d00079cd751][A developer calls fetch('/api/data') and assumes the returned Promise rejects when the server responds with HTTP 404. This assumption is:]]
 *** AJAX example: fetch API
 
 Core idea: ~fetch()~ returns a *Promise*  @@latex: \textemdash{} @@  no callback-nesting needed
@@ -1653,7 +1653,7 @@ only
      :BEAMER_env: alertblock
      :END:
 
-     Quiz: HTTP/1.1 opens multiple TCP connections to avoid head-of-line blocking. How does HTTP/2 solve this instead?
+     [[pingo://pingo.coactum.de/711130/6a3cd860b7fc6d00079cd75b][HTTP/1.1 browsers open multiple parallel TCP connections to overcome head-of-line blocking. How does HTTP/2 address this differently?]]
 
 *** Initial development: HTTP 2.0 / SPDY © Google
 Hence improvement goals: Efficiency, reduced user latency
@@ -1790,7 +1790,7 @@ Compare \url{http://caniuse.com/\#feat=http3}
      :BEAMER_env: alertblock
      :END:
 
-     Quiz: An instant-messaging app needs to push new messages to the browser immediately. Why is WebSocket preferable to HTTP polling?
+     [[pingo://pingo.coactum.de/711130/6a3cd860b7fc6d00079cd760][An instant-messaging app must show new messages as soon as they arrive. Why is WebSocket preferable to HTTP polling for this use case?]]
 *** Alternative: One connection to deal with updates  
 
 - Enabled by WebSocket \cite{RFC6455} and accompanying
@@ -2041,7 +2041,7 @@ Core aspect: Use received JSON in template
      :BEAMER_env: alertblock
      :END:
 
-     Quiz: A script from foo.com wants to call an API on bar.com. What must bar.com do to allow this cross-origin request?
+     [[pingo://pingo.coactum.de/711130/6a3cd860b7fc6d00079cd765][A script loaded from foo.com tries to fetch data from bar.com. The Same-Origin Policy normally blocks this. What must happen to allow it?]]
 *** OAuth, OpenID 
 
 - Get/give access across web applications 

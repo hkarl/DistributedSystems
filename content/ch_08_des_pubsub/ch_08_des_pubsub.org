@@ -27,6 +27,7 @@
 - But open question: When to receive?
 - Receiver might want to be told if something interesting has happened
 - But how to know whom to tell?? 
+\pause
 
 
 
@@ -34,7 +35,6 @@
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
 Which API style does publish/subscribe add to the basic send/receive API?
 *** Events in focus? 
 
@@ -59,13 +59,13 @@ Which API style does publish/subscribe add to the basic send/receive API?
     - E.g., which company?
   - *Subject-based*: events with key/value-pairs as metadata
   - *Content-based*: directly look at content 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
 Name the THREE types of event descriptions covered in this lecture.
 *** Subscribe, publish, notify 
 
@@ -95,13 +95,13 @@ Overview paper: \cite{eugster03:faces_pubsub}
    - *Decoupling in identity*: Neither publisher nor subscribers need to (or should) know their identities
    - *Decoupling in space*: Where the matching of subscriptions and publications takes place is irrelevant 
  - Heterogeneous 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
 Which decoupling dimension means publishers and subscribers need not know each other's identity?
 *** No memory 
 
@@ -111,6 +111,7 @@ Which decoupling dimension means publishers and subscribers need not know each o
 \pause
 - We cover systems that *do* keep memory in the next chapter: Message
   queuing 
+\pause
 
 
 
@@ -118,8 +119,7 @@ Which decoupling dimension means publishers and subscribers need not know each o
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-What happens in a strict P/S system to publications that occurred BEFORE a subscription was registered?
+[[pingo://pingo.coactum.de/711130/6a3d13a7b7fc6d00079cd997][A strict publish/subscribe system (with *no memory*) behaves as follows regarding late subscribers:]]
 ** Matching 
    :PROPERTIES:
    :CUSTOM_ID: sec:ps:matching
@@ -132,14 +132,14 @@ What happens in a strict P/S system to publications that occurred BEFORE a subsc
   - Publication: List of topics
 - Match: If the intersection of subscription and publication list of
   topics is not empty 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In topic-based P/S, a publication matches a subscription when their topic lists do what?
+[[pingo://pingo.coactum.de/711130/6a3d13a7b7fc6d00079cd988][In topic-based pub/sub, a publication matches a subscription when …]]
 *** Matching in subject-based P/S 
     :PROPERTIES:
     :CUSTOM_ID: s:ps:subject-based
@@ -187,6 +187,7 @@ In topic-based P/S, a publication matches a subscription when their topic lists 
 - Subscription specifies which content is relevant
   - By a regular expression
   - By an arbitrary function (mapping content to True/False) 
+\pause
 
 
 
@@ -194,8 +195,7 @@ In topic-based P/S, a publication matches a subscription when their topic lists 
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Content-based subscriptions match on what part of a publication?
+[[pingo://pingo.coactum.de/711130/6a3d13a7b7fc6d00079cd9a6][Which pub/sub variant matches publications by inspecting their *actual payload* rather than attached metadata?]]
 *** Matching 
 
 - Many more variants exist
@@ -245,6 +245,7 @@ Content-based subscriptions match on what part of a publication?
 
 #+BEAMER: \pause
 - Scales up, but still does not deal with failures 
+\pause
 
 
 
@@ -252,8 +253,7 @@ Content-based subscriptions match on what part of a publication?
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In the GROUP of centralised servers approach, what problem does flooding solve — and what problem does it NOT solve?
+[[pingo://pingo.coactum.de/711130/6a3d13a7b7fc6d00079cd9ab][In the flooding approach for distributed event routing, one type of message is flooded to all servers and the other is sent to exactly one server. What is the primary drawback?]]
 *** Flooding 
 
 - Simplest option:
@@ -296,14 +296,14 @@ In the GROUP of centralised servers approach, what problem does flooding solve �
   (\slideref{sec:ps:matching}[s:ps:subject-based:siena])
 
   - Scheme can be generalised 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-CBCB stands for — and it is an example of what broader concept?
+[[pingo://pingo.coactum.de/711130/6a3d13a7b7fc6d00079cd9a1][The CBCB broadcast layer is built on …]]
 *** CBCB setup 
 
 - $N$ matching servers
@@ -356,6 +356,7 @@ We write $p_2 \prec p_1$
   neighbours 
 - Note: There are more details necessary to make this work; just
   general idea 
+\pause
 
 
 
@@ -363,8 +364,7 @@ We write $p_2 \prec p_1$
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In CBCB, what does each routing-table entry at a node store for each neighbour?
+[[pingo://pingo.coactum.de/711130/6a3d13a7b7fc6d00079cd992][What does it mean for predicate p1 to *cover* predicate p2 in CBCB content-based routing?]]
 *** CBCB forwarding 
 
 - For each neighbour in the broadcast tree, routing function produced
@@ -489,14 +489,14 @@ print("Average temperature for zipcode '%s' was %dF" % (
   - Hard to make this scale to truly distributed, large-scale setups
   - \href{https://zguide.zeromq.org/}{Longer discussion} on
     how to scale up  and build advanced pub/sub patterns in 0mq 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-0mq pub/sub: filtering happens WHERE — and why does this matter for scalability?
+[[pingo://pingo.coactum.de/711130/6a3d13a7b7fc6d00079cd99c][In 0mq pub/sub, where does topic filtering happen?]]
 ** Redis 
    :PROPERTIES:
    :CUSTOM_ID: sec:redis

@@ -65,14 +65,14 @@
   - Underlying communication system (e.g., IP) distributed message
   - Much cheaper than multiple unicasts (e.g., Ethernet, wireless) 
   - But: Likely imperfect 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Compared to replicated unicast, IP multicast saves bandwidth mainly on which part of the network?
+[[pingo://pingo.coactum.de/711130/6a3d1396b7fc6d00079cd951][Which statement best describes IP multicast compared to replicated unicast?]]
 
 *** Imperfections in multicast 
 
@@ -152,6 +152,7 @@ At first
 #+ATTR_LaTeX: :width 0.8\linewidth :options page=1
 #+NAME: fig:mc:reliable
 [[./figures/mcast_ordering.pdf]]
+\pause
 
 
 
@@ -162,8 +163,7 @@ At first
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-UNIFORM AGREEMENT in reliable multicast means: if one process delivers m, what must happen?
+[[pingo://pingo.coactum.de/711130/6a3d1396b7fc6d00079cd956][In reliable multicast, the UNIFORM AGREEMENT property states:]]
 
 *** Reliable multicast \textendash{} formally 
 
@@ -255,6 +255,7 @@ Remember: No group changes so far!
 #+ATTR_LaTeX: :height 0.6\textheight :options page=2
 #+NAME: fig:mc:fifo
 [[./figures/mcast_ordering.pdf]]
+\pause
 
 
 
@@ -262,8 +263,7 @@ Remember: No group changes so far!
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-FIFO multicast guarantees ordering per sender. What does it say about messages from DIFFERENT senders?
+[[pingo://pingo.coactum.de/711130/6a3d1396b7fc6d00079cd95b][What is the 'holdback' technique used for in FIFO multicast?]]
 
 *** Holdback 
 
@@ -298,13 +298,13 @@ FIFO multicast guarantees ordering per sender. What does it say about messages f
  - Example: Deposit to a replicated bank account from one site, add interest from another site
  - Quite expensive in larger systems
  - Not necessarily FIFO
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
 Two senders deposit and add interest to a replicated bank account. Which ordering prevents inconsistency?
 
 *** Atomic order 
@@ -346,6 +346,7 @@ If processes p and q both TO-deliver messages m and m’, then p TO-delivers m b
 
 
 \cite{Defago:2004:McastSurvey}
+\pause
 
 
 
@@ -353,8 +354,7 @@ If processes p and q both TO-deliver messages m and m’, then p TO-delivers m b
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Total order multicast formally adds which property on top of reliable multicast?
+[[pingo://pingo.coactum.de/711130/6a3d1396b7fc6d00079cd960][What is the key difference between atomic order and total order multicast?]]
 
 *** Usage: State machine replication \cite{Schneider:1990:StateMachines} 
 
@@ -472,14 +472,14 @@ def Receive(m, seqnr):
   - Suppose delivery of message r1 causes message r2 to be originated
   - At a third node, it would be confusing to see message r2 before r1
     - Causality apparently reversed 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Why can physical timestamps NOT be used to determine causal ordering in a distributed system?
+[[pingo://pingo.coactum.de/711130/6a3d1396b7fc6d00079cd96a][Why are physical timestamps NOT suitable for implementing causal multicast?]]
 
 *** Preserve causality \textendash{} example 
 
@@ -1063,6 +1063,7 @@ closure* is the relation $R \subset E\times E$ such that
 
 $$\forall e_1, e_2: (e_1, e_2) \in R \leftrightarrow (e_1, e_2) \in
 R_1 \vee \exists e: (e_1, e) \in R_1 \wedge (e, e_2) \in R$$ 
+\pause
 
 
 
@@ -1071,8 +1072,7 @@ R_1 \vee \exists e: (e_1, e) \in R_1 \wedge (e, e_2) \in R$$
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-If L(e) < L(e') using Lamport timestamps, what can we conclude about the relationship between e and e'?
+[[pingo://pingo.coactum.de/711130/6a3d1396b7fc6d00079cd96f][A Lamport timestamp L(e) < L(e') implies which of the following?]]
 
 *** Happened-before equals causality? 
 
@@ -1368,6 +1368,7 @@ LamportTime transformation of a given distributed  algorithm A to L(A)
    - If e is a receive event it applies
      - VC := max{VC, send vector time of the message}; componentwise 
      - VC[i] := VC[i]+1
+\pause
  
 
 
@@ -1375,8 +1376,7 @@ LamportTime transformation of a given distributed  algorithm A to L(A)
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-A process receives a message with vector timestamp vt. It sets VC := max(VC, vt) then increments VC[i]. What does VC[j] represent after this update?
+[[pingo://pingo.coactum.de/711130/6a3d1396b7fc6d00079cd974][In the vector clock update rule, when process i receives a message with timestamp vt, how is the local vector clock VC updated?]]
 
 *** Vector clocks and causal structure 
 
@@ -1452,14 +1452,14 @@ Vector clocks represent the entire /cone/ of previous events
    - Based on vector clocks 
    - UDP/IP-based, IP multicast used if possible, but usually has to
      fall back on repeated unicasts 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In CBCAST, a message from sender i with timestamp vt is held back at receiver j when which condition is violated?
+[[pingo://pingo.coactum.de/711130/6a3d1396b7fc6d00079cd979][In the CBCAST protocol, a message with vector timestamp vt sent by process i is delivered at process j when:]]
 
 *** CBCAST protocol  
 
@@ -1552,14 +1552,14 @@ Update VT
 - Message semantics: specified independently of the API call, in XML
   files
   - Stacking semantics on top of each other 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In JGroups, which XML protocol element enables total-order multicast by routing all messages via a coordinator?
+[[pingo://pingo.coactum.de/711130/6a3d1396b7fc6d00079cd965][In the central sequencer approach to total-order multicast, what is the sequencer's role?]]
 
 *** JGroups example configuration 
 

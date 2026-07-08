@@ -115,6 +115,7 @@ We usually have some operations like:
     - Buffer still occupied by message; cannot be reused immediately
     - Needs separate information that buffer is cleared
     - Unusual  
+\pause
 
 
 
@@ -123,8 +124,7 @@ We usually have some operations like:
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: send(buf, dest) returns immediately without waiting for the receiver. What has the OS guaranteed at this point?
+     [[pingo://pingo.coactum.de/711130/6a3cd52a487dc200089884d3][A process calls send(buf, dest) and the call returns immediately — without waiting for the receiver to call recv. Which statement is most likely true?]]
 *** Synchronicity of operations 
 
 
@@ -139,14 +139,16 @@ We usually have some operations like:
     - Corresponding return value if no
     - Does never block process for longer time 
 
-
-**** PINGO!                                                      :B_alertblock:
+\pause
+**** Quiz!                                                      :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: A client uses non-blocking receive and busy-polls for a reply. What is the main cost compared to blocking receive?
+
+     A client uses non-blocking receive and busy-polls for a reply. What is the main cost compared to blocking receive?
+
+
 *** Synchronicity of operations: combinations 
 
 - All combinations possible
@@ -324,6 +326,7 @@ are allowed to occur
       $\rightarrow$ Timeout! 
     
 ** Faults models 
+\pause
 
 
 **** PINGO!                                                      :B_alertblock:
@@ -331,8 +334,7 @@ are allowed to occur
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: A designer assumes all messages arrive within 100 ms. Which timing model does this describe?
+     [[pingo://pingo.coactum.de/711130/6a3cd52a487dc200089884d9][A distributed system designer states: 'Any message from node A to node B arrives within 100 ms.' Which timing model does this describe?]]
 *** Fault models 
 
 - Things go wrong!
@@ -720,6 +722,7 @@ print("Received request: %s" % message)
 
 #+BEAMER: \pause
 - Different names: serialization, pack/unpack, marshalling 
+\pause
 
 
 **** PINGO!                                                      :B_alertblock:
@@ -727,8 +730,7 @@ print("Received request: %s" % message)
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: Without a neutral wire format, how many pairwise translators are needed between n programming languages?
+     [[pingo://pingo.coactum.de/711130/6a3cd52a487dc200089884de][Without a neutral wire format, how many pairwise translation functions are needed between n programming languages in the worst case?]]
 *** 0mq: Exchanging data across languages 
 
 - Uses a simple and very efficient wire format 
@@ -997,6 +999,7 @@ int main(void)
 #+ATTR_LaTeX: :width 0.95\textwidth
 #+NAME: fig:packunpack
 [[./figures/idl.pdf]]
+\pause
 
 
 
@@ -1005,8 +1008,7 @@ int main(void)
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: What does Protocol Buffers (.proto + protoc) give you that Python msgpack does NOT? (Select all that apply.)
+     [[pingo://pingo.coactum.de/711130/6a3cd52a487dc200089884e3][What does Protocol Buffers (.proto + protoc) give you that Python msgpack does NOT? Select all that apply.]]
 *** Option 2.2: Example google Protocol Buffers 
 
 - Protocol Buffers provides
@@ -1373,6 +1375,7 @@ A series of requests might be related to each other
      from which to read
      - E.g., Network File System
  - Remote editing (like Google docs or similar) 
+\pause
 
 
 **** PINGO!                                                      :B_alertblock:
@@ -1380,8 +1383,7 @@ A series of requests might be related to each other
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: A server remembers the file offset between successive read calls from the same client. Is this stateful or stateless? What happens if the server crashes?
+     [[pingo://pingo.coactum.de/711130/6a3cd52a487dc200089884e8][A client reads a 10 MB file from a server in 1 MB chunks; the server remembers the file offset between calls. Which statement is true?]]
 *** How to find server? 
 
 - Open issue: How does client know which server to talk to? 
@@ -1432,6 +1434,7 @@ A series of requests might be related to each other
 
 
 ** Request/reply  
+\pause
 
 
 **** PINGO!                                                      :B_alertblock:
@@ -1439,8 +1442,7 @@ A series of requests might be related to each other
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: Name one advantage and one disadvantage of the two-tier client/server architecture.
+     [[pingo://pingo.coactum.de/711130/6a3cd52a487dc200089884f2][Which disadvantage of the basic two-tier client/server architecture is directly identified in the lecture?]]
 *** Request/reply protocol in more detail
 
 Request/reply is seemingly trivial
@@ -1536,6 +1538,7 @@ Actions:
      - (History can be cleared by interpreting a client’s request n+1 as acknowledgement for the request n – but timeout still necessary)
 
 ** Summary 
+\pause
 
 
 **** PINGO!                                                      :B_alertblock:
@@ -1543,8 +1546,7 @@ Actions:
      :BEAMER_env: alertblock
      :END:
 
-\pause
-     Quiz: A client retransmits a bank-transfer request after a timeout. What risk arises if the server does not track processed message IDs?
+     [[pingo://pingo.coactum.de/711130/6a3cd52a487dc200089884ed][A client sends a request to transfer 100 EUR from account A to B. The server executes the transfer but the reply is lost. The client times out and retransmits. What is the risk if the server does not track processed message IDs?]]
 *** Summary: A simple two-tier model 
 
 - Client/server is a simple model to structure distributed applications

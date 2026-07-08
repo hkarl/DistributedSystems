@@ -19,7 +19,7 @@
   - Which one?
   - Scalability? Dependability? 
 
-*** The story so far
+*** The story so far (2)
 
 - What happens with these messages?
   - Trigger action?
@@ -49,12 +49,14 @@
 
 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
 \pause
 Which consistency model requires that a write is instantaneously visible to all processes?
+
+
 *** Consistency challenge: Non-commutative updates 
 
 **** $t=1$: Updates reach nearby storage 
@@ -251,7 +253,7 @@ of the /most recent/ write on x
 
   
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
@@ -376,12 +378,13 @@ First read at B already has to deliver 42.
   serializer
 
 
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In linearizability, if o1 completes before o2 starts, what must be true?
+
+[[pingo://pingo.coactum.de/711130/6a3d13cd487dc20008988784][Which statement best describes linearizability?]]
 *** Example 
 
 ***** 
@@ -458,12 +461,13 @@ appear in this sequence in the order specified by its program.
 Sequential consistency allows reorder with respect to real time 
 
 
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Two processes each perform a write; a third process observes them in opposite orders from a fourth. Which consistency model is violated?
+
+[[pingo://pingo.coactum.de/711130/6a3d13cd487dc2000898878a][How does sequential consistency differ from linearizability?]]
 *** Sequential consistency, example 
 
 
@@ -560,13 +564,13 @@ Necessary condition:
 
 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Causal consistency allows concurrent writes to be seen in different order on different machines. TRUE or FALSE?
+
+[[pingo://pingo.coactum.de/711130/6a3d13ce487dc20008988790][Under causal consistency, which operations must be seen by all processes in the same order?]]
 *** Causal consistency: Example
 
 #+CAPTION: Causally consistent example
@@ -614,12 +618,13 @@ Necessary Condition:
  - but writes *from different* processes may be seen in a *different order* by different processes.
 
 
-**** PINGO!                                                       :B_alertblock:
+**** COMMENT PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
 \pause
 FIFO consistency guarantees order of writes from a single process. Does it also guarantee order across different processes?
+
 *** FIFO consistency: Example 
 
 #+CAPTION: FIFO consistent example
@@ -1048,13 +1053,13 @@ Object o not replicated;  p at S1, *S2*, S3; q at S3, *S4*
   - Each site can easily keep track of sequence of updates 
 - Alternatives? 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-With the write-everywhere protocol, why is each site easily able to keep track of the sequence of updates?
+
+[[pingo://pingo.coactum.de/711130/6a3d13ce487dc200089887ba][In a push-based (server-initiated) update propagation protocol, what state must the server maintain that a pull-based protocol does NOT require?]]
 *** Thought experiment: Write only once? 
 
 - Possible alternative: Write only locally? 
@@ -1176,13 +1181,13 @@ With the write-everywhere protocol, why is each site easily able to keep track o
  - Note: Many different ways of forming quorums exist (e.g., along
    trees) 
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-With N=5 replicas, N_W=3, N_R=3: does this satisfy the quorum overlap condition N_R + N_W > N?
+
+[[pingo://pingo.coactum.de/711130/6a3d13ce487dc200089887a2][In a quorum-based protocol with N replicas, write quorum N_W and read quorum N_R, which condition ensures every read overlaps with every write?]]
 *** Quorum examples 
 ****                                                              :B_columns:
      :PROPERTIES:
@@ -1251,12 +1256,13 @@ With N=5 replicas, N_W=3, N_R=3: does this satisfy the quorum overlap condition 
    - But that might be a bit *too* weak?? 
 
 
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Give an everyday example of a system that provides eventual consistency.
+
+[[pingo://pingo.coactum.de/711130/6a3d13ce487dc20008988796][What does eventual consistency guarantee?]]
 *** From eventual to client-centric consistency 
  Consider a mobile user accessing an eventually consistent replicated data store 
  - Write performed in one replica; move happens; reads data back from other replica $\leadsto$ Not what was written!
@@ -1578,13 +1584,18 @@ Basic implementation idea:
 
 * CRDT
 
-
+\pause
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-A client writes at replica L1, then reads from replica L2 and sees the old value. Which client-centric guarantee is violated?
+
+[[pingo://pingo.coactum.de/711130/6a3d13ce487dc200089887a8][Which client-centric guarantee is violated when a client writes to replica A then reads from replica B and cannot see its own write?]]
+
+
+
+* Auxiliary algorithms 
+
 *** Replication without coordination? 
 
 - So far: coordination necessary to make sure that updates produce

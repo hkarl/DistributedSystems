@@ -122,14 +122,14 @@ properties:
 - Partition-tolerance 
 
 Sources: \cite{fox99:_harves_yield_scalab_toler_system}, \cite{brewer12:_cap} \href{https://people.eecs.berkeley.edu/~brewer/cs262b-2004/PODC-keynote.pdf}{E. Brewer, PODC keynote} 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-According to the CAP theorem, which combination is impossible in a partitioned distributed system?
+[[pingo://pingo.coactum.de/711130/6a3d140bb7fc6d00079cd9c0][Which property does the CAP theorem say you CANNOT simultaneously guarantee in a distributed data store?]]
 A) Available + Consistent   B) Available + Partition-tolerant   C) All three simultaneously   D) Consistent + Partition-tolerant
 *** Pacelec 
 
@@ -144,14 +144,14 @@ A more detailed interpretation:
   availability (A) and consistency (C)
 - Else, there is a tradeoff between latency (L) and consistency (C)
   - Non-consistent answers can be given faster 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-PACELEC says: when there is NO partition, the trade-off is between…?
+[[pingo://pingo.coactum.de/711130/6a3d140bb7fc6d00079cd9c5][In the PACELEC framework, what trade-off exists when there is NO partition?]]
 A) Availability and Durability   B) Latency and Consistency   C) Throughput and Fault-tolerance   D) Sharding and Replication
 *** SQL/ACID  data bases? 
 
@@ -199,14 +199,14 @@ One design choice: give up consistency!
   relation to message queueing 
 
 ** Eventual consistency 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-What does the 'S' in BASE stand for?
+[[pingo://pingo.coactum.de/711130/6a3d140bb7fc6d00079cd9ca][What does BASE stand for in the context of NoSQL databases?]]
 A) Scalable   B) Synchronised   C) Soft state   D) Structured
 *** Eventual consistency 
 
@@ -250,6 +250,7 @@ consistent
 - ... and simplified design
 - Sometimes, tables just are not the right model
 - Sometimes, ACID guarantees just not necessary (think: shopping cart) 
+\pause
 
 
 
@@ -257,7 +258,6 @@ consistent
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
 Which of the following is NOT a typical motivation for choosing a NoSQL database over SQL?
 A) Better horizontal scalability   B) Stronger ACID guarantees   C) Schema flexibility   D) High write throughput
 *** NoSql data models: Diverse 
@@ -364,13 +364,13 @@ A) Better horizontal scalability   B) Stronger ACID guarantees   C) Schema flexi
 - Possible first example: Amazon Dynamo
 - CAP: Typically, available and partition-tolerant
   - But you might get inconsistent answers 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
 Key-value stores are best described as…?
 A) A table with fixed columns and rows   B) A big hash table with no enforced schema   C) A tree of nested documents   D) A graph of nodes and edges
 *** Key-value: Dynamo 
@@ -399,6 +399,7 @@ A) A table with fixed columns and rows   B) A big hash table with no enforced sc
     via *Merkle trees* (detect diverged replicas efficiently)
 - *Membership*: gossip-based failure detection and ring view
 - No multi-key transactions (no ACID isolation)
+\pause
 
 
 
@@ -406,7 +407,6 @@ A) A table with fixed columns and rows   B) A big hash table with no enforced sc
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
 In Amazon Dynamo, when a preferred replica node is unavailable, writes are sent to another node and a 'hint' is stored. This mechanism is called…?
 A) Merkle recovery   B) Hinted handoff   C) Sloppy quorum read   D) Vector clock merge
 *** Column-oriented databases 
@@ -446,6 +446,7 @@ A) Merkle recovery   B) Hinted handoff   C) Sloppy quorum read   D) Vector clock
     concern* (how fresh a read must be) allow shifting towards AP
 - *Good for*: catalogs, user profiles, content management \textendash{}
   any domain where schema varies across records
+\pause
 
 
 
@@ -453,7 +454,6 @@ A) Merkle recovery   B) Hinted handoff   C) Sloppy quorum read   D) Vector clock
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
 MongoDB's default CAP position is CP. What does this mean in practice when the primary fails?
 A) Reads and writes continue without interruption   B) Writes are temporarily unavailable until a new primary is elected   C) The database switches to AP mode automatically   D) Data is lost
 *** Column-oriented databases: Cassandra \cite{Lakshman:2010:Cassandra}
@@ -471,6 +471,7 @@ A) Reads and writes continue without interruption   B) Writes are temporarily un
     (analogous to $R + W > N$ in Dynamo) 
 - *Good for*: time-series data, event logs, IoT telemetry \textendash{}
   append-heavy, high-throughput workloads
+\pause
 
 
 
@@ -479,8 +480,7 @@ A) Reads and writes continue without interruption   B) Writes are temporarily un
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-In Cassandra, which condition guarantees strong (linearisable) consistency?
+[[pingo://pingo.coactum.de/711130/6a3d140bb7fc6d00079cd9de][Cassandra's CAP position by default is AP (Available + Partition-tolerant). Which consistency level forces strong consistency at the cost of availability?]]
 A) Write concern = 1   B) Read level ONE + Write level ONE   C) Read QUORUM + Write QUORUM (R + W > N)   D) ALL reads only
 *** Graph databases
 
@@ -501,14 +501,14 @@ A) Write concern = 1   B) Read level ONE + Write level ONE   C) Read QUORUM + Wr
   
 
 ** Directory services 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-Index-free adjacency in graph databases means…?
+[[pingo://pingo.coactum.de/711130/6a3d140bb7fc6d00079cd9cf][Which NoSQL data model uses nodes and edges as first-class citizens, enabling O(1) per-hop traversal?]]
 A) There are no indexes at all   B) Each node directly stores pointers to its neighbours, enabling O(1) per-hop traversal   C) The graph has no edges   D) Joins are computed via a global index
 *** Special case: Directories 
 
@@ -680,14 +680,14 @@ A) There are no indexes at all   B) Each node directly stores pointers to its ne
    - No detection scheme for stale data! 
  - Usually complemented by local naming-like services 
    - E.g., to store user passwords (NIS, yellow pages, …) – see later 
+\pause
 
 
 **** PINGO!                                                       :B_alertblock:
      :PROPERTIES:
      :BEAMER_env: alertblock
      :END:
-\pause
-DNS uses eventual consistency. Which mechanism limits how long a resolver may cache a record?
+[[pingo://pingo.coactum.de/711130/6a3d140bb7fc6d00079cd9ed][In DNS, what does the Time-To-Live (TTL) field of a resource record control?]]
 A) Merkle tree synchronisation   B) Time-To-Live (TTL) field in resource records   C) Gossip protocol   D) Vector clock expiry
 *** Dynamic DNS
  - Problem: More hosts than IP addresses; only temporarily assigned IP addresses 
