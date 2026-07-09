@@ -6,9 +6,9 @@
 
 
 
-EMACS=emacs
+# EMACS=emacs
 # typical alternatives can be something like:
-# EMACS="/Applications/Emacs.app/Contents/MacOS/Emacs" 
+EMACS="/Applications/Emacs.app/Contents/MacOS/Emacs" 
 
 EMACSEXPORTPARAMS= --batch -l ../templates/emacs_init.el -f org-beamer-export-to-latex
 
