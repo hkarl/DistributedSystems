@@ -59,3 +59,15 @@
   (normal-top-level-add-subdirs-to-load-path))
 
 (require 'org-ref)
+
+(with-eval-after-load 'ol
+  (org-link-set-parameters "pingo"
+    :follow (lambda (path _) (browse-url (concat "pingo:" path)))
+    :export (lambda (path desc backend)
+              (when (eq backend 'latex)
+                (let* ((uri (replace-regexp-in-string
+                             "&" "\\\\&" (concat "pingo:" path)))
+                       (label (or desc "Start Poll")))
+                  (format "\\href{%s}{\\beamerbutton{%s}}" uri label))))))
+
+
